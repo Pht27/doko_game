@@ -173,7 +173,7 @@ A player may declare Schmeißen (forcing a redeal) if their hand meets **any** o
 Triggered when Armut is declined by all.
 
 - Play proceeds as a normal game with Sonderkarten active.
-- The player who **wins the trick containing the second ♠ Queen** is forced to choose and play a **Solo** with their remaining cards from that point on. Solo rules then apply for the remainder.
+- The player who **wins the trick containing the second ♠ Queen** is forced to choose and play a **Solo** with their remaining cards from that point on. Normal Solo rules then apply (Sonderkarten deactivated). The player may choose any configured Solo type **except** Kontrasolo and Stille Hochzeit.
 - The Armut player leads.
 
 ---
@@ -184,7 +184,8 @@ Triggered when Armut is declined by all.
 - The player announces Hochzeit and names a condition: **"first trick"**, **"first Fehl trick"**, or **"first trump trick"** (a trick is a Trumpf/Fehl trick based on the **led card**).
 - The player who wins the described trick becomes the **second Re party member**.
 - If no partner is found in the **first three tricks**, the player plays a **Stille Hochzeit** (solo) for the rest of the game.
-- Announcements are only allowed **after the party is determined**, then only on the very next card. Consecutive announcement rules apply as usual.
+- Announcements are only allowed **after the partner is found**. The window opens at that moment and closes before the **second card played after marrying**; each further announcement extends the deadline by one card, as usual.
+- If no partner is found in 3 tricks (→ Stille Hochzeit), the party was never determined and no announcements were possible.
 
 ---
 
@@ -196,7 +197,7 @@ Silent solos are not declared as reservations but revealed through play.
 - A player with both ♣ Queens may play silently (not declare Hochzeit).
 - Plays like a normal game; only the Hochzeit party knows it is effectively a solo.
 - Revealed when the second ♣ Queen is played.
-- Announcements and all normal rules apply, **except** Genschern and Gegengenschern have no effect.
+- Announcements and all normal rules apply, **except** Genscherdamen and Gegengenscherdamen are fully inert (Genschern/Gegengenschern cannot be announced, and holding both ♥ Queens does not grant passive Re status).
 - Scored as a **Solo** at the end.
 
 ### Kontrasolo [CONFIGURABLE]
@@ -216,7 +217,7 @@ Silent solos are not declared as reservations but revealed through play.
 
 ## Soli [CONFIGURABLE per type]
 
-In **all Soli**: Sonderkarten and Extrapunkte are deactivated — **except in Stille Soli** (Stille Hochzeit, Kontrasolo), where Sonderkarten remain active. The solo player **always leads**. The solo player's points are **tripled** when recording scores. Base game value is 1, increasable by announcements.
+In **all Soli**: Sonderkarten and Extrapunkte are deactivated — **except in Stille Soli** (Stille Hochzeit, Kontrasolo), where both Sonderkarten and Extrapunkte remain active. The solo player **always leads**. The solo player's points are **tripled** when recording scores. Base game value is 1, increasable by announcements.
 
 Color order (canonical): ♣ > ♠ > ♥ > ♦.
 
@@ -251,7 +252,7 @@ Four variants: ♣, ♠, ♥, ♦ Solo.
 
 ### Schlanker Martin [CONFIGURABLE]
 - Normal game rules, but no Sonderkarten and no Extrapunkte.
-- **Tie-breaking reversed**: second identical card beats the first — **except** for Dullen (♥ 10), except in the last trick (where Dulle rule is reversed as usual).
+- **Tie-breaking reversed**: second identical card beats the first — including Dullen (♥ 10); the configured Dulle rule and last-trick exception do **not** apply.
 - Goal: **fewest tricks** for the solo player.
 - Draw: if the solo player ties for fewest tricks with another player, the game is worth **0 points**.
 - No announcements.
@@ -309,7 +310,7 @@ Examples:
 
 ## Sonderkarten (Special Cards) [CONFIGURABLE — all off in Armut and all Soli]
 
-All Sonderkarten are **deactivated in Soli and Armut** — **except in Stille Soli** (Stille Hochzeit, Kontrasolo), where Sonderkarten remain active. Each is individually configurable.
+All Sonderkarten are **deactivated in Soli and Armut** — **except in Stille Soli** (Stille Hochzeit, Kontrasolo), where both Sonderkarten and Extrapunkte remain active. Each is individually configurable.
 
 ### Schweinchen [CONFIGURABLE]
 - Condition: a player holds **both ♦ Aces**.
@@ -320,14 +321,14 @@ All Sonderkarten are **deactivated in Soli and Armut** — **except in Stille So
 ### Superschweinchen [CONFIGURABLE]
 - Requires Schweinchen to be active (either announced or second ♦ Ace played).
 - Condition: a player holds **both ♦ 10s** (on one hand).
-- These become **Superschweinchen**, ranking **above the Schweinchen**.
+- These become **Superschweinchen**, ranking **above the Schweinchen**. When active, the ♦ 10s are removed from their normal trump position (rank 23–24) and placed above the Schweinchen.
 - A ♦ 10 played before Schweinchen were announced can still be a Superschweinchen when the second is played.
 - If Schweinchen were not announced but a player plays the second ♦ Ace (having had both), Superschweinchen may be announced from that point.
 
 ### Hyperschweinchen [CONFIGURABLE]
 - Requires Superschweinchen to be active.
 - Condition: a player holds **both ♦ Kings** (on one hand).
-- These become **Hyperschweinchen**, ranking **above the Superschweinchen**.
+- These become **Hyperschweinchen**, ranking **above the Superschweinchen**. When active, the ♦ Kings are removed from their normal trump position (rank 21–22) and placed above the Superschweinchen.
 - Same propagation rule as Superschweinchen (one card already played still allows activation).
 
 ### Linksdrehender Gehängter [CONFIGURABLE]
@@ -378,7 +379,7 @@ All Sonderkarten are **deactivated in Soli and Armut** — **except in Stille So
 
 ## Extrapunkte (Bonus Points) [CONFIGURABLE — all off in Soli]
 
-All Extrapunkte are **deactivated in Soli**. Each is individually configurable.
+All Extrapunkte are **deactivated in Soli** — **except in Stille Soli** (Stille Hochzeit, Kontrasolo), where they remain active. Each is individually configurable.
 Extra points from both parties are **offset against each other** in the final score.
 
 ### Doppelkopf [CONFIGURABLE]
@@ -408,13 +409,15 @@ Extra points from both parties are **offset against each other** in the final sc
 - If the Fischauge belonged to the **opposing party**, the Fuchs's party gets **+1 point**.
 
 ### Festmahl [CONFIGURABLE]
-- If a trick contains **≥ 3 animals** and **at least two are the same type**, the **second animal of the majority** wins the trick.
+- If a trick contains **≥ 3 animals** and **at least two are the same type**, the **second card of the majority type** (in play order) wins the trick.
+- Festmahl only applies if Blutbad does not (Blutbad takes precedence).
 - If there are exactly **two pairs**, the **last card played** wins.
 - Animals: Fischaugen + all members of the Schweinchen family (Schweinchen, Superschweinchen, Hyperschweinchen).
 
 ### Blutbad [CONFIGURABLE]
 - If a trick contains **≥ 3 different animal types**, the **non-animal card** wins the trick.
 - If all cards in the trick are animals, the **Fischauge** wins.
+- Blutbad takes precedence over Festmahl when both conditions are met.
 - Animals: same as Festmahl.
 
 ### Klabautermann [CONFIGURABLE]
