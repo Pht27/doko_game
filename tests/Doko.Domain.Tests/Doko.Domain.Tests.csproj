@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
@@ -17,6 +17,20 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
+    <Using Include="FluentAssertions" />
+    <Using Include="Doko.Domain.Cards" />
+    <Using Include="Doko.Domain.Players" />
+    <Using Include="Doko.Domain.Hands" />
+    <Using Include="Doko.Domain.Tricks" />
+    <Using Include="Doko.Domain.Trump" />
+    <Using Include="Doko.Domain.Parties" />
+    <Using Include="Doko.Domain.Announcements" />
+    <Using Include="Doko.Domain.GameFlow" />
+    <Using Include="Doko.Domain.Scoring" />
+    <Using Include="Doko.Domain.Rules" />
+    <Using Include="Doko.Domain.Sonderkarten" />
+    <Using Include="Doko.Domain.Extrapunkte" />
+    <Using Include="Doko.Domain.Reservations" />
   </ItemGroup>
 
   <ItemGroup>
