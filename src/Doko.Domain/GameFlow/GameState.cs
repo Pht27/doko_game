@@ -48,6 +48,41 @@ public sealed class GameState
     private GameState() { }
 #pragma warning restore CS8618
 
+    /// <summary>
+    /// Creates a <see cref="GameState"/> with the given configuration. All parameters are optional
+    /// and fall back to sensible defaults so tests only need to supply what they care about.
+    /// </summary>
+    public static GameState Create(
+        RuleSet?                                 rules               = null,
+        IReadOnlyList<PlayerState>?              players             = null,
+        PlayerId                                 currentTurn         = default,
+        ITrumpEvaluator?                         trumpEvaluator      = null,
+        IPartyResolver?                          partyResolver       = null,
+        PlayDirection                            direction           = PlayDirection.Counterclockwise,
+        IReservation?                            activeReservation   = null,
+        IReadOnlyList<Trick>?                    completedTricks     = null,
+        Trick?                                   currentTrick        = null,
+        IReadOnlyList<Announcement>?             announcements       = null,
+        IReadOnlyList<SonderkarteType>?          activeSonderkarten  = null,
+        IReadOnlyDictionary<PlayerId, Hand>?     initialHands        = null,
+        GameId                                   id                  = default) => new GameState
+        {
+            Id                 = id.Value == Guid.Empty ? GameId.New() : id,
+            Phase              = GamePhase.Playing,
+            Rules              = rules              ?? RuleSet.Default(),
+            Players            = players            ?? [],
+            CurrentTurn        = currentTurn,
+            Direction          = direction,
+            ActiveReservation  = activeReservation,
+            CompletedTricks    = completedTricks    ?? [],
+            CurrentTrick       = currentTrick,
+            Announcements      = announcements      ?? [],
+            ActiveSonderkarten = activeSonderkarten ?? [],
+            TrumpEvaluator     = trumpEvaluator     ?? NormalTrumpEvaluator.Instance,
+            PartyResolver      = partyResolver      ?? NormalPartyResolver.Instance,
+            InitialHands       = initialHands,
+        };
+
     /// <summary>Determines the next player in the given play direction.</summary>
     public PlayerId NextPlayer(PlayerId current, PlayDirection direction)
     {
