@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Application.Tests", "t
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Infrastructure", "src\Doko.Infrastructure\Doko.Infrastructure.csproj", "{41A0667C-A5DD-4FA4-8BF8-F8A73C0EC3FF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Console", "src\Doko.Console\Doko.Console.csproj", "{20298E77-6A31-4D5A-85C0-FE4A1E279C3C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,18 @@ Global
 		{41A0667C-A5DD-4FA4-8BF8-F8A73C0EC3FF}.Release|x64.Build.0 = Release|Any CPU
 		{41A0667C-A5DD-4FA4-8BF8-F8A73C0EC3FF}.Release|x86.ActiveCfg = Release|Any CPU
 		{41A0667C-A5DD-4FA4-8BF8-F8A73C0EC3FF}.Release|x86.Build.0 = Release|Any CPU
+		{20298E77-6A31-4D5A-85C0-FE4A1E279C3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20298E77-6A31-4D5A-85C0-FE4A1E279C3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20298E77-6A31-4D5A-85C0-FE4A1E279C3C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{20298E77-6A31-4D5A-85C0-FE4A1E279C3C}.Debug|x64.Build.0 = Debug|Any CPU
+		{20298E77-6A31-4D5A-85C0-FE4A1E279C3C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{20298E77-6A31-4D5A-85C0-FE4A1E279C3C}.Debug|x86.Build.0 = Debug|Any CPU
+		{20298E77-6A31-4D5A-85C0-FE4A1E279C3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20298E77-6A31-4D5A-85C0-FE4A1E279C3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20298E77-6A31-4D5A-85C0-FE4A1E279C3C}.Release|x64.ActiveCfg = Release|Any CPU
+		{20298E77-6A31-4D5A-85C0-FE4A1E279C3C}.Release|x64.Build.0 = Release|Any CPU
+		{20298E77-6A31-4D5A-85C0-FE4A1E279C3C}.Release|x86.ActiveCfg = Release|Any CPU
+		{20298E77-6A31-4D5A-85C0-FE4A1E279C3C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -97,5 +111,6 @@ Global
 		{33BA240F-2AED-48E8-A3B8-D94CA31CB452} = {196828B5-7FA5-49A8-B9B6-C6C916A72567}
 		{181102C4-D09D-42A5-ADA0-5F345BE69D12} = {7569D44E-D048-4D29-9C5D-65639A42BAFF}
 		{41A0667C-A5DD-4FA4-8BF8-F8A73C0EC3FF} = {196828B5-7FA5-49A8-B9B6-C6C916A72567}
+		{20298E77-6A31-4D5A-85C0-FE4A1E279C3C} = {196828B5-7FA5-49A8-B9B6-C6C916A72567}
 	EndGlobalSection
 EndGlobal

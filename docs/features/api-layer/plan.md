@@ -1,5 +1,13 @@
 # Plan: API Layer
 
+## Status
+
+| Project | Status |
+|---------|--------|
+| `Doko.Infrastructure` | ✅ Done — `InMemoryGameRepository`, `RandomDeckShuffler`, `AddDokoInfrastructure()` |
+| `Doko.Console` | ✅ Done — full hot-seat game loop, renderer, input reader, event publisher |
+| `Doko.Api` | ⬜ Not started |
+
 ## Context
 
 Domain and Application layers are complete with 147 passing tests. The next step is to expose the game engine over HTTP so clients can play, and to provide a local console runner for testing game logic without a server. This plan introduces three new projects: `Doko.Api` (controllers, DTOs, SignalR hub, DI wiring), `Doko.Infrastructure` (in-memory repository, event publisher, deck shuffler), and `Doko.Console` (interactive terminal game).

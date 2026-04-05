@@ -89,22 +89,22 @@ public sealed class ConsoleInputReader
         }
     }
 
-    private static IReservation BuildReservation(ReservationKind kind, PlayerId playerId)
+    private static IReservation BuildReservation(ReservationPriority kind, PlayerId playerId)
         => kind switch
         {
-            ReservationKind.Hochzeit      => BuildHochzeit(playerId),
-            ReservationKind.Armut         => BuildArmut(playerId),
-            ReservationKind.Schmeissen    => new SchmeissenReservation(),
-            ReservationKind.Damensolo     => new DamensoloReservation(playerId),
-            ReservationKind.Bubensolo     => new BubensoloReservation(playerId),
-            ReservationKind.Fleischloses  => new FleischlosesReservation(playerId),
-            ReservationKind.Knochenloses  => new KnochenlosesReservation(playerId),
-            ReservationKind.SchlankerMartin => new SchlankerMartinReservation(playerId),
-            ReservationKind.KaroSolo      => new FarbsoloReservation(Suit.Karo,  playerId),
-            ReservationKind.KreuzSolo     => new FarbsoloReservation(Suit.Kreuz, playerId),
-            ReservationKind.PikSolo       => new FarbsoloReservation(Suit.Pik,   playerId),
-            ReservationKind.HerzSolo      => new FarbsoloReservation(Suit.Herz,  playerId),
-            _                             => null!,
+            ReservationPriority.Hochzeit       => BuildHochzeit(playerId),
+            ReservationPriority.Armut          => BuildArmut(playerId),
+            ReservationPriority.Schmeissen     => new SchmeissenReservation(),
+            ReservationPriority.Damensolo      => new DamensoloReservation(playerId),
+            ReservationPriority.Bubensolo      => new BubensoloReservation(playerId),
+            ReservationPriority.Fleischloses   => new FleischlosesReservation(playerId),
+            ReservationPriority.Knochenloses   => new KnochenlosesReservation(playerId),
+            ReservationPriority.SchlankerMartin => new SchlankerMartinReservation(playerId),
+            ReservationPriority.KaroSolo       => new FarbsoloReservation(Suit.Karo,  playerId),
+            ReservationPriority.KreuzSolo      => new FarbsoloReservation(Suit.Kreuz, playerId),
+            ReservationPriority.PikSolo        => new FarbsoloReservation(Suit.Pik,   playerId),
+            ReservationPriority.HerzSolo       => new FarbsoloReservation(Suit.Herz,  playerId),
+            _                                  => null!,
         };
 
     private static HochzeitReservation BuildHochzeit(PlayerId playerId)
@@ -144,20 +144,20 @@ public sealed class ConsoleInputReader
         }
     }
 
-    private static string FormatReservationKind(ReservationKind kind) => kind switch
+    private static string FormatReservationKind(ReservationPriority kind) => kind switch
     {
-        ReservationKind.Hochzeit       => "Hochzeit",
-        ReservationKind.Armut          => "Armut",
-        ReservationKind.Schmeissen     => "Schmeißen",
-        ReservationKind.Damensolo      => "Damensolo",
-        ReservationKind.Bubensolo      => "Bubensolo",
-        ReservationKind.Fleischloses   => "Fleischloses",
-        ReservationKind.Knochenloses   => "Knochenloses",
-        ReservationKind.SchlankerMartin => "Schlanker Martin",
-        ReservationKind.KaroSolo       => "Karo-Solo",
-        ReservationKind.KreuzSolo      => "Kreuz-Solo",
-        ReservationKind.PikSolo        => "Pik-Solo",
-        ReservationKind.HerzSolo       => "Herz-Solo",
-        _                              => kind.ToString(),
+        ReservationPriority.Hochzeit        => "Hochzeit",
+        ReservationPriority.Armut           => "Armut",
+        ReservationPriority.Schmeissen      => "Schmeißen",
+        ReservationPriority.Damensolo       => "Damensolo",
+        ReservationPriority.Bubensolo       => "Bubensolo",
+        ReservationPriority.Fleischloses    => "Fleischloses",
+        ReservationPriority.Knochenloses    => "Knochenloses",
+        ReservationPriority.SchlankerMartin => "Schlanker Martin",
+        ReservationPriority.KaroSolo        => "Karo-Solo",
+        ReservationPriority.KreuzSolo       => "Kreuz-Solo",
+        ReservationPriority.PikSolo         => "Pik-Solo",
+        ReservationPriority.HerzSolo        => "Herz-Solo",
+        _                                   => kind.ToString(),
     };
 }
