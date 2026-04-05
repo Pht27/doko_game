@@ -35,4 +35,11 @@ public interface ISonderkarte
     bool AreConditionsMet(GameState state);
 
     GameStateModification? Apply(GameState state);
+
+    /// <summary>
+    /// When true, the activation window for this sonderkarte closes permanently the moment
+    /// the player plays the triggering card without activating it.
+    /// When false (e.g. LinksGehangter, Kemmerich), the player may decide on any qualifying play.
+    /// </summary>
+    bool WindowClosesWhenDeclined { get; }
 }

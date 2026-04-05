@@ -74,6 +74,10 @@ public sealed class PlayCardUseCase(
             sonderkarteEvents.Add(new SonderkarteTriggeredEvent(state.Id, command.Player, sonderkarte.Type, mod));
         }
 
+        // Close activation windows for eligible-but-declined sonderkarten
+        foreach (var sonderkarte in eligible.Where(s => s.WindowClosesWhenDeclined && !activateSet.Contains(s.Type)))
+            state.Apply(new CloseActivationWindowModification(sonderkarte.Type));
+
         // Remove card from player's hand
         var newHand = playerState.Hand.Remove(card);
         state.Apply(new UpdatePlayerHandModification(command.Player, newHand));

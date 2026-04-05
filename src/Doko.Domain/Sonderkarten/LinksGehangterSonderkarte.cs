@@ -15,6 +15,8 @@ public sealed class LinksGehangterSonderkarte : SonderkarteBase
     public override SonderkarteType Type => SonderkarteType.LinksGehangter;
     public override CardType TriggeringCard => KaroBube;
 
+    public override bool WindowClosesWhenDeclined => false;
+
     public override bool AreConditionsMet(GameState state)
         => !IsActive(state, SonderkarteType.LinksGehangter)
         && OriginallyHeldBoth(state, KaroBube);

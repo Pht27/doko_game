@@ -62,3 +62,11 @@ public sealed record AddCompletedTrickModification(
 /// <summary>Appends an announcement to the game state.</summary>
 public sealed record AddAnnouncementModification(
     Announcements.Announcement Announcement) : GameStateModification;
+
+/// <summary>
+/// Marks the activation window for a sonderkarte as permanently closed.
+/// Applied when a player plays the triggering card but does not activate an eligible sonderkarte
+/// whose <c>WindowClosesWhenDeclined</c> is true.
+/// </summary>
+public sealed record CloseActivationWindowModification(
+    SonderkarteType Type) : GameStateModification;

@@ -12,14 +12,16 @@ namespace Doko.Domain.Sonderkarten;
 public sealed class SuperschweinchenSonderkarte : SonderkarteBase
 {
     private static readonly CardType KaroZehn = new(Suit.Karo, Rank.Zehn);
+    private static readonly CardType KaroAss  = new(Suit.Karo, Rank.Ass);
 
     public override SonderkarteType Type => SonderkarteType.Superschweinchen;
     public override CardType TriggeringCard => KaroZehn;
     public override ISonderkarteRankingModifier RankingModifier => SuperschweinchenModifier.Instance;
 
     public override bool AreConditionsMet(GameState state)
-        => IsActive(state, SonderkarteType.Schweinchen)
+        => (IsActive(state, SonderkarteType.Schweinchen) || BothPlayedBySamePlayer(state, KaroAss))
         && !IsActive(state, SonderkarteType.Superschweinchen)
+        && !IsWindowClosed(state, SonderkarteType.Superschweinchen)
         && OriginallyHeldBoth(state, KaroZehn);
 
     public override GameStateModification? Apply(GameState state) => null;

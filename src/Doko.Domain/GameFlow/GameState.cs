@@ -30,6 +30,12 @@ public sealed class GameState
     public IReadOnlyList<Announcement> Announcements { get; private set; }
     public IReadOnlyList<SonderkarteType> ActiveSonderkarten { get; private set; }
 
+    /// <summary>
+    /// Sonderkarten whose activation window has permanently closed: the triggering card was played
+    /// but the player chose not to activate. Checked by <see cref="ISonderkarte.AreConditionsMet"/>.
+    /// </summary>
+    public IReadOnlySet<SonderkarteType> ClosedWindows { get; private set; } = new HashSet<SonderkarteType>();
+
     public ITrumpEvaluator TrumpEvaluator { get; private set; }
     public IPartyResolver PartyResolver { get; private set; }
 
@@ -134,6 +140,10 @@ public sealed class GameState
             case ActivateSonderkarteModification m:
                 ActiveSonderkarten = ActiveSonderkarten.Append(m.Type).ToList();
                 RebuildTrumpEvaluator();
+                break;
+
+            case CloseActivationWindowModification m:
+                ClosedWindows = new HashSet<SonderkarteType>(ClosedWindows) { m.Type };
                 break;
 
             case AdvancePhaseModification m:
