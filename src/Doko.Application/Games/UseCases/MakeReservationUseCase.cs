@@ -5,6 +5,7 @@ using Doko.Application.Games.Results;
 using Doko.Domain.GameFlow;
 using Doko.Domain.GameFlow.Events;
 using Doko.Domain.Players;
+using Doko.Domain.Reservations;
 using Doko.Domain.Sonderkarten;
 
 namespace Doko.Application.Games.UseCases;
@@ -56,6 +57,16 @@ public sealed class MakeReservationUseCase(IGameRepository repository, IGameEven
             .OrderBy(kv => kv.Value!.Priority)
             .Select(kv => kv.Value)
             .FirstOrDefault();
+
+        // Schmeißen ends the game immediately — no play, no score
+        if (winner is SchmeissenReservation)
+        {
+            state.Apply(new AdvancePhaseModification(GamePhase.Geschmissen));
+            await repository.SaveAsync(state, ct);
+            await publisher.PublishAsync(state.Id, events, ct);
+            return new GameActionResult<MakeReservationResult>.Ok(
+                new MakeReservationResult(true, winner, Geschmissen: true));
+        }
 
         state.Apply(new SetGameModeModification(winner));
         state.Apply(new AdvancePhaseModification(GamePhase.Playing));
