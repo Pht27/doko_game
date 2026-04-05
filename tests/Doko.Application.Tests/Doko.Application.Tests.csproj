@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.2" />
+    <PackageReference Include="FluentAssertions" Version="8.9.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+    <Using Include="FluentAssertions" />
+    <Using Include="Doko.Application.Common" />
+    <Using Include="Doko.Application.Games.Commands" />
+    <Using Include="Doko.Application.Games.Results" />
+    <Using Include="Doko.Application.Games.Queries" />
+    <Using Include="Doko.Application.Games.UseCases" />
+    <Using Include="Doko.Domain.Cards" />
+    <Using Include="Doko.Domain.Players" />
+    <Using Include="Doko.Domain.Hands" />
+    <Using Include="Doko.Domain.Tricks" />
+    <Using Include="Doko.Domain.GameFlow" />
+    <Using Include="Doko.Domain.Parties" />
+    <Using Include="Doko.Domain.Rules" />
+    <Using Include="Doko.Domain.Sonderkarten" />
+    <Using Include="Doko.Domain.Reservations" />
+    <Using Include="Doko.Domain.Announcements" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Doko.Application\Doko.Application.csproj" />
+    <ProjectReference Include="..\..\src\Doko.Domain\Doko.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
