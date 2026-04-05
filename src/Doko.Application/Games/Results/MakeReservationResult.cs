@@ -4,4 +4,5 @@ namespace Doko.Application.Games.Results;
 
 public record MakeReservationResult(
     bool AllDeclared,
-    IReservation? WinningReservation);
+    IReservation? WinningReservation,
+    bool Geschmissen = false);
