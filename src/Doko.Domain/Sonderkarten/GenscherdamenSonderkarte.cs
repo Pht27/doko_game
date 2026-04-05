@@ -17,6 +17,7 @@ public sealed class GenscherdamenSonderkarte : SonderkarteBase
 
     public override bool AreConditionsMet(GameState state)
         => !IsActive(state, SonderkarteType.Genscherdamen)
+        && !IsWindowClosed(state, SonderkarteType.Genscherdamen)
         && OriginallyHeldBoth(state, HerzDame);
 
     public override GameStateModification? Apply(GameState state) => null;

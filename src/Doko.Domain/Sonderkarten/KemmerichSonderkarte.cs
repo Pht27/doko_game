@@ -16,6 +16,8 @@ public sealed class KemmerichSonderkarte : SonderkarteBase
     public override SonderkarteType Type => SonderkarteType.Kemmerich;
     public override CardType TriggeringCard => HerzBube;
 
+    public override bool WindowClosesWhenDeclined => false;
+
     public override bool AreConditionsMet(GameState state)
     {
         if (IsActive(state, SonderkarteType.Kemmerich)) return false;
