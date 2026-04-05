@@ -108,5 +108,6 @@ internal static class B
             announcements:      announcements,
             completedTricks:    completedTricks,
             activeSonderkarten: activeSonderkarten,
-            initialHands:       initialHands);
+            initialHands:       initialHands,
+            phase:              GamePhase.Playing);
 }

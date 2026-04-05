@@ -4,6 +4,7 @@ using Doko.Domain.Parties;
 using Doko.Domain.Players;
 using Doko.Domain.Reservations;
 using Doko.Domain.Rules;
+using Doko.Domain.Scoring;
 using Doko.Domain.Sonderkarten;
 using Doko.Domain.Tricks;
 using Doko.Domain.Trump;
@@ -40,6 +41,20 @@ public sealed class GameState
     /// </summary>
     public IReadOnlyDictionary<PlayerId, Hand>? InitialHands { get; private set; }
 
+    /// <summary>
+    /// Tracks each player's reservation declaration during the Reservations phase.
+    /// Populated by <see cref="RecordDeclarationModification"/>; null means the player has not yet declared.
+    /// </summary>
+    public IReadOnlyDictionary<PlayerId, IReservation?> ReservationDeclarations { get; private set; }
+        = new Dictionary<PlayerId, IReservation?>();
+
+    /// <summary>
+    /// Pre-computed trick results (winner + extrapunkt awards) appended at trick completion time.
+    /// Parallel to <see cref="CompletedTricks"/>; used by <c>FinishGameUseCase</c> to build
+    /// <c>CompletedGame</c> for the scorer.
+    /// </summary>
+    public IReadOnlyList<TrickResult> ScoredTricks { get; private set; } = [];
+
     /// <summary>Card-point transfers recorded by Sonderkarten (e.g. Schatz). Used during scoring.</summary>
     public IReadOnlyList<TransferCardPointsModification> CardPointTransfers => _cardPointTransfers;
     private readonly List<TransferCardPointsModification> _cardPointTransfers = new();
@@ -65,10 +80,11 @@ public sealed class GameState
         IReadOnlyList<Announcement>?             announcements       = null,
         IReadOnlyList<SonderkarteType>?          activeSonderkarten  = null,
         IReadOnlyDictionary<PlayerId, Hand>?     initialHands        = null,
+        GamePhase                                phase               = GamePhase.Dealing,
         GameId                                   id                  = default) => new GameState
         {
             Id                 = id.Value == Guid.Empty ? GameId.New() : id,
-            Phase              = GamePhase.Playing,
+            Phase              = phase,
             Rules              = rules              ?? RuleSet.Default(),
             Players            = players            ?? [],
             CurrentTurn        = currentTurn,
@@ -118,6 +134,52 @@ public sealed class GameState
             case ActivateSonderkarteModification m:
                 ActiveSonderkarten = ActiveSonderkarten.Append(m.Type).ToList();
                 RebuildTrumpEvaluator();
+                break;
+
+            case AdvancePhaseModification m:
+                Phase = m.NewPhase;
+                break;
+
+            case SetGameModeModification m:
+                ActiveReservation = m.Reservation;
+                var ctx = m.Reservation?.Apply();
+                TrumpEvaluator = ctx?.TrumpEvaluator ?? NormalTrumpEvaluator.Instance;
+                PartyResolver  = ctx?.PartyResolver  ?? NormalPartyResolver.Instance;
+                break;
+
+            case SetCurrentTurnModification m:
+                CurrentTurn = m.Player;
+                break;
+
+            case DealHandsModification m:
+                Players      = [.. Players.Select(p => p with { Hand = m.Hands[p.Id] })];
+                InitialHands = m.Hands;
+                break;
+
+            case RecordDeclarationModification m:
+                var updated = new Dictionary<PlayerId, IReservation?>(ReservationDeclarations)
+                {
+                    [m.Player] = m.Declaration,
+                };
+                ReservationDeclarations = updated;
+                break;
+
+            case UpdatePlayerHandModification m:
+                Players = [.. Players.Select(p => p.Id == m.Player ? p with { Hand = m.NewHand } : p)];
+                break;
+
+            case SetCurrentTrickModification m:
+                CurrentTrick = m.Trick;
+                break;
+
+            case AddCompletedTrickModification m:
+                CompletedTricks = [.. CompletedTricks, m.Trick];
+                ScoredTricks    = [.. ScoredTricks,    m.Result];
+                CurrentTrick    = null;
+                break;
+
+            case AddAnnouncementModification m:
+                Announcements = [.. Announcements, m.Announcement];
                 break;
 
             default:
