@@ -18,4 +18,18 @@ public record PlayerGameView(
     TrickSummary? CurrentTrick,
     IReadOnlyList<TrickSummary> CompletedTricks,
     PlayerId CurrentTurn,
-    bool IsMyTurn);
+    bool IsMyTurn)
+{
+    /// <summary>
+    /// Hand sorted for display: trump highest-to-lowest, then plain suits grouped and sorted.
+    /// Computed by <see cref="GameQueryService"/> using the current trump evaluator.
+    /// </summary>
+    public IReadOnlyList<Card> HandSorted { get; init; } = Hand;
+
+    /// <summary>
+    /// Reservation types the player is eligible to declare (during the Reservations phase).
+    /// Empty outside the Reservations phase or after the player has already declared.
+    /// "Keine Vorbehalt" (null) is always implicitly available and not listed here.
+    /// </summary>
+    public IReadOnlyList<ReservationKind> EligibleReservations { get; init; } = [];
+}

@@ -3,11 +3,13 @@ using Doko.Application.Games.Queries;
 using Doko.Domain.Announcements;
 using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
+using Doko.Domain.Hands;
+using Doko.Domain.Parties;
 using Doko.Domain.Players;
+using Doko.Domain.Reservations;
 using Doko.Domain.Rules;
 using Doko.Domain.Sonderkarten;
 using Doko.Domain.Tricks;
-using Doko.Application.Games.Queries;
 
 namespace Doko.Application.Games;
 
@@ -83,6 +85,27 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             .Select((r, i) => ToTrickSummary(i, r.Trick, r.Winner))
             .ToList();
 
+        // Hand sorted by trump (highest to lowest), then plain suits grouped by suit and sorted
+        var handSorted = hand
+            .OrderByDescending(c => state.TrumpEvaluator.IsTrump(c.Type))
+            .ThenByDescending(c => state.TrumpEvaluator.IsTrump(c.Type)
+                ? state.TrumpEvaluator.GetTrumpRank(c.Type)
+                : 0)
+            .ThenBy(c => (int)c.Type.Suit)
+            .ThenByDescending(c => state.TrumpEvaluator.IsTrump(c.Type)
+                ? 0
+                : state.TrumpEvaluator.GetPlainRank(c.Type))
+            .ToList();
+
+        // Eligible reservations during reservation phase (before this player has declared)
+        var eligibleReservations = new List<ReservationKind>();
+        if (state.Phase == GamePhase.Reservations
+            && !state.ReservationDeclarations.ContainsKey(requestingPlayer))
+        {
+            eligibleReservations = ComputeEligibleReservations(
+                requestingPlayer, playerState.Hand, state.Rules);
+        }
+
         return new PlayerGameView(
             gameId,
             state.Phase,
@@ -95,7 +118,11 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             currentTrickSummary,
             completedSummaries,
             state.CurrentTurn,
-            isMyTurn);
+            isMyTurn)
+        {
+            HandSorted = handSorted,
+            EligibleReservations = eligibleReservations,
+        };
     }
 
     private static TrickSummary ToTrickSummary(int trickNumber, Trick trick, PlayerId? winner)
@@ -104,5 +131,31 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             .Select(tc => new TrickCardSummary(tc.Player, tc.Card))
             .ToList();
         return new TrickSummary(trickNumber, cards, winner);
+    }
+
+    private static List<ReservationKind> ComputeEligibleReservations(
+        PlayerId player, Hand hand, RuleSet rules)
+    {
+        var result = new List<ReservationKind>();
+
+        // Solos — use a dummy richPlayer for Armut eligibility check (partner chosen later)
+        if (new FarbsoloReservation(Suit.Karo,  player).IsEligible(hand, rules)) result.Add(ReservationKind.KaroSolo);
+        if (new FarbsoloReservation(Suit.Kreuz, player).IsEligible(hand, rules)) result.Add(ReservationKind.KreuzSolo);
+        if (new FarbsoloReservation(Suit.Pik,   player).IsEligible(hand, rules)) result.Add(ReservationKind.PikSolo);
+        if (new FarbsoloReservation(Suit.Herz,  player).IsEligible(hand, rules)) result.Add(ReservationKind.HerzSolo);
+        if (new DamensoloReservation(player).IsEligible(hand, rules))            result.Add(ReservationKind.Damensolo);
+        if (new BubensoloReservation(player).IsEligible(hand, rules))            result.Add(ReservationKind.Bubensolo);
+        if (new FleischlosesReservation(player).IsEligible(hand, rules))         result.Add(ReservationKind.Fleischloses);
+        if (new KnochenlosesReservation(player).IsEligible(hand, rules))         result.Add(ReservationKind.Knochenloses);
+        if (new SchlankerMartinReservation(player).IsEligible(hand, rules))      result.Add(ReservationKind.SchlankerMartin);
+
+        // Other reservations (Armut uses a dummy partner; IsEligible only checks the hand)
+        var dummyPartner = new PlayerId((byte)((player.Value + 1) % 4));
+        if (new ArmutReservation(player, dummyPartner).IsEligible(hand, rules))  result.Add(ReservationKind.Armut);
+        if (new HochzeitReservation(player, HochzeitCondition.FirstTrick).IsEligible(hand, rules))
+            result.Add(ReservationKind.Hochzeit);
+        if (new SchmeissenReservation().IsEligible(hand, rules))                 result.Add(ReservationKind.Schmeissen);
+
+        return result;
     }
 }
