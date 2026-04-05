@@ -2,6 +2,7 @@ using Doko.Domain.Announcements;
 using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
 using Doko.Domain.Players;
+using Doko.Domain.Reservations;
 
 namespace Doko.Application.Games.Queries;
 
@@ -31,5 +32,5 @@ public record PlayerGameView(
     /// Empty outside the Reservations phase or after the player has already declared.
     /// "Keine Vorbehalt" (null) is always implicitly available and not listed here.
     /// </summary>
-    public IReadOnlyList<ReservationKind> EligibleReservations { get; init; } = [];
+    public IReadOnlyList<ReservationPriority> EligibleReservations { get; init; } = [];
 }
