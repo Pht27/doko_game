@@ -1,7 +1,7 @@
 # Tech Stack
 
 ## Backend
-- **Runtime**: .NET 9 (C#)
+- **Runtime**: .NET 10 (C#)
 - **Framework**: ASP.NET Core (Web API)
 - **Testing**: xUnit
 - **Architecture**: Clean Architecture (Domain / Application / Infrastructure / API layers)
