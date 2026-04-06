@@ -16,6 +16,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
+#pragma warning disable IDE0060 // unused parameter warnings for ct in simple wrappers
+
 namespace Doko.Api.Controllers;
 
 [ApiController]
@@ -24,7 +26,10 @@ namespace Doko.Api.Controllers;
 public class GamesController(
     IStartGameUseCase startGame,
     IDealCardsUseCase dealCards,
+    IDeclareHealthStatusUseCase declareHealth,
     IMakeReservationUseCase makeReservation,
+    IAcceptArmutUseCase acceptArmut,
+    IExchangeArmutCardsUseCase exchangeArmutCards,
     IPlayCardUseCase playCard,
     IMakeAnnouncementUseCase makeAnnouncement,
     IGameQueryService gameQuery,
@@ -57,6 +62,22 @@ public class GamesController(
         return result.ToActionResult(_ => Ok());
     }
 
+    [HttpPost("{gameId}/health")]
+    public async Task<IActionResult> DeclareHealth(
+        string gameId,
+        [FromBody] DeclareHealthRequest req,
+        CancellationToken ct
+    )
+    {
+        if (!Guid.TryParse(gameId, out var guid))
+            return NotFound(new ErrorResponse("game_not_found"));
+
+        var player = GetPlayerId();
+        var command = new DeclareHealthStatusCommand(new GameId(guid), player, req.HasVorbehalt);
+        var result = await declareHealth.ExecuteAsync(command, ct);
+        return result.ToActionResult(r => Ok(new DeclareHealthResponse(r.AllDeclared)));
+    }
+
     [HttpPost("{gameId}/reservations")]
     public async Task<IActionResult> MakeReservation(
         string gameId,
@@ -72,6 +93,39 @@ public class GamesController(
         var command = new MakeReservationCommand(new GameId(guid), player, reservation);
         var result = await makeReservation.ExecuteAsync(command, ct);
         return result.ToActionResult(r => Ok(DtoMapper.ToResponse(r)));
+    }
+
+    [HttpPost("{gameId}/armut-response")]
+    public async Task<IActionResult> AcceptArmut(
+        string gameId,
+        [FromBody] AcceptArmutRequest req,
+        CancellationToken ct
+    )
+    {
+        if (!Guid.TryParse(gameId, out var guid))
+            return NotFound(new ErrorResponse("game_not_found"));
+
+        var player = GetPlayerId();
+        var command = new AcceptArmutCommand(new GameId(guid), player, req.Accepts);
+        var result = await acceptArmut.ExecuteAsync(command, ct);
+        return result.ToActionResult(r => Ok(new AcceptArmutResponse(r.Accepted, r.SchwarzesSau)));
+    }
+
+    [HttpPost("{gameId}/armut-exchange")]
+    public async Task<IActionResult> ExchangeArmutCards(
+        string gameId,
+        [FromBody] ExchangeArmutCardsRequest req,
+        CancellationToken ct
+    )
+    {
+        if (!Guid.TryParse(gameId, out var guid))
+            return NotFound(new ErrorResponse("game_not_found"));
+
+        var player = GetPlayerId();
+        var cardIds = req.CardIds.Select(id => new CardId((byte)id)).ToList();
+        var command = new ExchangeArmutCardsCommand(new GameId(guid), player, cardIds);
+        var result = await exchangeArmutCards.ExecuteAsync(command, ct);
+        return result.ToActionResult(r => Ok(new ExchangeArmutCardsResponse(r.ReturnedTrumpCount)));
     }
 
     [HttpPost("{gameId}/cards")]

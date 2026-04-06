@@ -17,7 +17,10 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IStartGameUseCase, StartGameUseCase>();
         services.AddScoped<IDealCardsUseCase, DealCardsUseCase>();
+        services.AddScoped<IDeclareHealthStatusUseCase, DeclareHealthStatusUseCase>();
         services.AddScoped<IMakeReservationUseCase, MakeReservationUseCase>();
+        services.AddScoped<IAcceptArmutUseCase, AcceptArmutUseCase>();
+        services.AddScoped<IExchangeArmutCardsUseCase, ExchangeArmutCardsUseCase>();
         services.AddScoped<IPlayCardUseCase, PlayCardUseCase>();
         services.AddScoped<IMakeAnnouncementUseCase, MakeAnnouncementUseCase>();
         services.AddScoped<IGameQueryService, GameQueryService>();

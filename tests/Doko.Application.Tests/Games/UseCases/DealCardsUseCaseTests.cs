@@ -27,7 +27,7 @@ public class DealCardsUseCaseTests
         result.Should().BeOfType<GameActionResult<Unit>.Ok>();
 
         var state = await repo.GetAsync(gameId);
-        state!.Phase.Should().Be(GamePhase.Reservations);
+        state!.Phase.Should().Be(GamePhase.ReservationHealthCheck);
         state.Players.Should().AllSatisfy(p => p.Hand.Cards.Should().NotBeEmpty());
     }
 

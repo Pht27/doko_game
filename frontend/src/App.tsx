@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import { useHotSeat } from './hooks/useHotSeat';
 import { useGameState } from './hooks/useGameState';
-import { playCard, makeReservation, makeAnnouncement } from './api/game';
+import { playCard, declareHealth, makeReservation, respondToArmut, exchangeArmutCards, makeAnnouncement } from './api/game';
 import { PlayerSwitcher } from './components/PlayerSwitcher';
 import { GameInfo } from './components/GameInfo';
 import { PlayerLabel } from './components/PlayerLabel';
 import { TrickArea } from './components/TrickArea';
 import { HandDisplay } from './components/HandDisplay';
+import { HealthCheckDialog } from './components/HealthCheckDialog';
 import { ReservationDialog } from './components/ReservationDialog';
+import { ArmutPartnerDialog } from './components/ArmutPartnerDialog';
+import { ArmutCardExchangeDialog } from './components/ArmutCardExchangeDialog';
 import { SonderkarteOverlay } from './components/SonderkarteOverlay';
 import { AnnouncementButton } from './components/AnnouncementButton';
 import { ResultScreen } from './components/ResultScreen';
@@ -64,6 +67,18 @@ function App() {
     }
   }
 
+  async function handleHealthCheck(hasVorbehalt: boolean) {
+    setActionError(null);
+    try {
+      await declareHealth(token, gameId, { hasVorbehalt });
+      const next = (activePlayer + 1) % 4;
+      setActivePlayer(next);
+      refetch();
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : String(e));
+    }
+  }
+
   async function handleReservation(reservation: string | null, hochzeitCondition: string | null, armutPartner: number | null) {
     setActionError(null);
     try {
@@ -71,6 +86,28 @@ function App() {
       // Auto-advance to next player who hasn't declared yet
       const next = (activePlayer + 1) % 4;
       setActivePlayer(next);
+      refetch();
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : String(e));
+    }
+  }
+
+  async function handleArmutResponse(accepts: boolean) {
+    setActionError(null);
+    try {
+      await respondToArmut(token, gameId, { accepts });
+      const next = (activePlayer + 1) % 4;
+      setActivePlayer(next);
+      refetch();
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : String(e));
+    }
+  }
+
+  async function handleArmutExchange(cardIds: number[]) {
+    setActionError(null);
+    try {
+      await exchangeArmutCards(token, gameId, { cardIds });
       refetch();
     } catch (e) {
       setActionError(e instanceof Error ? e.message : String(e));
@@ -141,12 +178,29 @@ function App() {
             />
           ) : <div />}
 
-          {/* Center: reservation dialog during Reservations phase, trick area during Playing */}
-          {view?.phase === 'Reservations' && view.eligibleReservations.length > 0 ? (
+          {/* Center: show the right dialog for each reservation phase, or the trick area */}
+          {view?.shouldDeclareHealth ? (
+            <HealthCheckDialog
+              playerId={activePlayer}
+              onDeclare={handleHealthCheck}
+            />
+          ) : view?.eligibleReservations && view.eligibleReservations.length > 0 ? (
             <ReservationDialog
               playerId={activePlayer}
               eligibleReservations={view.eligibleReservations}
               onDeclare={handleReservation}
+            />
+          ) : view?.shouldRespondToArmut ? (
+            <ArmutPartnerDialog
+              playerId={activePlayer}
+              onRespond={handleArmutResponse}
+            />
+          ) : view?.shouldReturnArmutCards && view.armutCardReturnCount !== null ? (
+            <ArmutCardExchangeDialog
+              playerId={activePlayer}
+              hand={view.handSorted}
+              returnCount={view.armutCardReturnCount}
+              onConfirm={handleArmutExchange}
             />
           ) : (
             <TrickArea

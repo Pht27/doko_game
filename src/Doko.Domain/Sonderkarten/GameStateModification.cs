@@ -52,6 +52,30 @@ public sealed record SetCurrentTurnModification(PlayerId Player) : GameStateModi
 public sealed record DealHandsModification(IReadOnlyDictionary<PlayerId, Hand> Hands)
     : GameStateModification;
 
+/// <summary>Records one player's health declaration (Gesund/Vorbehalt) during ReservationHealthCheck.</summary>
+public sealed record RecordHealthDeclarationModification(PlayerId Player, bool HasVorbehalt)
+    : GameStateModification;
+
+/// <summary>Replaces the list of players still awaiting a response in the current reservation check phase.</summary>
+public sealed record SetPendingRespondersModification(IReadOnlyList<PlayerId> Responders)
+    : GameStateModification;
+
+/// <summary>Clears all reservation declarations (used when moving between check phases).</summary>
+public sealed record ClearReservationDeclarationsModification : GameStateModification;
+
+/// <summary>Sets the player who declared Armut.</summary>
+public sealed record SetArmutPlayerModification(PlayerId ArmutPlayer) : GameStateModification;
+
+/// <summary>Sets the rich player who accepted the Armut.</summary>
+public sealed record SetArmutRichPlayerModification(PlayerId RichPlayer) : GameStateModification;
+
+/// <summary>
+/// Transfers all trump cards from the poor player's hand to the rich player's hand and
+/// records the transfer count in <c>ArmutTransferCount</c>.
+/// </summary>
+public sealed record ArmutGiveTrumpsModification(PlayerId PoorPlayer, PlayerId RichPlayer)
+    : GameStateModification;
+
 /// <summary>Records one player's reservation declaration during the reservation phase.</summary>
 public sealed record RecordDeclarationModification(PlayerId Player, IReservation? Declaration)
     : GameStateModification;
