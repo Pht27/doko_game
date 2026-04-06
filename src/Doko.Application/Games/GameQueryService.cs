@@ -114,14 +114,23 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             && state.PendingReservationResponders.Count > 0
             && state.PendingReservationResponders[0] == requestingPlayer;
 
+        bool singleVorbehalt = state.HealthDeclarations.Count(kv => kv.Value) == 1;
+        bool mustDeclareReservation =
+            isCheckPhaseTurn
+            && state.Phase == GamePhase.ReservationSoloCheck
+            && singleVorbehalt;
+
         IReadOnlyList<ReservationPriority> eligibleReservations = [];
         if (isCheckPhaseTurn)
         {
-            bool singleVorbehalt = state.HealthDeclarations.Count(kv => kv.Value) == 1;
             eligibleReservations = state.Phase switch
             {
                 GamePhase.ReservationSoloCheck when singleVorbehalt =>
-                    ReservationRegistry.GetEligible(requestingPlayer, playerState.Hand, state.Rules),
+                    ReservationRegistry.GetEligible(
+                        requestingPlayer,
+                        playerState.Hand,
+                        state.Rules
+                    ),
                 GamePhase.ReservationSoloCheck =>
                     ReservationRegistry.GetEligibleSolos(requestingPlayer, playerState.Hand, state.Rules),
                 GamePhase.ReservationArmutCheck =>
@@ -164,6 +173,7 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             HandSorted = handSorted,
             ShouldDeclareHealth = shouldDeclareHealth,
             EligibleReservations = eligibleReservations,
+            MustDeclareReservation = mustDeclareReservation,
             ShouldRespondToArmut = shouldRespondToArmut,
             ShouldReturnArmutCards = shouldReturnArmutCards,
             ArmutCardReturnCount = armutCardReturnCount,

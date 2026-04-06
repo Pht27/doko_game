@@ -188,6 +188,7 @@ function App() {
             <ReservationDialog
               playerId={activePlayer}
               eligibleReservations={view.eligibleReservations}
+              mustDeclare={view.mustDeclareReservation}
               onDeclare={handleReservation}
             />
           ) : view?.shouldRespondToArmut ? (
