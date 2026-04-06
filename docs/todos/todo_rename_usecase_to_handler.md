@@ -1,0 +1,1 @@
+I want to rename all UseCases to Handlers, i.e. AcceptArmutHandler etc... Because that is a synonym right?
