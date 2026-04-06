@@ -37,15 +37,16 @@ public class AnnouncementRulesTests
     {
         // 1 completed trick (4) + 1 card in current trick = 5; deadline=5 → 5 >= 5 → blocked
         var completed = CompleteTrick(B.P0);
-        var current   = new Trick();
+        var current = new Trick();
         current.Add(new TrickCard(B.Card(99, Suit.Kreuz, Rank.Neun), B.P0));
 
         var state = GameState.Create(
-            rules:           RuleSet.Default(),
-            players:         B.FourPlayers(),
-            partyResolver:   B.SoloResolver(),
+            rules: RuleSet.Default(),
+            players: B.FourPlayers(),
+            partyResolver: B.SoloResolver(),
             completedTricks: [completed],
-            currentTrick:    current);
+            currentTrick: current
+        );
 
         AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Re, state).Should().BeFalse();
     }
@@ -54,18 +55,19 @@ public class AnnouncementRulesTests
     public void CanAnnounce_DeadlineShiftsWithEachAnnouncement()
     {
         // 1 announcement made: deadline = 5 + 4*1 = 9. With 5 cards played → 5 < 9 → still allowed.
-        var completed  = CompleteTrick(B.P0);
-        var current    = new Trick();
+        var completed = CompleteTrick(B.P0);
+        var current = new Trick();
         current.Add(new TrickCard(B.Card(99, Suit.Kreuz, Rank.Neun), B.P0));
 
-        var re  = B.Ann(B.P0, AnnouncementType.Re);
+        var re = B.Ann(B.P0, AnnouncementType.Re);
         var state = GameState.Create(
-            rules:           RuleSet.Default(),
-            players:         B.FourPlayers(),
-            partyResolver:   B.SoloResolver(),
+            rules: RuleSet.Default(),
+            players: B.FourPlayers(),
+            partyResolver: B.SoloResolver(),
             completedTricks: [completed],
-            currentTrick:    current,
-            announcements:   [re]);
+            currentTrick: current,
+            announcements: [re]
+        );
 
         // P1=Kontra, deadline = 9, cards = 5 → allowed to announce Kontra
         AnnouncementRules.CanAnnounce(B.P1, AnnouncementType.Kontra, state).Should().BeTrue();
@@ -120,11 +122,9 @@ public class AnnouncementRulesTests
     [Fact]
     public void CanAnnounce_Keine60_AllowedAfterKeine90()
     {
-        var state = B.BasicState(announcements:
-        [
-            B.Ann(B.P0, AnnouncementType.Re),
-            B.Ann(B.P0, AnnouncementType.Keine90),
-        ]);
+        var state = B.BasicState(
+            announcements: [B.Ann(B.P0, AnnouncementType.Re), B.Ann(B.P0, AnnouncementType.Keine90)]
+        );
         AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Keine60, state).Should().BeTrue();
     }
 
@@ -142,8 +142,9 @@ public class AnnouncementRulesTests
     {
         var trick = HighValueTrick(B.P0);
         var state = B.BasicState(
-            rules:           RuleSet.Minimal(), // EnforcePflichtansage=false
-            completedTricks: [trick]);
+            rules: RuleSet.Minimal(), // EnforcePflichtansage=false
+            completedTricks: [trick]
+        );
         AnnouncementRules.IsMandatory(B.P0, state).Should().BeFalse();
     }
 
@@ -163,10 +164,11 @@ public class AnnouncementRulesTests
     {
         // Kreuz Ass (11) leads, 3 Nines follow → 11 Augen < 35
         var trick = B.Trick(
-            (0, Suit.Kreuz, Rank.Ass,  B.P0),
+            (0, Suit.Kreuz, Rank.Ass, B.P0),
             (1, Suit.Kreuz, Rank.Neun, B.P1),
-            (2, Suit.Pik,   Rank.Neun, B.P2),
-            (3, Suit.Herz,  Rank.Neun, B.P3));
+            (2, Suit.Pik, Rank.Neun, B.P2),
+            (3, Suit.Herz, Rank.Neun, B.P3)
+        );
         var state = B.BasicState(completedTricks: [trick]);
         AnnouncementRules.IsMandatory(B.P0, state).Should().BeFalse();
     }
@@ -185,7 +187,8 @@ public class AnnouncementRulesTests
         var trick = HighValueTrick(B.P0);
         var state = B.BasicState(
             completedTricks: [trick],
-            announcements:   [B.Ann(B.P0, AnnouncementType.Re)]);
+            announcements: [B.Ann(B.P0, AnnouncementType.Re)]
+        );
         AnnouncementRules.IsMandatory(B.P0, state).Should().BeFalse();
     }
 
@@ -202,7 +205,7 @@ public class AnnouncementRulesTests
     [Fact]
     public void ViolatesFeigheit_ReturnsFalse_WhenFeigheitDisabled()
     {
-        var state  = B.BasicState(rules: RuleSet.Minimal()); // EnforceFeigheit=false
+        var state = B.BasicState(rules: RuleSet.Minimal()); // EnforceFeigheit=false
         var result = new GameResult(Party.Re, 180, 60, 1, [], Feigheit: false);
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
     }
@@ -212,10 +215,11 @@ public class AnnouncementRulesTests
     {
         // ActiveReservation != null → skip Feigheit check
         var state = GameState.Create(
-            rules:            RuleSet.Default(),
-            players:          B.FourPlayers(),
-            partyResolver:    B.SoloResolver(),
-            activeReservation: new DamensoloReservation(B.P0));
+            rules: RuleSet.Default(),
+            players: B.FourPlayers(),
+            partyResolver: B.SoloResolver(),
+            activeReservation: new DamensoloReservation(B.P0)
+        );
         var result = new GameResult(Party.Re, 180, 20, 1, [], Feigheit: false);
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
     }
@@ -228,16 +232,18 @@ public class AnnouncementRulesTests
         // Winner=Re, loserPoints=88: missing Re(+1) + Keine90(+1) = 2, not > 2 → no Feigheit.
         // State includes a Kontra trick so loserWonNoTricks=false (avoids Schwarz missing point).
         var kontraTrick = B.Trick(
-            (30, Suit.Kreuz, Rank.Ass,  B.P1),
+            (30, Suit.Kreuz, Rank.Ass, B.P1),
             (31, Suit.Kreuz, Rank.Neun, B.P0),
-            (32, Suit.Pik,   Rank.Neun, B.P2),
-            (33, Suit.Herz,  Rank.Neun, B.P3));
+            (32, Suit.Pik, Rank.Neun, B.P2),
+            (33, Suit.Herz, Rank.Neun, B.P3)
+        );
 
         var state = GameState.Create(
-            rules:           RuleSet.Default(),
-            players:         B.FourPlayers(),
-            partyResolver:   B.SoloResolver(),
-            completedTricks: [kontraTrick]);
+            rules: RuleSet.Default(),
+            players: B.FourPlayers(),
+            partyResolver: B.SoloResolver(),
+            completedTricks: [kontraTrick]
+        );
 
         var result = new GameResult(Party.Re, 152, 88, 1, [], Feigheit: false);
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
@@ -248,9 +254,10 @@ public class AnnouncementRulesTests
     {
         // Winner=Re, loserPoints=44: missing Re + Keine90 + Keine60 = 3 → Feigheit
         var state = GameState.Create(
-            rules:         RuleSet.Default(),
-            players:       B.FourPlayers(),
-            partyResolver: B.SoloResolver());
+            rules: RuleSet.Default(),
+            players: B.FourPlayers(),
+            partyResolver: B.SoloResolver()
+        );
 
         var result = new GameResult(Party.Re, 196, 44, 1, [], Feigheit: false);
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeTrue();
@@ -261,14 +268,16 @@ public class AnnouncementRulesTests
     {
         // Winner=Re, loserPoints=44, but Re announced Re+Keine90+Keine60 → missing=0
         var state = GameState.Create(
-            rules:         RuleSet.Default(),
-            players:       B.FourPlayers(),
+            rules: RuleSet.Default(),
+            players: B.FourPlayers(),
             partyResolver: B.SoloResolver(),
-            announcements: [
+            announcements:
+            [
                 B.Ann(B.P0, AnnouncementType.Re),
                 B.Ann(B.P0, AnnouncementType.Keine90),
                 B.Ann(B.P0, AnnouncementType.Keine60),
-            ]);
+            ]
+        );
 
         var result = new GameResult(Party.Re, 196, 44, 1, [], Feigheit: false);
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
@@ -284,10 +293,10 @@ public class AnnouncementRulesTests
     {
         // Use B.P0 as first card to ensure P0 wins when winner=P0
         var trick = new Trick();
-        trick.Add(new TrickCard(B.Card(10, Suit.Kreuz, Rank.Ass),    winner));
-        trick.Add(new TrickCard(B.Card(11, Suit.Kreuz, Rank.Zehn),   B.P1));
-        trick.Add(new TrickCard(B.Card(12, Suit.Pik,   Rank.Ass),    B.P2));
-        trick.Add(new TrickCard(B.Card(13, Suit.Herz,  Rank.Ass),    B.P3));
+        trick.Add(new TrickCard(B.Card(10, Suit.Kreuz, Rank.Ass), winner));
+        trick.Add(new TrickCard(B.Card(11, Suit.Kreuz, Rank.Zehn), B.P1));
+        trick.Add(new TrickCard(B.Card(12, Suit.Pik, Rank.Ass), B.P2));
+        trick.Add(new TrickCard(B.Card(13, Suit.Herz, Rank.Ass), B.P3));
         return trick;
     }
 
@@ -295,10 +304,10 @@ public class AnnouncementRulesTests
     private static Trick CompleteTrick(PlayerId winner)
     {
         var trick = new Trick();
-        trick.Add(new TrickCard(B.Card(20, Suit.Kreuz, Rank.Ass),  winner));
+        trick.Add(new TrickCard(B.Card(20, Suit.Kreuz, Rank.Ass), winner));
         trick.Add(new TrickCard(B.Card(21, Suit.Kreuz, Rank.Neun), B.P1));
-        trick.Add(new TrickCard(B.Card(22, Suit.Pik,   Rank.Neun), B.P2));
-        trick.Add(new TrickCard(B.Card(23, Suit.Herz,  Rank.Neun), B.P3));
+        trick.Add(new TrickCard(B.Card(22, Suit.Pik, Rank.Neun), B.P2));
+        trick.Add(new TrickCard(B.Card(23, Suit.Herz, Rank.Neun), B.P3));
         return trick;
     }
 }

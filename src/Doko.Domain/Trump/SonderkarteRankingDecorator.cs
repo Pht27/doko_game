@@ -9,7 +9,8 @@ public abstract class SonderkarteRankingDecorator : ITrumpEvaluator
 
     protected SonderkarteRankingDecorator(
         ITrumpEvaluator inner,
-        IReadOnlyList<ISonderkarteRankingModifier> modifiers)
+        IReadOnlyList<ISonderkarteRankingModifier> modifiers
+    )
     {
         Inner = inner;
         Modifiers = modifiers;

@@ -24,18 +24,17 @@ public sealed class ArmutReservation : IReservation
 
     public ReservationPriority Priority => ReservationPriority.Armut;
 
-    public bool IsEligible(Hand hand, RuleSet rules)
-        => rules.AllowArmut && CountArmutTrump(hand) <= 3;
+    public bool IsEligible(Hand hand, RuleSet rules) =>
+        rules.AllowArmut && CountArmutTrump(hand) <= 3;
 
-    public GameModeContext Apply()
-        => new(NormalTrumpEvaluator.Instance, new ArmutPartyResolver(_poorPlayer, _richPlayer));
+    public GameModeContext Apply() =>
+        new(NormalTrumpEvaluator.Instance, new ArmutPartyResolver(_poorPlayer, _richPlayer));
 
     /// <summary>Counts trump for Armut eligibility: excludes ♦ Aces (Füchse).</summary>
-    private static int CountArmutTrump(Hand hand)
-        => hand.Cards.Count(c => IsArmutTrump(c.Type));
+    private static int CountArmutTrump(Hand hand) => hand.Cards.Count(c => IsArmutTrump(c.Type));
 
-    private static bool IsArmutTrump(CardType c)
-        => c.Rank is Rank.Dame or Rank.Bube
+    private static bool IsArmutTrump(CardType c) =>
+        c.Rank is Rank.Dame or Rank.Bube
         || (c.Suit == Suit.Herz && c.Rank == Rank.Zehn)
         || (c.Suit == Suit.Karo && c.Rank != Rank.Ass); // ♦A excluded
 }

@@ -12,17 +12,18 @@ public sealed class NoTrumpEvaluator : ITrumpEvaluator
 
     public bool IsTrump(CardType card) => false;
 
-    public int GetTrumpRank(CardType card)
-        => throw new InvalidOperationException("No trump cards exist in this game mode.");
+    public int GetTrumpRank(CardType card) =>
+        throw new InvalidOperationException("No trump cards exist in this game mode.");
 
-    public int GetPlainRank(CardType card) => card.Rank switch
-    {
-        Rank.Ass    => 6,
-        Rank.Zehn   => 5,
-        Rank.Koenig => 4,
-        Rank.Dame   => 3,
-        Rank.Bube   => 2,
-        Rank.Neun   => 1,
-        _ => throw new ArgumentOutOfRangeException(nameof(card), $"No plain rank for: {card}"),
-    };
+    public int GetPlainRank(CardType card) =>
+        card.Rank switch
+        {
+            Rank.Ass => 6,
+            Rank.Zehn => 5,
+            Rank.Koenig => 4,
+            Rank.Dame => 3,
+            Rank.Bube => 2,
+            Rank.Neun => 1,
+            _ => throw new ArgumentOutOfRangeException(nameof(card), $"No plain rank for: {card}"),
+        };
 }

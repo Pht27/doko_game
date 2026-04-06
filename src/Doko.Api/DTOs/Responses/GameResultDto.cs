@@ -8,4 +8,5 @@ public record GameResultDto(
     int KontraPoints,
     int GameValue,
     IReadOnlyList<ExtrapunktAwardDto> AllAwards,
-    bool Feigheit);
+    bool Feigheit
+);

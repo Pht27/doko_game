@@ -21,6 +21,6 @@ public sealed class SchlankerMartinReservation : IReservation
 
     public bool IsEligible(Hand hand, RuleSet rules) => rules.AllowSchlankerMartin;
 
-    public GameModeContext Apply()
-        => new(NormalTrumpEvaluator.Instance, new SoloPartyResolver(_soloPlayer));
+    public GameModeContext Apply() =>
+        new(NormalTrumpEvaluator.Instance, new SoloPartyResolver(_soloPlayer));
 }

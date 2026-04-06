@@ -8,16 +8,16 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var jwtKey = builder.Configuration["Jwt:Key"]
+var jwtKey =
+    builder.Configuration["Jwt:Key"]
     ?? throw new InvalidOperationException("Jwt:Key is not configured.");
 
-builder.Services
-    .AddDokoApplication()
+builder
+    .Services.AddDokoApplication()
     .AddDokoInfrastructure()
     .AddDokoApi()
     .AddSignalR()
-    .Services
-    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -34,8 +34,10 @@ builder.Services
             OnMessageReceived = context =>
             {
                 var accessToken = context.Request.Query["access_token"];
-                if (!string.IsNullOrEmpty(accessToken) &&
-                    context.HttpContext.Request.Path.StartsWithSegments("/hubs/game"))
+                if (
+                    !string.IsNullOrEmpty(accessToken)
+                    && context.HttpContext.Request.Path.StartsWithSegments("/hubs/game")
+                )
                 {
                     context.Token = accessToken;
                 }

@@ -27,10 +27,9 @@ public sealed class HochzeitReservation : IReservation
 
     public ReservationPriority Priority => ReservationPriority.Hochzeit;
 
-    public bool IsEligible(Hand hand, RuleSet rules)
-        => rules.AllowHochzeit
-        && hand.Cards.Count(c => c.Type == KreuzDame) >= 2;
+    public bool IsEligible(Hand hand, RuleSet rules) =>
+        rules.AllowHochzeit && hand.Cards.Count(c => c.Type == KreuzDame) >= 2;
 
-    public GameModeContext Apply()
-        => new(NormalTrumpEvaluator.Instance, new HochzeitPartyResolver(_hochzeitPlayer, _condition));
+    public GameModeContext Apply() =>
+        new(NormalTrumpEvaluator.Instance, new HochzeitPartyResolver(_hochzeitPlayer, _condition));
 }

@@ -28,10 +28,14 @@ public class GamesController(
     IPlayCardUseCase playCard,
     IMakeAnnouncementUseCase makeAnnouncement,
     IGameQueryService gameQuery,
-    IHubContext<GameHub> hub) : ControllerBase
+    IHubContext<GameHub> hub
+) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> StartGame([FromBody] StartGameRequest req, CancellationToken ct)
+    public async Task<IActionResult> StartGame(
+        [FromBody] StartGameRequest req,
+        CancellationToken ct
+    )
     {
         if (req.PlayerIds.Count != 4)
             return BadRequest(new ErrorResponse("exactly_four_players_required"));
@@ -57,7 +61,8 @@ public class GamesController(
     public async Task<IActionResult> MakeReservation(
         string gameId,
         [FromBody] MakeReservationRequest req,
-        CancellationToken ct)
+        CancellationToken ct
+    )
     {
         if (!Guid.TryParse(gameId, out var guid))
             return NotFound(new ErrorResponse("game_not_found"));
@@ -73,14 +78,17 @@ public class GamesController(
     public async Task<IActionResult> PlayCard(
         string gameId,
         [FromBody] PlayCardRequest req,
-        CancellationToken ct)
+        CancellationToken ct
+    )
     {
         if (!Guid.TryParse(gameId, out var guid))
             return NotFound(new ErrorResponse("game_not_found"));
 
         var player = GetPlayerId();
-        var sonderkarten = req.ActivateSonderkarten
-            .Where(s => Enum.TryParse<SonderkarteType>(s, ignoreCase: true, out _))
+        var sonderkarten = req
+            .ActivateSonderkarten.Where(s =>
+                Enum.TryParse<SonderkarteType>(s, ignoreCase: true, out _)
+            )
             .Select(s => Enum.Parse<SonderkarteType>(s, ignoreCase: true))
             .ToList();
         var genscherPartner = req.GenscherPartnerId.HasValue
@@ -92,13 +100,16 @@ public class GamesController(
             player,
             new CardId((byte)req.CardId),
             sonderkarten,
-            genscherPartner);
+            genscherPartner
+        );
 
         var result = await playCard.ExecuteAsync(command, ct);
         return await result.ToActionResult(async r =>
         {
             if (r.GameFinished && r.FinishedResult is { } finished)
-                await hub.Clients.Group(gameId).SendAsync("gameFinished", DtoMapper.ToDto(finished.Result), ct);
+                await hub
+                    .Clients.Group(gameId)
+                    .SendAsync("gameFinished", DtoMapper.ToDto(finished.Result), ct);
 
             return Ok(DtoMapper.ToResponse(r));
         });
@@ -108,7 +119,8 @@ public class GamesController(
     public async Task<IActionResult> MakeAnnouncement(
         string gameId,
         [FromBody] MakeAnnouncementRequest req,
-        CancellationToken ct)
+        CancellationToken ct
+    )
     {
         if (!Guid.TryParse(gameId, out var guid))
             return NotFound(new ErrorResponse("game_not_found"));

@@ -22,16 +22,17 @@ public static class DtoMapper
             HandSorted: view.HandSorted.Select(ToDto).ToList(),
             LegalCards: view.LegalCards.Select(ToDto).ToList(),
             LegalAnnouncements: view.LegalAnnouncements.Select(a => a.ToString()).ToList(),
-            EligibleSonderkartenPerCard: view.EligibleSonderkartenPerCard
-                .ToDictionary(
-                    kvp => (int)kvp.Key.Value,
-                    kvp => (IReadOnlyList<SonderkarteInfoDto>)kvp.Value.Select(ToDto).ToList()),
+            EligibleSonderkartenPerCard: view.EligibleSonderkartenPerCard.ToDictionary(
+                kvp => (int)kvp.Key.Value,
+                kvp => (IReadOnlyList<SonderkarteInfoDto>)kvp.Value.Select(ToDto).ToList()
+            ),
             OtherPlayers: view.OtherPlayers.Select(ToDto).ToList(),
             CurrentTrick: view.CurrentTrick is { } ct ? ToDto(ct) : null,
             CompletedTricks: view.CompletedTricks.Select(ToDto).ToList(),
             CurrentTurn: view.CurrentTurn.Value,
             IsMyTurn: view.IsMyTurn,
-            EligibleReservations: view.EligibleReservations.Select(r => r.ToString()).ToList());
+            EligibleReservations: view.EligibleReservations.Select(r => r.ToString()).ToList()
+        );
 
     public static CardDto ToDto(Card card) =>
         new(card.Id.Value, card.Type.Suit.ToString(), card.Type.Rank.ToString());
@@ -43,17 +44,21 @@ public static class DtoMapper
         new(p.Id.Value, p.Seat.ToString(), p.KnownParty?.ToString(), p.HandCardCount);
 
     public static TrickSummaryDto ToDto(TrickSummary t) =>
-        new(t.TrickNumber,
+        new(
+            t.TrickNumber,
             t.Cards.Select(c => new TrickCardDto(c.Player.Value, ToDto(c.Card))).ToList(),
-            t.Winner?.Value);
+            t.Winner?.Value
+        );
 
     public static GameResultDto ToDto(GameResult r) =>
-        new(r.Winner.ToString(),
+        new(
+            r.Winner.ToString(),
             r.RePoints,
             r.KontraPoints,
             r.GameValue,
             r.AllAwards.Select(ToDto).ToList(),
-            r.Feigheit);
+            r.Feigheit
+        );
 
     public static ExtrapunktAwardDto ToDto(ExtrapunktAward a) =>
         new(a.Type.ToString(), a.BenefittingPlayer.Value, a.Delta);
@@ -62,8 +67,12 @@ public static class DtoMapper
         new(r.AllDeclared, r.WinningReservation?.Priority.ToString(), r.Geschmissen);
 
     public static PlayCardResponse ToResponse(PlayCardResult r) =>
-        new(r.TrickCompleted, r.TrickWinner?.Value, r.GameFinished,
-            r.FinishedResult is { } fr ? ToDto(fr.Result) : null);
+        new(
+            r.TrickCompleted,
+            r.TrickWinner?.Value,
+            r.GameFinished,
+            r.FinishedResult is { } fr ? ToDto(fr.Result) : null
+        );
 
     /// <summary>
     /// Constructs an <see cref="IReservation"/> from the API request, mirroring
@@ -72,32 +81,39 @@ public static class DtoMapper
     /// </summary>
     public static IReservation? BuildReservation(MakeReservationRequest req, PlayerId player)
     {
-        if (req.Reservation is null) return null;
+        if (req.Reservation is null)
+            return null;
 
-        if (!Enum.TryParse<ReservationPriority>(req.Reservation, ignoreCase: true, out var priority))
+        if (
+            !Enum.TryParse<ReservationPriority>(req.Reservation, ignoreCase: true, out var priority)
+        )
             return null;
 
         return priority switch
         {
-            ReservationPriority.Hochzeit      => BuildHochzeit(req, player),
-            ReservationPriority.Armut         => BuildArmut(req, player),
-            ReservationPriority.Schmeissen    => new SchmeissenReservation(),
-            ReservationPriority.Damensolo     => new DamensoloReservation(player),
-            ReservationPriority.Bubensolo     => new BubensoloReservation(player),
-            ReservationPriority.Fleischloses  => new FleischlosesReservation(player),
-            ReservationPriority.Knochenloses  => new KnochenlosesReservation(player),
+            ReservationPriority.Hochzeit => BuildHochzeit(req, player),
+            ReservationPriority.Armut => BuildArmut(req, player),
+            ReservationPriority.Schmeissen => new SchmeissenReservation(),
+            ReservationPriority.Damensolo => new DamensoloReservation(player),
+            ReservationPriority.Bubensolo => new BubensoloReservation(player),
+            ReservationPriority.Fleischloses => new FleischlosesReservation(player),
+            ReservationPriority.Knochenloses => new KnochenlosesReservation(player),
             ReservationPriority.SchlankerMartin => new SchlankerMartinReservation(player),
-            ReservationPriority.KaroSolo      => new FarbsoloReservation(Suit.Karo,  player),
-            ReservationPriority.KreuzSolo     => new FarbsoloReservation(Suit.Kreuz, player),
-            ReservationPriority.PikSolo       => new FarbsoloReservation(Suit.Pik,   player),
-            ReservationPriority.HerzSolo      => new FarbsoloReservation(Suit.Herz,  player),
-            _                                 => null,
+            ReservationPriority.KaroSolo => new FarbsoloReservation(Suit.Karo, player),
+            ReservationPriority.KreuzSolo => new FarbsoloReservation(Suit.Kreuz, player),
+            ReservationPriority.PikSolo => new FarbsoloReservation(Suit.Pik, player),
+            ReservationPriority.HerzSolo => new FarbsoloReservation(Suit.Herz, player),
+            _ => null,
         };
     }
 
     private static HochzeitReservation BuildHochzeit(MakeReservationRequest req, PlayerId player)
     {
-        var condition = Enum.TryParse<HochzeitCondition>(req.HochzeitCondition, ignoreCase: true, out var c)
+        var condition = Enum.TryParse<HochzeitCondition>(
+            req.HochzeitCondition,
+            ignoreCase: true,
+            out var c
+        )
             ? c
             : HochzeitCondition.FirstTrick;
         return new HochzeitReservation(player, condition);

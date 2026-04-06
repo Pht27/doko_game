@@ -4,9 +4,9 @@ namespace Doko.Domain.Tests.Hands;
 
 public class HandTests
 {
-    private static Card KreuzAss  => B.Card(0, Suit.Kreuz, Rank.Ass);
+    private static Card KreuzAss => B.Card(0, Suit.Kreuz, Rank.Ass);
     private static Card KreuzAss2 => B.Card(1, Suit.Kreuz, Rank.Ass); // same type, different Id
-    private static Card PikKoenig => B.Card(2, Suit.Pik,   Rank.Koenig);
+    private static Card PikKoenig => B.Card(2, Suit.Pik, Rank.Koenig);
 
     [Fact]
     public void Remove_ReturnsNewHandWithoutCard()

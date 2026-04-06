@@ -8,7 +8,11 @@ namespace Doko.Api.Hubs;
 
 public sealed class SignalRGameEventPublisher(IHubContext<GameHub> hubContext) : IGameEventPublisher
 {
-    public async Task PublishAsync(GameId gameId, IReadOnlyList<IDomainEvent> events, CancellationToken ct = default)
+    public async Task PublishAsync(
+        GameId gameId,
+        IReadOnlyList<IDomainEvent> events,
+        CancellationToken ct = default
+    )
     {
         var group = hubContext.Clients.Group(gameId.ToString());
 
@@ -16,44 +20,60 @@ public sealed class SignalRGameEventPublisher(IHubContext<GameHub> hubContext) :
         {
             var task = evt switch
             {
-                CardPlayedEvent e => group.SendAsync("cardPlayed", new
-                {
-                    player = e.Player.Value,
-                    card = DtoMapper.ToDto(e.Card),
-                    trickNumber = e.TrickNumber,
-                }, ct),
+                CardPlayedEvent e => group.SendAsync(
+                    "cardPlayed",
+                    new
+                    {
+                        player = e.Player.Value,
+                        card = DtoMapper.ToDto(e.Card),
+                        trickNumber = e.TrickNumber,
+                    },
+                    ct
+                ),
 
-                TrickCompletedEvent e => group.SendAsync("trickCompleted", new
-                {
-                    trickNumber = e.TrickNumber,
-                    winner = e.Winner.Value,
-                    awards = e.Result.Awards.Select(DtoMapper.ToDto).ToArray(),
-                }, ct),
+                TrickCompletedEvent e => group.SendAsync(
+                    "trickCompleted",
+                    new
+                    {
+                        trickNumber = e.TrickNumber,
+                        winner = e.Winner.Value,
+                        awards = e.Result.Awards.Select(DtoMapper.ToDto).ToArray(),
+                    },
+                    ct
+                ),
 
-                AnnouncementMadeEvent e => group.SendAsync("announcementMade", new
-                {
-                    player = e.Player.Value,
-                    type = e.Type.ToString(),
-                    trickNumber = e.TrickNumber,
-                }, ct),
+                AnnouncementMadeEvent e => group.SendAsync(
+                    "announcementMade",
+                    new
+                    {
+                        player = e.Player.Value,
+                        type = e.Type.ToString(),
+                        trickNumber = e.TrickNumber,
+                    },
+                    ct
+                ),
 
-                ReservationMadeEvent e => group.SendAsync("reservationMade", new
-                {
-                    player = e.Player.Value,
-                    reservation = e.Reservation?.Priority.ToString(),
-                }, ct),
+                ReservationMadeEvent e => group.SendAsync(
+                    "reservationMade",
+                    new
+                    {
+                        player = e.Player.Value,
+                        reservation = e.Reservation?.Priority.ToString(),
+                    },
+                    ct
+                ),
 
-                SonderkarteTriggeredEvent e => group.SendAsync("sonderkarteTriggered", new
-                {
-                    player = e.Player.Value,
-                    type = e.Type.ToString(),
-                }, ct),
+                SonderkarteTriggeredEvent e => group.SendAsync(
+                    "sonderkarteTriggered",
+                    new { player = e.Player.Value, type = e.Type.ToString() },
+                    ct
+                ),
 
-                PartyRevealedEvent e => group.SendAsync("partyRevealed", new
-                {
-                    player = e.Player.Value,
-                    party = e.Party.ToString(),
-                }, ct),
+                PartyRevealedEvent e => group.SendAsync(
+                    "partyRevealed",
+                    new { player = e.Player.Value, party = e.Party.ToString() },
+                    ct
+                ),
 
                 _ => Task.CompletedTask,
             };

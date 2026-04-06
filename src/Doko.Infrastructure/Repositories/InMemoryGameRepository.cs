@@ -8,8 +8,8 @@ public sealed class InMemoryGameRepository : IGameRepository
 {
     private readonly ConcurrentDictionary<GameId, GameState> _store = new();
 
-    public Task<GameState?> GetAsync(GameId id, CancellationToken ct = default)
-        => Task.FromResult(_store.GetValueOrDefault(id));
+    public Task<GameState?> GetAsync(GameId id, CancellationToken ct = default) =>
+        Task.FromResult(_store.GetValueOrDefault(id));
 
     public Task SaveAsync(GameState state, CancellationToken ct = default)
     {

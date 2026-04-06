@@ -11,7 +11,8 @@ public sealed class KaffeekranzExtrapunkt : IExtrapunkt
 
     public IReadOnlyList<ExtrapunktAward> Evaluate(Trick completedTrick, GameState state)
     {
-        if (!completedTrick.Cards.All(tc => tc.Card.Type.Rank == Rank.Dame)) return [];
+        if (!completedTrick.Cards.All(tc => tc.Card.Type.Rank == Rank.Dame))
+            return [];
 
         var winner = completedTrick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
         return [new ExtrapunktAward(Type, winner, 1)];

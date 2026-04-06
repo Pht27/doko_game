@@ -20,18 +20,19 @@ public sealed class HeidmannSonderkarte : SonderkarteBase
 
     public override bool AreConditionsMet(GameState state)
     {
-        if (IsActive(state, SonderkarteType.Heidmann)) return false;
-        if (!OriginallyHeldBoth(state, PikBube)) return false;
+        if (IsActive(state, SonderkarteType.Heidmann))
+            return false;
+        if (!OriginallyHeldBoth(state, PikBube))
+            return false;
 
         // The window expires once the player has already played a ♠ Jack
-        bool alreadyPlayedPikBube = state.CompletedTricks
-            .SelectMany(t => t.Cards)
+        bool alreadyPlayedPikBube = state
+            .CompletedTricks.SelectMany(t => t.Cards)
             .Any(tc => tc.Player == state.CurrentTurn && tc.Card.Type == PikBube);
 
         return !alreadyPlayedPikBube;
     }
 
-    protected override GameStateModification? ExtraEffects(GameState state)
-        => new RebuildTrumpEvaluatorModification();
-
+    protected override GameStateModification? ExtraEffects(GameState state) =>
+        new RebuildTrumpEvaluatorModification();
 }

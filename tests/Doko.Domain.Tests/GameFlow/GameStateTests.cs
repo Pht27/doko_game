@@ -70,7 +70,7 @@ public class GameStateTests
     [Fact]
     public void Apply_WithdrawAnnouncement_RemovesMatchingAnnouncement()
     {
-        var ann   = B.Ann(B.P0, AnnouncementType.Re);
+        var ann = B.Ann(B.P0, AnnouncementType.Re);
         var state = GameState.Create(announcements: [ann]);
 
         state.Apply(new WithdrawAnnouncementModification(B.P0, AnnouncementType.Re));
@@ -81,9 +81,9 @@ public class GameStateTests
     [Fact]
     public void Apply_WithdrawAnnouncement_LeavesOtherAnnouncementsIntact()
     {
-        var re     = B.Ann(B.P0, AnnouncementType.Re);
+        var re = B.Ann(B.P0, AnnouncementType.Re);
         var kontra = B.Ann(B.P1, AnnouncementType.Kontra);
-        var state  = GameState.Create(announcements: [re, kontra]);
+        var state = GameState.Create(announcements: [re, kontra]);
 
         state.Apply(new WithdrawAnnouncementModification(B.P0, AnnouncementType.Re));
 
@@ -97,7 +97,8 @@ public class GameStateTests
     {
         var transfer = new TransferCardPointsModification(
             new CardType(Suit.Herz, Rank.Zehn),
-            new CardType(Suit.Herz, Rank.Neun));
+            new CardType(Suit.Herz, Rank.Neun)
+        );
         var state = GameState.Create();
 
         state.Apply(transfer);
@@ -109,9 +110,13 @@ public class GameStateTests
     public void Apply_TransferCardPoints_AccumulatesMultiple()
     {
         var t1 = new TransferCardPointsModification(
-            new CardType(Suit.Herz, Rank.Zehn), new CardType(Suit.Herz, Rank.Neun));
+            new CardType(Suit.Herz, Rank.Zehn),
+            new CardType(Suit.Herz, Rank.Neun)
+        );
         var t2 = new TransferCardPointsModification(
-            new CardType(Suit.Karo, Rank.Ass),  new CardType(Suit.Karo, Rank.Neun));
+            new CardType(Suit.Karo, Rank.Ass),
+            new CardType(Suit.Karo, Rank.Neun)
+        );
         var state = GameState.Create();
 
         state.Apply(t1);
@@ -138,10 +143,12 @@ public class GameStateTests
         state.Apply(new RebuildTrumpEvaluatorModification());
 
         var karoAss = new CardType(Suit.Karo, Rank.Ass);
-        var dulle   = new CardType(Suit.Herz, Rank.Zehn);
+        var dulle = new CardType(Suit.Herz, Rank.Zehn);
 
-        state.TrumpEvaluator.GetTrumpRank(karoAss)
-            .Should().BeGreaterThan(state.TrumpEvaluator.GetTrumpRank(dulle));
+        state
+            .TrumpEvaluator.GetTrumpRank(karoAss)
+            .Should()
+            .BeGreaterThan(state.TrumpEvaluator.GetTrumpRank(dulle));
     }
 
     [Fact]
@@ -155,16 +162,24 @@ public class GameStateTests
         // After Heidmann: Jacks above Queens
         var kreuzDame = new CardType(Suit.Kreuz, Rank.Dame);
         var kreuzBube = new CardType(Suit.Kreuz, Rank.Bube);
-        state.TrumpEvaluator.GetTrumpRank(kreuzBube)
-            .Should().BeGreaterThan(state.TrumpEvaluator.GetTrumpRank(kreuzDame),
-                because: "Heidmann makes Jacks outrank Queens");
+        state
+            .TrumpEvaluator.GetTrumpRank(kreuzBube)
+            .Should()
+            .BeGreaterThan(
+                state.TrumpEvaluator.GetTrumpRank(kreuzDame),
+                because: "Heidmann makes Jacks outrank Queens"
+            );
 
         state.Apply(new ActivateSonderkarteModification(SonderkarteType.Heidfrau));
         state.Apply(new RebuildTrumpEvaluatorModification());
 
         // After Heidfrau suppresses Heidmann: Queens back above Jacks
-        state.TrumpEvaluator.GetTrumpRank(kreuzDame)
-            .Should().BeGreaterThan(state.TrumpEvaluator.GetTrumpRank(kreuzBube),
-                because: "Heidfrau reverts Heidmann; Queens should outrank Jacks again");
+        state
+            .TrumpEvaluator.GetTrumpRank(kreuzDame)
+            .Should()
+            .BeGreaterThan(
+                state.TrumpEvaluator.GetTrumpRank(kreuzBube),
+                because: "Heidfrau reverts Heidmann; Queens should outrank Jacks again"
+            );
     }
 }

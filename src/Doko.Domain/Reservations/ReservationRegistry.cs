@@ -18,16 +18,19 @@ public static class ReservationRegistry
     /// and is not included in the result.
     /// </summary>
     public static IReadOnlyList<ReservationPriority> GetEligible(
-        PlayerId player, Hand hand, RuleSet rules)
+        PlayerId player,
+        Hand hand,
+        RuleSet rules
+    )
     {
         var dummyPartner = new PlayerId((byte)((player.Value + 1) % 4));
 
         IReservation[] all =
         [
-            new FarbsoloReservation(Suit.Karo,  player),
+            new FarbsoloReservation(Suit.Karo, player),
             new FarbsoloReservation(Suit.Kreuz, player),
-            new FarbsoloReservation(Suit.Pik,   player),
-            new FarbsoloReservation(Suit.Herz,  player),
+            new FarbsoloReservation(Suit.Pik, player),
+            new FarbsoloReservation(Suit.Herz, player),
             new DamensoloReservation(player),
             new BubensoloReservation(player),
             new FleischlosesReservation(player),
@@ -38,9 +41,6 @@ public static class ReservationRegistry
             new SchmeissenReservation(),
         ];
 
-        return all
-            .Where(r => r.IsEligible(hand, rules))
-            .Select(r => r.Priority)
-            .ToList();
+        return all.Where(r => r.IsEligible(hand, rules)).Select(r => r.Priority).ToList();
     }
 }

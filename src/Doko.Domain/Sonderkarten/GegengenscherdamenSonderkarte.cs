@@ -10,14 +10,14 @@ namespace Doko.Domain.Sonderkarten;
 /// </summary>
 public sealed class GegengenscherdamenSonderkarte : SonderkarteBase
 {
-    private static readonly CardType KaroDame  = new(Suit.Karo, Rank.Dame);
-    private static readonly CardType HerzDame  = new(Suit.Herz, Rank.Dame);
+    private static readonly CardType KaroDame = new(Suit.Karo, Rank.Dame);
+    private static readonly CardType HerzDame = new(Suit.Herz, Rank.Dame);
 
     public override SonderkarteType Type => SonderkarteType.Gegengenscherdamen;
     public override CardType TriggeringCard => KaroDame;
 
-    public override bool AreConditionsMet(GameState state)
-        => (IsActive(state, SonderkarteType.Genscherdamen) || BothPlayedBySamePlayer(state, HerzDame))
+    public override bool AreConditionsMet(GameState state) =>
+        (IsActive(state, SonderkarteType.Genscherdamen) || BothPlayedBySamePlayer(state, HerzDame))
         && !IsActive(state, SonderkarteType.Gegengenscherdamen)
         && !IsWindowClosed(state, SonderkarteType.Gegengenscherdamen)
         && OriginallyHeldBoth(state, KaroDame);

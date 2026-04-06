@@ -17,7 +17,8 @@ public class AuthController(IConfiguration configuration) : ControllerBase
         if (req.PlayerId < 0 || req.PlayerId > 3)
             return BadRequest(new ErrorResponse("invalid_player_id"));
 
-        var key = configuration["Jwt:Key"]
+        var key =
+            configuration["Jwt:Key"]
             ?? throw new InvalidOperationException("Jwt:Key is not configured.");
         var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
 

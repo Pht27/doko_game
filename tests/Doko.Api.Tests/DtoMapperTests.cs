@@ -14,7 +14,11 @@ public class DtoMapperTests
     [Fact]
     public void BuildReservation_NullInput_ReturnsNull()
     {
-        var req = new MakeReservationRequest(Reservation: null, HochzeitCondition: null, ArmutPartner: null);
+        var req = new MakeReservationRequest(
+            Reservation: null,
+            HochzeitCondition: null,
+            ArmutPartner: null
+        );
         DtoMapper.BuildReservation(req, Player0).Should().BeNull();
     }
 
@@ -29,7 +33,10 @@ public class DtoMapperTests
     [InlineData("KreuzSolo", typeof(FarbsoloReservation))]
     [InlineData("PikSolo", typeof(FarbsoloReservation))]
     [InlineData("HerzSolo", typeof(FarbsoloReservation))]
-    public void BuildReservation_KnownPriority_ReturnsCorrectType(string priority, Type expectedType)
+    public void BuildReservation_KnownPriority_ReturnsCorrectType(
+        string priority,
+        Type expectedType
+    )
     {
         var req = new MakeReservationRequest(priority, null, null);
         var reservation = DtoMapper.BuildReservation(req, Player0);
@@ -60,14 +67,21 @@ public class DtoMapperTests
     {
         var req = new MakeReservationRequest("Hochzeit", conditionStr, null);
         var reservation = DtoMapper.BuildReservation(req, Player0);
-        reservation.Should().BeOfType<HochzeitReservation>()
-            .Which.Priority.Should().Be(ReservationPriority.Hochzeit);
+        reservation
+            .Should()
+            .BeOfType<HochzeitReservation>()
+            .Which.Priority.Should()
+            .Be(ReservationPriority.Hochzeit);
     }
 
     [Fact]
     public void BuildReservation_Hochzeit_DefaultsToFirstTrickWhenConditionMissing()
     {
-        var req = new MakeReservationRequest("Hochzeit", HochzeitCondition: null, ArmutPartner: null);
+        var req = new MakeReservationRequest(
+            "Hochzeit",
+            HochzeitCondition: null,
+            ArmutPartner: null
+        );
         var reservation = DtoMapper.BuildReservation(req, Player0);
         reservation.Should().BeOfType<HochzeitReservation>();
     }

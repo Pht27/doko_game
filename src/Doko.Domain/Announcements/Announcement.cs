@@ -6,4 +6,5 @@ public record Announcement(
     PlayerId Player,
     AnnouncementType Type,
     int TrickNumber,
-    int CardIndexInTrick);
+    int CardIndexInTrick
+);

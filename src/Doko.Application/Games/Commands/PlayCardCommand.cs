@@ -14,4 +14,5 @@ public record PlayCardCommand(
     /// Required when the player activates Genscherdamen or Gegengenscherdamen.
     /// The named player becomes the Genscher's Re partner.
     /// </summary>
-    PlayerId? GenscherPartner = null);
+    PlayerId? GenscherPartner = null
+);

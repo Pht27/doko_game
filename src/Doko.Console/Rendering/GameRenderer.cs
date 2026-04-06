@@ -9,7 +9,9 @@ public sealed class GameRenderer
     public void Render(PlayerGameView view)
     {
         var trickNum = view.CurrentTrick?.TrickNumber ?? view.CompletedTricks.Count;
-        System.Console.WriteLine($"=== Player {view.RequestingPlayer} | Trick {trickNum + 1} | Phase: {view.Phase} ===");
+        System.Console.WriteLine(
+            $"=== Player {view.RequestingPlayer} | Trick {trickNum + 1} | Phase: {view.Phase} ==="
+        );
         System.Console.WriteLine();
 
         RenderPlayerCircle(view);
@@ -28,14 +30,15 @@ public sealed class GameRenderer
 
         // Hand — use pre-sorted list, mark legal with *
         var legalIds = view.LegalCards.Select(c => c.Id).ToHashSet();
-        var sorted   = view.HandSorted.Count > 0 ? view.HandSorted : view.Hand;
+        var sorted = view.HandSorted.Count > 0 ? view.HandSorted : view.Hand;
         System.Console.WriteLine($"\nYour hand ({sorted.Count} cards):  (* = legal to play)");
         for (int i = 0; i < sorted.Count; i++)
         {
-            var card  = sorted[i];
+            var card = sorted[i];
             var legal = legalIds.Contains(card.Id) ? "*" : " ";
-            System.Console.Write($"  {legal}[{i + 1,2}] {FormatCard(card),-5}");
-            if ((i + 1) % 6 == 0) System.Console.WriteLine();
+            System.Console.Write($"  {legal}[{i + 1, 2}] {FormatCard(card), -5}");
+            if ((i + 1) % 6 == 0)
+                System.Console.WriteLine();
         }
         System.Console.WriteLine();
 
@@ -50,11 +53,18 @@ public sealed class GameRenderer
         if (anySk)
         {
             System.Console.WriteLine("\nSonderkarten when playing:");
-            foreach (var (cardId, infos) in view.EligibleSonderkartenPerCard.Where(kv => kv.Value.Count > 0))
+            foreach (
+                var (cardId, infos) in view.EligibleSonderkartenPerCard.Where(kv =>
+                    kv.Value.Count > 0
+                )
+            )
             {
                 var card = view.Hand.FirstOrDefault(c => c.Id == cardId);
-                if (card is null) continue;
-                System.Console.WriteLine($"  {FormatCard(card)}: {string.Join(", ", infos.Select(s => s.Name))}");
+                if (card is null)
+                    continue;
+                System.Console.WriteLine(
+                    $"  {FormatCard(card)}: {string.Join(", ", infos.Select(s => s.Name))}"
+                );
             }
         }
 
@@ -75,8 +85,9 @@ public sealed class GameRenderer
         System.Console.WriteLine($"Your hand ({hand.Count} cards):");
         for (int i = 0; i < hand.Count; i++)
         {
-            System.Console.Write($"  [{i + 1,2}] {FormatCard(hand[i]),-5}");
-            if ((i + 1) % 6 == 0) System.Console.WriteLine();
+            System.Console.Write($"  [{i + 1, 2}] {FormatCard(hand[i]), -5}");
+            if ((i + 1) % 6 == 0)
+                System.Console.WriteLine();
         }
         System.Console.WriteLine();
     }
@@ -97,7 +108,9 @@ public sealed class GameRenderer
         {
             System.Console.WriteLine("\n  Extrapunkte:");
             foreach (var award in result.AllAwards)
-                System.Console.WriteLine($"    {award.Type,-20} P{award.BenefittingPlayer}  ({award.Delta:+#;-#;0})");
+                System.Console.WriteLine(
+                    $"    {award.Type, -20} P{award.BenefittingPlayer}  ({award.Delta:+#;-#;0})"
+                );
         }
         System.Console.WriteLine();
     }
@@ -124,18 +137,16 @@ public sealed class GameRenderer
         var names = new string[4];
         for (byte i = 0; i < 4; i++)
         {
-            bool isMe      = i == view.RequestingPlayer.Value;
+            bool isMe = i == view.RequestingPlayer.Value;
             bool isCurrent = i == view.CurrentTurn.Value;
-            var other      = view.OtherPlayers.FirstOrDefault(p => p.Id.Value == i);
-            int cardCount  = isMe ? (view.Hand.Count) : (other?.HandCardCount ?? 0);
-            var party      = isMe
-                ? null
-                : other?.KnownParty?.ToString();
+            var other = view.OtherPlayers.FirstOrDefault(p => p.Id.Value == i);
+            int cardCount = isMe ? (view.Hand.Count) : (other?.HandCardCount ?? 0);
+            var party = isMe ? null : other?.KnownParty?.ToString();
 
-            var tag   = isCurrent ? "◄" : " ";
-            var me    = isMe ? "*" : " ";
-            var pStr  = party is not null ? $"[{party[0]}]" : "   ";
-            names[i]  = $"{me}P{i}{pStr}({cardCount}){tag}";
+            var tag = isCurrent ? "◄" : " ";
+            var me = isMe ? "*" : " ";
+            var pStr = party is not null ? $"[{party[0]}]" : "   ";
+            names[i] = $"{me}P{i}{pStr}({cardCount}){tag}";
         }
 
         System.Console.WriteLine($"           {names[1]}");
@@ -149,20 +160,20 @@ public sealed class GameRenderer
         var suit = card.Type.Suit switch
         {
             Suit.Kreuz => "♣",
-            Suit.Pik   => "♠",
-            Suit.Herz  => "♥",
-            Suit.Karo  => "♦",
-            _          => "?",
+            Suit.Pik => "♠",
+            Suit.Herz => "♥",
+            Suit.Karo => "♦",
+            _ => "?",
         };
         var rank = card.Type.Rank switch
         {
-            Rank.Neun   => "9",
-            Rank.Bube   => "J",
-            Rank.Dame   => "Q",
+            Rank.Neun => "9",
+            Rank.Bube => "J",
+            Rank.Dame => "Q",
             Rank.Koenig => "K",
-            Rank.Zehn   => "10",
-            Rank.Ass    => "A",
-            _           => "?",
+            Rank.Zehn => "10",
+            Rank.Ass => "A",
+            _ => "?",
         };
         return $"{suit}{rank}";
     }

@@ -22,12 +22,14 @@ public sealed class HochzeitPartyResolver : IPartyResolver
 
     public Party? ResolveParty(PlayerId player, GameState state)
     {
-        if (player == _hochzeitPlayer) return Party.Re;
+        if (player == _hochzeitPlayer)
+            return Party.Re;
 
         int qualifyingTricks = 0;
         foreach (var trick in state.CompletedTricks)
         {
-            if (!Qualifies(trick, state)) continue;
+            if (!Qualifies(trick, state))
+                continue;
             qualifyingTricks++;
 
             var winner = trick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
@@ -47,19 +49,26 @@ public sealed class HochzeitPartyResolver : IPartyResolver
         int qualifyingTricks = 0;
         foreach (var trick in state.CompletedTricks)
         {
-            if (!Qualifies(trick, state)) continue;
+            if (!Qualifies(trick, state))
+                continue;
             qualifyingTricks++;
             var winner = trick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
-            if (winner != _hochzeitPlayer) return true;
+            if (winner != _hochzeitPlayer)
+                return true;
         }
         return qualifyingTricks >= 3;
     }
 
-    private bool Qualifies(Tricks.Trick trick, GameState state) => _condition switch
-    {
-        HochzeitCondition.FirstTrick      => true,
-        HochzeitCondition.FirstFehlTrick  => !state.TrumpEvaluator.IsTrump(trick.Cards[0].Card.Type),
-        HochzeitCondition.FirstTrumpTrick => state.TrumpEvaluator.IsTrump(trick.Cards[0].Card.Type),
-        _ => false,
-    };
+    private bool Qualifies(Tricks.Trick trick, GameState state) =>
+        _condition switch
+        {
+            HochzeitCondition.FirstTrick => true,
+            HochzeitCondition.FirstFehlTrick => !state.TrumpEvaluator.IsTrump(
+                trick.Cards[0].Card.Type
+            ),
+            HochzeitCondition.FirstTrumpTrick => state.TrumpEvaluator.IsTrump(
+                trick.Cards[0].Card.Type
+            ),
+            _ => false,
+        };
 }

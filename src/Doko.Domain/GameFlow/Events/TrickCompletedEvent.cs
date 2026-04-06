@@ -7,4 +7,5 @@ public sealed record TrickCompletedEvent(
     GameId GameId,
     int TrickNumber,
     PlayerId Winner,
-    TrickResult Result) : IDomainEvent;
+    TrickResult Result
+) : IDomainEvent;

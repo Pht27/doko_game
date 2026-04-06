@@ -17,26 +17,25 @@ public sealed class FestmahlExtrapunkt : IExtrapunkt
     public IReadOnlyList<ExtrapunktAward> Evaluate(Trick completedTrick, GameState state)
     {
         var animals = AnimalHelpers.GetAnimals(completedTrick, state);
-        if (animals.Count < 3) return [];
+        if (animals.Count < 3)
+            return [];
 
         // Blutbad takes precedence when ≥ 3 different animal types are present
         int distinctKinds = animals.Select(a => a.Kind).Distinct().Count();
-        if (distinctKinds >= 3) return [];
+        if (distinctKinds >= 3)
+            return [];
 
         // Need at least two of the same type
-        var byKind = animals
-            .GroupBy(a => a.Kind)
-            .OrderByDescending(g => g.Count())
-            .ToList();
+        var byKind = animals.GroupBy(a => a.Kind).OrderByDescending(g => g.Count()).ToList();
 
-        if (byKind[0].Count() < 2) return [];
+        if (byKind[0].Count() < 2)
+            return [];
 
         Players.PlayerId festmahlWinner;
         int majorityCount = byKind[0].Count();
 
-        bool twoPairs = byKind.Count >= 2
-                     && byKind[1].Count() == majorityCount
-                     && majorityCount == 2;
+        bool twoPairs =
+            byKind.Count >= 2 && byKind[1].Count() == majorityCount && majorityCount == 2;
 
         if (twoPairs)
         {

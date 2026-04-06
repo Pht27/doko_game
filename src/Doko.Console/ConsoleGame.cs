@@ -19,7 +19,8 @@ public sealed class ConsoleGame(
     IMakeAnnouncementUseCase makeAnnouncement,
     IGameQueryService queryService,
     GameRenderer renderer,
-    ConsoleInputReader inputReader)
+    ConsoleInputReader inputReader
+)
 {
     public async Task RunAsync(CancellationToken ct = default)
     {
@@ -44,8 +45,9 @@ public sealed class ConsoleGame(
         for (byte i = 0; i < 4; i++)
         {
             var playerId = new PlayerId(i);
-            var view = await queryService.GetPlayerViewAsync(gameId, playerId, ct)
-                       ?? throw new InvalidOperationException($"No view for player {i}");
+            var view =
+                await queryService.GetPlayerViewAsync(gameId, playerId, ct)
+                ?? throw new InvalidOperationException($"No view for player {i}");
 
             System.Console.Clear();
             System.Console.WriteLine($"=== Player {i}'s Reservation ===\n");
@@ -56,7 +58,9 @@ public sealed class ConsoleGame(
             {
                 reservation = inputReader.PromptReservation(playerId, view);
                 var result = await makeReservation.ExecuteAsync(
-                    new MakeReservationCommand(gameId, playerId, reservation), ct);
+                    new MakeReservationCommand(gameId, playerId, reservation),
+                    ct
+                );
 
                 if (result is GameActionResult<MakeReservationResult>.Ok ok)
                 {
@@ -89,12 +93,14 @@ public sealed class ConsoleGame(
         while (true)
         {
             // Determine current player by peeking at any view
-            var peek = await queryService.GetPlayerViewAsync(gameId, new PlayerId(0), ct)
-                       ?? throw new InvalidOperationException("Game disappeared.");
+            var peek =
+                await queryService.GetPlayerViewAsync(gameId, new PlayerId(0), ct)
+                ?? throw new InvalidOperationException("Game disappeared.");
 
             var currentPlayer = peek.CurrentTurn;
-            var view = await queryService.GetPlayerViewAsync(gameId, currentPlayer, ct)
-                       ?? throw new InvalidOperationException($"No view for player {currentPlayer}.");
+            var view =
+                await queryService.GetPlayerViewAsync(gameId, currentPlayer, ct)
+                ?? throw new InvalidOperationException($"No view for player {currentPlayer}.");
 
             System.Console.Clear();
             renderer.Render(view);
@@ -106,7 +112,9 @@ public sealed class ConsoleGame(
                 if (annType.HasValue)
                 {
                     var annResult = await makeAnnouncement.ExecuteAsync(
-                        new MakeAnnouncementCommand(gameId, currentPlayer, annType.Value), ct);
+                        new MakeAnnouncementCommand(gameId, currentPlayer, annType.Value),
+                        ct
+                    );
                     if (annResult is GameActionResult<Unit>.Failure annFail)
                         System.Console.WriteLine($"  Announcement rejected: {annFail.Error}\n");
                 }
@@ -117,7 +125,15 @@ public sealed class ConsoleGame(
             {
                 var (cardId, sonderkarten, genscherPartner) = inputReader.PromptCard(view);
                 var playResult = await playCard.ExecuteAsync(
-                    new PlayCardCommand(gameId, currentPlayer, cardId, sonderkarten, genscherPartner), ct);
+                    new PlayCardCommand(
+                        gameId,
+                        currentPlayer,
+                        cardId,
+                        sonderkarten,
+                        genscherPartner
+                    ),
+                    ct
+                );
 
                 if (playResult is GameActionResult<PlayCardResult>.Failure playFail)
                 {

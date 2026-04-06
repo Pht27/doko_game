@@ -31,8 +31,10 @@ public class StartGameUseCaseTests
         var ok = (GameActionResult<StartGameResult>.Ok)result;
         var saved = await repo.GetAsync(ok.Value.GameId);
 
-        saved!.Players.Select(p => p.Seat)
-            .Should().Equal(PlayerSeat.First, PlayerSeat.Second, PlayerSeat.Third, PlayerSeat.Fourth);
+        saved!
+            .Players.Select(p => p.Seat)
+            .Should()
+            .Equal(PlayerSeat.First, PlayerSeat.Second, PlayerSeat.Third, PlayerSeat.Fourth);
     }
 
     [Fact]
@@ -43,7 +45,10 @@ public class StartGameUseCaseTests
 
         var result = await useCase.ExecuteAsync(new StartGameCommand([AppB.P0, AppB.P1]));
 
-        result.Should().BeOfType<GameActionResult<StartGameResult>.Failure>()
-            .Which.Error.Should().Be(GameError.InvalidPhase);
+        result
+            .Should()
+            .BeOfType<GameActionResult<StartGameResult>.Failure>()
+            .Which.Error.Should()
+            .Be(GameError.InvalidPhase);
     }
 }

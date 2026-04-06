@@ -20,15 +20,19 @@ public sealed class KemmerichSonderkarte : SonderkarteBase
 
     public override bool AreConditionsMet(GameState state)
     {
-        if (IsActive(state, SonderkarteType.Kemmerich)) return false;
-        if (!OriginallyHeldBoth(state, HerzBube)) return false;
+        if (IsActive(state, SonderkarteType.Kemmerich))
+            return false;
+        if (!OriginallyHeldBoth(state, HerzBube))
+            return false;
 
         // Need at least one announcement from the current player's party to withdraw
         var playerParty = state.PartyResolver.ResolveParty(state.CurrentTurn, state);
-        if (playerParty is null) return false;
+        if (playerParty is null)
+            return false;
 
         return state.Announcements.Any(a =>
-            state.PartyResolver.ResolveParty(a.Player, state) == playerParty);
+            state.PartyResolver.ResolveParty(a.Player, state) == playerParty
+        );
     }
 
     // Announcement withdrawal is interactive; PlayCardUseCase prompts the player and

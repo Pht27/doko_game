@@ -5,10 +5,23 @@ public static class Deck
     private static readonly Suit[] AllSuits = [Suit.Kreuz, Suit.Pik, Suit.Herz, Suit.Karo];
 
     private static readonly Rank[] AllRanks =
-        [Rank.Neun, Rank.Bube, Rank.Dame, Rank.Koenig, Rank.Zehn, Rank.Ass];
+    [
+        Rank.Neun,
+        Rank.Bube,
+        Rank.Dame,
+        Rank.Koenig,
+        Rank.Zehn,
+        Rank.Ass,
+    ];
 
     private static readonly Rank[] RanksNoNines =
-        [Rank.Bube, Rank.Dame, Rank.Koenig, Rank.Zehn, Rank.Ass];
+    [
+        Rank.Bube,
+        Rank.Dame,
+        Rank.Koenig,
+        Rank.Zehn,
+        Rank.Ass,
+    ];
 
     /// <summary>Returns the standard 48-card double deck (two copies of each of the 24 card types).</summary>
     public static IReadOnlyList<Card> Standard48() => BuildDeck(AllRanks);

@@ -6,4 +6,5 @@ namespace Doko.Api.DTOs.Requests;
 public record PlayCardRequest(
     int CardId,
     IReadOnlyList<string> ActivateSonderkarten,
-    int? GenscherPartnerId);
+    int? GenscherPartnerId
+);

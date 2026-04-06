@@ -18,16 +18,19 @@ public sealed class FuchsGefangenExtrapunkt : IExtrapunkt
     public IReadOnlyList<ExtrapunktAward> Evaluate(Trick completedTrick, GameState state)
     {
         // ♦A are Schweinchen when that sonderkarte is active — not Füchse
-        if (state.ActiveSonderkarten.Contains(SonderkarteType.Schweinchen)) return [];
+        if (state.ActiveSonderkarten.Contains(SonderkarteType.Schweinchen))
+            return [];
 
         var winner = completedTrick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
         var winnerParty = state.PartyResolver.ResolveParty(winner, state);
-        if (winnerParty is null) return [];
+        if (winnerParty is null)
+            return [];
 
         var awards = new List<ExtrapunktAward>();
         foreach (var tc in completedTrick.Cards)
         {
-            if (tc.Card.Type != KaroAss) continue;
+            if (tc.Card.Type != KaroAss)
+                continue;
             var foxParty = state.PartyResolver.ResolveParty(tc.Player, state);
             if (foxParty is not null && foxParty != winnerParty)
                 awards.Add(new ExtrapunktAward(Type, winner, 1));

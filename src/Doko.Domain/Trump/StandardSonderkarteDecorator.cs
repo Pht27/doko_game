@@ -11,11 +11,12 @@ public sealed class StandardSonderkarteDecorator : SonderkarteRankingDecorator
 {
     public StandardSonderkarteDecorator(
         ITrumpEvaluator inner,
-        IReadOnlyList<ISonderkarteRankingModifier> modifiers)
+        IReadOnlyList<ISonderkarteRankingModifier> modifiers
+    )
         : base(inner, modifiers) { }
 
-    public override bool IsTrump(CardType card)
-        => Inner.IsTrump(card) || Modifiers.Any(m => m.Applies(card));
+    public override bool IsTrump(CardType card) =>
+        Inner.IsTrump(card) || Modifiers.Any(m => m.Applies(card));
 
     public override int GetTrumpRank(CardType card)
     {

@@ -11,12 +11,22 @@ namespace Doko.Application.Games.UseCases;
 
 public interface IDealCardsUseCase
 {
-    Task<GameActionResult<Unit>> ExecuteAsync(DealCardsCommand command, CancellationToken ct = default);
+    Task<GameActionResult<Unit>> ExecuteAsync(
+        DealCardsCommand command,
+        CancellationToken ct = default
+    );
 }
 
-public sealed class DealCardsUseCase(IGameRepository repository, IGameEventPublisher publisher, IDeckShuffler shuffler) : IDealCardsUseCase
+public sealed class DealCardsUseCase(
+    IGameRepository repository,
+    IGameEventPublisher publisher,
+    IDeckShuffler shuffler
+) : IDealCardsUseCase
 {
-    public async Task<GameActionResult<Unit>> ExecuteAsync(DealCardsCommand command, CancellationToken ct = default)
+    public async Task<GameActionResult<Unit>> ExecuteAsync(
+        DealCardsCommand command,
+        CancellationToken ct = default
+    )
     {
         var state = await repository.GetAsync(command.GameId, ct);
         if (state is null)

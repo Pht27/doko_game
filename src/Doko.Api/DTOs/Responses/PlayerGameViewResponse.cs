@@ -14,4 +14,5 @@ public record PlayerGameViewResponse(
     IReadOnlyList<TrickSummaryDto> CompletedTricks,
     int CurrentTurn,
     bool IsMyTurn,
-    IReadOnlyList<string> EligibleReservations);
+    IReadOnlyList<string> EligibleReservations
+);

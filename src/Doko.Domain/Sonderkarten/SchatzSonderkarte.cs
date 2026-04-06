@@ -16,10 +16,9 @@ public sealed class SchatzSonderkarte : SonderkarteBase
     public override SonderkarteType Type => SonderkarteType.Schatz;
     public override CardType TriggeringCard => HerzNeun;
 
-    public override bool AreConditionsMet(GameState state)
-        => !IsActive(state, SonderkarteType.Schatz)
-        && OriginallyHeldBoth(state, HerzNeun);
+    public override bool AreConditionsMet(GameState state) =>
+        !IsActive(state, SonderkarteType.Schatz) && OriginallyHeldBoth(state, HerzNeun);
 
-    protected override GameStateModification? ExtraEffects(GameState state)
-        => new TransferCardPointsModification(HerzZehn, HerzNeun);
+    protected override GameStateModification? ExtraEffects(GameState state) =>
+        new TransferCardPointsModification(HerzZehn, HerzNeun);
 }

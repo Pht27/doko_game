@@ -12,12 +12,21 @@ namespace Doko.Application.Games.UseCases;
 
 public interface IMakeReservationUseCase
 {
-    Task<GameActionResult<MakeReservationResult>> ExecuteAsync(MakeReservationCommand command, CancellationToken ct = default);
+    Task<GameActionResult<MakeReservationResult>> ExecuteAsync(
+        MakeReservationCommand command,
+        CancellationToken ct = default
+    );
 }
 
-public sealed class MakeReservationUseCase(IGameRepository repository, IGameEventPublisher publisher) : IMakeReservationUseCase
+public sealed class MakeReservationUseCase(
+    IGameRepository repository,
+    IGameEventPublisher publisher
+) : IMakeReservationUseCase
 {
-    public async Task<GameActionResult<MakeReservationResult>> ExecuteAsync(MakeReservationCommand command, CancellationToken ct = default)
+    public async Task<GameActionResult<MakeReservationResult>> ExecuteAsync(
+        MakeReservationCommand command,
+        CancellationToken ct = default
+    )
     {
         var state = await repository.GetAsync(command.GameId, ct);
         if (state is null)
@@ -33,8 +42,13 @@ public sealed class MakeReservationUseCase(IGameRepository repository, IGameEven
         if (playerState is null)
             return new GameActionResult<MakeReservationResult>.Failure(GameError.NotYourTurn);
 
-        if (command.Reservation is not null && !command.Reservation.IsEligible(playerState.Hand, state.Rules))
-            return new GameActionResult<MakeReservationResult>.Failure(GameError.ReservationNotEligible);
+        if (
+            command.Reservation is not null
+            && !command.Reservation.IsEligible(playerState.Hand, state.Rules)
+        )
+            return new GameActionResult<MakeReservationResult>.Failure(
+                GameError.ReservationNotEligible
+            );
 
         var events = new List<IDomainEvent>
         {
@@ -48,12 +62,14 @@ public sealed class MakeReservationUseCase(IGameRepository repository, IGameEven
         {
             await repository.SaveAsync(state, ct);
             await publisher.PublishAsync(state.Id, events, ct);
-            return new GameActionResult<MakeReservationResult>.Ok(new MakeReservationResult(false, null));
+            return new GameActionResult<MakeReservationResult>.Ok(
+                new MakeReservationResult(false, null)
+            );
         }
 
         // All declared — resolve winner by priority (lowest Priority value wins)
-        var winner = state.ReservationDeclarations
-            .Where(kv => kv.Value is not null)
+        var winner = state
+            .ReservationDeclarations.Where(kv => kv.Value is not null)
             .OrderBy(kv => kv.Value!.Priority)
             .Select(kv => kv.Value)
             .FirstOrDefault();
@@ -65,7 +81,8 @@ public sealed class MakeReservationUseCase(IGameRepository repository, IGameEven
             await repository.SaveAsync(state, ct);
             await publisher.PublishAsync(state.Id, events, ct);
             return new GameActionResult<MakeReservationResult>.Ok(
-                new MakeReservationResult(true, winner, Geschmissen: true));
+                new MakeReservationResult(true, winner, Geschmissen: true)
+            );
         }
 
         state.Apply(new SetGameModeModification(winner));
@@ -77,6 +94,8 @@ public sealed class MakeReservationUseCase(IGameRepository repository, IGameEven
         await repository.SaveAsync(state, ct);
         await publisher.PublishAsync(state.Id, events, ct);
 
-        return new GameActionResult<MakeReservationResult>.Ok(new MakeReservationResult(true, winner));
+        return new GameActionResult<MakeReservationResult>.Ok(
+            new MakeReservationResult(true, winner)
+        );
     }
 }

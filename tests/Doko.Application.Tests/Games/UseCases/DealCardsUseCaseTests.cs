@@ -6,10 +6,12 @@ public class DealCardsUseCaseTests
 {
     private async Task<GameId> StartedGame(
         Doko.Application.Tests.Fakes.InMemoryGameRepository repo,
-        Doko.Application.Tests.Fakes.RecordingGameEventPublisher pub)
+        Doko.Application.Tests.Fakes.RecordingGameEventPublisher pub
+    )
     {
-        var startResult = await new StartGameUseCase(repo, pub)
-            .ExecuteAsync(new StartGameCommand(AppB.FourPlayerIds, RuleSet.Minimal()));
+        var startResult = await new StartGameUseCase(repo, pub).ExecuteAsync(
+            new StartGameCommand(AppB.FourPlayerIds, RuleSet.Minimal())
+        );
         return ((GameActionResult<StartGameResult>.Ok)startResult).Value.GameId;
     }
 
@@ -51,8 +53,11 @@ public class DealCardsUseCaseTests
 
         var result = await useCase.ExecuteAsync(new DealCardsCommand(GameId.New()));
 
-        result.Should().BeOfType<GameActionResult<Unit>.Failure>()
-            .Which.Error.Should().Be(GameError.GameNotFound);
+        result
+            .Should()
+            .BeOfType<GameActionResult<Unit>.Failure>()
+            .Which.Error.Should()
+            .Be(GameError.GameNotFound);
     }
 
     [Fact]
@@ -63,10 +68,14 @@ public class DealCardsUseCaseTests
         // Deal once to move to Reservations
         await new DealCardsUseCase(repo, pub, shuffler).ExecuteAsync(new DealCardsCommand(gameId));
 
-        var result = await new DealCardsUseCase(repo, pub, shuffler)
-            .ExecuteAsync(new DealCardsCommand(gameId));
+        var result = await new DealCardsUseCase(repo, pub, shuffler).ExecuteAsync(
+            new DealCardsCommand(gameId)
+        );
 
-        result.Should().BeOfType<GameActionResult<Unit>.Failure>()
-            .Which.Error.Should().Be(GameError.InvalidPhase);
+        result
+            .Should()
+            .BeOfType<GameActionResult<Unit>.Failure>()
+            .Which.Error.Should()
+            .Be(GameError.InvalidPhase);
     }
 }

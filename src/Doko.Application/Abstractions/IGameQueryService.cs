@@ -6,5 +6,9 @@ namespace Doko.Application.Abstractions;
 
 public interface IGameQueryService
 {
-    Task<PlayerGameView?> GetPlayerViewAsync(GameId gameId, PlayerId requestingPlayer, CancellationToken ct = default);
+    Task<PlayerGameView?> GetPlayerViewAsync(
+        GameId gameId,
+        PlayerId requestingPlayer,
+        CancellationToken ct = default
+    );
 }
