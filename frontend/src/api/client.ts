@@ -15,5 +15,6 @@ export async function apiFetch<T>(
     throw new Error(`HTTP ${res.status}: ${body}`);
   }
 
-  return res.json() as Promise<T>;
+  const text = await res.text();
+  return (text ? JSON.parse(text) : undefined) as T;
 }
