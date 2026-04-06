@@ -30,7 +30,7 @@ When returning the cards, it is displayed, how many cards got returned and if th
 
 ## Schwarze Sau
 
-When in the game mode Schwarze Sau the trick with the second Pik Dame is concluded, the game enters another special phase. The play who won that trick gets to choose a solo in which the game continues from here on. That includes every solo except Kontrasolo and Stille Hochzeit, but Schlanker Martin. The trump evaluators and card orders and so on immediately get swapped to that game modes configuration. The game in the end gets counted as if the player played this solo from the start.
+When in the game mode Schwarze Sau the trick with the second Pik Dame is concluded, the game enters another special phase (maybe it doesnt need to be a phase, but i have no other idea of how to handle it). The play who won that trick gets to choose a solo in which the game continues from here on. That includes every solo except Kontrasolo and Stille Hochzeit, but Schlanker Martin. The trump evaluators and card orders and so on immediately get swapped to that game modes configuration. The game in the end gets counted as if the player played this solo from the start.
 
 ## Idea
 
