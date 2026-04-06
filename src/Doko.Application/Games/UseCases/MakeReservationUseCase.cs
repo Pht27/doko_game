@@ -107,16 +107,18 @@ public sealed class MakeReservationUseCase(
         Domain.GameFlow.GameState state
     )
     {
-        // Passing is always allowed in any check phase
+        // Single-Vorbehalt player must declare something — passing is not allowed.
+        bool singleVorbehalt = state.HealthDeclarations.Count(kv => kv.Value) == 1;
+        if (reservation is null && phase == GamePhase.ReservationSoloCheck && singleVorbehalt)
+            return false;
+
+        // Passing is allowed in all other check phases
         if (reservation is null)
             return true;
 
-        // Single-Vorbehalt player may declare any reservation in SoloCheck
-        bool singleVorbehalt =
-            state.HealthDeclarations.Count(kv => kv.Value) == 1;
-
         return phase switch
         {
+            // Single-Vorbehalt player may declare any reservation in SoloCheck
             GamePhase.ReservationSoloCheck =>
                 singleVorbehalt || IsSoloReservation(reservation),
             GamePhase.ReservationArmutCheck =>

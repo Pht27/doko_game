@@ -38,9 +38,15 @@ public record PlayerGameView(
     /// Reservation types the player is eligible to declare in the current check phase
     /// (SoloCheck, ArmutCheck, SchmeissenCheck, HochzeitCheck).
     /// Empty outside those phases or when it is not this player's turn.
-    /// "Keine Vorbehalt" (pass) is always implicitly available and not listed here.
+    /// "Keine Vorbehalt" (pass) is implicitly available unless <see cref="MustDeclareReservation"/> is true.
     /// </summary>
     public IReadOnlyList<ReservationPriority> EligibleReservations { get; init; } = [];
+
+    /// <summary>
+    /// True when the player is not permitted to pass — they are the sole Vorbehalt player and
+    /// must declare a specific reservation.
+    /// </summary>
+    public bool MustDeclareReservation { get; init; } = false;
 
     /// <summary>
     /// True when it is this player's turn to respond to an Armut partner request

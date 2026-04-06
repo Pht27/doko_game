@@ -20,6 +20,9 @@ public record PlayerGameViewResponse(
     /// <summary>True when it is this player's turn to declare health status (Gesund/Vorbehalt).</summary>
     public bool ShouldDeclareHealth { get; init; } = false;
 
+    /// <summary>True when the player must declare a reservation and may not pass.</summary>
+    public bool MustDeclareReservation { get; init; } = false;
+
     /// <summary>True when it is this player's turn to respond to an Armut partner request.</summary>
     public bool ShouldRespondToArmut { get; init; } = false;
 

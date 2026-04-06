@@ -1,0 +1,1 @@
+The make reservation use case class is too bloated and not readable. We have to make it more readable by adding private helper functions
