@@ -1,0 +1,1 @@
+Bei den Spielern soll angezeigt werden, wenn ihre Partei schon bekannt ist, zB in Solos/Hochzeit/Armut oder wenn sie eine Kreuz Dame gespielt haben. Außerdem sollen ihre Ansagen angezeigt werden.
