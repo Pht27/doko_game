@@ -15,5 +15,5 @@ const RANK_MAP: Record<string, string> = {
 };
 
 export function cardSvgPath(suit: string, rank: string): string {
-  return `/src/assets/cards/${SUIT_MAP[suit]}${RANK_MAP[rank]}.svg`;
+  return `/cards/${SUIT_MAP[suit]}${RANK_MAP[rank]}.svg`;
 }
