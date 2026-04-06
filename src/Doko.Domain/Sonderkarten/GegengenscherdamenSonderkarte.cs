@@ -22,5 +22,6 @@ public sealed class GegengenscherdamenSonderkarte : SonderkarteBase
         && !IsWindowClosed(state, SonderkarteType.Gegengenscherdamen)
         && OriginallyHeldBoth(state, KaroDame);
 
-    public override GameStateModification? Apply(GameState state) => null;
+    // Partner selection is interactive; PlayCardUseCase applies SetPartyResolverModification
+    // after receiving the chosen partner from the command.
 }

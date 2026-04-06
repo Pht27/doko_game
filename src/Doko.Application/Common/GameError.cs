@@ -10,4 +10,6 @@ public enum GameError
     ReservationNotEligible,
     SonderkarteNotEligible,
     AlreadyDeclared,
+    GenscherPartnerRequired,
+    GenscherPartnerInvalid,
 }
