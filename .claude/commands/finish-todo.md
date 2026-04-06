@@ -2,7 +2,7 @@ Research, implement, and close out a todo item, then merge to main.
 
 ## Arguments
 $ARGUMENTS should be the path to the todo markdown file (e.g. `docs/todos/todo_fix_csharpier_problems.md`).
-If no argument is given, use the file currently open in the IDE.
+If no argument is given, use the file currently open in the IDE. Create a new branch for this implementation.
 
 ## Steps
 
