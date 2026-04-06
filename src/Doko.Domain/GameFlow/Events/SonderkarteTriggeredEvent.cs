@@ -7,4 +7,4 @@ public sealed record SonderkarteTriggeredEvent(
     GameId GameId,
     PlayerId Player,
     SonderkarteType Type,
-    GameStateModification? Modification) : IDomainEvent;
+    IReadOnlyList<GameStateModification> Modifications) : IDomainEvent;

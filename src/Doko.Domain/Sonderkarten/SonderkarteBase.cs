@@ -12,7 +12,25 @@ public abstract class SonderkarteBase : ISonderkarte
     public virtual SonderkarteType? Suppresses => null;
     public virtual bool WindowClosesWhenDeclined => true;
     public abstract bool AreConditionsMet(GameState state);
-    public abstract GameStateModification? Apply(GameState state);
+
+    /// <summary>
+    /// Always emits <see cref="ActivateSonderkarteModification"/> first, then appends the
+    /// result of <see cref="ExtraEffects"/> when non-null. Not overridable — override
+    /// <see cref="ExtraEffects"/> instead.
+    /// </summary>
+    public IReadOnlyList<GameStateModification> Apply(GameState state)
+    {
+        var extra = ExtraEffects(state);
+        return extra is null
+            ? [new ActivateSonderkarteModification(Type)]
+            : [new ActivateSonderkarteModification(Type), extra];
+    }
+
+    /// <summary>
+    /// Override to return a single additional modification applied after activation.
+    /// Return null when activation alone is sufficient (e.g. Kemmerich, Genscherdamen).
+    /// </summary>
+    protected virtual GameStateModification? ExtraEffects(GameState state) => null;
 
     /// <summary>
     /// Returns true if the current player's initial hand contained at least two copies of

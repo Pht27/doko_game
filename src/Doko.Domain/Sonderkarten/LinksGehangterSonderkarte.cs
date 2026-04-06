@@ -21,5 +21,8 @@ public sealed class LinksGehangterSonderkarte : SonderkarteBase
         => !IsActive(state, SonderkarteType.LinksGehangter)
         && OriginallyHeldBoth(state, KaroBube);
 
-    public override GameStateModification? Apply(GameState state) => new ReverseDirectionModification();
+    protected override GameStateModification? ExtraEffects(GameState state)
+        => state.CurrentTrick is null || state.CurrentTrick.Cards.Count == 0
+            ? new ReverseDirectionModification()
+            : new ScheduleDirectionFlipModification();
 }

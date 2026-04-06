@@ -40,6 +40,13 @@ public sealed class GameState
     public IPartyResolver PartyResolver { get; private set; }
 
     /// <summary>
+    /// True when a direction reversal (LinksGehangter/RechtsGehangter) was activated mid-trick
+    /// and should take effect at the start of the next trick.
+    /// Cleared automatically when <see cref="ReverseDirectionModification"/> is applied.
+    /// </summary>
+    public bool DirectionFlipPending { get; private set; }
+
+    /// <summary>
     /// Each player's hand as originally dealt. Set once when dealing completes, never mutated.
     /// Used by sonderkarte eligibility checks that need to know what a player originally held
     /// (e.g. Superschweinchen: player originally held both ♦10, but may have already played the first).
@@ -125,6 +132,11 @@ public sealed class GameState
                 Direction = Direction == PlayDirection.Counterclockwise
                     ? PlayDirection.Clockwise
                     : PlayDirection.Counterclockwise;
+                DirectionFlipPending = false;
+                break;
+
+            case ScheduleDirectionFlipModification:
+                DirectionFlipPending = true;
                 break;
 
             case WithdrawAnnouncementModification m:
@@ -139,6 +151,9 @@ public sealed class GameState
 
             case ActivateSonderkarteModification m:
                 ActiveSonderkarten = ActiveSonderkarten.Append(m.Type).ToList();
+                break;
+
+            case RebuildTrumpEvaluatorModification:
                 RebuildTrumpEvaluator();
                 break;
 
@@ -186,6 +201,10 @@ public sealed class GameState
                 CompletedTricks = [.. CompletedTricks, m.Trick];
                 ScoredTricks    = [.. ScoredTricks,    m.Result];
                 CurrentTrick    = null;
+                break;
+
+            case SetPartyResolverModification m:
+                PartyResolver = m.Resolver;
                 break;
 
             case AddAnnouncementModification m:

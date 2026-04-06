@@ -31,5 +31,6 @@ public sealed class KemmerichSonderkarte : SonderkarteBase
             state.PartyResolver.ResolveParty(a.Player, state) == playerParty);
     }
 
-    public override GameStateModification? Apply(GameState state) => null;
+    // Announcement withdrawal is interactive; PlayCardUseCase prompts the player and
+    // applies WithdrawAnnouncementModification after receiving the choice.
 }
