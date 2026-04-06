@@ -170,9 +170,21 @@ public sealed class MakeReservationUseCase(
     {
         var winner = PickWinner(state);
 
+        if (winner is ArmutReservation)
+        {
+            // Single-Vorbehalt player declared Armut — route to partner finding
+            return await ResolveArmutCheckAsync(state, events, ct);
+        }
+
+        if (winner is SchmeissenReservation)
+        {
+            // Single-Vorbehalt player declared Schmeißen
+            return await ResolveSchmeissenCheckAsync(state, events, ct);
+        }
+
         if (winner is not null)
         {
-            // A Solo (or single-Vorbehalt free choice) won
+            // A Solo (or single-Vorbehalt free choice: Hochzeit, Schlanker Martin) won
             state.Apply(new SetGameModeModification(winner));
             state.Apply(new AdvancePhaseModification(GamePhase.Playing));
             state.Apply(new SetCurrentTurnModification(state.Players[0].Id));
