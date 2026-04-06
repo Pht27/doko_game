@@ -19,14 +19,4 @@ If no argument is given, use the file currently open in the IDE. Create a new br
 
 5. **Mark as finished** — move the todo file into a `finished/` subfolder next to its current location (e.g. `docs/todos/finished/todo_fix_csharpier_problems.md`). Create the subfolder if it does not exist.
 
-6. **Commit** all changes with a fitting commit message that summarizes what was done.
-
-7. **Merge into main via rebase**:
-   - `git fetch origin main`
-   - `git rebase origin/main`
-   - `git checkout main`
-   - `git merge --ff-only <branch>`
-   - `git push`
-   
-   If you are already on main, skip the checkout/merge steps and just push.
-   Ask for confirmation before pushing.
+6. **Commit** the changes along the way with fitting commit messages that summarizes what was done in sensible chunks.
