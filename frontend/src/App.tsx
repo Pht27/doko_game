@@ -131,7 +131,7 @@ function App() {
           )}
         </div>
 
-        {/* Middle row: left opponent | trick | right opponent */}
+        {/* Middle row: left opponent | center | right opponent */}
         <div className="flex items-center justify-between w-full px-6">
           {leftOpponent ? (
             <PlayerLabel
@@ -141,11 +141,20 @@ function App() {
             />
           ) : <div />}
 
-          <TrickArea
-            trick={view?.currentTrick ?? null}
-            requestingPlayer={activePlayer}
-            seatOf={seatOf}
-          />
+          {/* Center: reservation dialog during Reservations phase, trick area during Playing */}
+          {view?.phase === 'Reservations' && view.eligibleReservations.length > 0 ? (
+            <ReservationDialog
+              playerId={activePlayer}
+              eligibleReservations={view.eligibleReservations}
+              onDeclare={handleReservation}
+            />
+          ) : (
+            <TrickArea
+              trick={view?.currentTrick ?? null}
+              requestingPlayer={activePlayer}
+              seatOf={seatOf}
+            />
+          )}
 
           {rightOpponent ? (
             <PlayerLabel
@@ -188,14 +197,6 @@ function App() {
       </div>
 
       {/* Overlays */}
-      {view?.phase === 'Reservations' && view.eligibleReservations.length > 0 && (
-        <ReservationDialog
-          playerId={activePlayer}
-          eligibleReservations={view.eligibleReservations}
-          onDeclare={handleReservation}
-        />
-      )}
-
       {pendingCard && (
         <SonderkarteOverlay
           sonderkarten={pendingCard.sonderkarten}
