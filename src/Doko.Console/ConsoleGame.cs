@@ -115,9 +115,9 @@ public sealed class ConsoleGame(
             // Play card — retry on failure
             while (true)
             {
-                var (cardId, sonderkarten) = inputReader.PromptCard(view);
+                var (cardId, sonderkarten, genscherPartner) = inputReader.PromptCard(view);
                 var playResult = await playCard.ExecuteAsync(
-                    new PlayCardCommand(gameId, currentPlayer, cardId, sonderkarten), ct);
+                    new PlayCardCommand(gameId, currentPlayer, cardId, sonderkarten, genscherPartner), ct);
 
                 if (playResult is GameActionResult<PlayCardResult>.Failure playFail)
                 {
