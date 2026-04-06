@@ -9,4 +9,9 @@ public record PlayCardCommand(
     GameId GameId,
     PlayerId Player,
     CardId Card,
-    IReadOnlyList<SonderkarteType> ActivateSonderkarten);
+    IReadOnlyList<SonderkarteType> ActivateSonderkarten,
+    /// <summary>
+    /// Required when the player activates Genscherdamen or Gegengenscherdamen.
+    /// The named player becomes the Genscher's Re partner.
+    /// </summary>
+    PlayerId? GenscherPartner = null);
