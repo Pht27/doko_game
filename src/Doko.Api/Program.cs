@@ -46,8 +46,21 @@ builder.Services
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173", "http://localhost:4173")
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials(); // required for SignalR
+    });
+});
+
 var app = builder.Build();
 
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
