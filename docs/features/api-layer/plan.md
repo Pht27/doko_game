@@ -38,8 +38,11 @@ Doko.Api/
     Requests/
       StartGameRequest.cs          — { PlayerIds: int[], Rules?: RuleSetDto }
       DealCardsRequest.cs          — (empty, gameId from route)
-      MakeReservationRequest.cs    — { Reservation: ReservationDto? }
-      PlayCardRequest.cs           — { CardId: int, ActivateSonderkarten: string[] }
+      MakeReservationRequest.cs    — { Reservation: string?, HochzeitCondition: string?, ArmutPartner: int? }
+                                        Reservation is a ReservationPriority enum name or null ("keine Vorbehalt")
+                                        HochzeitCondition: "FirstTrick" | "FirstFehlTrick" | "FirstTrumpTrick"
+                                        ArmutPartner: PlayerId of the rich player (required when Reservation == "Armut")
+      PlayCardRequest.cs           — { CardId: int, ActivateSonderkarten: string[], GenscherPartnerId: int? }
       MakeAnnouncementRequest.cs   — { Type: string }
     Responses/
       StartGameResponse.cs         — { GameId: string }
@@ -47,6 +50,7 @@ Doko.Api/
       ErrorResponse.cs             — { Error: string }
   Mapping/
     DtoMapper.cs                   — static helpers: command → DTO, domain → DTO
+                                     includes BuildReservation factory (mirrors ConsoleInputReader.BuildReservation)
   Extensions/
     GameActionResultExtensions.cs  — GameActionResult<T> → IActionResult (Ok/BadRequest/NotFound)
     ServiceCollectionExtensions.cs — AddDokoApi()
@@ -184,7 +188,38 @@ builder.Services
 
 ## Solution File
 
-Add all three new projects to `Doko.sln`.
+Add all three new projects to `Doko.sln`. Also add a `tests/Doko.Api.Tests` project.
+
+---
+
+## Tests
+
+New project: `tests/Doko.Api.Tests` (xUnit + `Microsoft.AspNetCore.Mvc.Testing`).
+
+**What to test:**
+
+### `GameActionResultExtensions` (unit tests)
+- Each `GameError` maps to the correct HTTP status and error string
+- `Ok` result calls the `onOk` delegate and returns its result
+
+### `DtoMapper.BuildReservation` (unit tests)
+- Each `ReservationPriority` maps to the correct `IReservation` concrete type
+- `HochzeitCondition` string maps to the correct `HochzeitCondition` enum value
+- `ArmutPartner` is wired into `ArmutReservation.RichPlayer`
+- Unknown/null reservation string returns null (keine Vorbehalt)
+
+### `AuthController` (integration tests via `WebApplicationFactory`)
+- `POST /auth/token { "playerId": 0 }` returns 200 with a valid JWT containing `player_id = 0`
+- `playerId` outside 0–3 returns 400
+
+### `GamesController` (integration tests via `WebApplicationFactory`)
+- Unauthenticated requests return 401
+- `POST /games` with 4 player IDs returns 200 with a `GameId`
+- `GET /games/{id}` with wrong player's token returns the correct player view (not another's)
+- `POST /games/{id}/deal` after game start returns 200
+- Use case failures map correctly (e.g. `NotYourTurn` → 400 `not_your_turn`)
+
+**Test project DI:** Register mock/stub use cases (`Substitute` or hand-rolled stubs) via `WebApplicationFactory.WithWebHostBuilder`. Use `InMemoryGameRepository` directly for integration tests that need real game state.
 
 ---
 
