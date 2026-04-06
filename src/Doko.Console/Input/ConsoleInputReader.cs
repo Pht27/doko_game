@@ -11,10 +11,17 @@ namespace Doko.Console.Input;
 
 public sealed class ConsoleInputReader
 {
+    private static readonly HashSet<SonderkarteType> GenscherTypes =
+    [
+        SonderkarteType.Genscherdamen,
+        SonderkarteType.Gegengenscherdamen,
+    ];
+
     /// <summary>
     /// Prompts the player to pick a legal card and any sonderkarten to activate with it.
+    /// Returns the card, the activated sonderkarten, and an optional Genscher partner.
     /// </summary>
-    public (CardId CardId, IReadOnlyList<SonderkarteType> Sonderkarten) PromptCard(PlayerGameView view)
+    public (CardId CardId, IReadOnlyList<SonderkarteType> Sonderkarten, PlayerId? GenscherPartner) PromptCard(PlayerGameView view)
     {
         while (true)
         {
@@ -22,28 +29,52 @@ public sealed class ConsoleInputReader
             var input = System.Console.ReadLine()?.Trim();
             if (int.TryParse(input, out int choice) && choice >= 1 && choice <= view.LegalCards.Count)
             {
-                var card        = view.LegalCards[choice - 1];
-                var sonderkarten = PromptSonderkarten(card, view);
-                return (card.Id, sonderkarten);
+                var card = view.LegalCards[choice - 1];
+                var (sonderkarten, partner) = PromptSonderkarten(card, view);
+                return (card.Id, sonderkarten, partner);
             }
             System.Console.WriteLine($"  Enter a number between 1 and {view.LegalCards.Count}.");
         }
     }
 
-    private static IReadOnlyList<SonderkarteType> PromptSonderkarten(Card card, PlayerGameView view)
+    private (IReadOnlyList<SonderkarteType> Activated, PlayerId? GenscherPartner) PromptSonderkarten(Card card, PlayerGameView view)
     {
         if (!view.EligibleSonderkartenPerCard.TryGetValue(card.Id, out var eligible) || eligible.Count == 0)
-            return [];
+            return ([], null);
 
         var activated = new List<SonderkarteType>();
+        PlayerId? genscherPartner = null;
+
         foreach (var info in eligible)
         {
             System.Console.Write($"  Activate {info.Name}? [y/N]: ");
             var input = System.Console.ReadLine()?.Trim().ToLower();
-            if (input is "y" or "yes")
-                activated.Add(info.Type);
+            if (input is not ("y" or "yes"))
+                continue;
+
+            activated.Add(info.Type);
+
+            if (GenscherTypes.Contains(info.Type))
+                genscherPartner = PromptGenscherPartner(view.RequestingPlayer, view.OtherPlayers);
         }
-        return activated;
+        return (activated, genscherPartner);
+    }
+
+    private static PlayerId PromptGenscherPartner(PlayerId genscher, IReadOnlyList<PlayerPublicState> others)
+    {
+        System.Console.WriteLine("  Choose your new partner:");
+        foreach (var p in others)
+            System.Console.WriteLine($"    [{p.Id.Value}] Player {p.Id.Value}");
+
+        while (true)
+        {
+            System.Console.Write($"  Partner (not {genscher.Value}): ");
+            var input = System.Console.ReadLine()?.Trim();
+            if (byte.TryParse(input, out byte id) && id != genscher.Value
+                && others.Any(p => p.Id.Value == id))
+                return new PlayerId(id);
+            System.Console.WriteLine("  Invalid choice. Enter a player number from the list.");
+        }
     }
 
     /// <summary>
