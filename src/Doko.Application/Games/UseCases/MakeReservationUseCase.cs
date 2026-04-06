@@ -119,24 +119,21 @@ public sealed class MakeReservationUseCase(
         return phase switch
         {
             // Single-Vorbehalt player may declare any reservation in SoloCheck
-            GamePhase.ReservationSoloCheck =>
-                singleVorbehalt || IsSoloReservation(reservation),
-            GamePhase.ReservationArmutCheck =>
-                reservation is ArmutReservation,
-            GamePhase.ReservationSchmeissenCheck =>
-                reservation is SchmeissenReservation,
-            GamePhase.ReservationHochzeitCheck =>
-                reservation is HochzeitReservation,
+            GamePhase.ReservationSoloCheck => singleVorbehalt || IsSoloReservation(reservation),
+            GamePhase.ReservationArmutCheck => reservation is ArmutReservation,
+            GamePhase.ReservationSchmeissenCheck => reservation is SchmeissenReservation,
+            GamePhase.ReservationHochzeitCheck => reservation is HochzeitReservation,
             _ => false,
         };
     }
 
     private static bool IsSoloReservation(IReservation r) =>
-        r is FarbsoloReservation
-            or DamensoloReservation
-            or BubensoloReservation
-            or FleischlosesReservation
-            or KnochenlosesReservation;
+        r
+            is FarbsoloReservation
+                or DamensoloReservation
+                or BubensoloReservation
+                or FleischlosesReservation
+                or KnochenlosesReservation;
 
     // ── Phase resolution ──────────────────────────────────────────────────────
 
@@ -326,21 +323,15 @@ public sealed class MakeReservationUseCase(
         IReservation target
     ) =>
         state
-            .ReservationDeclarations.Where(kv =>
-                kv.Value?.Priority == target.Priority
-            )
+            .ReservationDeclarations.Where(kv => kv.Value?.Priority == target.Priority)
             .OrderBy(kv => (int)state.Players.First(p => p.Id == kv.Key).Seat)
             .First()
             .Key;
 
     /// <summary>Returns Vorbehalt players in seat order.</summary>
-    private static IReadOnlyList<PlayerId> VorbehaltPlayers(
-        Domain.GameFlow.GameState state
-    ) =>
+    private static IReadOnlyList<PlayerId> VorbehaltPlayers(Domain.GameFlow.GameState state) =>
         state
-            .Players.Where(p =>
-                state.HealthDeclarations.TryGetValue(p.Id, out var hasV) && hasV
-            )
+            .Players.Where(p => state.HealthDeclarations.TryGetValue(p.Id, out var hasV) && hasV)
             .Select(p => p.Id)
             .ToList();
 

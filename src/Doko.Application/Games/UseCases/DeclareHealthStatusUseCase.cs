@@ -41,7 +41,9 @@ public sealed class DeclareHealthStatusUseCase(
             return new GameActionResult<DeclareHealthStatusResult>.Failure(GameError.NotYourTurn);
 
         if (state.HealthDeclarations.ContainsKey(command.Player))
-            return new GameActionResult<DeclareHealthStatusResult>.Failure(GameError.AlreadyDeclared);
+            return new GameActionResult<DeclareHealthStatusResult>.Failure(
+                GameError.AlreadyDeclared
+            );
 
         var events = new List<IDomainEvent>
         {
@@ -67,9 +69,7 @@ public sealed class DeclareHealthStatusUseCase(
 
         // All players have declared — resolve next phase
         var vorbehaltPlayers = state
-            .Players.Where(p =>
-                state.HealthDeclarations.TryGetValue(p.Id, out var hasV) && hasV
-            )
+            .Players.Where(p => state.HealthDeclarations.TryGetValue(p.Id, out var hasV) && hasV)
             .Select(p => p.Id)
             .ToList();
 
