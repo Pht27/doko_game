@@ -15,7 +15,7 @@ export interface GameStateResult {
 
 export function useGameState(
   tokens: string[],
-  gameId: string,
+  gameId: string | null,
   activePlayer: number,
 ): GameStateResult {
   const [view, setView] = useState<PlayerGameViewResponse | null>(null);
@@ -27,6 +27,7 @@ export function useGameState(
   const token = tokens[activePlayer];
 
   const refetch = useCallback(async () => {
+    if (!token || !gameId) return;
     setLoading(true);
     try {
       const data = await getGameView(token, gameId);
@@ -46,6 +47,7 @@ export function useGameState(
 
   // Set up a single shared SignalR connection
   useEffect(() => {
+    if (!tokens[0] || !gameId) return;
     const connection = createHubConnection(tokens[0]);
     connectionRef.current = connection;
 
@@ -67,7 +69,7 @@ export function useGameState(
 
     connection
       .start()
-      .then(() => joinGameGroup(connection, gameId))
+      .then(() => joinGameGroup(connection, gameId!))
       .catch((e) => console.warn('SignalR connect failed', e));
 
     return () => {
