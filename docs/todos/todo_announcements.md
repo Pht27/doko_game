@@ -1,0 +1,1 @@
+Announcements in our play style are actually not turn bound. They have the deadline criteria as already implemented (up until before the second card of the second trick with the extensions), but apart from that, anyone can announce anything regardless if it is their turn or not.

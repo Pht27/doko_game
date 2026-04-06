@@ -1,0 +1,1 @@
+I would like a clean folder structure, where all the code is in the src files. The assets like the cards have to lie in another folder. the src folder is divided into frontend and backend (all the c# stuff). Later we will add Deployment (CI/CD) and Database code. When changing this, the solution needs to be adapted
