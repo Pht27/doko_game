@@ -1,5 +1,6 @@
 import type { CardDto, SonderkarteInfoDto } from '../types/api';
-import { cardSvgPath } from '../api/cards';
+import { cardSvgComponent } from '../api/cards';
+import './HandDisplay.css';
 
 interface HandDisplayProps {
   cards: CardDto[];
@@ -16,28 +17,20 @@ export function HandDisplay({
   onCardClick,
 }: HandDisplayProps) {
   return (
-    <div className="flex items-end justify-center gap-[-12px] px-4 pb-2 overflow-visible">
+    <div className="hand">
       {cards.map((card, i) => {
-        const isLegal = legalCardIds.has(card.id);
-        const clickable = isMyTurn && isLegal;
+        const clickable = isMyTurn && legalCardIds.has(card.id);
+        const CardSvg = cardSvgComponent(card.suit, card.rank);
 
         return (
           <div
             key={card.id}
             style={{ marginLeft: i === 0 ? 0 : -20, zIndex: i }}
-            className="relative transition-transform duration-100"
+            className="card-wrapper"
           >
-            <img
-              src={cardSvgPath(card.suit, card.rank)}
-              alt={`${card.rank} of ${card.suit}`}
+            <CardSvg
               onClick={() => clickable && onCardClick(card)}
-              className={[
-                'h-28 w-auto rounded-md shadow-lg select-none',
-                clickable
-                  ? 'cursor-pointer hover:-translate-y-3 ring-2 ring-indigo-400 transition-transform'
-                  : 'opacity-40 cursor-default',
-                'transition-transform duration-100',
-              ].join(' ')}
+              className={`card ${clickable ? 'card-playable' : 'card-unplayable'}`}
             />
           </div>
         );
