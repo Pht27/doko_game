@@ -14,6 +14,16 @@ const RANK_MAP: Record<string, string> = {
   Ace: 'A',
 };
 
+// Eagerly import all card SVGs as URLs via Vite's glob import
+const svgUrls = import.meta.glob('../assets/cards/*.svg', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+}) as Record<string, string>;
+
 export function cardSvgPath(suit: string, rank: string): string {
-  return `/cards/${SUIT_MAP[suit]}${RANK_MAP[rank]}.svg`;
+  const filename = `${SUIT_MAP[suit]}${RANK_MAP[rank]}.svg`;
+  const url = svgUrls[`../assets/cards/${filename}`];
+  if (!url) console.warn(`Card SVG not found: ${filename}`);
+  return url ?? '';
 }
