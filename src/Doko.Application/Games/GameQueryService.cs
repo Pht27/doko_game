@@ -16,7 +16,10 @@ namespace Doko.Application.Games;
 public sealed class GameQueryService(IGameRepository repository) : IGameQueryService
 {
     public async Task<PlayerGameView?> GetPlayerViewAsync(
-        GameId gameId, PlayerId requestingPlayer, CancellationToken ct = default)
+        GameId gameId,
+        PlayerId requestingPlayer,
+        CancellationToken ct = default
+    )
     {
         var state = await repository.GetAsync(gameId, ct);
         if (state is null)
@@ -34,8 +37,9 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
         if (isMyTurn && state.CurrentTrick is not null or { Cards.Count: 0 })
         {
             var trick = state.CurrentTrick ?? new Trick();
-            legalCards = hand
-                .Where(c => CardPlayValidator.CanPlay(c, playerState.Hand, trick, state.TrumpEvaluator))
+            legalCards = hand.Where(c =>
+                    CardPlayValidator.CanPlay(c, playerState.Hand, trick, state.TrumpEvaluator)
+                )
                 .ToList();
         }
         else if (isMyTurn)
@@ -45,11 +49,12 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
         }
 
         // Legal announcements
-        var legalAnnouncements = state.Phase == GamePhase.Playing
-            ? Enum.GetValues<AnnouncementType>()
-                .Where(t => AnnouncementRules.CanAnnounce(requestingPlayer, t, state))
-                .ToList()
-            : (IReadOnlyList<AnnouncementType>)[];
+        var legalAnnouncements =
+            state.Phase == GamePhase.Playing
+                ? Enum.GetValues<AnnouncementType>()
+                    .Where(t => AnnouncementRules.CanAnnounce(requestingPlayer, t, state))
+                    .ToList()
+                : (IReadOnlyList<AnnouncementType>)[];
 
         // Eligible sonderkarten per card in hand — include display metadata
         var eligiblePerCard = new Dictionary<CardId, IReadOnlyList<SonderkarteInfo>>();
@@ -57,7 +62,8 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
         {
             foreach (var card in hand)
             {
-                var eligible = SonderkarteRegistry.GetEligibleForCard(card, state, state.Rules)
+                var eligible = SonderkarteRegistry
+                    .GetEligibleForCard(card, state, state.Rules)
                     .Select(s => SonderkarteInfo.For(s.Type))
                     .ToList();
                 if (eligible.Count > 0)
@@ -66,13 +72,9 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
         }
 
         // Other players' public state
-        var others = state.Players
-            .Where(p => p.Id != requestingPlayer)
-            .Select(p => new PlayerPublicState(
-                p.Id,
-                p.Seat,
-                p.KnownParty,
-                p.Hand.Cards.Count))
+        var others = state
+            .Players.Where(p => p.Id != requestingPlayer)
+            .Select(p => new PlayerPublicState(p.Id, p.Seat, p.KnownParty, p.Hand.Cards.Count))
             .ToList();
 
         // Current trick summary
@@ -81,27 +83,27 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             : null;
 
         // Completed tricks summaries
-        var completedSummaries = state.ScoredTricks
-            .Select((r, i) => ToTrickSummary(i, r.Trick, r.Winner))
+        var completedSummaries = state
+            .ScoredTricks.Select((r, i) => ToTrickSummary(i, r.Trick, r.Winner))
             .ToList();
 
         // Hand sorted by trump (highest to lowest), then plain suits grouped by suit and sorted
-        var handSorted = hand
-            .OrderByDescending(c => state.TrumpEvaluator.IsTrump(c.Type))
-            .ThenByDescending(c => state.TrumpEvaluator.IsTrump(c.Type)
-                ? state.TrumpEvaluator.GetTrumpRank(c.Type)
-                : 0)
+        var handSorted = hand.OrderByDescending(c => state.TrumpEvaluator.IsTrump(c.Type))
+            .ThenByDescending(c =>
+                state.TrumpEvaluator.IsTrump(c.Type) ? state.TrumpEvaluator.GetTrumpRank(c.Type) : 0
+            )
             .ThenBy(c => (int)c.Type.Suit)
-            .ThenByDescending(c => state.TrumpEvaluator.IsTrump(c.Type)
-                ? 0
-                : state.TrumpEvaluator.GetPlainRank(c.Type))
+            .ThenByDescending(c =>
+                state.TrumpEvaluator.IsTrump(c.Type) ? 0 : state.TrumpEvaluator.GetPlainRank(c.Type)
+            )
             .ToList();
 
         // Eligible reservations during reservation phase (before this player has declared)
-        var eligibleReservations = state.Phase == GamePhase.Reservations
+        var eligibleReservations =
+            state.Phase == GamePhase.Reservations
             && !state.ReservationDeclarations.ContainsKey(requestingPlayer)
-            ? ReservationRegistry.GetEligible(requestingPlayer, playerState.Hand, state.Rules)
-            : [];
+                ? ReservationRegistry.GetEligible(requestingPlayer, playerState.Hand, state.Rules)
+                : [];
 
         return new PlayerGameView(
             gameId,
@@ -115,7 +117,8 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             currentTrickSummary,
             completedSummaries,
             state.CurrentTurn,
-            isMyTurn)
+            isMyTurn
+        )
         {
             HandSorted = handSorted,
             EligibleReservations = eligibleReservations,
@@ -124,9 +127,7 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
 
     private static TrickSummary ToTrickSummary(int trickNumber, Trick trick, PlayerId? winner)
     {
-        var cards = trick.Cards
-            .Select(tc => new TrickCardSummary(tc.Player, tc.Card))
-            .ToList();
+        var cards = trick.Cards.Select(tc => new TrickCardSummary(tc.Player, tc.Card)).ToList();
         return new TrickSummary(trickNumber, cards, winner);
     }
 }

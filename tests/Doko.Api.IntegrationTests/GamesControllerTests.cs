@@ -15,7 +15,10 @@ public class GamesControllerTests(ApiTestFixture fixture) : IClassFixture<ApiTes
     public async Task StartGame_Unauthenticated_Returns401()
     {
         var client = fixture.CreateClient();
-        var response = await client.PostAsJsonAsync("/games", new { PlayerIds = new[] { 0, 1, 2, 3 } });
+        var response = await client.PostAsJsonAsync(
+            "/games",
+            new { PlayerIds = new[] { 0, 1, 2, 3 } }
+        );
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
 
@@ -27,7 +30,10 @@ public class GamesControllerTests(ApiTestFixture fixture) : IClassFixture<ApiTes
             _ => new GameActionResult<StartGameResult>.Ok(new StartGameResult(expectedId));
 
         var client = fixture.CreateAuthenticatedClient(playerId: 0);
-        var response = await client.PostAsJsonAsync("/games", new { PlayerIds = new[] { 0, 1, 2, 3 } });
+        var response = await client.PostAsJsonAsync(
+            "/games",
+            new { PlayerIds = new[] { 0, 1, 2, 3 } }
+        );
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<JsonElement>();
@@ -38,7 +44,10 @@ public class GamesControllerTests(ApiTestFixture fixture) : IClassFixture<ApiTes
     public async Task StartGame_WrongPlayerCount_Returns400()
     {
         var client = fixture.CreateAuthenticatedClient();
-        var response = await client.PostAsJsonAsync("/games", new { PlayerIds = new[] { 0, 1, 2 } });
+        var response = await client.PostAsJsonAsync(
+            "/games",
+            new { PlayerIds = new[] { 0, 1, 2 } }
+        );
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
 
@@ -49,7 +58,10 @@ public class GamesControllerTests(ApiTestFixture fixture) : IClassFixture<ApiTes
             _ => new GameActionResult<StartGameResult>.Failure(GameError.GameNotFound);
 
         var client = fixture.CreateAuthenticatedClient();
-        var response = await client.PostAsJsonAsync("/games", new { PlayerIds = new[] { 0, 1, 2, 3 } });
+        var response = await client.PostAsJsonAsync(
+            "/games",
+            new { PlayerIds = new[] { 0, 1, 2, 3 } }
+        );
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
@@ -67,8 +79,9 @@ public class GamesControllerTests(ApiTestFixture fixture) : IClassFixture<ApiTes
     public async Task DealCards_ValidRequest_Returns200()
     {
         var gameId = Guid.NewGuid();
-        ((StubDealCardsUseCase)fixture.DealCards).Handler =
-            _ => new GameActionResult<Unit>.Ok(Unit.Value);
+        ((StubDealCardsUseCase)fixture.DealCards).Handler = _ => new GameActionResult<Unit>.Ok(
+            Unit.Value
+        );
 
         var client = fixture.CreateAuthenticatedClient();
         var response = await client.PostAsync($"/games/{gameId}/deal", null);
@@ -80,8 +93,9 @@ public class GamesControllerTests(ApiTestFixture fixture) : IClassFixture<ApiTes
     public async Task DealCards_InvalidPhase_Returns400WithCode()
     {
         var gameId = Guid.NewGuid();
-        ((StubDealCardsUseCase)fixture.DealCards).Handler =
-            _ => new GameActionResult<Unit>.Failure(GameError.InvalidPhase);
+        ((StubDealCardsUseCase)fixture.DealCards).Handler = _ => new GameActionResult<Unit>.Failure(
+            GameError.InvalidPhase
+        );
 
         var client = fixture.CreateAuthenticatedClient();
         var response = await client.PostAsync($"/games/{gameId}/deal", null);
@@ -118,7 +132,13 @@ public class GamesControllerTests(ApiTestFixture fixture) : IClassFixture<ApiTes
         var client = fixture.CreateAuthenticatedClient();
         var response = await client.PostAsJsonAsync(
             $"/games/{gameId}/cards",
-            new { CardId = 5, ActivateSonderkarten = Array.Empty<string>(), GenscherPartnerId = (int?)null });
+            new
+            {
+                CardId = 5,
+                ActivateSonderkarten = Array.Empty<string>(),
+                GenscherPartnerId = (int?)null,
+            }
+        );
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         var body = await response.Content.ReadFromJsonAsync<ErrorResponse>();
@@ -132,7 +152,8 @@ public class GamesControllerTests(ApiTestFixture fixture) : IClassFixture<ApiTes
         var client = fixture.CreateAuthenticatedClient();
         var response = await client.PostAsJsonAsync(
             $"/games/{gameId}/announcements",
-            new { Type = "NotAValidType" });
+            new { Type = "NotAValidType" }
+        );
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
@@ -147,7 +168,8 @@ public class GamesControllerTests(ApiTestFixture fixture) : IClassFixture<ApiTes
         var client = fixture.CreateAuthenticatedClient();
         var response = await client.PostAsJsonAsync(
             $"/games/{gameId}/announcements",
-            new { Type = "Re" });
+            new { Type = "Re" }
+        );
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }

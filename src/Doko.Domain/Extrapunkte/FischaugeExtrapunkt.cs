@@ -16,11 +16,13 @@ public sealed class FischaugeExtrapunkt : IExtrapunkt
 
     public IReadOnlyList<ExtrapunktAward> Evaluate(Trick completedTrick, GameState state)
     {
-        if (!AnimalHelpers.FischaugeActive(state)) return [];
+        if (!AnimalHelpers.FischaugeActive(state))
+            return [];
 
         var winner = completedTrick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
-        bool winnerPlayedFischauge = completedTrick.Cards
-            .Any(tc => tc.Card.Type == KaroNeun && tc.Player == winner);
+        bool winnerPlayedFischauge = completedTrick.Cards.Any(tc =>
+            tc.Card.Type == KaroNeun && tc.Player == winner
+        );
 
         return winnerPlayedFischauge ? [new ExtrapunktAward(Type, winner, 1)] : [];
     }

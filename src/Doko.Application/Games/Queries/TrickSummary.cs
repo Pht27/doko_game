@@ -8,4 +8,5 @@ public record TrickCardSummary(PlayerId Player, Card Card);
 public record TrickSummary(
     int TrickNumber,
     IReadOnlyList<TrickCardSummary> Cards,
-    PlayerId? Winner);
+    PlayerId? Winner
+);

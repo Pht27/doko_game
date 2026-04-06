@@ -6,4 +6,5 @@ namespace Doko.Api.DTOs.Requests;
 public record MakeReservationRequest(
     string? Reservation,
     string? HochzeitCondition,
-    int? ArmutPartner);
+    int? ArmutPartner
+);

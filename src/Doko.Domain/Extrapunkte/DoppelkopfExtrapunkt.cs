@@ -10,7 +10,8 @@ public sealed class DoppelkopfExtrapunkt : IExtrapunkt
 
     public IReadOnlyList<ExtrapunktAward> Evaluate(Trick completedTrick, GameState state)
     {
-        if (completedTrick.Points < 40) return [];
+        if (completedTrick.Points < 40)
+            return [];
 
         var winner = completedTrick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
         return [new ExtrapunktAward(Type, winner, 1)];

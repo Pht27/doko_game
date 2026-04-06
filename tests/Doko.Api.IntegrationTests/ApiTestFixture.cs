@@ -32,7 +32,9 @@ public class ApiTestFixture : WebApplicationFactory<Program>
             services.Replace(ServiceDescriptor.Singleton<IDealCardsUseCase>(DealCards));
             services.Replace(ServiceDescriptor.Singleton<IMakeReservationUseCase>(MakeReservation));
             services.Replace(ServiceDescriptor.Singleton<IPlayCardUseCase>(PlayCard));
-            services.Replace(ServiceDescriptor.Singleton<IMakeAnnouncementUseCase>(MakeAnnouncement));
+            services.Replace(
+                ServiceDescriptor.Singleton<IMakeAnnouncementUseCase>(MakeAnnouncement)
+            );
         });
     }
 
@@ -53,7 +55,10 @@ public class ApiTestFixture : WebApplicationFactory<Program>
     {
         var client = CreateClient();
         client.DefaultRequestHeaders.Authorization =
-            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", GenerateToken(playerId));
+            new System.Net.Http.Headers.AuthenticationHeaderValue(
+                "Bearer",
+                GenerateToken(playerId)
+            );
         return client;
     }
 }

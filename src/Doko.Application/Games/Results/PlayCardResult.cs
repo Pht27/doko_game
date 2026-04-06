@@ -6,4 +6,5 @@ public record PlayCardResult(
     bool TrickCompleted,
     PlayerId? TrickWinner,
     bool GameFinished,
-    GameFinishedResult? FinishedResult);
+    GameFinishedResult? FinishedResult
+);

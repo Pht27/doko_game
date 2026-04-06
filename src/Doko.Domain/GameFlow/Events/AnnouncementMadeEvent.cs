@@ -8,4 +8,5 @@ public sealed record AnnouncementMadeEvent(
     PlayerId Player,
     AnnouncementType Type,
     int TrickNumber,
-    int CardIndexInTrick) : IDomainEvent;
+    int CardIndexInTrick
+) : IDomainEvent;

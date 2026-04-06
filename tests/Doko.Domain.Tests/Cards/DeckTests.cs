@@ -3,12 +3,10 @@ namespace Doko.Domain.Tests.Cards;
 public class DeckTests
 {
     [Fact]
-    public void Standard48_HasCorrectCount()
-        => Deck.Standard48().Should().HaveCount(48);
+    public void Standard48_HasCorrectCount() => Deck.Standard48().Should().HaveCount(48);
 
     [Fact]
-    public void Standard40_HasCorrectCount()
-        => Deck.Standard40().Should().HaveCount(40);
+    public void Standard40_HasCorrectCount() => Deck.Standard40().Should().HaveCount(40);
 
     [Fact]
     public void Standard48_AllCardIdsAreUnique()
@@ -41,14 +39,14 @@ public class DeckTests
     }
 
     [Fact]
-    public void Standard40_ContainsNoNines()
-        => Deck.Standard40().Should().NotContain(c => c.Type.Rank == Rank.Neun);
+    public void Standard40_ContainsNoNines() =>
+        Deck.Standard40().Should().NotContain(c => c.Type.Rank == Rank.Neun);
 
     [Fact]
-    public void Standard48_AugenSumTo240()
-        => Deck.Standard48().Sum(c => CardPoints.Of(c.Type.Rank)).Should().Be(240);
+    public void Standard48_AugenSumTo240() =>
+        Deck.Standard48().Sum(c => CardPoints.Of(c.Type.Rank)).Should().Be(240);
 
     [Fact]
-    public void Standard40_AugenSumTo240()
-        => Deck.Standard40().Sum(c => CardPoints.Of(c.Type.Rank)).Should().Be(240);
+    public void Standard40_AugenSumTo240() =>
+        Deck.Standard40().Sum(c => CardPoints.Of(c.Type.Rank)).Should().Be(240);
 }

@@ -6,7 +6,11 @@ namespace Doko.Console.Events;
 
 public sealed class ConsoleGameEventPublisher : IGameEventPublisher
 {
-    public Task PublishAsync(GameId gameId, IReadOnlyList<IDomainEvent> events, CancellationToken ct = default)
+    public Task PublishAsync(
+        GameId gameId,
+        IReadOnlyList<IDomainEvent> events,
+        CancellationToken ct = default
+    )
     {
         foreach (var evt in events)
         {

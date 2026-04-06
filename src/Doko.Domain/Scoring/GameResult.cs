@@ -9,4 +9,5 @@ public record GameResult(
     int KontraPoints,
     int GameValue,
     IReadOnlyList<ExtrapunktAward> AllAwards,
-    bool Feigheit);
+    bool Feigheit
+);

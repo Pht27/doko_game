@@ -20,7 +20,7 @@ public sealed class GameScorer : IGameScorer
         var state = game.FinalState;
 
         // ── 1. Sum Augen per party ────────────────────────────────────────────────
-        int rePoints    = 0;
+        int rePoints = 0;
         int kontraPoints = 0;
 
         foreach (var trickResult in game.Tricks)
@@ -28,7 +28,7 @@ public sealed class GameScorer : IGameScorer
             int trickAugen = ComputeEffectiveAugen(trickResult.Trick, state.CardPointTransfers);
             var winnerParty = state.PartyResolver.ResolveParty(trickResult.Winner, state);
             if (winnerParty == Party.Re)
-                rePoints    += trickAugen;
+                rePoints += trickAugen;
             else
                 kontraPoints += trickAugen;
         }
@@ -40,19 +40,22 @@ public sealed class GameScorer : IGameScorer
 
         // ── 3. Determine if loser won any tricks ──────────────────────────────────
         bool loserWonNoTricks = !game.Tricks.Any(t =>
-            state.PartyResolver.ResolveParty(t.Winner, state) != winner);
+            state.PartyResolver.ResolveParty(t.Winner, state) != winner
+        );
 
         // ── 4. Collect all Extrapunkte awards ─────────────────────────────────────
-        var allAwards = game.Tricks
-            .SelectMany(t => t.Awards)
-            .Where(a => a.Delta > 0)   // Delta=0 awards are trick-winner overrides, not score bonuses
+        var allAwards = game
+            .Tricks.SelectMany(t => t.Awards)
+            .Where(a => a.Delta > 0) // Delta=0 awards are trick-winner overrides, not score bonuses
             .ToList();
 
-        int reExtra     = allAwards
+        int reExtra = allAwards
             .Where(a => state.PartyResolver.ResolveParty(a.BenefittingPlayer, state) == Party.Re)
             .Sum(a => a.Delta);
         int kontraExtra = allAwards
-            .Where(a => state.PartyResolver.ResolveParty(a.BenefittingPlayer, state) == Party.Kontra)
+            .Where(a =>
+                state.PartyResolver.ResolveParty(a.BenefittingPlayer, state) == Party.Kontra
+            )
             .Sum(a => a.Delta);
 
         // ── 5. Build base game value ───────────────────────────────────────────────
@@ -62,36 +65,47 @@ public sealed class GameScorer : IGameScorer
         gameValue++;
 
         // Gegen die Alten (Kontra party wins)
-        if (winner == Party.Kontra) gameValue++;
+        if (winner == Party.Kontra)
+            gameValue++;
 
         // Threshold bonuses (loser didn't reach the threshold)
-        if (loserPoints < 90)  gameValue++;   // Keine 90
-        if (loserPoints < 60)  gameValue++;   // Keine 60
-        if (loserPoints < 30)  gameValue++;   // Keine 30
-        if (loserWonNoTricks)  gameValue++;   // Schwarz
+        if (loserPoints < 90)
+            gameValue++; // Keine 90
+        if (loserPoints < 60)
+            gameValue++; // Keine 60
+        if (loserPoints < 30)
+            gameValue++; // Keine 30
+        if (loserWonNoTricks)
+            gameValue++; // Schwarz
 
         // One point per announcement (by any party)
         gameValue += state.Announcements.Count;
 
         // Net Extrapunkte offset
-        int winnerExtra = winner == Party.Re ? reExtra    : kontraExtra;
-        int loserExtra  = winner == Party.Re ? kontraExtra : reExtra;
+        int winnerExtra = winner == Party.Re ? reExtra : kontraExtra;
+        int loserExtra = winner == Party.Re ? kontraExtra : reExtra;
         gameValue += winnerExtra - loserExtra;
 
         // ── 6. Feigheit ────────────────────────────────────────────────────────────
-        var provisionalResult = new GameResult(winner, rePoints, kontraPoints, gameValue,
-            allAwards, Feigheit: false);
+        var provisionalResult = new GameResult(
+            winner,
+            rePoints,
+            kontraPoints,
+            gameValue,
+            allAwards,
+            Feigheit: false
+        );
 
         bool feigheit = AnnouncementRules.ViolatesFeigheit(provisionalResult, state);
         if (feigheit)
         {
             // Feigheit: winning party actually loses
-            winner    = winner == Party.Re ? Party.Kontra : Party.Re;
+            winner = winner == Party.Re ? Party.Kontra : Party.Re;
             loserPoints = winner == Party.Re ? kontraPoints : rePoints;
 
             // Recalculate extra penalty: each announcement beyond 2 that was missing adds 1
             int extraPenalty = ComputeFeigheitPenalty(provisionalResult, state);
-            gameValue = 1 + extraPenalty;   // Gewonnen + extra
+            gameValue = 1 + extraPenalty; // Gewonnen + extra
         }
 
         return new GameResult(winner, rePoints, kontraPoints, gameValue, allAwards, feigheit);
@@ -99,50 +113,66 @@ public sealed class GameScorer : IGameScorer
 
     private static int ComputeEffectiveAugen(
         Tricks.Trick trick,
-        IReadOnlyList<Sonderkarten.TransferCardPointsModification> transfers)
+        IReadOnlyList<Sonderkarten.TransferCardPointsModification> transfers
+    )
     {
         return trick.Cards.Sum(tc => EffectiveCardPoints(tc.Card.Type, transfers));
     }
 
     private static int EffectiveCardPoints(
         CardType type,
-        IReadOnlyList<Sonderkarten.TransferCardPointsModification> transfers)
+        IReadOnlyList<Sonderkarten.TransferCardPointsModification> transfers
+    )
     {
         int points = CardPoints.Of(type.Rank);
         foreach (var t in transfers)
         {
-            if (type == t.From) return 0;
-            if (type == t.To)   points += CardPoints.Of(t.From.Rank);
+            if (type == t.From)
+                return 0;
+            if (type == t.To)
+                points += CardPoints.Of(t.From.Rank);
         }
         return points;
     }
 
-    private static int ComputeFeigheitPenalty(GameResult provisionalResult, GameFlow.GameState state)
+    private static int ComputeFeigheitPenalty(
+        GameResult provisionalResult,
+        GameFlow.GameState state
+    )
     {
         // Count how many announcements were missing beyond the threshold
         var provisionalWinner = provisionalResult.Winner;
-        int loserPoints = provisionalWinner == Party.Re
-            ? provisionalResult.KontraPoints
-            : provisionalResult.RePoints;
+        int loserPoints =
+            provisionalWinner == Party.Re
+                ? provisionalResult.KontraPoints
+                : provisionalResult.RePoints;
 
-        var winnerAnnounced = state.Announcements
-            .Where(a => state.PartyResolver.ResolveParty(a.Player, state) == provisionalWinner)
+        var winnerAnnounced = state
+            .Announcements.Where(a =>
+                state.PartyResolver.ResolveParty(a.Player, state) == provisionalWinner
+            )
             .Select(a => a.Type)
             .ToHashSet();
 
-        var baseAnnouncement = provisionalWinner == Party.Re
-            ? AnnouncementType.Re
-            : AnnouncementType.Kontra;
+        var baseAnnouncement =
+            provisionalWinner == Party.Re ? AnnouncementType.Re : AnnouncementType.Kontra;
 
         int missing = 0;
-        if (loserPoints < 120 && !winnerAnnounced.Contains(baseAnnouncement)) missing++;
-        if (loserPoints < 90  && !winnerAnnounced.Contains(AnnouncementType.Keine90))  missing++;
-        if (loserPoints < 60  && !winnerAnnounced.Contains(AnnouncementType.Keine60))  missing++;
-        if (loserPoints < 30  && !winnerAnnounced.Contains(AnnouncementType.Keine30))  missing++;
+        if (loserPoints < 120 && !winnerAnnounced.Contains(baseAnnouncement))
+            missing++;
+        if (loserPoints < 90 && !winnerAnnounced.Contains(AnnouncementType.Keine90))
+            missing++;
+        if (loserPoints < 60 && !winnerAnnounced.Contains(AnnouncementType.Keine60))
+            missing++;
+        if (loserPoints < 30 && !winnerAnnounced.Contains(AnnouncementType.Keine30))
+            missing++;
 
         bool loserWonNoTricks = !state.CompletedTricks.Any(t =>
             state.PartyResolver.ResolveParty(
-                t.Winner(state.TrumpEvaluator, state.Rules.DulleRule), state) != provisionalWinner);
+                t.Winner(state.TrumpEvaluator, state.Rules.DulleRule),
+                state
+            ) != provisionalWinner
+        );
         if (loserWonNoTricks && !winnerAnnounced.Contains(AnnouncementType.Schwarz))
             missing++;
 

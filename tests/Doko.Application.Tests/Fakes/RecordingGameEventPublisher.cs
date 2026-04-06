@@ -9,7 +9,11 @@ public sealed class RecordingGameEventPublisher : IGameEventPublisher
 
     public IReadOnlyList<IDomainEvent> Published => _published;
 
-    public Task PublishAsync(GameId gameId, IReadOnlyList<IDomainEvent> events, CancellationToken ct = default)
+    public Task PublishAsync(
+        GameId gameId,
+        IReadOnlyList<IDomainEvent> events,
+        CancellationToken ct = default
+    )
     {
         _published.AddRange(events);
         return Task.CompletedTask;

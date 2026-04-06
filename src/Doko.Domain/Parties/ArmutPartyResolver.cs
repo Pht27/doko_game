@@ -15,8 +15,8 @@ public sealed class ArmutPartyResolver : IPartyResolver
         _richPlayer = richPlayer;
     }
 
-    public Party? ResolveParty(PlayerId player, GameState state)
-        => player == _poorPlayer || player == _richPlayer ? Party.Re : Party.Kontra;
+    public Party? ResolveParty(PlayerId player, GameState state) =>
+        player == _poorPlayer || player == _richPlayer ? Party.Re : Party.Kontra;
 
     public bool IsFullyResolved(GameState state) => true;
 }

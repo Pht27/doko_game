@@ -17,6 +17,6 @@ public sealed class FleischlosesReservation : IReservation
 
     public bool IsEligible(Hand hand, RuleSet rules) => rules.AllowFleischloses;
 
-    public GameModeContext Apply()
-        => new(NoTrumpEvaluator.Instance, new SoloPartyResolver(_soloPlayer));
+    public GameModeContext Apply() =>
+        new(NoTrumpEvaluator.Instance, new SoloPartyResolver(_soloPlayer));
 }

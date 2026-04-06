@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -16,5 +15,4 @@
     <ProjectReference Include="..\Doko.Application\Doko.Application.csproj" />
     <ProjectReference Include="..\Doko.Infrastructure\Doko.Infrastructure.csproj" />
   </ItemGroup>
-
 </Project>

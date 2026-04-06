@@ -52,50 +52,52 @@ public record RuleSet
     public bool EnableKaffeekranzchen { get; init; }
 
     /// <summary>Standard Koppeldopf rules with all optional features enabled.</summary>
-    public static RuleSet Default() => new()
-    {
-        PlayWithNines          = true,
-        AllowFarbsoli          = true,
-        AllowDamensolo         = true,
-        AllowBubensolo         = true,
-        AllowFleischloses      = true,
-        AllowKnochenloses      = true,
-        AllowSchlankerMartin   = true,
-        AllowStilleSolo        = true,
-        AllowArmut             = true,
-        AllowHochzeit          = true,
-        AllowSchmeissen        = true,
-        DulleRule              = DulleRule.SecondBeatsFirst,
-        EnableSchweinchen      = true,
-        EnableSuperschweinchen = true,
-        EnableHyperschweinchen = true,
-        EnableLinksGehangter   = true,
-        EnableRechtsGehangter  = true,
-        EnableGenscherdamen    = true,
-        EnableGegengenscherdamen = true,
-        EnableHeidmann         = true,
-        EnableHeidfrau         = true,
-        EnableKemmerich        = true,
-        EnableSchatz           = true,
-        AllowAnnouncements     = true,
-        EnforcePflichtansage   = true,
-        EnforceFeigheit        = true,
-        EnableDoppelkopf       = true,
-        EnableFuchsGefangen    = true,
-        EnableKarlchen         = true,
-        EnableAgathe           = true,
-        EnableFischauge        = true,
-        EnableGansGefangen     = true,
-        EnableFestmahl         = true,
-        EnableBlutbad          = true,
-        EnableKlabautermann    = true,
-        EnableKaffeekranzchen  = true,
-    };
+    public static RuleSet Default() =>
+        new()
+        {
+            PlayWithNines = true,
+            AllowFarbsoli = true,
+            AllowDamensolo = true,
+            AllowBubensolo = true,
+            AllowFleischloses = true,
+            AllowKnochenloses = true,
+            AllowSchlankerMartin = true,
+            AllowStilleSolo = true,
+            AllowArmut = true,
+            AllowHochzeit = true,
+            AllowSchmeissen = true,
+            DulleRule = DulleRule.SecondBeatsFirst,
+            EnableSchweinchen = true,
+            EnableSuperschweinchen = true,
+            EnableHyperschweinchen = true,
+            EnableLinksGehangter = true,
+            EnableRechtsGehangter = true,
+            EnableGenscherdamen = true,
+            EnableGegengenscherdamen = true,
+            EnableHeidmann = true,
+            EnableHeidfrau = true,
+            EnableKemmerich = true,
+            EnableSchatz = true,
+            AllowAnnouncements = true,
+            EnforcePflichtansage = true,
+            EnforceFeigheit = true,
+            EnableDoppelkopf = true,
+            EnableFuchsGefangen = true,
+            EnableKarlchen = true,
+            EnableAgathe = true,
+            EnableFischauge = true,
+            EnableGansGefangen = true,
+            EnableFestmahl = true,
+            EnableBlutbad = true,
+            EnableKlabautermann = true,
+            EnableKaffeekranzchen = true,
+        };
 
     /// <summary>Minimal rules with all optional features disabled.</summary>
-    public static RuleSet Minimal() => new()
-    {
-        DulleRule = DulleRule.SecondBeatsFirst,
-        // All bool properties default to false — no optional features enabled
-    };
+    public static RuleSet Minimal() =>
+        new()
+        {
+            DulleRule = DulleRule.SecondBeatsFirst,
+            // All bool properties default to false — no optional features enabled
+        };
 }

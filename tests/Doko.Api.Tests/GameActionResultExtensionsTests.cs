@@ -13,8 +13,7 @@ public class GameActionResultExtensionsTests
         var result = new GameActionResult<int>.Ok(42);
         var action = result.ToActionResult(v => new OkObjectResult(v));
 
-        action.Should().BeOfType<OkObjectResult>()
-            .Which.Value.Should().Be(42);
+        action.Should().BeOfType<OkObjectResult>().Which.Value.Should().Be(42);
     }
 
     [Theory]
@@ -33,8 +32,7 @@ public class GameActionResultExtensionsTests
         var result = new GameActionResult<int>.Failure(error);
         var action = result.ToActionResult(v => new OkObjectResult(v));
 
-        action.Should().BeAssignableTo<ObjectResult>()
-            .Which.StatusCode.Should().Be(expectedStatus);
+        action.Should().BeAssignableTo<ObjectResult>().Which.StatusCode.Should().Be(expectedStatus);
     }
 
     [Theory]
@@ -53,8 +51,12 @@ public class GameActionResultExtensionsTests
         var result = new GameActionResult<int>.Failure(error);
         var action = result.ToActionResult(v => new OkObjectResult(v));
 
-        action.Should().BeAssignableTo<ObjectResult>()
-            .Which.Value.Should().BeOfType<ErrorResponse>()
-            .Which.Error.Should().Be(expectedError);
+        action
+            .Should()
+            .BeAssignableTo<ObjectResult>()
+            .Which.Value.Should()
+            .BeOfType<ErrorResponse>()
+            .Which.Error.Should()
+            .Be(expectedError);
     }
 }

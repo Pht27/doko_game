@@ -12,17 +12,18 @@ public sealed class KnochenloseTrumpEvaluator : ITrumpEvaluator
 
     public bool IsTrump(CardType card) => false;
 
-    public int GetTrumpRank(CardType card)
-        => throw new InvalidOperationException("No trump cards exist in Knochenloses.");
+    public int GetTrumpRank(CardType card) =>
+        throw new InvalidOperationException("No trump cards exist in Knochenloses.");
 
-    public int GetPlainRank(CardType card) => card.Rank switch
-    {
-        Rank.Ass    => 6,
-        Rank.Koenig => 5,
-        Rank.Dame   => 4,
-        Rank.Bube   => 3,
-        Rank.Zehn   => 2,
-        Rank.Neun   => 1,
-        _ => throw new ArgumentOutOfRangeException(nameof(card), $"No plain rank for: {card}"),
-    };
+    public int GetPlainRank(CardType card) =>
+        card.Rank switch
+        {
+            Rank.Ass => 6,
+            Rank.Koenig => 5,
+            Rank.Dame => 4,
+            Rank.Bube => 3,
+            Rank.Zehn => 2,
+            Rank.Neun => 1,
+            _ => throw new ArgumentOutOfRangeException(nameof(card), $"No plain rank for: {card}"),
+        };
 }

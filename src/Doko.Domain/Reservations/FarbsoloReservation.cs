@@ -21,17 +21,18 @@ public sealed class FarbsoloReservation : IReservation
         _soloPlayer = soloPlayer;
     }
 
-    public ReservationPriority Priority => _suit switch
-    {
-        Suit.Karo  => ReservationPriority.KaroSolo,
-        Suit.Kreuz => ReservationPriority.KreuzSolo,
-        Suit.Pik   => ReservationPriority.PikSolo,
-        Suit.Herz  => ReservationPriority.HerzSolo,
-        _ => throw new ArgumentOutOfRangeException(nameof(_suit)),
-    };
+    public ReservationPriority Priority =>
+        _suit switch
+        {
+            Suit.Karo => ReservationPriority.KaroSolo,
+            Suit.Kreuz => ReservationPriority.KreuzSolo,
+            Suit.Pik => ReservationPriority.PikSolo,
+            Suit.Herz => ReservationPriority.HerzSolo,
+            _ => throw new ArgumentOutOfRangeException(nameof(_suit)),
+        };
 
     public bool IsEligible(Hand hand, RuleSet rules) => rules.AllowFarbsoli;
 
-    public GameModeContext Apply()
-        => new(new FarbsoloTrumpEvaluator(_suit), new SoloPartyResolver(_soloPlayer));
+    public GameModeContext Apply() =>
+        new(new FarbsoloTrumpEvaluator(_suit), new SoloPartyResolver(_soloPlayer));
 }

@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -39,5 +38,4 @@
     <ProjectReference Include="..\..\src\Doko.Application\Doko.Application.csproj" />
     <ProjectReference Include="..\..\src\Doko.Domain\Doko.Domain.csproj" />
   </ItemGroup>
-
 </Project>

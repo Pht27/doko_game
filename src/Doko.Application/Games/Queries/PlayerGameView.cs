@@ -19,7 +19,8 @@ public record PlayerGameView(
     TrickSummary? CurrentTrick,
     IReadOnlyList<TrickSummary> CompletedTricks,
     PlayerId CurrentTurn,
-    bool IsMyTurn)
+    bool IsMyTurn
+)
 {
     /// <summary>
     /// Hand sorted for display: trump highest-to-lowest, then plain suits grouped and sorted.

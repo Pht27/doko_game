@@ -14,7 +14,12 @@ public static class CardPlayValidator
     /// — if the led card is a plain suit, the player must play that same plain suit if they have any;
     /// — if unable to follow suit, any card may be played.
     /// </summary>
-    public static bool CanPlay(Card card, Hand hand, Trick currentTrick, ITrumpEvaluator trumpEvaluator)
+    public static bool CanPlay(
+        Card card,
+        Hand hand,
+        Trick currentTrick,
+        ITrumpEvaluator trumpEvaluator
+    )
     {
         if (currentTrick.Cards.Count == 0)
             return true;
@@ -25,7 +30,8 @@ public static class CardPlayValidator
         if (ledIsTrump)
         {
             bool handHasTrump = hand.Cards.Any(c => trumpEvaluator.IsTrump(c.Type));
-            if (!handHasTrump) return true;
+            if (!handHasTrump)
+                return true;
             return trumpEvaluator.IsTrump(card.Type);
         }
         else
@@ -33,8 +39,10 @@ public static class CardPlayValidator
             // Plain lead: must follow the same plain suit (excluding trump cards of that suit)
             Suit ledSuit = ledCard.Type.Suit;
             bool handHasLedSuit = hand.Cards.Any(c =>
-                !trumpEvaluator.IsTrump(c.Type) && c.Type.Suit == ledSuit);
-            if (!handHasLedSuit) return true;
+                !trumpEvaluator.IsTrump(c.Type) && c.Type.Suit == ledSuit
+            );
+            if (!handHasLedSuit)
+                return true;
             return !trumpEvaluator.IsTrump(card.Type) && card.Type.Suit == ledSuit;
         }
     }

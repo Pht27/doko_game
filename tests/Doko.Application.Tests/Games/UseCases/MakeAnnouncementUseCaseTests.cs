@@ -6,26 +6,30 @@ namespace Doko.Application.Tests.Games.UseCases;
 
 public class MakeAnnouncementUseCaseTests
 {
-    private static async Task<(Fakes.InMemoryGameRepository, Fakes.RecordingGameEventPublisher, GameId)>
-        PlayingGame()
+    private static async Task<(
+        Fakes.InMemoryGameRepository,
+        Fakes.RecordingGameEventPublisher,
+        GameId
+    )> PlayingGame()
     {
         var (repo, pub, _) = AppB.Infrastructure();
 
         // Solo resolver: P0 = Re, others = Kontra
         var players = new[]
         {
-            new PlayerState(AppB.P0, PlayerSeat.First,  Hand.Empty, null),
+            new PlayerState(AppB.P0, PlayerSeat.First, Hand.Empty, null),
             new PlayerState(AppB.P1, PlayerSeat.Second, Hand.Empty, null),
-            new PlayerState(AppB.P2, PlayerSeat.Third,  Hand.Empty, null),
+            new PlayerState(AppB.P2, PlayerSeat.Third, Hand.Empty, null),
             new PlayerState(AppB.P3, PlayerSeat.Fourth, Hand.Empty, null),
         };
 
         var state = GameState.Create(
-            phase:        GamePhase.Playing,
-            players:      players,
-            currentTurn:  AppB.P0,
+            phase: GamePhase.Playing,
+            players: players,
+            currentTurn: AppB.P0,
             partyResolver: new SoloPartyResolver(AppB.P0),
-            rules:        new RuleSet { AllowAnnouncements = true });
+            rules: new RuleSet { AllowAnnouncements = true }
+        );
 
         await repo.SaveAsync(state);
         return (repo, pub, state.Id);
@@ -37,7 +41,9 @@ public class MakeAnnouncementUseCaseTests
         var (repo, pub, id) = await PlayingGame();
         var useCase = new MakeAnnouncementUseCase(repo, pub);
 
-        var result = await useCase.ExecuteAsync(new MakeAnnouncementCommand(id, AppB.P0, AnnouncementType.Re));
+        var result = await useCase.ExecuteAsync(
+            new MakeAnnouncementCommand(id, AppB.P0, AnnouncementType.Re)
+        );
 
         result.Should().BeOfType<GameActionResult<Unit>.Ok>();
 
@@ -53,10 +59,15 @@ public class MakeAnnouncementUseCaseTests
         var useCase = new MakeAnnouncementUseCase(repo, pub);
 
         // P0 is Re; Keine90 requires Re to be announced first
-        var result = await useCase.ExecuteAsync(new MakeAnnouncementCommand(id, AppB.P0, AnnouncementType.Keine90));
+        var result = await useCase.ExecuteAsync(
+            new MakeAnnouncementCommand(id, AppB.P0, AnnouncementType.Keine90)
+        );
 
-        result.Should().BeOfType<GameActionResult<Unit>.Failure>()
-            .Which.Error.Should().Be(GameError.AnnouncementNotAllowed);
+        result
+            .Should()
+            .BeOfType<GameActionResult<Unit>.Failure>()
+            .Which.Error.Should()
+            .Be(GameError.AnnouncementNotAllowed);
     }
 
     [Fact]
@@ -65,25 +76,36 @@ public class MakeAnnouncementUseCaseTests
         var (repo, pub, _) = AppB.Infrastructure();
         var useCase = new MakeAnnouncementUseCase(repo, pub);
 
-        var result = await useCase.ExecuteAsync(new MakeAnnouncementCommand(GameId.New(), AppB.P0, AnnouncementType.Re));
+        var result = await useCase.ExecuteAsync(
+            new MakeAnnouncementCommand(GameId.New(), AppB.P0, AnnouncementType.Re)
+        );
 
-        result.Should().BeOfType<GameActionResult<Unit>.Failure>()
-            .Which.Error.Should().Be(GameError.GameNotFound);
+        result
+            .Should()
+            .BeOfType<GameActionResult<Unit>.Failure>()
+            .Which.Error.Should()
+            .Be(GameError.GameNotFound);
     }
 
     [Fact]
     public async Task MakeAnnouncement_WrongPhase_ReturnsError()
     {
         var (repo, pub, _) = AppB.Infrastructure();
-        var state = GameState.Create(phase: GamePhase.Dealing, players: [
-            new PlayerState(AppB.P0, PlayerSeat.First, Hand.Empty, null),
-        ]);
+        var state = GameState.Create(
+            phase: GamePhase.Dealing,
+            players: [new PlayerState(AppB.P0, PlayerSeat.First, Hand.Empty, null)]
+        );
         await repo.SaveAsync(state);
         var useCase = new MakeAnnouncementUseCase(repo, pub);
 
-        var result = await useCase.ExecuteAsync(new MakeAnnouncementCommand(state.Id, AppB.P0, AnnouncementType.Re));
+        var result = await useCase.ExecuteAsync(
+            new MakeAnnouncementCommand(state.Id, AppB.P0, AnnouncementType.Re)
+        );
 
-        result.Should().BeOfType<GameActionResult<Unit>.Failure>()
-            .Which.Error.Should().Be(GameError.InvalidPhase);
+        result
+            .Should()
+            .BeOfType<GameActionResult<Unit>.Failure>()
+            .Which.Error.Should()
+            .Be(GameError.InvalidPhase);
     }
 }

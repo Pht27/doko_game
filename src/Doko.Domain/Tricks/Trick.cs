@@ -22,7 +22,7 @@ public sealed class Trick
     {
         var led = _cards[0];
         bool winnerIsTrump = trumpEvaluator.IsTrump(led.Card.Type);
-        PlayerId winner    = led.Player;
+        PlayerId winner = led.Player;
         CardType winnerType = led.Card.Type;
         int winnerRank = winnerIsTrump
             ? trumpEvaluator.GetTrumpRank(led.Card.Type)
@@ -30,7 +30,7 @@ public sealed class Trick
 
         for (int i = 1; i < _cards.Count; i++)
         {
-            var tc     = _cards[i];
+            var tc = _cards[i];
             bool isTrump = trumpEvaluator.IsTrump(tc.Card.Type);
 
             if (!isTrump)
@@ -39,7 +39,12 @@ public sealed class Trick
                 if (!winnerIsTrump && tc.Card.Type.Suit == led.Card.Type.Suit)
                 {
                     int rank = trumpEvaluator.GetPlainRank(tc.Card.Type);
-                    if (rank > winnerRank) { winner = tc.Player; winnerType = tc.Card.Type; winnerRank = rank; }
+                    if (rank > winnerRank)
+                    {
+                        winner = tc.Player;
+                        winnerType = tc.Card.Type;
+                        winnerRank = rank;
+                    }
                 }
                 continue;
             }
@@ -49,7 +54,10 @@ public sealed class Trick
             if (!winnerIsTrump)
             {
                 // First trump overrides any plain card
-                winner = tc.Player; winnerType = tc.Card.Type; winnerIsTrump = true; winnerRank = trumpRank;
+                winner = tc.Player;
+                winnerType = tc.Card.Type;
+                winnerIsTrump = true;
+                winnerRank = trumpRank;
                 continue;
             }
 
@@ -57,12 +65,17 @@ public sealed class Trick
             if (IsDulle(tc.Card.Type) && IsDulle(winnerType))
             {
                 if (dulleRule == Rules.DulleRule.SecondBeatsFirst)
-                { winner = tc.Player; winnerType = tc.Card.Type; }
+                {
+                    winner = tc.Player;
+                    winnerType = tc.Card.Type;
+                }
                 // FirstBeatsSecond: first wins — no change
             }
             else if (trumpRank > winnerRank)
             {
-                winner = tc.Player; winnerType = tc.Card.Type; winnerRank = trumpRank;
+                winner = tc.Player;
+                winnerType = tc.Card.Type;
+                winnerRank = trumpRank;
             }
             // Equal non-Dulle trumps: first played wins — no change
         }
@@ -70,6 +83,5 @@ public sealed class Trick
         return winner;
     }
 
-    private static bool IsDulle(CardType card)
-        => card.Suit == Suit.Herz && card.Rank == Rank.Zehn;
+    private static bool IsDulle(CardType card) => card.Suit == Suit.Herz && card.Rank == Rank.Zehn;
 }

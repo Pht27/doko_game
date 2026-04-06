@@ -2,13 +2,13 @@ namespace Doko.Domain.Tests.Trump;
 
 public class SonderkarteDecoratorTests
 {
-    private static readonly CardType KaroAss    = new(Suit.Karo, Rank.Ass);
-    private static readonly CardType KaroZehn   = new(Suit.Karo, Rank.Zehn);
+    private static readonly CardType KaroAss = new(Suit.Karo, Rank.Ass);
+    private static readonly CardType KaroZehn = new(Suit.Karo, Rank.Zehn);
     private static readonly CardType KaroKoenig = new(Suit.Karo, Rank.Koenig);
-    private static readonly CardType Dulle      = new(Suit.Herz, Rank.Zehn);
-    private static readonly CardType KreuzDame  = new(Suit.Kreuz, Rank.Dame);
-    private static readonly CardType KreuzBube  = new(Suit.Kreuz, Rank.Bube);
-    private static readonly CardType PikBube    = new(Suit.Pik, Rank.Bube);
+    private static readonly CardType Dulle = new(Suit.Herz, Rank.Zehn);
+    private static readonly CardType KreuzDame = new(Suit.Kreuz, Rank.Dame);
+    private static readonly CardType KreuzBube = new(Suit.Kreuz, Rank.Bube);
+    private static readonly CardType PikBube = new(Suit.Pik, Rank.Bube);
 
     // ── Schweinchen ──────────────────────────────────────────────────────────
 
@@ -22,8 +22,8 @@ public class SonderkarteDecoratorTests
     [Fact]
     public void Schweinchen_DoesNotAffectOtherCards()
     {
-        var plain  = NormalTrumpEvaluator.Instance;
-        var sut    = Decorated(SchweinchenModifier.Instance);
+        var plain = NormalTrumpEvaluator.Instance;
+        var sut = Decorated(SchweinchenModifier.Instance);
         sut.GetTrumpRank(KreuzDame).Should().Be(plain.GetTrumpRank(KreuzDame));
     }
 
@@ -44,7 +44,8 @@ public class SonderkarteDecoratorTests
         var sut = Decorated(
             SchweinchenModifier.Instance,
             SuperschweinchenModifier.Instance,
-            HyperschweinchenModifier.Instance);
+            HyperschweinchenModifier.Instance
+        );
         sut.GetTrumpRank(KaroKoenig).Should().BeGreaterThan(sut.GetTrumpRank(KaroZehn));
     }
 
@@ -73,8 +74,10 @@ public class SonderkarteDecoratorTests
         // Simulate by using the decorator WITHOUT Heidmann modifier.
         var plain = NormalTrumpEvaluator.Instance;
         var withoutHeidmann = new StandardSonderkarteDecorator(plain, []);
-        withoutHeidmann.GetTrumpRank(KreuzDame)
-            .Should().BeGreaterThan(withoutHeidmann.GetTrumpRank(KreuzBube));
+        withoutHeidmann
+            .GetTrumpRank(KreuzDame)
+            .Should()
+            .BeGreaterThan(withoutHeidmann.GetTrumpRank(KreuzBube));
     }
 
     // ── IsTrump passthrough ───────────────────────────────────────────────────
@@ -90,6 +93,6 @@ public class SonderkarteDecoratorTests
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private static StandardSonderkarteDecorator Decorated(
-        params ISonderkarteRankingModifier[] modifiers) =>
-        new(NormalTrumpEvaluator.Instance, modifiers);
+        params ISonderkarteRankingModifier[] modifiers
+    ) => new(NormalTrumpEvaluator.Instance, modifiers);
 }

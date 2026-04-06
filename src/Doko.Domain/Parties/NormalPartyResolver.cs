@@ -13,7 +13,8 @@ public sealed class NormalPartyResolver : IPartyResolver
 
     public Party? ResolveParty(PlayerId player, GameState state)
     {
-        if (state.InitialHands is null) return null;
+        if (state.InitialHands is null)
+            return null;
         return state.InitialHands[player].Cards.Any(c => c.Type == KreuzDame)
             ? Party.Re
             : Party.Kontra;

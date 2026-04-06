@@ -12,24 +12,28 @@ namespace Doko.Domain.Extrapunkte;
 public sealed class GansGefangenExtrapunkt : IExtrapunkt
 {
     private static readonly CardType KaroNeun = new(Suit.Karo, Rank.Neun);
-    private static readonly CardType KaroAss  = new(Suit.Karo, Rank.Ass);
+    private static readonly CardType KaroAss = new(Suit.Karo, Rank.Ass);
 
     public ExtrapunktType Type => ExtrapunktType.GansGefangen;
 
     public IReadOnlyList<ExtrapunktAward> Evaluate(Trick completedTrick, GameState state)
     {
-        if (!AnimalHelpers.FischaugeActive(state)) return [];
+        if (!AnimalHelpers.FischaugeActive(state))
+            return [];
         // ♦A are Schweinchen when active — no Füchse to catch Gänse
-        if (state.ActiveSonderkarten.Contains(SonderkarteType.Schweinchen)) return [];
+        if (state.ActiveSonderkarten.Contains(SonderkarteType.Schweinchen))
+            return [];
 
         var fishes = completedTrick.Cards.Where(tc => tc.Card.Type == KaroNeun).ToList();
-        var foxes  = completedTrick.Cards.Where(tc => tc.Card.Type == KaroAss).ToList();
+        var foxes = completedTrick.Cards.Where(tc => tc.Card.Type == KaroAss).ToList();
 
-        if (fishes.Count == 0 || foxes.Count != 1) return [];
+        if (fishes.Count == 0 || foxes.Count != 1)
+            return [];
 
         var winner = completedTrick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
         var fox = foxes[0];
-        if (fox.Player != winner) return [];
+        if (fox.Player != winner)
+            return [];
 
         var winnerParty = state.PartyResolver.ResolveParty(winner, state);
         var awards = new List<ExtrapunktAward>();

@@ -16,12 +16,12 @@ public sealed class HeidfrauSonderkarte : SonderkarteBase
     public override CardType TriggeringCard => PikDame;
     public override SonderkarteType? Suppresses => SonderkarteType.Heidmann;
 
-    public override bool AreConditionsMet(GameState state)
-        => IsActive(state, SonderkarteType.Heidmann)
+    public override bool AreConditionsMet(GameState state) =>
+        IsActive(state, SonderkarteType.Heidmann)
         && !IsActive(state, SonderkarteType.Heidfrau)
         && !IsWindowClosed(state, SonderkarteType.Heidfrau)
         && OriginallyHeldBoth(state, PikDame);
 
-    protected override GameStateModification? ExtraEffects(GameState state)
-        => new RebuildTrumpEvaluatorModification();
+    protected override GameStateModification? ExtraEffects(GameState state) =>
+        new RebuildTrumpEvaluatorModification();
 }

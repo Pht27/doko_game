@@ -19,14 +19,17 @@ public sealed class KarlchenExtrapunkt : IExtrapunkt
     {
         bool heidmannActive = state.ActiveSonderkarten.Contains(SonderkarteType.Heidmann);
         bool heidfrauActive = state.ActiveSonderkarten.Contains(SonderkarteType.Heidfrau);
-        if (heidmannActive && !heidfrauActive) return [];
+        if (heidmannActive && !heidfrauActive)
+            return [];
 
         // Only on the last trick (12 tricks total; CompletedTricks has 11 before this one is added)
-        if (state.CompletedTricks.Count != 11) return [];
+        if (state.CompletedTricks.Count != 11)
+            return [];
 
         var winner = completedTrick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
-        bool winnerPlayedKarlchen = completedTrick.Cards
-            .Any(tc => tc.Card.Type == KreuzBube && tc.Player == winner);
+        bool winnerPlayedKarlchen = completedTrick.Cards.Any(tc =>
+            tc.Card.Type == KreuzBube && tc.Player == winner
+        );
 
         return winnerPlayedKarlchen ? [new ExtrapunktAward(Type, winner, 1)] : [];
     }

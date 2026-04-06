@@ -12,6 +12,6 @@ public sealed class HeidmannModifier : ISonderkarteRankingModifier
 
     public bool Applies(CardType card) => card.Rank is Rank.Dame or Rank.Bube;
 
-    public int ModifiedTrumpRank(CardType card, int baseRank)
-        => card.Rank == Rank.Bube ? baseRank + 8 : baseRank - 8;
+    public int ModifiedTrumpRank(CardType card, int baseRank) =>
+        card.Rank == Rank.Bube ? baseRank + 8 : baseRank - 8;
 }

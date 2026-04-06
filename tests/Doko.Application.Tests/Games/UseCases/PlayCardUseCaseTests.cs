@@ -9,20 +9,24 @@ public class PlayCardUseCaseTests
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     /// <summary>Creates a game state already in Playing phase with known hands.</summary>
-    private static async Task<(Fakes.InMemoryGameRepository repo, Fakes.RecordingGameEventPublisher pub, GameId id)>
-        PlayingGame(
-            IReadOnlyList<Card>? p0Hand = null,
-            IReadOnlyList<Card>? p1Hand = null,
-            IReadOnlyList<Card>? p2Hand = null,
-            IReadOnlyList<Card>? p3Hand = null)
+    private static async Task<(
+        Fakes.InMemoryGameRepository repo,
+        Fakes.RecordingGameEventPublisher pub,
+        GameId id
+    )> PlayingGame(
+        IReadOnlyList<Card>? p0Hand = null,
+        IReadOnlyList<Card>? p1Hand = null,
+        IReadOnlyList<Card>? p2Hand = null,
+        IReadOnlyList<Card>? p3Hand = null
+    )
     {
         var (repo, pub, _) = AppB.Infrastructure();
 
         // 4 ♦A cards to keep it simple (all trump in normal mode so no follow-suit issues)
-        var karoAss0 = AppB.Card(0,  Suit.Karo, Rank.Ass);
-        var karoAss1 = AppB.Card(1,  Suit.Karo, Rank.Ass);
-        var pikAss0  = AppB.Card(2,  Suit.Pik,  Rank.Ass);
-        var pikAss1  = AppB.Card(3,  Suit.Pik,  Rank.Ass);
+        var karoAss0 = AppB.Card(0, Suit.Karo, Rank.Ass);
+        var karoAss1 = AppB.Card(1, Suit.Karo, Rank.Ass);
+        var pikAss0 = AppB.Card(2, Suit.Pik, Rank.Ass);
+        var pikAss1 = AppB.Card(3, Suit.Pik, Rank.Ass);
 
         p0Hand ??= [karoAss0];
         p1Hand ??= [karoAss1];
@@ -31,17 +35,18 @@ public class PlayCardUseCaseTests
 
         var players = new[]
         {
-            new PlayerState(AppB.P0, PlayerSeat.First,  AppB.HandOf([.. p0Hand]), null),
+            new PlayerState(AppB.P0, PlayerSeat.First, AppB.HandOf([.. p0Hand]), null),
             new PlayerState(AppB.P1, PlayerSeat.Second, AppB.HandOf([.. p1Hand]), null),
-            new PlayerState(AppB.P2, PlayerSeat.Third,  AppB.HandOf([.. p2Hand]), null),
+            new PlayerState(AppB.P2, PlayerSeat.Third, AppB.HandOf([.. p2Hand]), null),
             new PlayerState(AppB.P3, PlayerSeat.Fourth, AppB.HandOf([.. p3Hand]), null),
         };
 
         var state = GameState.Create(
-            phase:       GamePhase.Playing,
-            players:     players,
+            phase: GamePhase.Playing,
+            players: players,
             currentTurn: AppB.P0,
-            rules:       RuleSet.Minimal());
+            rules: RuleSet.Minimal()
+        );
 
         await repo.SaveAsync(state);
         return (repo, pub, state.Id);
@@ -49,8 +54,8 @@ public class PlayCardUseCaseTests
 
     private static IPlayCardUseCase UseCase(
         Fakes.InMemoryGameRepository repo,
-        Fakes.RecordingGameEventPublisher pub)
-        => new PlayCardUseCase(repo, pub, new GameScorer());
+        Fakes.RecordingGameEventPublisher pub
+    ) => new PlayCardUseCase(repo, pub, new GameScorer());
 
     // ── Tests ─────────────────────────────────────────────────────────────────
 
@@ -104,8 +109,11 @@ public class PlayCardUseCaseTests
 
         var result = await uc.ExecuteAsync(new PlayCardCommand(id, AppB.P1, card.Id, []));
 
-        result.Should().BeOfType<GameActionResult<PlayCardResult>.Failure>()
-            .Which.Error.Should().Be(GameError.NotYourTurn);
+        result
+            .Should()
+            .BeOfType<GameActionResult<PlayCardResult>.Failure>()
+            .Which.Error.Should()
+            .Be(GameError.NotYourTurn);
     }
 
     [Fact]
@@ -114,10 +122,15 @@ public class PlayCardUseCaseTests
         var (repo, pub, _) = AppB.Infrastructure();
         var uc = UseCase(repo, pub);
 
-        var result = await uc.ExecuteAsync(new PlayCardCommand(GameId.New(), AppB.P0, new CardId(0), []));
+        var result = await uc.ExecuteAsync(
+            new PlayCardCommand(GameId.New(), AppB.P0, new CardId(0), [])
+        );
 
-        result.Should().BeOfType<GameActionResult<PlayCardResult>.Failure>()
-            .Which.Error.Should().Be(GameError.GameNotFound);
+        result
+            .Should()
+            .BeOfType<GameActionResult<PlayCardResult>.Failure>()
+            .Which.Error.Should()
+            .Be(GameError.GameNotFound);
     }
 
     [Fact]
@@ -126,24 +139,25 @@ public class PlayCardUseCaseTests
         // One card each, P0 leads with ♦A (plain), others follow with plain non-♦ → P0's ♦A wins
         var c0 = AppB.Card(0, Suit.Karo, Rank.Ass);
         var c1 = AppB.Card(1, Suit.Karo, Rank.Ass);
-        var c2 = AppB.Card(2, Suit.Pik,  Rank.Koenig);
-        var c3 = AppB.Card(3, Suit.Pik,  Rank.Koenig);
+        var c2 = AppB.Card(2, Suit.Pik, Rank.Koenig);
+        var c3 = AppB.Card(3, Suit.Pik, Rank.Koenig);
 
         // Use NoTrump so plain-suit rules apply cleanly
         var players = new[]
         {
-            new PlayerState(AppB.P0, PlayerSeat.First,  AppB.HandOf(c0), null),
+            new PlayerState(AppB.P0, PlayerSeat.First, AppB.HandOf(c0), null),
             new PlayerState(AppB.P1, PlayerSeat.Second, AppB.HandOf(c1), null),
-            new PlayerState(AppB.P2, PlayerSeat.Third,  AppB.HandOf(c2), null),
+            new PlayerState(AppB.P2, PlayerSeat.Third, AppB.HandOf(c2), null),
             new PlayerState(AppB.P3, PlayerSeat.Fourth, AppB.HandOf(c3), null),
         };
         var (repo, pub, _) = AppB.Infrastructure();
         var state = GameState.Create(
-            phase:          GamePhase.Playing,
-            players:        players,
-            currentTurn:    AppB.P0,
+            phase: GamePhase.Playing,
+            players: players,
+            currentTurn: AppB.P0,
             trumpEvaluator: NoTrumpEvaluator.Instance,
-            rules:          RuleSet.Minimal());
+            rules: RuleSet.Minimal()
+        );
         await repo.SaveAsync(state);
         var id = state.Id;
         var uc = UseCase(repo, pub);
@@ -168,11 +182,15 @@ public class PlayCardUseCaseTests
         // Each player has one card; play until game ends
         var c0 = AppB.Card(0, Suit.Karo, Rank.Ass);
         var c1 = AppB.Card(1, Suit.Kreuz, Rank.Ass);
-        var c2 = AppB.Card(2, Suit.Pik,  Rank.Ass);
+        var c2 = AppB.Card(2, Suit.Pik, Rank.Ass);
         var c3 = AppB.Card(3, Suit.Herz, Rank.Ass);
 
         var (repo, pub, id) = await PlayingGame(
-            p0Hand: [c0], p1Hand: [c1], p2Hand: [c2], p3Hand: [c3]);
+            p0Hand: [c0],
+            p1Hand: [c1],
+            p2Hand: [c2],
+            p3Hand: [c3]
+        );
         var uc = UseCase(repo, pub);
 
         await uc.ExecuteAsync(new PlayCardCommand(id, AppB.P0, c0.Id, []));

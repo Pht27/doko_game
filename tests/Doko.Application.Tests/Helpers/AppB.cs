@@ -16,8 +16,12 @@ internal static class AppB
     public static IReadOnlyList<PlayerId> FourPlayerIds => [P0, P1, P2, P3];
 
     // ── Fixture factory ───────────────────────────────────────────────────────
-    public static (InMemoryGameRepository repo, RecordingGameEventPublisher pub, FakeDeckShuffler shuffler)
-        Infrastructure() => (new InMemoryGameRepository(), new RecordingGameEventPublisher(), new FakeDeckShuffler());
+    public static (
+        InMemoryGameRepository repo,
+        RecordingGameEventPublisher pub,
+        FakeDeckShuffler shuffler
+    ) Infrastructure() =>
+        (new InMemoryGameRepository(), new RecordingGameEventPublisher(), new FakeDeckShuffler());
 
     // ── Convenience ──────────────────────────────────────────────────────────
     public static Card Card(byte id, Suit suit, Rank rank) =>
@@ -28,9 +32,11 @@ internal static class AppB
     public static GameState StateInPhase(
         GamePhase phase,
         PlayerId currentTurn = default,
-        IReadOnlyList<PlayerState>? players = null) =>
+        IReadOnlyList<PlayerState>? players = null
+    ) =>
         GameState.Create(
-            phase:       phase,
+            phase: phase,
             currentTurn: currentTurn.Value == 0 ? P0 : currentTurn,
-            players:     players);
+            players: players
+        );
 }
