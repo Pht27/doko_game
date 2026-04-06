@@ -135,6 +135,7 @@ public class GameStateTests
     {
         var state = GameState.Create(rules: RuleSet.Default());
         state.Apply(new ActivateSonderkarteModification(SonderkarteType.Schweinchen));
+        state.Apply(new RebuildTrumpEvaluatorModification());
 
         var karoAss = new CardType(Suit.Karo, Rank.Ass);
         var dulle   = new CardType(Suit.Herz, Rank.Zehn);
@@ -149,6 +150,7 @@ public class GameStateTests
         var state = GameState.Create(rules: RuleSet.Default());
 
         state.Apply(new ActivateSonderkarteModification(SonderkarteType.Heidmann));
+        state.Apply(new RebuildTrumpEvaluatorModification());
 
         // After Heidmann: Jacks above Queens
         var kreuzDame = new CardType(Suit.Kreuz, Rank.Dame);
@@ -158,6 +160,7 @@ public class GameStateTests
                 because: "Heidmann makes Jacks outrank Queens");
 
         state.Apply(new ActivateSonderkarteModification(SonderkarteType.Heidfrau));
+        state.Apply(new RebuildTrumpEvaluatorModification());
 
         // After Heidfrau suppresses Heidmann: Queens back above Jacks
         state.TrumpEvaluator.GetTrumpRank(kreuzDame)

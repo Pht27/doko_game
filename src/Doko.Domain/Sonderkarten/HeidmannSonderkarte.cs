@@ -31,5 +31,7 @@ public sealed class HeidmannSonderkarte : SonderkarteBase
         return !alreadyPlayedPikBube;
     }
 
-    public override GameStateModification? Apply(GameState state) => null;
+    protected override GameStateModification? ExtraEffects(GameState state)
+        => new RebuildTrumpEvaluatorModification();
+
 }

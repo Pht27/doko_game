@@ -22,6 +22,6 @@ public sealed class SchweinSonderkarte : SonderkarteBase
         && !IsWindowClosed(state, SonderkarteType.Schweinchen)
         && OriginallyHeldBoth(state, KaroAss);
 
-    // Ranking change is applied by the game engine via SchweinchenModifier once active.
-    public override GameStateModification? Apply(GameState state) => null;
+    protected override GameStateModification? ExtraEffects(GameState state)
+        => new RebuildTrumpEvaluatorModification();
 }

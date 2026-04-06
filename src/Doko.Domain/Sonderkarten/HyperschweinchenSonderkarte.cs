@@ -23,5 +23,7 @@ public sealed class HyperschweinchenSonderkarte : SonderkarteBase
         && !IsWindowClosed(state, SonderkarteType.Hyperschweinchen)
         && OriginallyHeldBoth(state, KaroKoenig);
 
-    public override GameStateModification? Apply(GameState state) => null;
+    protected override GameStateModification? ExtraEffects(GameState state)
+        => new RebuildTrumpEvaluatorModification();
+
 }
