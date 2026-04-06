@@ -47,6 +47,10 @@ export interface PlayerGameViewResponse {
   currentTurn: number;
   isMyTurn: boolean;
   eligibleReservations: string[];
+  shouldDeclareHealth: boolean;
+  shouldRespondToArmut: boolean;
+  shouldReturnArmutCards: boolean;
+  armutCardReturnCount: number | null;
 }
 
 // ── Results ───────────────────────────────────────────────────────────────────
@@ -105,6 +109,31 @@ export interface MakeReservationRequest {
 
 export interface MakeAnnouncementRequest {
   type: string;
+}
+
+export interface DeclareHealthRequest {
+  hasVorbehalt: boolean;
+}
+
+export interface DeclareHealthResponse {
+  allDeclared: boolean;
+}
+
+export interface AcceptArmutRequest {
+  accepts: boolean;
+}
+
+export interface AcceptArmutResponse {
+  accepted: boolean;
+  schwarzesSau: boolean;
+}
+
+export interface ExchangeArmutCardsRequest {
+  cardIds: number[];
+}
+
+export interface ExchangeArmutCardsResponse {
+  returnedTrumpCount: number;
 }
 
 // ── SignalR events ─────────────────────────────────────────────────────────────

@@ -47,7 +47,10 @@ public sealed class DealCardsUseCase(
         }
 
         state.Apply(new DealHandsModification(hands));
-        state.Apply(new AdvancePhaseModification(GamePhase.Reservations));
+        state.Apply(new AdvancePhaseModification(GamePhase.ReservationHealthCheck));
+        // All four players must declare health status — prime the pending queue.
+        var allPlayers = state.Players.Select(p => p.Id).ToList();
+        state.Apply(new SetPendingRespondersModification(allPlayers));
         state.Apply(new SetCurrentTurnModification(state.Players[0].Id));
 
         await repository.SaveAsync(state, ct);

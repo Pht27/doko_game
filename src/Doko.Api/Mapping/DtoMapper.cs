@@ -32,7 +32,13 @@ public static class DtoMapper
             CurrentTurn: view.CurrentTurn.Value,
             IsMyTurn: view.IsMyTurn,
             EligibleReservations: view.EligibleReservations.Select(r => r.ToString()).ToList()
-        );
+        )
+        {
+            ShouldDeclareHealth = view.ShouldDeclareHealth,
+            ShouldRespondToArmut = view.ShouldRespondToArmut,
+            ShouldReturnArmutCards = view.ShouldReturnArmutCards,
+            ArmutCardReturnCount = view.ArmutCardReturnCount,
+        };
 
     public static CardDto ToDto(Card card) =>
         new(card.Id.Value, card.Type.Suit.ToString(), card.Type.Rank.ToString());

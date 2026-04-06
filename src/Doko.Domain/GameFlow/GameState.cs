@@ -56,14 +56,45 @@ public sealed class GameState
     public IReadOnlyDictionary<PlayerId, Hand>? InitialHands { get; private set; }
 
     /// <summary>
-    /// Tracks each player's reservation declaration during the Reservations phase.
-    /// Populated by <see cref="RecordDeclarationModification"/>; null means the player has not yet declared.
+    /// Round 1 of reservation discovery: each player's health declaration.
+    /// True = Vorbehalt (has a reservation), false = Gesund (none).
+    /// Null means the player has not yet been asked.
+    /// </summary>
+    public IReadOnlyDictionary<PlayerId, bool> HealthDeclarations { get; private set; } =
+        new Dictionary<PlayerId, bool>();
+
+    /// <summary>
+    /// Players still awaiting a declaration in the current reservation check phase
+    /// (SoloCheck, ArmutCheck, …). <see cref="CurrentTurn"/> equals the first entry.
+    /// Empty outside reservation check phases.
+    /// </summary>
+    public IReadOnlyList<PlayerId> PendingReservationResponders { get; private set; } = [];
+
+    /// <summary>
+    /// Tracks each player's reservation declaration during a check phase.
+    /// Populated by <see cref="RecordDeclarationModification"/>; null means the player passed.
+    /// Cleared between check phases by <see cref="ClearReservationDeclarationsModification"/>.
     /// </summary>
     public IReadOnlyDictionary<PlayerId, IReservation?> ReservationDeclarations
     {
         get;
         private set;
     } = new Dictionary<PlayerId, IReservation?>();
+
+    /// <summary>The player who declared Armut. Set when Armut wins the reservation check.</summary>
+    public PlayerId? ArmutPlayer { get; private set; }
+
+    /// <summary>
+    /// The rich player who accepted the Armut. Set during <see cref="GamePhase.ArmutPartnerFinding"/>.
+    /// Null if nobody has accepted yet.
+    /// </summary>
+    public PlayerId? ArmutRichPlayer { get; private set; }
+
+    /// <summary>
+    /// How many cards the poor player gave to the rich player in the Armut exchange.
+    /// Used to validate the number of cards returned.
+    /// </summary>
+    public int ArmutTransferCount { get; private set; }
 
     /// <summary>
     /// Pre-computed trick results (winner + extrapunkt awards) appended at trick completion time.
@@ -186,6 +217,50 @@ public sealed class GameState
                 Players = [.. Players.Select(p => p with { Hand = m.Hands[p.Id] })];
                 InitialHands = m.Hands;
                 break;
+
+            case RecordHealthDeclarationModification m:
+                HealthDeclarations = new Dictionary<PlayerId, bool>(HealthDeclarations)
+                {
+                    [m.Player] = m.HasVorbehalt,
+                };
+                break;
+
+            case SetPendingRespondersModification m:
+                PendingReservationResponders = m.Responders;
+                break;
+
+            case ClearReservationDeclarationsModification:
+                ReservationDeclarations = new Dictionary<PlayerId, IReservation?>();
+                break;
+
+            case SetArmutPlayerModification m:
+                ArmutPlayer = m.ArmutPlayer;
+                break;
+
+            case SetArmutRichPlayerModification m:
+                ArmutRichPlayer = m.RichPlayer;
+                break;
+
+            case ArmutGiveTrumpsModification m:
+            {
+                var poorState = Players.First(p => p.Id == m.PoorPlayer);
+                var richState = Players.First(p => p.Id == m.RichPlayer);
+                var trumps = poorState.Hand.Cards.Where(c => TrumpEvaluator.IsTrump(c.Type)).ToList();
+                ArmutTransferCount = trumps.Count;
+                var poorNewHand = new Hands.Hand(poorState.Hand.Cards.Except(trumps).ToList());
+                var richNewHand = new Hands.Hand(
+                    richState.Hand.Cards.Concat(trumps).ToList()
+                );
+                Players =
+                [
+                    .. Players.Select(p =>
+                        p.Id == m.PoorPlayer ? p with { Hand = poorNewHand }
+                        : p.Id == m.RichPlayer ? p with { Hand = richNewHand }
+                        : p
+                    ),
+                ];
+                break;
+            }
 
             case RecordDeclarationModification m:
                 var updated = new Dictionary<PlayerId, IReservation?>(ReservationDeclarations)

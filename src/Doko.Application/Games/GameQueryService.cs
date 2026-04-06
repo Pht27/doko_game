@@ -98,12 +98,53 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             )
             .ToList();
 
-        // Eligible reservations during reservation phase (before this player has declared)
-        var eligibleReservations =
-            state.Phase == GamePhase.Reservations
-            && !state.ReservationDeclarations.ContainsKey(requestingPlayer)
-                ? ReservationRegistry.GetEligible(requestingPlayer, playerState.Hand, state.Rules)
-                : [];
+        // Health check
+        bool shouldDeclareHealth =
+            state.Phase == GamePhase.ReservationHealthCheck
+            && state.PendingReservationResponders.Count > 0
+            && state.PendingReservationResponders[0] == requestingPlayer;
+
+        // Eligible reservations in a check phase (only when it's this player's turn)
+        bool isCheckPhaseTurn =
+            state.Phase
+                is GamePhase.ReservationSoloCheck
+                    or GamePhase.ReservationArmutCheck
+                    or GamePhase.ReservationSchmeissenCheck
+                    or GamePhase.ReservationHochzeitCheck
+            && state.PendingReservationResponders.Count > 0
+            && state.PendingReservationResponders[0] == requestingPlayer;
+
+        IReadOnlyList<ReservationPriority> eligibleReservations = [];
+        if (isCheckPhaseTurn)
+        {
+            bool singleVorbehalt = state.HealthDeclarations.Count(kv => kv.Value) == 1;
+            eligibleReservations = state.Phase switch
+            {
+                GamePhase.ReservationSoloCheck when singleVorbehalt =>
+                    ReservationRegistry.GetEligible(requestingPlayer, playerState.Hand, state.Rules),
+                GamePhase.ReservationSoloCheck =>
+                    ReservationRegistry.GetEligibleSolos(requestingPlayer, playerState.Hand, state.Rules),
+                GamePhase.ReservationArmutCheck =>
+                    ReservationRegistry.GetEligibleArmut(requestingPlayer, playerState.Hand, state.Rules),
+                GamePhase.ReservationSchmeissenCheck =>
+                    ReservationRegistry.GetEligibleSchmeissen(requestingPlayer, playerState.Hand, state.Rules),
+                GamePhase.ReservationHochzeitCheck =>
+                    ReservationRegistry.GetEligibleHochzeit(requestingPlayer, playerState.Hand, state.Rules),
+                _ => [],
+            };
+        }
+
+        // Armut partner finding
+        bool shouldRespondToArmut =
+            state.Phase == GamePhase.ArmutPartnerFinding
+            && state.PendingReservationResponders.Count > 0
+            && state.PendingReservationResponders[0] == requestingPlayer;
+
+        // Armut card exchange
+        bool shouldReturnArmutCards =
+            state.Phase == GamePhase.ArmutCardExchange
+            && state.ArmutRichPlayer == requestingPlayer;
+        int? armutCardReturnCount = shouldReturnArmutCards ? state.ArmutTransferCount : null;
 
         return new PlayerGameView(
             gameId,
@@ -121,7 +162,11 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
         )
         {
             HandSorted = handSorted,
+            ShouldDeclareHealth = shouldDeclareHealth,
             EligibleReservations = eligibleReservations,
+            ShouldRespondToArmut = shouldRespondToArmut,
+            ShouldReturnArmutCards = shouldReturnArmutCards,
+            ArmutCardReturnCount = armutCardReturnCount,
         };
     }
 

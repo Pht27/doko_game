@@ -3,8 +3,14 @@ import type {
   AuthTokenResponse,
   StartGameResponse,
   PlayerGameViewResponse,
+  DeclareHealthRequest,
+  DeclareHealthResponse,
   MakeReservationRequest,
   MakeReservationResponse,
+  AcceptArmutRequest,
+  AcceptArmutResponse,
+  ExchangeArmutCardsRequest,
+  ExchangeArmutCardsResponse,
   PlayCardRequest,
   PlayCardResponse,
   MakeAnnouncementRequest,
@@ -36,6 +42,39 @@ export function getGameView(
   gameId: string,
 ): Promise<PlayerGameViewResponse> {
   return apiFetch(`/games/${gameId}`, token);
+}
+
+export function declareHealth(
+  token: string,
+  gameId: string,
+  body: DeclareHealthRequest,
+): Promise<DeclareHealthResponse> {
+  return apiFetch(`/games/${gameId}/health`, token, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+}
+
+export function respondToArmut(
+  token: string,
+  gameId: string,
+  body: AcceptArmutRequest,
+): Promise<AcceptArmutResponse> {
+  return apiFetch(`/games/${gameId}/armut-response`, token, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+}
+
+export function exchangeArmutCards(
+  token: string,
+  gameId: string,
+  body: ExchangeArmutCardsRequest,
+): Promise<ExchangeArmutCardsResponse> {
+  return apiFetch(`/games/${gameId}/armut-exchange`, token, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
 }
 
 export function makeReservation(
