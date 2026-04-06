@@ -166,12 +166,10 @@ function App() {
         </div>
 
         {/* Announcement button */}
-        {view?.isMyTurn && (
-          <AnnouncementButton
-            legalAnnouncements={view.legalAnnouncements}
-            onAnnounce={handleAnnouncement}
-          />
-        )}
+        <AnnouncementButton
+          legalAnnouncements={view?.legalAnnouncements ?? []}
+          onAnnounce={handleAnnouncement}
+        />
 
         {/* Action error */}
         {actionError && (
