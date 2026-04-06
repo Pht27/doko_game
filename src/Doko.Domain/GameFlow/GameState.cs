@@ -245,12 +245,12 @@ public sealed class GameState
             {
                 var poorState = Players.First(p => p.Id == m.PoorPlayer);
                 var richState = Players.First(p => p.Id == m.RichPlayer);
-                var trumps = poorState.Hand.Cards.Where(c => TrumpEvaluator.IsTrump(c.Type)).ToList();
+                var trumps = poorState
+                    .Hand.Cards.Where(c => TrumpEvaluator.IsTrump(c.Type))
+                    .ToList();
                 ArmutTransferCount = trumps.Count;
                 var poorNewHand = new Hands.Hand(poorState.Hand.Cards.Except(trumps).ToList());
-                var richNewHand = new Hands.Hand(
-                    richState.Hand.Cards.Concat(trumps).ToList()
-                );
+                var richNewHand = new Hands.Hand(richState.Hand.Cards.Concat(trumps).ToList());
                 Players =
                 [
                     .. Players.Select(p =>

@@ -116,9 +116,7 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
 
         bool singleVorbehalt = state.HealthDeclarations.Count(kv => kv.Value) == 1;
         bool mustDeclareReservation =
-            isCheckPhaseTurn
-            && state.Phase == GamePhase.ReservationSoloCheck
-            && singleVorbehalt;
+            isCheckPhaseTurn && state.Phase == GamePhase.ReservationSoloCheck && singleVorbehalt;
 
         IReadOnlyList<ReservationPriority> eligibleReservations = [];
         if (isCheckPhaseTurn)
@@ -131,14 +129,26 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
                         playerState.Hand,
                         state.Rules
                     ),
-                GamePhase.ReservationSoloCheck =>
-                    ReservationRegistry.GetEligibleSolos(requestingPlayer, playerState.Hand, state.Rules),
-                GamePhase.ReservationArmutCheck =>
-                    ReservationRegistry.GetEligibleArmut(requestingPlayer, playerState.Hand, state.Rules),
-                GamePhase.ReservationSchmeissenCheck =>
-                    ReservationRegistry.GetEligibleSchmeissen(requestingPlayer, playerState.Hand, state.Rules),
-                GamePhase.ReservationHochzeitCheck =>
-                    ReservationRegistry.GetEligibleHochzeit(requestingPlayer, playerState.Hand, state.Rules),
+                GamePhase.ReservationSoloCheck => ReservationRegistry.GetEligibleSolos(
+                    requestingPlayer,
+                    playerState.Hand,
+                    state.Rules
+                ),
+                GamePhase.ReservationArmutCheck => ReservationRegistry.GetEligibleArmut(
+                    requestingPlayer,
+                    playerState.Hand,
+                    state.Rules
+                ),
+                GamePhase.ReservationSchmeissenCheck => ReservationRegistry.GetEligibleSchmeissen(
+                    requestingPlayer,
+                    playerState.Hand,
+                    state.Rules
+                ),
+                GamePhase.ReservationHochzeitCheck => ReservationRegistry.GetEligibleHochzeit(
+                    requestingPlayer,
+                    playerState.Hand,
+                    state.Rules
+                ),
                 _ => [],
             };
         }
@@ -151,8 +161,7 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
 
         // Armut card exchange
         bool shouldReturnArmutCards =
-            state.Phase == GamePhase.ArmutCardExchange
-            && state.ArmutRichPlayer == requestingPlayer;
+            state.Phase == GamePhase.ArmutCardExchange && state.ArmutRichPlayer == requestingPlayer;
         int? armutCardReturnCount = shouldReturnArmutCards ? state.ArmutTransferCount : null;
 
         return new PlayerGameView(

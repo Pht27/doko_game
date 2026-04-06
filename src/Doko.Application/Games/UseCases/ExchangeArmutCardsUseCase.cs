@@ -42,9 +42,7 @@ public sealed class ExchangeArmutCardsUseCase(
             return new GameActionResult<ExchangeArmutCardsResult>.Failure(GameError.NotYourTurn);
 
         if (command.CardIdsToReturn.Count != state.ArmutTransferCount)
-            return new GameActionResult<ExchangeArmutCardsResult>.Failure(
-                GameError.IllegalCard
-            );
+            return new GameActionResult<ExchangeArmutCardsResult>.Failure(GameError.IllegalCard);
 
         var richPlayerState = state.Players.First(p => p.Id == command.RichPlayer);
         var poorPlayer = state.ArmutPlayer!.Value;
@@ -63,12 +61,8 @@ public sealed class ExchangeArmutCardsUseCase(
         int returnedTrumpCount = validCards.Count(c => state.TrumpEvaluator.IsTrump(c.Type));
 
         // Move cards: remove from rich, add to poor
-        var newRichHand = new Hand(
-            richHand.Cards.Where(c => !validCards.Contains(c)).ToList()
-        );
-        var newPoorHand = new Hand(
-            poorPlayerState.Hand.Cards.Concat(validCards).ToList()
-        );
+        var newRichHand = new Hand(richHand.Cards.Where(c => !validCards.Contains(c)).ToList());
+        var newPoorHand = new Hand(poorPlayerState.Hand.Cards.Concat(validCards).ToList());
 
         state.Apply(new UpdatePlayerHandModification(command.RichPlayer, newRichHand));
         state.Apply(new UpdatePlayerHandModification(poorPlayer, newPoorHand));

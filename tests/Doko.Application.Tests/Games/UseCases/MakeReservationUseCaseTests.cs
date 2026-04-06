@@ -170,10 +170,12 @@ public class MakeReservationUseCaseTests
     public async Task DeclareHealth_AllGesund_AdvancesToPlaying()
     {
         var (repo, pub, _) = AppB.Infrastructure();
-        var gameId = ((GameActionResult<StartGameResult>.Ok)
+        var gameId = (
+            (GameActionResult<StartGameResult>.Ok)
                 await new StartGameUseCase(repo, pub).ExecuteAsync(
                     new StartGameCommand(AppB.FourPlayerIds, RuleSet.Minimal())
-                ))
+                )
+        )
             .Value
             .GameId;
         await new DealCardsUseCase(repo, pub, new Fakes.FakeDeckShuffler()).ExecuteAsync(

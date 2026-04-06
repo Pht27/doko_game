@@ -21,10 +21,8 @@ public interface IAcceptArmutUseCase
 /// Handles a player's acceptance or refusal of the Armut during
 /// <see cref="GamePhase.ArmutPartnerFinding"/>.
 /// </summary>
-public sealed class AcceptArmutUseCase(
-    IGameRepository repository,
-    IGameEventPublisher publisher
-) : IAcceptArmutUseCase
+public sealed class AcceptArmutUseCase(IGameRepository repository, IGameEventPublisher publisher)
+    : IAcceptArmutUseCase
 {
     public async Task<GameActionResult<AcceptArmutResult>> ExecuteAsync(
         AcceptArmutCommand command,
