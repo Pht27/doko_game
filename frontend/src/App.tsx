@@ -188,7 +188,7 @@ function App() {
       </div>
 
       {/* Overlays */}
-      {view?.phase === 'Reservations' && view.isMyTurn && (
+      {view?.phase === 'Reservations' && view.eligibleReservations.length > 0 && (
         <ReservationDialog
           playerId={activePlayer}
           eligibleReservations={view.eligibleReservations}
