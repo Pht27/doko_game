@@ -20,7 +20,6 @@ export function HandDisplay({
       {cards.map((card, i) => {
         const isLegal = legalCardIds.has(card.id);
         const clickable = isMyTurn && isLegal;
-        const offset = i * 36;
 
         return (
           <div
@@ -39,7 +38,6 @@ export function HandDisplay({
                   : 'opacity-40 cursor-default',
                 'transition-transform duration-100',
               ].join(' ')}
-              style={{ marginLeft: i === 0 ? 0 : -20 }}
             />
           </div>
         );
