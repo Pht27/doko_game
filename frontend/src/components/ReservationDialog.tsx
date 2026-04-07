@@ -38,24 +38,6 @@ export function ReservationDialog({ playerId, eligibleReservations, mustDeclare 
           );
         }
 
-        if (res === 'Armut') {
-          return (
-            <div key={res} className="flex flex-col gap-1">
-              {[0, 1, 2, 3]
-                .filter((p) => p !== playerId)
-                .map((partner) => (
-                  <button
-                    key={partner}
-                    onClick={() => onDeclare('Armut', null, partner)}
-                    className="w-full bg-orange-600 hover:bg-orange-500 text-white rounded-lg py-1.5 text-xs transition-colors"
-                  >
-                    Armut → P{partner}
-                  </button>
-                ))}
-            </div>
-          );
-        }
-
         return (
           <button
             key={res}

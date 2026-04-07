@@ -62,4 +62,15 @@ public record PlayerGameView(
 
     /// <summary>How many cards the rich player must return. Null outside <see cref="GamePhase.ArmutCardExchange"/>.</summary>
     public int? ArmutCardReturnCount { get; init; } = null;
+
+    /// <summary>
+    /// Number of cards exchanged in the Armut. Non-null after the exchange completes (i.e. during
+    /// the Playing phase of an Armut game). Used to display the exchange announcement to all players.
+    /// </summary>
+    public int? ArmutExchangeCardCount { get; init; } = null;
+
+    /// <summary>
+    /// Whether the rich player's returned cards included any trump. Non-null after the exchange.
+    /// </summary>
+    public bool? ArmutReturnedTrump { get; init; } = null;
 }

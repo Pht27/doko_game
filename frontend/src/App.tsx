@@ -10,7 +10,6 @@ import { HandDisplay } from './components/HandDisplay';
 import { HealthCheckDialog } from './components/HealthCheckDialog';
 import { ReservationDialog } from './components/ReservationDialog';
 import { ArmutPartnerDialog } from './components/ArmutPartnerDialog';
-import { ArmutCardExchangeDialog } from './components/ArmutCardExchangeDialog';
 import { SonderkarteOverlay } from './components/SonderkarteOverlay';
 import { AnnouncementButton } from './components/AnnouncementButton';
 import { ResultScreen } from './components/ResultScreen';
@@ -28,6 +27,8 @@ function App() {
   // Pending card play — waiting for sonderkarte selection
   const [pendingCard, setPendingCard] = useState<{ card: CardDto; sonderkarten: SonderkarteInfoDto[] } | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  // Cards selected for Armut return
+  const [armutReturnSelected, setArmutReturnSelected] = useState<Set<number>>(new Set());
 
   if (!session) {
     return (
@@ -46,14 +47,29 @@ function App() {
   const { tokens, gameId } = session;
   const token = tokens[activePlayer];
 
-  async function handleCardClick(card: CardDto) {
+  function handleCardClick(card: CardDto) {
     if (!view) return;
+
+    // In Armut exchange mode, clicking a card toggles selection instead of playing it
+    if (view.shouldReturnArmutCards) {
+      setArmutReturnSelected((prev) => {
+        const next = new Set(prev);
+        if (next.has(card.id)) {
+          next.delete(card.id);
+        } else if (next.size < (view.armutCardReturnCount ?? 0)) {
+          next.add(card.id);
+        }
+        return next;
+      });
+      return;
+    }
+
     const eligibleSk = view.eligibleSonderkartenPerCard[card.id] ?? [];
     if (eligibleSk.length > 0) {
       setPendingCard({ card, sonderkarten: eligibleSk });
       return;
     }
-    await submitPlayCard(card.id, [], null);
+    void submitPlayCard(card.id, [], null);
   }
 
   async function submitPlayCard(cardId: number, activateSonderkarten: string[], genscherPartnerId: number | null) {
@@ -106,6 +122,7 @@ function App() {
 
   async function handleArmutExchange(cardIds: number[]) {
     setActionError(null);
+    setArmutReturnSelected(new Set());
     try {
       await exchangeArmutCards(token, gameId, { cardIds });
       refetch();
@@ -155,6 +172,14 @@ function App() {
         <PlayerSwitcher activePlayer={activePlayer} onSwitch={setActivePlayer} />
       </div>
 
+      {/* Armut exchange announcement — shown for all players throughout the Armut game */}
+      {view?.armutExchangeCardCount != null && view.armutReturnedTrump != null && (
+        <div className="bg-orange-900/40 text-orange-200 text-xs text-center py-1 px-4">
+          Armut: {view.armutExchangeCardCount} Karte(n) zurückgegeben
+          {view.armutReturnedTrump ? ' · mit Trump' : ' · kein Trump'}
+        </div>
+      )}
+
       {/* Main game area */}
       <div className="flex-1 relative flex flex-col items-center justify-between py-2">
         {/* Top opponent */}
@@ -197,12 +222,21 @@ function App() {
               onRespond={handleArmutResponse}
             />
           ) : view?.shouldReturnArmutCards && view.armutCardReturnCount !== null ? (
-            <ArmutCardExchangeDialog
-              playerId={activePlayer}
-              hand={view.handSorted}
-              returnCount={view.armutCardReturnCount}
-              onConfirm={handleArmutExchange}
-            />
+            <div className="bg-gray-800/95 rounded-2xl p-4 w-72 shadow-2xl flex flex-col gap-2 border border-white/10">
+              <h2 className="text-white font-bold text-sm">
+                P{activePlayer}: {view.armutCardReturnCount} Karte(n) zurückgeben
+              </h2>
+              <p className="text-white/60 text-xs">
+                Wähle {view.armutCardReturnCount} Karte(n) aus deiner Hand ({armutReturnSelected.size}/{view.armutCardReturnCount})
+              </p>
+              <button
+                disabled={armutReturnSelected.size !== view.armutCardReturnCount}
+                onClick={() => handleArmutExchange(Array.from(armutReturnSelected))}
+                className="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg py-1.5 text-sm font-semibold transition-colors"
+              >
+                Bestätigen
+              </button>
+            </div>
           ) : (
             <TrickArea
               trick={view?.currentTrick ?? null}
@@ -243,6 +277,9 @@ function App() {
             isMyTurn={view.isMyTurn}
             eligibleSonderkarten={view.eligibleSonderkartenPerCard}
             onCardClick={handleCardClick}
+            selectionMode={view.shouldReturnArmutCards}
+            selectedCardIds={armutReturnSelected}
+            maxSelection={view.armutCardReturnCount ?? undefined}
           />
         )}
         {viewLoading && <div className="text-center text-white/40 text-xs py-1">Loading…</div>}

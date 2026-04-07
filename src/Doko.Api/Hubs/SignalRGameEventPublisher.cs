@@ -75,6 +75,17 @@ public sealed class SignalRGameEventPublisher(IHubContext<GameHub> hubContext) :
                     ct
                 ),
 
+                ArmutCardsExchangedEvent e => group.SendAsync(
+                    "armutCardsExchanged",
+                    new
+                    {
+                        richPlayer = e.RichPlayer.Value,
+                        cardCount = e.CardCount,
+                        includedTrump = e.IncludedTrump,
+                    },
+                    ct
+                ),
+
                 _ => Task.CompletedTask,
             };
 

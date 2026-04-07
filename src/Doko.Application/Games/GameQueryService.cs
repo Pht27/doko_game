@@ -164,6 +164,11 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             state.Phase == GamePhase.ArmutCardExchange && state.ArmutRichPlayer == requestingPlayer;
         int? armutCardReturnCount = shouldReturnArmutCards ? state.ArmutTransferCount : null;
 
+        // Armut exchange announcement — shown to all players after exchange completes
+        int? armutExchangeCardCount =
+            state.ArmutReturnedTrump.HasValue ? state.ArmutTransferCount : null;
+        bool? armutReturnedTrump = state.ArmutReturnedTrump;
+
         return new PlayerGameView(
             gameId,
             state.Phase,
@@ -186,6 +191,8 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             ShouldRespondToArmut = shouldRespondToArmut,
             ShouldReturnArmutCards = shouldReturnArmutCards,
             ArmutCardReturnCount = armutCardReturnCount,
+            ArmutExchangeCardCount = armutExchangeCardCount,
+            ArmutReturnedTrump = armutReturnedTrump,
         };
     }
 

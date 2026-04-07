@@ -31,4 +31,10 @@ public record PlayerGameViewResponse(
 
     /// <summary>How many cards must be returned. Null outside ArmutCardExchange phase.</summary>
     public int? ArmutCardReturnCount { get; init; } = null;
+
+    /// <summary>Cards exchanged in Armut. Non-null after exchange completes (for the announcement).</summary>
+    public int? ArmutExchangeCardCount { get; init; } = null;
+
+    /// <summary>Whether the returned cards included trump. Non-null after exchange completes.</summary>
+    public bool? ArmutReturnedTrump { get; init; } = null;
 }

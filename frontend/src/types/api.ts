@@ -52,6 +52,8 @@ export interface PlayerGameViewResponse {
   shouldRespondToArmut: boolean;
   shouldReturnArmutCards: boolean;
   armutCardReturnCount: number | null;
+  armutExchangeCardCount: number | null;
+  armutReturnedTrump: boolean | null;
 }
 
 // ── Results ───────────────────────────────────────────────────────────────────
@@ -145,4 +147,5 @@ export type SignalREvent =
   | 'AnnouncementMade'
   | 'ReservationMade'
   | 'GameFinished'
-  | 'SonderkarteTriggered';
+  | 'SonderkarteTriggered'
+  | 'ArmutCardsExchanged';
