@@ -1,1 +1,1 @@
-I want to rename all UseCases to Handlers, i.e. AcceptArmutHandler etc... Because that is a synonym right?
+I want to rename all UseCases to Handlers, i.e. AcceptArmutHandler etc... Because that is a synonym right? Also the functions should be readable by creating private helper functions and calling them.

@@ -1,1 +1,1 @@
-I want the frontend to use more Components where it makes sens. I feel like this is the strength of React and were not making use of that. And for each component i want a separate styling file.
+I want the frontend to use more Components where it makes sens. I feel like this is the strength of React and were not making use of that. And for each component i want a separate styling file. The App file for example is too bloated, we should separate it into more sensible components.

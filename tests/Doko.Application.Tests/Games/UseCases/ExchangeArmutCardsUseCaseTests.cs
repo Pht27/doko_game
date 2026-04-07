@@ -161,6 +161,21 @@ public class ExchangeArmutCardsUseCaseTests
     }
 
     [Fact]
+    public async Task ExchangeArmutCards_ValidExchange_FirstNonRichPartyPlayerLeftOfRichLeads()
+    {
+        // P0 = poor (seat 0), P1 = rich (seat 1)
+        // Left of rich: P2 (seat 2), then P3 (seat 3), then P0 (poor — skip).
+        // Expected leader: P2.
+        var (repo, pub, id) = await ArmutCardExchangeGame();
+        var useCase = new ExchangeArmutCardsUseCase(repo, pub);
+
+        await useCase.ExecuteAsync(new ExchangeArmutCardsCommand(id, AppB.P1, [Trump1.Id, Trump2.Id]));
+
+        var state = await repo.GetAsync(id);
+        state!.CurrentTurn.Should().Be(AppB.P2);
+    }
+
+    [Fact]
     public async Task ExchangeArmutCards_ReturnedTrumpCount_ReflectsActualTrumpsReturned()
     {
         var (repo, pub, id) = await ArmutCardExchangeGame();
