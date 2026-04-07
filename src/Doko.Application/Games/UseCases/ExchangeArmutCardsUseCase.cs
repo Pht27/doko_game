@@ -68,10 +68,12 @@ public sealed class ExchangeArmutCardsUseCase(
         state.Apply(new UpdatePlayerHandModification(poorPlayer, newPoorHand));
         state.Apply(new SetArmutReturnedTrumpModification(returnedTrumpCount > 0));
 
-        // The player seated immediately before the rich player in seat order leads the first trick.
+        // The first player to the left of the rich player who is not in the rich party leads.
         var richSeat = (int)state.Players.First(p => p.Id == command.RichPlayer).Seat;
-        var precedingSeat = (richSeat - 1 + 4) % 4;
-        var startingPlayer = state.Players.First(p => (int)p.Seat == precedingSeat).Id;
+        var startingPlayer = state.Players
+            .OrderBy(p => ((int)p.Seat - richSeat - 1 + 4) % 4)
+            .First(p => p.Id != command.RichPlayer && p.Id != poorPlayer)
+            .Id;
 
         state.Apply(new AdvancePhaseModification(GamePhase.Playing));
         state.Apply(new SetCurrentTurnModification(startingPlayer));
