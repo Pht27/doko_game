@@ -39,6 +39,8 @@ public static class DtoMapper
             ShouldRespondToArmut = view.ShouldRespondToArmut,
             ShouldReturnArmutCards = view.ShouldReturnArmutCards,
             ArmutCardReturnCount = view.ArmutCardReturnCount,
+            ArmutExchangeCardCount = view.ArmutExchangeCardCount,
+            ArmutReturnedTrump = view.ArmutReturnedTrump,
         };
 
     public static CardDto ToDto(Card card) =>
@@ -128,7 +130,9 @@ public static class DtoMapper
 
     private static ArmutReservation BuildArmut(MakeReservationRequest req, PlayerId player)
     {
-        var richPlayer = new PlayerId((byte)(req.ArmutPartner ?? 0));
-        return new ArmutReservation(player, richPlayer);
+        // Rich player is not known at declaration time — it is determined during ArmutPartnerFinding.
+        // Use the declaring player as a placeholder; the real reservation is constructed in AcceptArmutUseCase.
+        _ = req; // ArmutPartner field intentionally ignored
+        return new ArmutReservation(player, player);
     }
 }

@@ -19,3 +19,15 @@
 .card-unplayable {
   @apply opacity-50 cursor-default;
 }
+
+.card-selectable {
+  @apply cursor-pointer hover:-translate-y-3 ring-2 ring-orange-400 transition-transform;
+}
+
+.card-selected {
+  @apply cursor-pointer ring-2 ring-orange-500 transition-transform;
+}
+
+.card-wrapper-selected {
+  @apply -translate-y-4;
+}

@@ -66,9 +66,15 @@ public sealed class ExchangeArmutCardsUseCase(
 
         state.Apply(new UpdatePlayerHandModification(command.RichPlayer, newRichHand));
         state.Apply(new UpdatePlayerHandModification(poorPlayer, newPoorHand));
+        state.Apply(new SetArmutReturnedTrumpModification(returnedTrumpCount > 0));
+
+        // The player seated immediately before the rich player in seat order leads the first trick.
+        var richSeat = (int)state.Players.First(p => p.Id == command.RichPlayer).Seat;
+        var precedingSeat = (richSeat - 1 + 4) % 4;
+        var startingPlayer = state.Players.First(p => (int)p.Seat == precedingSeat).Id;
 
         state.Apply(new AdvancePhaseModification(GamePhase.Playing));
-        state.Apply(new SetCurrentTurnModification(state.Players[0].Id));
+        state.Apply(new SetCurrentTurnModification(startingPlayer));
 
         var events = new List<IDomainEvent>
         {

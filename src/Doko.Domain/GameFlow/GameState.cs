@@ -97,6 +97,12 @@ public sealed class GameState
     public int ArmutTransferCount { get; private set; }
 
     /// <summary>
+    /// Whether the cards returned by the rich player during <see cref="GamePhase.ArmutCardExchange"/>
+    /// included any trump. Null before the exchange completes.
+    /// </summary>
+    public bool? ArmutReturnedTrump { get; private set; }
+
+    /// <summary>
     /// Pre-computed trick results (winner + extrapunkt awards) appended at trick completion time.
     /// Parallel to <see cref="CompletedTricks"/>; used by <c>FinishGameUseCase</c> to build
     /// <c>CompletedGame</c> for the scorer.
@@ -261,6 +267,10 @@ public sealed class GameState
                 ];
                 break;
             }
+
+            case SetArmutReturnedTrumpModification m:
+                ArmutReturnedTrump = m.IncludedTrump;
+                break;
 
             case RecordDeclarationModification m:
                 var updated = new Dictionary<PlayerId, IReservation?>(ReservationDeclarations)
