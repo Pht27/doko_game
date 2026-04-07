@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Doko.Application\Doko.Application.csproj" />
-    <ProjectReference Include="..\..\src\Doko.Domain\Doko.Domain.csproj" />
+    <ProjectReference Include="..\..\backend\Doko.Application\Doko.Application.csproj" />
+    <ProjectReference Include="..\..\backend\Doko.Domain\Doko.Domain.csproj" />
   </ItemGroup>
 </Project>

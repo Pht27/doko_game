@@ -33,6 +33,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Doko.Domain\Doko.Domain.csproj" />
+    <ProjectReference Include="..\..\backend\Doko.Domain\Doko.Domain.csproj" />
   </ItemGroup>
 </Project>
