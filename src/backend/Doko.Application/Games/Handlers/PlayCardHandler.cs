@@ -13,9 +13,9 @@ using Doko.Domain.Scoring;
 using Doko.Domain.Sonderkarten;
 using Doko.Domain.Tricks;
 
-namespace Doko.Application.Games.UseCases;
+namespace Doko.Application.Games.Handlers;
 
-public interface IPlayCardUseCase
+public interface IPlayCardHandler
 {
     Task<GameActionResult<PlayCardResult>> ExecuteAsync(
         PlayCardCommand command,
@@ -23,13 +23,13 @@ public interface IPlayCardUseCase
     );
 }
 
-public sealed class PlayCardUseCase(
+public sealed class PlayCardHandler(
     IGameRepository repository,
     IGameEventPublisher publisher,
     IGameScorer scorer
-) : IPlayCardUseCase
+) : IPlayCardHandler
 {
-    private readonly FinishGameUseCase _finisher = new(scorer);
+    private readonly FinishGameHandler _finisher = new(scorer);
 
     public async Task<GameActionResult<PlayCardResult>> ExecuteAsync(
         PlayCardCommand command,

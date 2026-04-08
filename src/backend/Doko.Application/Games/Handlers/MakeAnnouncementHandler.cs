@@ -6,9 +6,9 @@ using Doko.Domain.GameFlow;
 using Doko.Domain.GameFlow.Events;
 using Doko.Domain.Sonderkarten;
 
-namespace Doko.Application.Games.UseCases;
+namespace Doko.Application.Games.Handlers;
 
-public interface IMakeAnnouncementUseCase
+public interface IMakeAnnouncementHandler
 {
     Task<GameActionResult<Unit>> ExecuteAsync(
         MakeAnnouncementCommand command,
@@ -16,10 +16,10 @@ public interface IMakeAnnouncementUseCase
     );
 }
 
-public sealed class MakeAnnouncementUseCase(
+public sealed class MakeAnnouncementHandler(
     IGameRepository repository,
     IGameEventPublisher publisher
-) : IMakeAnnouncementUseCase
+) : IMakeAnnouncementHandler
 {
     public async Task<GameActionResult<Unit>> ExecuteAsync(
         MakeAnnouncementCommand command,

@@ -35,6 +35,6 @@ public sealed class KemmerichSonderkarte : SonderkarteBase
         );
     }
 
-    // Announcement withdrawal is interactive; PlayCardUseCase prompts the player and
+    // Announcement withdrawal is interactive; PlayCardHandler prompts the player and
     // applies WithdrawAnnouncementModification after receiving the choice.
 }

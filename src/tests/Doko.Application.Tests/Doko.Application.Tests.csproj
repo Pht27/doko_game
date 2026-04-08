@@ -21,7 +21,7 @@
     <Using Include="Doko.Application.Games.Commands" />
     <Using Include="Doko.Application.Games.Results" />
     <Using Include="Doko.Application.Games.Queries" />
-    <Using Include="Doko.Application.Games.UseCases" />
+    <Using Include="Doko.Application.Games.Handlers" />
     <Using Include="Doko.Domain.Cards" />
     <Using Include="Doko.Domain.Players" />
     <Using Include="Doko.Domain.Hands" />

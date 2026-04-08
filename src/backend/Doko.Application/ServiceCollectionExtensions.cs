@@ -1,6 +1,6 @@
 using Doko.Application.Abstractions;
 using Doko.Application.Games;
-using Doko.Application.Games.UseCases;
+using Doko.Application.Games.Handlers;
 using Doko.Domain.Scoring;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,14 +15,14 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddDokoApplication(this IServiceCollection services)
     {
-        services.AddScoped<IStartGameUseCase, StartGameUseCase>();
-        services.AddScoped<IDealCardsUseCase, DealCardsUseCase>();
-        services.AddScoped<IDeclareHealthStatusUseCase, DeclareHealthStatusUseCase>();
-        services.AddScoped<IMakeReservationUseCase, MakeReservationUseCase>();
-        services.AddScoped<IAcceptArmutUseCase, AcceptArmutUseCase>();
-        services.AddScoped<IExchangeArmutCardsUseCase, ExchangeArmutCardsUseCase>();
-        services.AddScoped<IPlayCardUseCase, PlayCardUseCase>();
-        services.AddScoped<IMakeAnnouncementUseCase, MakeAnnouncementUseCase>();
+        services.AddScoped<IStartGameHandler, StartGameHandler>();
+        services.AddScoped<IDealCardsHandler, DealCardsHandler>();
+        services.AddScoped<IDeclareHealthStatusHandler, DeclareHealthStatusHandler>();
+        services.AddScoped<IMakeReservationHandler, MakeReservationHandler>();
+        services.AddScoped<IAcceptArmutHandler, AcceptArmutHandler>();
+        services.AddScoped<IExchangeArmutCardsHandler, ExchangeArmutCardsHandler>();
+        services.AddScoped<IPlayCardHandler, PlayCardHandler>();
+        services.AddScoped<IMakeAnnouncementHandler, MakeAnnouncementHandler>();
         services.AddScoped<IGameQueryService, GameQueryService>();
         services.AddSingleton<IGameScorer, GameScorer>();
         return services;

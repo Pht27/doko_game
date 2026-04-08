@@ -1,8 +1,8 @@
 using Doko.Application.Tests.Helpers;
 
-namespace Doko.Application.Tests.Games.UseCases;
+namespace Doko.Application.Tests.Games.Handlers;
 
-public class ExchangeArmutCardsUseCaseTests
+public class ExchangeArmutCardsHandlerTests
 {
     private static readonly Card Trump1 = AppB.Card(0, Suit.Kreuz, Rank.Bube);
     private static readonly Card Trump2 = AppB.Card(1, Suit.Kreuz, Rank.Dame);
@@ -44,7 +44,7 @@ public class ExchangeArmutCardsUseCaseTests
         await repo.SaveAsync(state);
 
         // P1 accepts → game moves to ArmutCardExchange, trumps transferred
-        await new AcceptArmutUseCase(repo, pub).ExecuteAsync(
+        await new AcceptArmutHandler(repo, pub).ExecuteAsync(
             new AcceptArmutCommand(state.Id, AppB.P1, true)
         );
 
@@ -58,7 +58,7 @@ public class ExchangeArmutCardsUseCaseTests
         var state = GameState.Create(phase: GamePhase.Playing, currentTurn: AppB.P1);
         state.Apply(new SetArmutRichPlayerModification(AppB.P1));
         await repo.SaveAsync(state);
-        var useCase = new ExchangeArmutCardsUseCase(repo, pub);
+        var useCase = new ExchangeArmutCardsHandler(repo, pub);
 
         var result = await useCase.ExecuteAsync(
             new ExchangeArmutCardsCommand(state.Id, AppB.P1, [])
@@ -75,7 +75,7 @@ public class ExchangeArmutCardsUseCaseTests
     public async Task ExchangeArmutCards_WrongPlayer_ReturnsNotYourTurn()
     {
         var (repo, pub, id) = await ArmutCardExchangeGame();
-        var useCase = new ExchangeArmutCardsUseCase(repo, pub);
+        var useCase = new ExchangeArmutCardsHandler(repo, pub);
 
         // P0 (poor player) tries to return cards — only the rich player can
         var result = await useCase.ExecuteAsync(
@@ -93,7 +93,7 @@ public class ExchangeArmutCardsUseCaseTests
     public async Task ExchangeArmutCards_WrongCount_ReturnsIllegalCard()
     {
         var (repo, pub, id) = await ArmutCardExchangeGame();
-        var useCase = new ExchangeArmutCardsUseCase(repo, pub);
+        var useCase = new ExchangeArmutCardsHandler(repo, pub);
 
         // ArmutTransferCount = 2; returning only 1 card is invalid
         var result = await useCase.ExecuteAsync(
@@ -111,7 +111,7 @@ public class ExchangeArmutCardsUseCaseTests
     public async Task ExchangeArmutCards_CardNotInHand_ReturnsIllegalCard()
     {
         var (repo, pub, id) = await ArmutCardExchangeGame();
-        var useCase = new ExchangeArmutCardsUseCase(repo, pub);
+        var useCase = new ExchangeArmutCardsHandler(repo, pub);
 
         // NonTrump2 belongs to P2, not P1
         var result = await useCase.ExecuteAsync(
@@ -129,7 +129,7 @@ public class ExchangeArmutCardsUseCaseTests
     public async Task ExchangeArmutCards_ValidExchange_AdvancesToPlaying()
     {
         var (repo, pub, id) = await ArmutCardExchangeGame();
-        var useCase = new ExchangeArmutCardsUseCase(repo, pub);
+        var useCase = new ExchangeArmutCardsHandler(repo, pub);
 
         // Return the 2 trumps received from poor player
         var result = await useCase.ExecuteAsync(
@@ -145,7 +145,7 @@ public class ExchangeArmutCardsUseCaseTests
     public async Task ExchangeArmutCards_ValidExchange_UpdatesBothHands()
     {
         var (repo, pub, id) = await ArmutCardExchangeGame();
-        var useCase = new ExchangeArmutCardsUseCase(repo, pub);
+        var useCase = new ExchangeArmutCardsHandler(repo, pub);
 
         // Rich player (P1) returns Trump1 and Trump2 to poor player (P0)
         await useCase.ExecuteAsync(
@@ -167,7 +167,7 @@ public class ExchangeArmutCardsUseCaseTests
         // Left of rich: P2 (seat 2), then P3 (seat 3), then P0 (poor — skip).
         // Expected leader: P2.
         var (repo, pub, id) = await ArmutCardExchangeGame();
-        var useCase = new ExchangeArmutCardsUseCase(repo, pub);
+        var useCase = new ExchangeArmutCardsHandler(repo, pub);
 
         await useCase.ExecuteAsync(new ExchangeArmutCardsCommand(id, AppB.P1, [Trump1.Id, Trump2.Id]));
 
@@ -179,7 +179,7 @@ public class ExchangeArmutCardsUseCaseTests
     public async Task ExchangeArmutCards_ReturnedTrumpCount_ReflectsActualTrumpsReturned()
     {
         var (repo, pub, id) = await ArmutCardExchangeGame();
-        var useCase = new ExchangeArmutCardsUseCase(repo, pub);
+        var useCase = new ExchangeArmutCardsHandler(repo, pub);
 
         // Return 1 trump (Trump1) and 1 non-trump (NonTrump1 is in P1's hand)
         var result = await useCase.ExecuteAsync(

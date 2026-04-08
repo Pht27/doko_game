@@ -5,9 +5,9 @@ using Doko.Application.Games.Results;
 using Doko.Domain.GameFlow;
 using Doko.Domain.Players;
 
-namespace Doko.Application.Games.UseCases;
+namespace Doko.Application.Games.Handlers;
 
-public interface IStartGameUseCase
+public interface IStartGameHandler
 {
     Task<GameActionResult<StartGameResult>> ExecuteAsync(
         StartGameCommand command,
@@ -15,8 +15,8 @@ public interface IStartGameUseCase
     );
 }
 
-public sealed class StartGameUseCase(IGameRepository repository, IGameEventPublisher publisher)
-    : IStartGameUseCase
+public sealed class StartGameHandler(IGameRepository repository, IGameEventPublisher publisher)
+    : IStartGameHandler
 {
     public async Task<GameActionResult<StartGameResult>> ExecuteAsync(
         StartGameCommand command,

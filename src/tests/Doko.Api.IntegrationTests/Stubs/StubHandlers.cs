@@ -1,12 +1,12 @@
 using Doko.Application.Common;
 using Doko.Application.Games.Commands;
+using Doko.Application.Games.Handlers;
 using Doko.Application.Games.Results;
-using Doko.Application.Games.UseCases;
 using Doko.Domain.GameFlow;
 
 namespace Doko.Api.IntegrationTests.Stubs;
 
-public class StubStartGameUseCase : IStartGameUseCase
+public class StubStartGameHandler : IStartGameHandler
 {
     public Func<StartGameCommand, GameActionResult<StartGameResult>>? Handler { get; set; }
 
@@ -23,7 +23,7 @@ public class StubStartGameUseCase : IStartGameUseCase
     }
 }
 
-public class StubDealCardsUseCase : IDealCardsUseCase
+public class StubDealCardsHandler : IDealCardsHandler
 {
     public Func<DealCardsCommand, GameActionResult<Unit>>? Handler { get; set; }
 
@@ -38,7 +38,7 @@ public class StubDealCardsUseCase : IDealCardsUseCase
     }
 }
 
-public class StubMakeReservationUseCase : IMakeReservationUseCase
+public class StubMakeReservationHandler : IMakeReservationHandler
 {
     public Func<
         MakeReservationCommand,
@@ -60,7 +60,7 @@ public class StubMakeReservationUseCase : IMakeReservationUseCase
     }
 }
 
-public class StubPlayCardUseCase : IPlayCardUseCase
+public class StubPlayCardHandler : IPlayCardHandler
 {
     public Func<PlayCardCommand, GameActionResult<PlayCardResult>>? Handler { get; set; }
 
@@ -84,7 +84,7 @@ public class StubPlayCardUseCase : IPlayCardUseCase
     }
 }
 
-public class StubMakeAnnouncementUseCase : IMakeAnnouncementUseCase
+public class StubMakeAnnouncementHandler : IMakeAnnouncementHandler
 {
     public Func<MakeAnnouncementCommand, GameActionResult<Unit>>? Handler { get; set; }
 

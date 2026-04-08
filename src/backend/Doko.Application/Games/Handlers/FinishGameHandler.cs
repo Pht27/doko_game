@@ -3,13 +3,13 @@ using Doko.Domain.GameFlow;
 using Doko.Domain.Scoring;
 using Doko.Domain.Sonderkarten;
 
-namespace Doko.Application.Games.UseCases;
+namespace Doko.Application.Games.Handlers;
 
 /// <summary>
-/// Internal use case — called by <see cref="PlayCardUseCase"/> when the last trick completes.
+/// Internal handler — called by <see cref="PlayCardHandler"/> when the last trick completes.
 /// Not exposed as a public interface to the Api layer.
 /// </summary>
-internal sealed class FinishGameUseCase(IGameScorer scorer)
+internal sealed class FinishGameHandler(IGameScorer scorer)
 {
     public GameFinishedResult Execute(GameState state)
     {

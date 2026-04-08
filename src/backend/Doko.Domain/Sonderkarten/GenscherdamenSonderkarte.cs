@@ -20,6 +20,6 @@ public sealed class GenscherdamenSonderkarte : SonderkarteBase
         && !IsWindowClosed(state, SonderkarteType.Genscherdamen)
         && OriginallyHeldBoth(state, HerzDame);
 
-    // Partner selection is interactive; PlayCardUseCase applies SetPartyResolverModification
+    // Partner selection is interactive; PlayCardHandler applies SetPartyResolverModification
     // after receiving the chosen partner from the command.
 }
