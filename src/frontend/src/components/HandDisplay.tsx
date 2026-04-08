@@ -38,11 +38,25 @@ export function HandDisplay({
           cardClass += clickable ? 'card-playable' : 'card-unplayable';
         }
 
+        // calculate fan angle
+        const spread = 30; // total angle spread in degrees
+        const mid = (cards.length - 1) / 2;
+        const angle = (i - mid) * (spread / cards.length);
+
+        // optional vertical curve
+        const curveDepth = 4;
+        const yOffset = Math.abs(i - mid) * curveDepth + 50;
+
         return (
           <div
             key={card.id}
-            style={{ marginLeft: i === 0 ? 0 : -20, zIndex: i }}
             className={`card-wrapper${isSelected ? ' card-wrapper-selected' : ''}`}
+            style={{
+              marginLeft: i === 0 ? 0 : -48,
+              zIndex: i,
+              transform: `rotate(${angle}deg) translateY(${yOffset}px)`,
+              transformOrigin: 'bottom center',
+            }}
           >
             <CardSvg
               onClick={() => clickable && onCardClick(card)}
