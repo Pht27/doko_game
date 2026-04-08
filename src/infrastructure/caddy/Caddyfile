@@ -1,4 +1,4 @@
-phtanywhere.org, www.phtanywhere.org {
+phtanywhere.org {
 
     handle /api/* {
         uri strip_prefix /api
