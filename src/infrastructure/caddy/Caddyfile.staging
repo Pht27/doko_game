@@ -1,12 +1,12 @@
-phtanywhere.org, www.phtanywhere.org {
+:80 {
 
     handle /api/* {
         uri strip_prefix /api
-        reverse_proxy backend:5000
+        reverse_proxy backend-staging:5000
     }
 
     handle /hubs/* {
-        reverse_proxy backend:5000
+        reverse_proxy backend-staging:5000
     }
 
     handle {
@@ -14,8 +14,4 @@ phtanywhere.org, www.phtanywhere.org {
         try_files {path} /index.html
         file_server
     }
-}
-
-test.phtanywhere.org {
-    reverse_proxy frontend-staging:80
 }

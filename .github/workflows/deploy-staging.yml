@@ -1,0 +1,24 @@
+name: Deploy Staging
+
+on:
+  push:
+    branches: [ develop ]
+
+jobs:
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            cd ${{ secrets.DEPLOY_STAGING_PATH }}
+            git pull origin develop
+            docker compose -p staging -f src/infrastructure/docker-compose.staging.yml \
+              --env-file src/infrastructure/.env.staging \
+              up --build -d --remove-orphans

@@ -1,5 +1,6 @@
 services:
-  backend:
+  backend-staging:
+    container_name: backend-staging
     build:
       context: ../..
       dockerfile: src/infrastructure/backend/Dockerfile
@@ -9,24 +10,15 @@ services:
       - doko-net
     restart: unless-stopped
 
-  caddy:
+  frontend-staging:
+    container_name: frontend-staging
     build:
       context: ../..
-      dockerfile: src/infrastructure/caddy/Dockerfile
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - caddy_data:/data
-    depends_on:
-      - backend
+      dockerfile: src/infrastructure/caddy/Dockerfile.staging
     networks:
       - doko-net
     restart: unless-stopped
 
-volumes:
-  caddy_data:
-
 networks:
   doko-net:
-    name: doko-net
+    external: true
