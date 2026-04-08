@@ -1,4 +1,46 @@
 services:
+  # =========================
+  # CADDY (single entrypoint)
+  # =========================
+  caddy:
+    image: caddy:alpine
+    container_name: caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - /root/opt/doko-frontend:/srv
+      - /root/opt/doko-staging-frontend:/srv-staging
+    depends_on:
+      - backend
+      - backend-staging
+    networks:
+      - doko-net
+    restart: unless-stopped
+
+  # =========================
+  # BACKEND PROD
+  # =========================
+  backend:
+    container_name: backend
+    build:
+      context: ../..
+      dockerfile: src/infrastructure/backend/Dockerfile
+    environment:
+      - Jwt__Key=${JWT_SECRET}
+    networks:
+      - doko-net
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  # =========================
+  # BACKEND STAGING
+  # =========================
   backend-staging:
     container_name: backend-staging
     build:
@@ -9,15 +51,13 @@ services:
     networks:
       - doko-net
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
 
-  frontend-staging:
-    container_name: frontend-staging
-    build:
-      context: ../..
-      dockerfile: src/infrastructure/caddy/Dockerfile.staging
-    networks:
-      - doko-net
-    restart: unless-stopped
+volumes:
+  caddy_data:
 
 networks:
   doko-net:

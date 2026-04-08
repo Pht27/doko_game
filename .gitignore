@@ -29,6 +29,7 @@ pnpm-debug.log*
 # Environment / secrets
 .env
 .env.*
+*.env.*
 appsettings.Development.json
 
 # IDE

@@ -10,15 +10,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy via SSH
+      - uses: actions/checkout@v4
+
+      - name: Build frontend
+        run: |
+          cd src/frontend
+          npm ci
+          npm run build
+
+      - name: Upload frontend to staging
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          source: "src/frontend/dist/"
+          target: "/root/opt/doko-staging-frontend/"
+          strip_components: 3
+
+      - name: Rebuild staging backend
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
-            cd ${{ secrets.DEPLOY_STAGING_PATH }}
+            cd ${{ secrets.DEPLOY_PATH }}
             git pull origin develop
-            docker compose -p staging -f src/infrastructure/docker-compose.staging.yml \
-              --env-file src/infrastructure/.env.staging \
-              up --build -d --remove-orphans
+            docker compose -f src/infrastructure/docker-compose.staging.yml \
+              --env-file src/infrastructure/.env \
+              up --build -d --no-deps backend-staging
