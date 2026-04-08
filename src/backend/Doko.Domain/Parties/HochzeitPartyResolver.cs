@@ -59,6 +59,26 @@ public sealed class HochzeitPartyResolver : IPartyResolver
         return qualifyingTricks >= 3;
     }
 
+    /// <summary>
+    /// Returns the announcement deadline relative to the Findungsstich.
+    /// No announcements are allowed before the Findungsstich (returns null).
+    /// After the Findungsstich at trick index K, the deadline is K*4+5
+    /// (= before the 2nd card of the trick after the Findungsstich).
+    /// </summary>
+    public int? AnnouncementBaseDeadline(GameState state)
+    {
+        for (int i = 0; i < state.CompletedTricks.Count; i++)
+        {
+            var trick = state.CompletedTricks[i];
+            if (!Qualifies(trick, state))
+                continue;
+            var winner = trick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
+            if (winner != _hochzeitPlayer)
+                return i * 4 + 5; // Findungsstich at index i
+        }
+        return null; // Findungsstich not yet found
+    }
+
     private bool Qualifies(Tricks.Trick trick, GameState state) =>
         _condition switch
         {

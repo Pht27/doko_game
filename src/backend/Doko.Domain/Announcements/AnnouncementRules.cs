@@ -13,12 +13,15 @@ public static class AnnouncementRules
         if (!state.Rules.AllowAnnouncements)
             return false;
 
-        // Timing: base deadline is before the 2nd card of the 2nd trick (= 5 total cards played).
-        // Each announcement shifts the deadline forward by 4 (one full trick).
+        // Timing: base deadline depends on the game type (e.g. in Hochzeit it is relative to the
+        // Findungsstich). Each announcement shifts the deadline forward by 4 (one full trick).
+        var baseDeadline = state.PartyResolver.AnnouncementBaseDeadline(state);
+        if (baseDeadline is null)
+            return false;
         int totalCardsPlayed =
             state.CompletedTricks.Count * 4 + (state.CurrentTrick?.Cards.Count ?? 0);
         int totalAnnouncements = state.Announcements.Count;
-        int deadline = 5 + 4 * totalAnnouncements;
+        int deadline = baseDeadline.Value + 4 * totalAnnouncements;
         if (totalCardsPlayed >= deadline)
             return false;
 

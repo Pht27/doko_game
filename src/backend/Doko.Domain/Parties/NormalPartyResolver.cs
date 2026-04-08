@@ -21,4 +21,6 @@ public sealed class NormalPartyResolver : IPartyResolver
     }
 
     public bool IsFullyResolved(GameState state) => state.InitialHands is not null;
+
+    public int? AnnouncementBaseDeadline(GameState state) => 5;
 }
