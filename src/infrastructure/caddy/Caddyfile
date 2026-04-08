@@ -15,3 +15,7 @@ phtanywhere.org, www.phtanywhere.org {
         file_server
     }
 }
+
+test.phtanywhere.org {
+    reverse_proxy frontend-staging:80
+}

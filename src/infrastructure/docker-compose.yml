@@ -5,6 +5,8 @@ services:
       dockerfile: src/infrastructure/backend/Dockerfile
     environment:
       - Jwt__Key=${JWT_SECRET}
+    networks:
+      - doko-net
     restart: unless-stopped
 
   caddy:
@@ -18,7 +20,13 @@ services:
       - caddy_data:/data
     depends_on:
       - backend
+    networks:
+      - doko-net
     restart: unless-stopped
 
 volumes:
   caddy_data:
+
+networks:
+  doko-net:
+    name: doko-net
