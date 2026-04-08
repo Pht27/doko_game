@@ -1,5 +1,5 @@
 import { t } from '../translations';
-import './AnnouncementButton.css';
+import '../styles/AnnouncementButton.css';
 
 interface AnnouncementButtonProps {
   legalAnnouncements: string[];

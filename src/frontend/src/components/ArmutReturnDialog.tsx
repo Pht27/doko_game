@@ -1,5 +1,5 @@
 import { t } from '../translations';
-import './ArmutReturnDialog.css';
+import '../styles/ArmutReturnDialog.css';
 
 interface ArmutReturnDialogProps {
   playerId: number;

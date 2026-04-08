@@ -1,5 +1,5 @@
 import { t } from '../translations';
-import './GameInfo.css';
+import '../styles/GameInfo.css';
 
 interface GameInfoProps {
   phase: string;

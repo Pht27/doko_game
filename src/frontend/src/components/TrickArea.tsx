@@ -1,7 +1,7 @@
 import type { TrickSummaryDto } from '../types/api';
 import { cardSvgPath } from '../api/cards';
 import { t } from '../translations';
-import './TrickArea.css';
+import '../styles/TrickArea.css';
 
 interface TrickAreaProps {
   trick: TrickSummaryDto | null;

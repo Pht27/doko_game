@@ -1,5 +1,5 @@
 import { t } from '../translations';
-import './PlayerSwitcher.css';
+import '../styles/PlayerSwitcher.css';
 
 interface PlayerSwitcherProps {
   activePlayer: number;
