@@ -1,5 +1,5 @@
 import { t } from '../translations';
-import './ReservationDialog.css';
+import '../styles/ReservationDialog.css';
 
 interface ReservationDialogProps {
   playerId: number;

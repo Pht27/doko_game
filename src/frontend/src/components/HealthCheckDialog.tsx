@@ -1,5 +1,5 @@
 import { t } from '../translations';
-import './HealthCheckDialog.css';
+import '../styles/HealthCheckDialog.css';
 
 interface HealthCheckDialogProps {
   playerId: number;

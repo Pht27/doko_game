@@ -1,6 +1,6 @@
 import type { GameResultDto } from '../types/api';
 import { t } from '../translations';
-import './ResultScreen.css';
+import '../styles/ResultScreen.css';
 
 interface ResultScreenProps {
   result: GameResultDto;

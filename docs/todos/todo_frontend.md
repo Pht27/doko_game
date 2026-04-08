@@ -1,3 +1,0 @@
-I want the frontend to use more Components where it makes sens. I feel like this is the strength of React and were not making use of that. And for each component i want a separate styling file. The App file for example is too bloated, we should separate it into more sensible components.
-
-also to work on translation / user info: For every message or button label etc I should have a file where I choose what it displays. SO i would have something like keine90announcement: "Keine 90 ansagen".

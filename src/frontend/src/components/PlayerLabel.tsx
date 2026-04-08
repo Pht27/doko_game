@@ -1,6 +1,6 @@
 import type { PlayerPublicStateDto } from '../types/api';
 import { t } from '../translations';
-import './PlayerLabel.css';
+import '../styles/PlayerLabel.css';
 
 interface PlayerLabelProps {
   player: PlayerPublicStateDto;

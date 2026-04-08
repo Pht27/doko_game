@@ -1,6 +1,6 @@
 import type { CardDto, SonderkarteInfoDto } from '../types/api';
 import { cardSvgComponent } from '../api/cards';
-import './HandDisplay.css';
+import '../styles/HandDisplay.css';
 
 interface HandDisplayProps {
   cards: CardDto[];

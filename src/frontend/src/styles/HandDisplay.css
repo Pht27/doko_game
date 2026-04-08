@@ -1,4 +1,4 @@
-@reference "../index.css";
+@reference "./index.css";
 
 .hand {
   @apply flex items-end justify-center px-4 pb-2 overflow-visible;

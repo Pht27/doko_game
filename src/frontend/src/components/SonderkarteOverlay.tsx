@@ -1,6 +1,6 @@
 import type { SonderkarteInfoDto } from '../types/api';
 import { t } from '../translations';
-import './SonderkarteOverlay.css';
+import '../styles/SonderkarteOverlay.css';
 
 interface SonderkarteOverlayProps {
   sonderkarten: SonderkarteInfoDto[];
