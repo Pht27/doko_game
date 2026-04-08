@@ -1,0 +1,17 @@
+phtanywhere.org, www.phtanywhere.org {
+
+    handle /api/* {
+        uri strip_prefix /api
+        reverse_proxy backend:5000
+    }
+
+    handle /hubs/* {
+        reverse_proxy backend:5000
+    }
+
+    handle {
+        root * /srv
+        try_files {path} /index.html
+        file_server
+    }
+}

@@ -7,12 +7,18 @@ services:
       - Jwt__Key=${JWT_SECRET}
     restart: unless-stopped
 
-  nginx:
+  caddy:
     build:
       context: ../..
-      dockerfile: src/infrastructure/nginx/Dockerfile
+      dockerfile: src/infrastructure/caddy/Dockerfile
     ports:
       - "80:80"
+      - "443:443"
+    volumes:
+      - caddy_data:/data
     depends_on:
       - backend
     restart: unless-stopped
+
+volumes:
+  caddy_data:
