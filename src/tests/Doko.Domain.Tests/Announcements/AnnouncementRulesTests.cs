@@ -283,7 +283,112 @@ public class AnnouncementRulesTests
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
     }
 
+    // ── CanAnnounce: Hochzeit timing ──────────────────────────────────────────
+
+    [Fact]
+    public void CanAnnounce_Hochzeit_BlockedBeforeFindungsstich()
+    {
+        // No tricks completed → Findungsstich not yet found → announcements blocked for everyone
+        var resolver = new HochzeitPartyResolver(B.P0, HochzeitCondition.FirstTrick);
+        var state = B.BasicState(partyResolver: resolver);
+
+        AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Re, state).Should().BeFalse();
+        AnnouncementRules.CanAnnounce(B.P1, AnnouncementType.Kontra, state).Should().BeFalse();
+    }
+
+    [Fact]
+    public void CanAnnounce_Hochzeit_AllowedRightAfterFindungsstich_TrickZero()
+    {
+        // Findungsstich at trick 0 (K=0 → base deadline=5). 4 cards played < 5 → allowed.
+        var resolver = new HochzeitPartyResolver(B.P0, HochzeitCondition.FirstTrick);
+        var state = B.BasicState(
+            partyResolver: resolver,
+            completedTricks: [HochzeitFindungsstichP1(0)]
+        );
+
+        // P1 won the Findungsstich → P1 is Re; P2 is Kontra
+        AnnouncementRules.CanAnnounce(B.P1, AnnouncementType.Re, state).Should().BeTrue();
+        AnnouncementRules.CanAnnounce(B.P2, AnnouncementType.Kontra, state).Should().BeTrue();
+    }
+
+    [Fact]
+    public void CanAnnounce_Hochzeit_AllowedAfterFindungsstich_LaterTrick()
+    {
+        // Findungsstich at trick 2 (K=2 → base deadline=13). 3 completed tricks = 12 cards played < 13 → allowed.
+        var resolver = new HochzeitPartyResolver(B.P0, HochzeitCondition.FirstTrick);
+        var state = B.BasicState(
+            partyResolver: resolver,
+            completedTricks:
+            [
+                HochzeitP0WinsTrick(0),
+                HochzeitP0WinsTrick(4),
+                HochzeitFindungsstichP1(8),
+            ]
+        );
+
+        AnnouncementRules.CanAnnounce(B.P1, AnnouncementType.Re, state).Should().BeTrue();
+    }
+
+    [Fact]
+    public void CanAnnounce_Hochzeit_BlockedAtDeadline_AfterFindungsstich()
+    {
+        // Findungsstich at trick 2 (K=2 → base deadline=13). 13 cards played (3 tricks + 1 in current) → blocked.
+        var resolver = new HochzeitPartyResolver(B.P0, HochzeitCondition.FirstTrick);
+        var current = new Trick();
+        current.Add(new TrickCard(B.Card(99, Suit.Pik, Rank.Neun), B.P0));
+
+        var state = GameState.Create(
+            rules: RuleSet.Default(),
+            players: B.FourPlayers(),
+            partyResolver: resolver,
+            completedTricks: [HochzeitP0WinsTrick(0), HochzeitP0WinsTrick(4), HochzeitFindungsstichP1(8)],
+            currentTrick: current
+        );
+
+        AnnouncementRules.CanAnnounce(B.P1, AnnouncementType.Re, state).Should().BeFalse();
+    }
+
+    [Fact]
+    public void CanAnnounce_Hochzeit_DeadlineShiftsWithAnnouncement()
+    {
+        // Findungsstich at trick 2 (K=2 → base deadline=13). 1 prior announcement → effective deadline=17.
+        // 13 cards played < 17 → still allowed.
+        var resolver = new HochzeitPartyResolver(B.P0, HochzeitCondition.FirstTrick);
+        var current = new Trick();
+        current.Add(new TrickCard(B.Card(99, Suit.Pik, Rank.Neun), B.P0));
+
+        var state = GameState.Create(
+            rules: RuleSet.Default(),
+            players: B.FourPlayers(),
+            partyResolver: resolver,
+            completedTricks: [HochzeitP0WinsTrick(0), HochzeitP0WinsTrick(4), HochzeitFindungsstichP1(8)],
+            currentTrick: current,
+            announcements: [B.Ann(B.P1, AnnouncementType.Re)]
+        );
+
+        // P1 already announced Re; now Keine90 is next. Deadline=17, 13 cards → allowed.
+        AnnouncementRules.CanAnnounce(B.P1, AnnouncementType.Keine90, state).Should().BeTrue();
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
+
+    /// <summary>A trick where P0 (Hochzeit player) wins by leading ♠A.</summary>
+    private static Trick HochzeitP0WinsTrick(byte startId) =>
+        B.Trick(
+            (startId, Suit.Pik, Rank.Ass, B.P0),
+            ((byte)(startId + 1), Suit.Herz, Rank.Neun, B.P1),
+            ((byte)(startId + 2), Suit.Herz, Rank.Koenig, B.P2),
+            ((byte)(startId + 3), Suit.Herz, Rank.Ass, B.P3)
+        );
+
+    /// <summary>The Findungsstich: P0 leads low ♠9, P1 wins with ♠A.</summary>
+    private static Trick HochzeitFindungsstichP1(byte startId) =>
+        B.Trick(
+            (startId, Suit.Pik, Rank.Neun, B.P0),
+            ((byte)(startId + 1), Suit.Pik, Rank.Ass, B.P1),
+            ((byte)(startId + 2), Suit.Herz, Rank.Neun, B.P2),
+            ((byte)(startId + 3), Suit.Herz, Rank.Koenig, B.P3)
+        );
 
     /// <summary>
     /// A trick where P0 wins ~43 Augen: leads ♣A (plain), ♣10, ♠A, ♥A follow.

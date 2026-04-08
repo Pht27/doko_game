@@ -14,4 +14,6 @@ public sealed class SoloPartyResolver : IPartyResolver
         player == _soloPlayer ? Party.Re : Party.Kontra;
 
     public bool IsFullyResolved(GameState state) => true;
+
+    public int? AnnouncementBaseDeadline(GameState state) => 5;
 }

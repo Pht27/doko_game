@@ -19,4 +19,6 @@ public sealed class ArmutPartyResolver : IPartyResolver
         player == _poorPlayer || player == _richPlayer ? Party.Re : Party.Kontra;
 
     public bool IsFullyResolved(GameState state) => true;
+
+    public int? AnnouncementBaseDeadline(GameState state) => 5;
 }
