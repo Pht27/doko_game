@@ -2,7 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Doko.Api.IntegrationTests.Stubs;
-using Doko.Application.Games.UseCases;
+using Doko.Application.Games.Handlers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,16 +11,16 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Doko.Api.IntegrationTests;
 
-/// <summary>Shared factory that replaces use cases with stubs and uses a fixed test JWT key.</summary>
+/// <summary>Shared factory that replaces handlers with stubs and uses a fixed test JWT key.</summary>
 public class ApiTestFixture : WebApplicationFactory<Program>
 {
     public const string TestJwtKey = "test-jwt-key-for-integration-tests-32chars!!";
 
-    public IStartGameUseCase StartGame { get; } = new StubStartGameUseCase();
-    public IDealCardsUseCase DealCards { get; } = new StubDealCardsUseCase();
-    public IMakeReservationUseCase MakeReservation { get; } = new StubMakeReservationUseCase();
-    public IPlayCardUseCase PlayCard { get; } = new StubPlayCardUseCase();
-    public IMakeAnnouncementUseCase MakeAnnouncement { get; } = new StubMakeAnnouncementUseCase();
+    public IStartGameHandler StartGame { get; } = new StubStartGameHandler();
+    public IDealCardsHandler DealCards { get; } = new StubDealCardsHandler();
+    public IMakeReservationHandler MakeReservation { get; } = new StubMakeReservationHandler();
+    public IPlayCardHandler PlayCard { get; } = new StubPlayCardHandler();
+    public IMakeAnnouncementHandler MakeAnnouncement { get; } = new StubMakeAnnouncementHandler();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -28,12 +28,12 @@ public class ApiTestFixture : WebApplicationFactory<Program>
 
         builder.ConfigureServices(services =>
         {
-            services.Replace(ServiceDescriptor.Singleton<IStartGameUseCase>(StartGame));
-            services.Replace(ServiceDescriptor.Singleton<IDealCardsUseCase>(DealCards));
-            services.Replace(ServiceDescriptor.Singleton<IMakeReservationUseCase>(MakeReservation));
-            services.Replace(ServiceDescriptor.Singleton<IPlayCardUseCase>(PlayCard));
+            services.Replace(ServiceDescriptor.Singleton<IStartGameHandler>(StartGame));
+            services.Replace(ServiceDescriptor.Singleton<IDealCardsHandler>(DealCards));
+            services.Replace(ServiceDescriptor.Singleton<IMakeReservationHandler>(MakeReservation));
+            services.Replace(ServiceDescriptor.Singleton<IPlayCardHandler>(PlayCard));
             services.Replace(
-                ServiceDescriptor.Singleton<IMakeAnnouncementUseCase>(MakeAnnouncement)
+                ServiceDescriptor.Singleton<IMakeAnnouncementHandler>(MakeAnnouncement)
             );
         });
     }

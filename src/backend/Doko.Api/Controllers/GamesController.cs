@@ -6,7 +6,7 @@ using Doko.Api.Mapping;
 using Doko.Application.Abstractions;
 using Doko.Application.Games.Commands;
 using Doko.Application.Games.Queries;
-using Doko.Application.Games.UseCases;
+using Doko.Application.Games.Handlers;
 using Doko.Domain.Announcements;
 using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
@@ -24,14 +24,14 @@ namespace Doko.Api.Controllers;
 [Route("games")]
 [Authorize]
 public class GamesController(
-    IStartGameUseCase startGame,
-    IDealCardsUseCase dealCards,
-    IDeclareHealthStatusUseCase declareHealth,
-    IMakeReservationUseCase makeReservation,
-    IAcceptArmutUseCase acceptArmut,
-    IExchangeArmutCardsUseCase exchangeArmutCards,
-    IPlayCardUseCase playCard,
-    IMakeAnnouncementUseCase makeAnnouncement,
+    IStartGameHandler startGame,
+    IDealCardsHandler dealCards,
+    IDeclareHealthStatusHandler declareHealth,
+    IMakeReservationHandler makeReservation,
+    IAcceptArmutHandler acceptArmut,
+    IExchangeArmutCardsHandler exchangeArmutCards,
+    IPlayCardHandler playCard,
+    IMakeAnnouncementHandler makeAnnouncement,
     IGameQueryService gameQuery,
     IHubContext<GameHub> hub
 ) : ControllerBase

@@ -26,7 +26,7 @@ public class GamesControllerTests(ApiTestFixture fixture) : IClassFixture<ApiTes
     public async Task StartGame_ValidRequest_Returns200WithGameId()
     {
         var expectedId = GameId.New();
-        ((StubStartGameUseCase)fixture.StartGame).Handler =
+        ((StubStartGameHandler)fixture.StartGame).Handler =
             _ => new GameActionResult<StartGameResult>.Ok(new StartGameResult(expectedId));
 
         var client = fixture.CreateAuthenticatedClient(playerId: 0);
@@ -52,9 +52,9 @@ public class GamesControllerTests(ApiTestFixture fixture) : IClassFixture<ApiTes
     }
 
     [Fact]
-    public async Task StartGame_UseCaseReturnsGameNotFound_Returns404()
+    public async Task StartGame_HandlerReturnsGameNotFound_Returns404()
     {
-        ((StubStartGameUseCase)fixture.StartGame).Handler =
+        ((StubStartGameHandler)fixture.StartGame).Handler =
             _ => new GameActionResult<StartGameResult>.Failure(GameError.GameNotFound);
 
         var client = fixture.CreateAuthenticatedClient();
@@ -79,7 +79,7 @@ public class GamesControllerTests(ApiTestFixture fixture) : IClassFixture<ApiTes
     public async Task DealCards_ValidRequest_Returns200()
     {
         var gameId = Guid.NewGuid();
-        ((StubDealCardsUseCase)fixture.DealCards).Handler = _ => new GameActionResult<Unit>.Ok(
+        ((StubDealCardsHandler)fixture.DealCards).Handler = _ => new GameActionResult<Unit>.Ok(
             Unit.Value
         );
 
@@ -93,7 +93,7 @@ public class GamesControllerTests(ApiTestFixture fixture) : IClassFixture<ApiTes
     public async Task DealCards_InvalidPhase_Returns400WithCode()
     {
         var gameId = Guid.NewGuid();
-        ((StubDealCardsUseCase)fixture.DealCards).Handler = _ => new GameActionResult<Unit>.Failure(
+        ((StubDealCardsHandler)fixture.DealCards).Handler = _ => new GameActionResult<Unit>.Failure(
             GameError.InvalidPhase
         );
 
@@ -126,7 +126,7 @@ public class GamesControllerTests(ApiTestFixture fixture) : IClassFixture<ApiTes
     public async Task PlayCard_NotYourTurn_Returns400WithCode()
     {
         var gameId = Guid.NewGuid();
-        ((StubPlayCardUseCase)fixture.PlayCard).Handler =
+        ((StubPlayCardHandler)fixture.PlayCard).Handler =
             _ => new GameActionResult<PlayCardResult>.Failure(GameError.NotYourTurn);
 
         var client = fixture.CreateAuthenticatedClient();
@@ -162,7 +162,7 @@ public class GamesControllerTests(ApiTestFixture fixture) : IClassFixture<ApiTes
     public async Task MakeAnnouncement_ValidType_Returns200()
     {
         var gameId = Guid.NewGuid();
-        ((StubMakeAnnouncementUseCase)fixture.MakeAnnouncement).Handler =
+        ((StubMakeAnnouncementHandler)fixture.MakeAnnouncement).Handler =
             _ => new GameActionResult<Unit>.Ok(Unit.Value);
 
         var client = fixture.CreateAuthenticatedClient();

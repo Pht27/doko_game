@@ -7,9 +7,9 @@ using Doko.Domain.Hands;
 using Doko.Domain.Players;
 using Doko.Domain.Sonderkarten;
 
-namespace Doko.Application.Games.UseCases;
+namespace Doko.Application.Games.Handlers;
 
-public interface IDealCardsUseCase
+public interface IDealCardsHandler
 {
     Task<GameActionResult<Unit>> ExecuteAsync(
         DealCardsCommand command,
@@ -17,11 +17,11 @@ public interface IDealCardsUseCase
     );
 }
 
-public sealed class DealCardsUseCase(
+public sealed class DealCardsHandler(
     IGameRepository repository,
     IGameEventPublisher publisher,
     IDeckShuffler shuffler
-) : IDealCardsUseCase
+) : IDealCardsHandler
 {
     public async Task<GameActionResult<Unit>> ExecuteAsync(
         DealCardsCommand command,

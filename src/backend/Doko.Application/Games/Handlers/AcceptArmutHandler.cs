@@ -4,12 +4,13 @@ using Doko.Application.Games.Commands;
 using Doko.Application.Games.Results;
 using Doko.Domain.GameFlow;
 using Doko.Domain.GameFlow.Events;
+using Doko.Domain.Players;
 using Doko.Domain.Reservations;
 using Doko.Domain.Sonderkarten;
 
-namespace Doko.Application.Games.UseCases;
+namespace Doko.Application.Games.Handlers;
 
-public interface IAcceptArmutUseCase
+public interface IAcceptArmutHandler
 {
     Task<GameActionResult<AcceptArmutResult>> ExecuteAsync(
         AcceptArmutCommand command,
@@ -21,8 +22,8 @@ public interface IAcceptArmutUseCase
 /// Handles a player's acceptance or refusal of the Armut during
 /// <see cref="GamePhase.ArmutPartnerFinding"/>.
 /// </summary>
-public sealed class AcceptArmutUseCase(IGameRepository repository, IGameEventPublisher publisher)
-    : IAcceptArmutUseCase
+public sealed class AcceptArmutHandler(IGameRepository repository, IGameEventPublisher publisher)
+    : IAcceptArmutHandler
 {
     public async Task<GameActionResult<AcceptArmutResult>> ExecuteAsync(
         AcceptArmutCommand command,
@@ -48,28 +49,48 @@ public sealed class AcceptArmutUseCase(IGameRepository repository, IGameEventPub
         };
 
         if (command.Accepts)
-        {
-            // Partner found — enter card exchange phase
-            state.Apply(new SetArmutRichPlayerModification(command.Player));
-            state.Apply(new SetPendingRespondersModification([]));
+            return await HandleAcceptanceAsync(state, command, events, ct);
 
-            // Automatically transfer poor player's trumps to rich player
-            var poorPlayer = state.ArmutPlayer!.Value;
-            state.Apply(new ArmutGiveTrumpsModification(poorPlayer, command.Player));
+        return await HandleDeclineAsync(state, command, events, ct);
+    }
 
-            // Set game mode now that both players are known
-            var reservation = new ArmutReservation(poorPlayer, command.Player);
-            state.Apply(new SetGameModeModification(reservation));
+    // ── Private helpers ───────────────────────────────────────────────────────
 
-            state.Apply(new AdvancePhaseModification(GamePhase.ArmutCardExchange));
-            // Rich player exchanges the cards
-            state.Apply(new SetCurrentTurnModification(command.Player));
+    private async Task<GameActionResult<AcceptArmutResult>> HandleAcceptanceAsync(
+        GameState state,
+        AcceptArmutCommand command,
+        List<IDomainEvent> events,
+        CancellationToken ct
+    )
+    {
+        // Partner found — enter card exchange phase
+        state.Apply(new SetArmutRichPlayerModification(command.Player));
+        state.Apply(new SetPendingRespondersModification([]));
 
-            await repository.SaveAsync(state, ct);
-            await publisher.PublishAsync(state.Id, events, ct);
-            return new GameActionResult<AcceptArmutResult>.Ok(new AcceptArmutResult(true));
-        }
+        // Automatically transfer poor player's trumps to rich player
+        var poorPlayer = state.ArmutPlayer!.Value;
+        state.Apply(new ArmutGiveTrumpsModification(poorPlayer, command.Player));
 
+        // Set game mode now that both players are known
+        var reservation = new ArmutReservation(poorPlayer, command.Player);
+        state.Apply(new SetGameModeModification(reservation));
+
+        state.Apply(new AdvancePhaseModification(GamePhase.ArmutCardExchange));
+        // Rich player exchanges the cards
+        state.Apply(new SetCurrentTurnModification(command.Player));
+
+        await repository.SaveAsync(state, ct);
+        await publisher.PublishAsync(state.Id, events, ct);
+        return new GameActionResult<AcceptArmutResult>.Ok(new AcceptArmutResult(true));
+    }
+
+    private async Task<GameActionResult<AcceptArmutResult>> HandleDeclineAsync(
+        GameState state,
+        AcceptArmutCommand command,
+        List<IDomainEvent> events,
+        CancellationToken ct
+    )
+    {
         // Declined — move to next candidate
         var remaining = state.PendingReservationResponders.Skip(1).ToList();
         state.Apply(new SetPendingRespondersModification(remaining));

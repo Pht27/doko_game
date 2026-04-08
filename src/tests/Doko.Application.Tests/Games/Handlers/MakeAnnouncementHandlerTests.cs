@@ -2,9 +2,9 @@ using Doko.Application.Tests.Helpers;
 using Doko.Domain.Parties;
 using Doko.Domain.Trump;
 
-namespace Doko.Application.Tests.Games.UseCases;
+namespace Doko.Application.Tests.Games.Handlers;
 
-public class MakeAnnouncementUseCaseTests
+public class MakeAnnouncementHandlerTests
 {
     private static async Task<(
         Fakes.InMemoryGameRepository,
@@ -39,7 +39,7 @@ public class MakeAnnouncementUseCaseTests
     public async Task MakeAnnouncement_Re_Succeeds()
     {
         var (repo, pub, id) = await PlayingGame();
-        var useCase = new MakeAnnouncementUseCase(repo, pub);
+        var useCase = new MakeAnnouncementHandler(repo, pub);
 
         var result = await useCase.ExecuteAsync(
             new MakeAnnouncementCommand(id, AppB.P0, AnnouncementType.Re)
@@ -56,7 +56,7 @@ public class MakeAnnouncementUseCaseTests
     public async Task MakeAnnouncement_NotAllowed_ReturnsError()
     {
         var (repo, pub, id) = await PlayingGame();
-        var useCase = new MakeAnnouncementUseCase(repo, pub);
+        var useCase = new MakeAnnouncementHandler(repo, pub);
 
         // P0 is Re; Keine90 requires Re to be announced first
         var result = await useCase.ExecuteAsync(
@@ -74,7 +74,7 @@ public class MakeAnnouncementUseCaseTests
     public async Task MakeAnnouncement_GameNotFound_ReturnsError()
     {
         var (repo, pub, _) = AppB.Infrastructure();
-        var useCase = new MakeAnnouncementUseCase(repo, pub);
+        var useCase = new MakeAnnouncementHandler(repo, pub);
 
         var result = await useCase.ExecuteAsync(
             new MakeAnnouncementCommand(GameId.New(), AppB.P0, AnnouncementType.Re)
@@ -96,7 +96,7 @@ public class MakeAnnouncementUseCaseTests
             players: [new PlayerState(AppB.P0, PlayerSeat.First, Hand.Empty, null)]
         );
         await repo.SaveAsync(state);
-        var useCase = new MakeAnnouncementUseCase(repo, pub);
+        var useCase = new MakeAnnouncementHandler(repo, pub);
 
         var result = await useCase.ExecuteAsync(
             new MakeAnnouncementCommand(state.Id, AppB.P0, AnnouncementType.Re)

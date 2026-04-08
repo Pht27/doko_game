@@ -1,15 +1,15 @@
 using Doko.Application.Tests.Helpers;
 
-namespace Doko.Application.Tests.Games.UseCases;
+namespace Doko.Application.Tests.Games.Handlers;
 
-public class DealCardsUseCaseTests
+public class DealCardsHandlerTests
 {
     private async Task<GameId> StartedGame(
         Doko.Application.Tests.Fakes.InMemoryGameRepository repo,
         Doko.Application.Tests.Fakes.RecordingGameEventPublisher pub
     )
     {
-        var startResult = await new StartGameUseCase(repo, pub).ExecuteAsync(
+        var startResult = await new StartGameHandler(repo, pub).ExecuteAsync(
             new StartGameCommand(AppB.FourPlayerIds, RuleSet.Minimal())
         );
         return ((GameActionResult<StartGameResult>.Ok)startResult).Value.GameId;
@@ -20,7 +20,7 @@ public class DealCardsUseCaseTests
     {
         var (repo, pub, shuffler) = AppB.Infrastructure();
         var gameId = await StartedGame(repo, pub);
-        var useCase = new DealCardsUseCase(repo, pub, shuffler);
+        var useCase = new DealCardsHandler(repo, pub, shuffler);
 
         var result = await useCase.ExecuteAsync(new DealCardsCommand(gameId));
 
@@ -36,7 +36,7 @@ public class DealCardsUseCaseTests
     {
         var (repo, pub, shuffler) = AppB.Infrastructure();
         var gameId = await StartedGame(repo, pub);
-        var useCase = new DealCardsUseCase(repo, pub, shuffler);
+        var useCase = new DealCardsHandler(repo, pub, shuffler);
 
         await useCase.ExecuteAsync(new DealCardsCommand(gameId));
 
@@ -49,7 +49,7 @@ public class DealCardsUseCaseTests
     public async Task DealCards_ReturnsGameNotFound_WhenGameDoesNotExist()
     {
         var (repo, pub, shuffler) = AppB.Infrastructure();
-        var useCase = new DealCardsUseCase(repo, pub, shuffler);
+        var useCase = new DealCardsHandler(repo, pub, shuffler);
 
         var result = await useCase.ExecuteAsync(new DealCardsCommand(GameId.New()));
 
@@ -66,9 +66,9 @@ public class DealCardsUseCaseTests
         var (repo, pub, shuffler) = AppB.Infrastructure();
         var gameId = await StartedGame(repo, pub);
         // Deal once to move to Reservations
-        await new DealCardsUseCase(repo, pub, shuffler).ExecuteAsync(new DealCardsCommand(gameId));
+        await new DealCardsHandler(repo, pub, shuffler).ExecuteAsync(new DealCardsCommand(gameId));
 
-        var result = await new DealCardsUseCase(repo, pub, shuffler).ExecuteAsync(
+        var result = await new DealCardsHandler(repo, pub, shuffler).ExecuteAsync(
             new DealCardsCommand(gameId)
         );
 

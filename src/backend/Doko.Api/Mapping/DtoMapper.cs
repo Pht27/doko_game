@@ -131,7 +131,7 @@ public static class DtoMapper
     private static ArmutReservation BuildArmut(MakeReservationRequest req, PlayerId player)
     {
         // Rich player is not known at declaration time — it is determined during ArmutPartnerFinding.
-        // Use the declaring player as a placeholder; the real reservation is constructed in AcceptArmutUseCase.
+        // Use the declaring player as a placeholder; the real reservation is constructed in AcceptArmutHandler.
         _ = req; // ArmutPartner field intentionally ignored
         return new ArmutReservation(player, player);
     }

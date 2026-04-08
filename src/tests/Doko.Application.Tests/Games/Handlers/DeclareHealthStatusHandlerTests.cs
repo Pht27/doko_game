@@ -1,19 +1,19 @@
 using Doko.Application.Tests.Helpers;
 
-namespace Doko.Application.Tests.Games.UseCases;
+namespace Doko.Application.Tests.Games.Handlers;
 
-public class DeclareHealthStatusUseCaseTests
+public class DeclareHealthStatusHandlerTests
 {
     private async Task<GameId> GameInHealthCheck(
         Fakes.InMemoryGameRepository repo,
         Fakes.RecordingGameEventPublisher pub
     )
     {
-        var startResult = await new StartGameUseCase(repo, pub).ExecuteAsync(
+        var startResult = await new StartGameHandler(repo, pub).ExecuteAsync(
             new StartGameCommand(AppB.FourPlayerIds, RuleSet.Minimal())
         );
         var id = ((GameActionResult<StartGameResult>.Ok)startResult).Value.GameId;
-        await new DealCardsUseCase(repo, pub, new Fakes.FakeDeckShuffler()).ExecuteAsync(
+        await new DealCardsHandler(repo, pub, new Fakes.FakeDeckShuffler()).ExecuteAsync(
             new DealCardsCommand(id)
         );
         return id;
@@ -23,12 +23,12 @@ public class DeclareHealthStatusUseCaseTests
     public async Task DeclareHealth_WrongPhase_ReturnsInvalidPhase()
     {
         var (repo, pub, _) = AppB.Infrastructure();
-        var startResult = await new StartGameUseCase(repo, pub).ExecuteAsync(
+        var startResult = await new StartGameHandler(repo, pub).ExecuteAsync(
             new StartGameCommand(AppB.FourPlayerIds, RuleSet.Minimal())
         );
         var id = ((GameActionResult<StartGameResult>.Ok)startResult).Value.GameId;
         // Game is in Dealing phase, not ReservationHealthCheck
-        var useCase = new DeclareHealthStatusUseCase(repo, pub);
+        var useCase = new DeclareHealthStatusHandler(repo, pub);
 
         var result = await useCase.ExecuteAsync(new DeclareHealthStatusCommand(id, AppB.P0, false));
 
@@ -44,7 +44,7 @@ public class DeclareHealthStatusUseCaseTests
     {
         var (repo, pub, _) = AppB.Infrastructure();
         var gameId = await GameInHealthCheck(repo, pub);
-        var useCase = new DeclareHealthStatusUseCase(repo, pub);
+        var useCase = new DeclareHealthStatusHandler(repo, pub);
 
         // P1 tries before P0 has gone
         var result = await useCase.ExecuteAsync(
@@ -63,7 +63,7 @@ public class DeclareHealthStatusUseCaseTests
     {
         var (repo, pub, _) = AppB.Infrastructure();
         var gameId = await GameInHealthCheck(repo, pub);
-        var useCase = new DeclareHealthStatusUseCase(repo, pub);
+        var useCase = new DeclareHealthStatusHandler(repo, pub);
 
         var result = await useCase.ExecuteAsync(
             new DeclareHealthStatusCommand(gameId, AppB.P0, false)
@@ -81,7 +81,7 @@ public class DeclareHealthStatusUseCaseTests
     {
         var (repo, pub, _) = AppB.Infrastructure();
         var gameId = await GameInHealthCheck(repo, pub);
-        var useCase = new DeclareHealthStatusUseCase(repo, pub);
+        var useCase = new DeclareHealthStatusHandler(repo, pub);
 
         foreach (var player in AppB.FourPlayerIds)
             await useCase.ExecuteAsync(new DeclareHealthStatusCommand(gameId, player, true));
@@ -96,7 +96,7 @@ public class DeclareHealthStatusUseCaseTests
     {
         var (repo, pub, _) = AppB.Infrastructure();
         var gameId = await GameInHealthCheck(repo, pub);
-        var useCase = new DeclareHealthStatusUseCase(repo, pub);
+        var useCase = new DeclareHealthStatusHandler(repo, pub);
 
         // Only P2 has a Vorbehalt
         await useCase.ExecuteAsync(new DeclareHealthStatusCommand(gameId, AppB.P0, false));
@@ -114,7 +114,7 @@ public class DeclareHealthStatusUseCaseTests
     {
         var (repo, pub, _) = AppB.Infrastructure();
         var gameId = await GameInHealthCheck(repo, pub);
-        var useCase = new DeclareHealthStatusUseCase(repo, pub);
+        var useCase = new DeclareHealthStatusHandler(repo, pub);
 
         GameActionResult<DeclareHealthStatusResult> lastResult = null!;
         foreach (var player in AppB.FourPlayerIds)

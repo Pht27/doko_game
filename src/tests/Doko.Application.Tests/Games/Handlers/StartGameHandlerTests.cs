@@ -1,14 +1,14 @@
 using Doko.Application.Tests.Helpers;
 
-namespace Doko.Application.Tests.Games.UseCases;
+namespace Doko.Application.Tests.Games.Handlers;
 
-public class StartGameUseCaseTests
+public class StartGameHandlerTests
 {
     [Fact]
     public async Task StartGame_CreatesGameInDealingPhase()
     {
         var (repo, pub, _) = AppB.Infrastructure();
-        var useCase = new StartGameUseCase(repo, pub);
+        var useCase = new StartGameHandler(repo, pub);
 
         var result = await useCase.ExecuteAsync(new StartGameCommand(AppB.FourPlayerIds));
 
@@ -25,7 +25,7 @@ public class StartGameUseCaseTests
     public async Task StartGame_AssignsSeatsInOrder()
     {
         var (repo, pub, _) = AppB.Infrastructure();
-        var useCase = new StartGameUseCase(repo, pub);
+        var useCase = new StartGameHandler(repo, pub);
 
         var result = await useCase.ExecuteAsync(new StartGameCommand(AppB.FourPlayerIds));
         var ok = (GameActionResult<StartGameResult>.Ok)result;
@@ -41,7 +41,7 @@ public class StartGameUseCaseTests
     public async Task StartGame_WithWrongPlayerCount_ReturnsInvalidPhase()
     {
         var (repo, pub, _) = AppB.Infrastructure();
-        var useCase = new StartGameUseCase(repo, pub);
+        var useCase = new StartGameHandler(repo, pub);
 
         var result = await useCase.ExecuteAsync(new StartGameCommand([AppB.P0, AppB.P1]));
 

@@ -8,9 +8,9 @@ using Doko.Domain.Players;
 using Doko.Domain.Reservations;
 using Doko.Domain.Sonderkarten;
 
-namespace Doko.Application.Games.UseCases;
+namespace Doko.Application.Games.Handlers;
 
-public interface IMakeReservationUseCase
+public interface IMakeReservationHandler
 {
     Task<GameActionResult<MakeReservationResult>> ExecuteAsync(
         MakeReservationCommand command,
@@ -22,10 +22,10 @@ public interface IMakeReservationUseCase
 /// Handles reservation declarations in any reservation check phase
 /// (SoloCheck, ArmutCheck, SchmeissenCheck, HochzeitCheck).
 /// </summary>
-public sealed class MakeReservationUseCase(
+public sealed class MakeReservationHandler(
     IGameRepository repository,
     IGameEventPublisher publisher
-) : IMakeReservationUseCase
+) : IMakeReservationHandler
 {
     private static readonly IReadOnlySet<GamePhase> CheckPhases = new HashSet<GamePhase>
     {

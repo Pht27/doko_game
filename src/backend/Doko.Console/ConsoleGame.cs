@@ -2,7 +2,7 @@ using Doko.Application.Abstractions;
 using Doko.Application.Common;
 using Doko.Application.Games.Commands;
 using Doko.Application.Games.Results;
-using Doko.Application.Games.UseCases;
+using Doko.Application.Games.Handlers;
 using Doko.Console.Input;
 using Doko.Console.Rendering;
 using Doko.Domain.GameFlow;
@@ -12,11 +12,11 @@ using Doko.Domain.Reservations;
 namespace Doko.Console;
 
 public sealed class ConsoleGame(
-    IStartGameUseCase startGame,
-    IDealCardsUseCase dealCards,
-    IMakeReservationUseCase makeReservation,
-    IPlayCardUseCase playCard,
-    IMakeAnnouncementUseCase makeAnnouncement,
+    IStartGameHandler startGame,
+    IDealCardsHandler dealCards,
+    IMakeReservationHandler makeReservation,
+    IPlayCardHandler playCard,
+    IMakeAnnouncementHandler makeAnnouncement,
     IGameQueryService queryService,
     GameRenderer renderer,
     ConsoleInputReader inputReader

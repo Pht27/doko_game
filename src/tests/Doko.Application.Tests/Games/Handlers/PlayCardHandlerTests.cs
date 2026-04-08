@@ -2,9 +2,9 @@ using Doko.Application.Tests.Helpers;
 using Doko.Domain.Scoring;
 using Doko.Domain.Trump;
 
-namespace Doko.Application.Tests.Games.UseCases;
+namespace Doko.Application.Tests.Games.Handlers;
 
-public class PlayCardUseCaseTests
+public class PlayCardHandlerTests
 {
     // ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -52,10 +52,10 @@ public class PlayCardUseCaseTests
         return (repo, pub, state.Id);
     }
 
-    private static IPlayCardUseCase UseCase(
+    private static IPlayCardHandler Handler(
         Fakes.InMemoryGameRepository repo,
         Fakes.RecordingGameEventPublisher pub
-    ) => new PlayCardUseCase(repo, pub, new GameScorer());
+    ) => new PlayCardHandler(repo, pub, new GameScorer());
 
     // ── Tests ─────────────────────────────────────────────────────────────────
 
@@ -64,7 +64,7 @@ public class PlayCardUseCaseTests
     {
         var card = AppB.Card(0, Suit.Karo, Rank.Ass);
         var (repo, pub, id) = await PlayingGame(p0Hand: [card]);
-        var uc = UseCase(repo, pub);
+        var uc = Handler(repo, pub);
 
         await uc.ExecuteAsync(new PlayCardCommand(id, AppB.P0, card.Id, []));
 
@@ -77,7 +77,7 @@ public class PlayCardUseCaseTests
     {
         var card = AppB.Card(0, Suit.Karo, Rank.Ass);
         var (repo, pub, id) = await PlayingGame(p0Hand: [card]);
-        var uc = UseCase(repo, pub);
+        var uc = Handler(repo, pub);
 
         await uc.ExecuteAsync(new PlayCardCommand(id, AppB.P0, card.Id, []));
 
@@ -92,7 +92,7 @@ public class PlayCardUseCaseTests
     {
         var card = AppB.Card(0, Suit.Karo, Rank.Ass);
         var (repo, pub, id) = await PlayingGame(p0Hand: [card]);
-        var uc = UseCase(repo, pub);
+        var uc = Handler(repo, pub);
 
         await uc.ExecuteAsync(new PlayCardCommand(id, AppB.P0, card.Id, []));
 
@@ -105,7 +105,7 @@ public class PlayCardUseCaseTests
     {
         var card = AppB.Card(1, Suit.Karo, Rank.Ass);
         var (repo, pub, id) = await PlayingGame(p1Hand: [card]);
-        var uc = UseCase(repo, pub);
+        var uc = Handler(repo, pub);
 
         var result = await uc.ExecuteAsync(new PlayCardCommand(id, AppB.P1, card.Id, []));
 
@@ -120,7 +120,7 @@ public class PlayCardUseCaseTests
     public async Task PlayCard_ReturnsGameNotFound_ForUnknownGame()
     {
         var (repo, pub, _) = AppB.Infrastructure();
-        var uc = UseCase(repo, pub);
+        var uc = Handler(repo, pub);
 
         var result = await uc.ExecuteAsync(
             new PlayCardCommand(GameId.New(), AppB.P0, new CardId(0), [])
@@ -160,7 +160,7 @@ public class PlayCardUseCaseTests
         );
         await repo.SaveAsync(state);
         var id = state.Id;
-        var uc = UseCase(repo, pub);
+        var uc = Handler(repo, pub);
 
         await uc.ExecuteAsync(new PlayCardCommand(id, AppB.P0, c0.Id, []));
         await uc.ExecuteAsync(new PlayCardCommand(id, AppB.P1, c1.Id, []));
@@ -191,7 +191,7 @@ public class PlayCardUseCaseTests
             p2Hand: [c2],
             p3Hand: [c3]
         );
-        var uc = UseCase(repo, pub);
+        var uc = Handler(repo, pub);
 
         await uc.ExecuteAsync(new PlayCardCommand(id, AppB.P0, c0.Id, []));
         await uc.ExecuteAsync(new PlayCardCommand(id, AppB.P1, c1.Id, []));

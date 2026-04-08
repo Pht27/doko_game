@@ -1,8 +1,8 @@
 using Doko.Application.Tests.Helpers;
 
-namespace Doko.Application.Tests.Games.UseCases;
+namespace Doko.Application.Tests.Games.Handlers;
 
-public class AcceptArmutUseCaseTests
+public class AcceptArmutHandlerTests
 {
     // Cards used across tests — IDs are arbitrary but unique
     private static readonly Card Trump1 = AppB.Card(0, Suit.Kreuz, Rank.Bube);
@@ -50,7 +50,7 @@ public class AcceptArmutUseCaseTests
         var (repo, pub, _) = AppB.Infrastructure();
         var state = GameState.Create(phase: GamePhase.Playing, currentTurn: AppB.P1);
         await repo.SaveAsync(state);
-        var useCase = new AcceptArmutUseCase(repo, pub);
+        var useCase = new AcceptArmutHandler(repo, pub);
 
         var result = await useCase.ExecuteAsync(new AcceptArmutCommand(state.Id, AppB.P1, true));
 
@@ -65,7 +65,7 @@ public class AcceptArmutUseCaseTests
     public async Task AcceptArmut_WrongPlayer_ReturnsNotYourTurn()
     {
         var (repo, pub, id) = await ArmutPartnerFindingGame();
-        var useCase = new AcceptArmutUseCase(repo, pub);
+        var useCase = new AcceptArmutHandler(repo, pub);
 
         // P2 tries when it's P1's turn
         var result = await useCase.ExecuteAsync(new AcceptArmutCommand(id, AppB.P2, true));
@@ -81,7 +81,7 @@ public class AcceptArmutUseCaseTests
     public async Task AcceptArmut_Accepted_EntersCardExchangePhase()
     {
         var (repo, pub, id) = await ArmutPartnerFindingGame();
-        var useCase = new AcceptArmutUseCase(repo, pub);
+        var useCase = new AcceptArmutHandler(repo, pub);
 
         await useCase.ExecuteAsync(new AcceptArmutCommand(id, AppB.P1, true));
 
@@ -95,7 +95,7 @@ public class AcceptArmutUseCaseTests
     public async Task AcceptArmut_Accepted_TransfersTrumpsFromPoorToRich()
     {
         var (repo, pub, id) = await ArmutPartnerFindingGame();
-        var useCase = new AcceptArmutUseCase(repo, pub);
+        var useCase = new AcceptArmutHandler(repo, pub);
 
         await useCase.ExecuteAsync(new AcceptArmutCommand(id, AppB.P1, true));
 
@@ -113,7 +113,7 @@ public class AcceptArmutUseCaseTests
     public async Task AcceptArmut_Declined_MovesToNextCandidate()
     {
         var (repo, pub, id) = await ArmutPartnerFindingGame();
-        var useCase = new AcceptArmutUseCase(repo, pub);
+        var useCase = new AcceptArmutHandler(repo, pub);
 
         var result = await useCase.ExecuteAsync(new AcceptArmutCommand(id, AppB.P1, false));
 
@@ -132,7 +132,7 @@ public class AcceptArmutUseCaseTests
     public async Task AcceptArmut_AllDeclined_EntersSchwarzesSauMode()
     {
         var (repo, pub, id) = await ArmutPartnerFindingGame();
-        var useCase = new AcceptArmutUseCase(repo, pub);
+        var useCase = new AcceptArmutHandler(repo, pub);
 
         await useCase.ExecuteAsync(new AcceptArmutCommand(id, AppB.P1, false));
         await useCase.ExecuteAsync(new AcceptArmutCommand(id, AppB.P2, false));

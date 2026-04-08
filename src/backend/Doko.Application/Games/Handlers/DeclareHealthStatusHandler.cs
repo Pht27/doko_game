@@ -4,11 +4,12 @@ using Doko.Application.Games.Commands;
 using Doko.Application.Games.Results;
 using Doko.Domain.GameFlow;
 using Doko.Domain.GameFlow.Events;
+using Doko.Domain.Players;
 using Doko.Domain.Sonderkarten;
 
-namespace Doko.Application.Games.UseCases;
+namespace Doko.Application.Games.Handlers;
 
-public interface IDeclareHealthStatusUseCase
+public interface IDeclareHealthStatusHandler
 {
     Task<GameActionResult<DeclareHealthStatusResult>> ExecuteAsync(
         DeclareHealthStatusCommand command,
@@ -16,10 +17,10 @@ public interface IDeclareHealthStatusUseCase
     );
 }
 
-public sealed class DeclareHealthStatusUseCase(
+public sealed class DeclareHealthStatusHandler(
     IGameRepository repository,
     IGameEventPublisher publisher
-) : IDeclareHealthStatusUseCase
+) : IDeclareHealthStatusHandler
 {
     public async Task<GameActionResult<DeclareHealthStatusResult>> ExecuteAsync(
         DeclareHealthStatusCommand command,
@@ -52,22 +53,28 @@ public sealed class DeclareHealthStatusUseCase(
 
         state.Apply(new RecordHealthDeclarationModification(command.Player, command.HasVorbehalt));
 
-        // Advance the pending queue
-        var remaining = state.PendingReservationResponders.Skip(1).ToList();
-        state.Apply(new SetPendingRespondersModification(remaining));
+        var remaining = AdvancePendingQueue(state);
 
         if (remaining.Count > 0)
-        {
-            // More players still need to declare health
-            state.Apply(new SetCurrentTurnModification(remaining[0]));
-            await repository.SaveAsync(state, ct);
-            await publisher.PublishAsync(state.Id, events, ct);
-            return new GameActionResult<DeclareHealthStatusResult>.Ok(
-                new DeclareHealthStatusResult(false)
-            );
-        }
+            return await SaveAndReturn(state, events, new DeclareHealthStatusResult(false), ct);
 
-        // All players have declared — resolve next phase
+        ResolveNextPhaseAfterAllDeclared(state);
+        return await SaveAndReturn(state, events, new DeclareHealthStatusResult(true), ct);
+    }
+
+    // ── Private helpers ───────────────────────────────────────────────────────
+
+    private static IReadOnlyList<PlayerId> AdvancePendingQueue(GameState state)
+    {
+        var remaining = state.PendingReservationResponders.Skip(1).ToList();
+        state.Apply(new SetPendingRespondersModification(remaining));
+        if (remaining.Count > 0)
+            state.Apply(new SetCurrentTurnModification(remaining[0]));
+        return remaining;
+    }
+
+    private static void ResolveNextPhaseAfterAllDeclared(GameState state)
+    {
         var vorbehaltPlayers = state
             .Players.Where(p => state.HealthDeclarations.TryGetValue(p.Id, out var hasV) && hasV)
             .Select(p => p.Id)
@@ -87,11 +94,17 @@ public sealed class DeclareHealthStatusUseCase(
             state.Apply(new AdvancePhaseModification(GamePhase.ReservationSoloCheck));
             state.Apply(new SetCurrentTurnModification(vorbehaltPlayers[0]));
         }
+    }
 
+    private async Task<GameActionResult<DeclareHealthStatusResult>> SaveAndReturn(
+        GameState state,
+        List<IDomainEvent> events,
+        DeclareHealthStatusResult result,
+        CancellationToken ct
+    )
+    {
         await repository.SaveAsync(state, ct);
         await publisher.PublishAsync(state.Id, events, ct);
-        return new GameActionResult<DeclareHealthStatusResult>.Ok(
-            new DeclareHealthStatusResult(true)
-        );
+        return new GameActionResult<DeclareHealthStatusResult>.Ok(result);
     }
 }

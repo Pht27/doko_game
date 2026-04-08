@@ -104,7 +104,7 @@ public sealed class GameState
 
     /// <summary>
     /// Pre-computed trick results (winner + extrapunkt awards) appended at trick completion time.
-    /// Parallel to <see cref="CompletedTricks"/>; used by <c>FinishGameUseCase</c> to build
+    /// Parallel to <see cref="CompletedTricks"/>; used by <c>FinishGameHandler</c> to build
     /// <c>CompletedGame</c> for the scorer.
     /// </summary>
     public IReadOnlyList<TrickResult> ScoredTricks { get; private set; } = [];

@@ -1,8 +1,8 @@
 using Doko.Application.Tests.Helpers;
 
-namespace Doko.Application.Tests.Games.UseCases;
+namespace Doko.Application.Tests.Games.Handlers;
 
-public class MakeReservationUseCaseTests
+public class MakeReservationHandlerTests
 {
     /// <summary>
     /// Creates a game, deals cards, and completes the health check with all players saying Gesund.
@@ -15,19 +15,19 @@ public class MakeReservationUseCaseTests
     {
         var id = (
             (GameActionResult<StartGameResult>.Ok)
-                await new StartGameUseCase(repo, pub).ExecuteAsync(
+                await new StartGameHandler(repo, pub).ExecuteAsync(
                     new StartGameCommand(AppB.FourPlayerIds, RuleSet.Minimal())
                 )
         )
             .Value
             .GameId;
-        await new DealCardsUseCase(repo, pub, new Fakes.FakeDeckShuffler()).ExecuteAsync(
+        await new DealCardsHandler(repo, pub, new Fakes.FakeDeckShuffler()).ExecuteAsync(
             new DealCardsCommand(id)
         );
         // All players say Gesund to skip health check
-        var healthUseCase = new DeclareHealthStatusUseCase(repo, pub);
+        var healthHandler = new DeclareHealthStatusHandler(repo, pub);
         foreach (var player in AppB.FourPlayerIds)
-            await healthUseCase.ExecuteAsync(new DeclareHealthStatusCommand(id, player, false));
+            await healthHandler.ExecuteAsync(new DeclareHealthStatusCommand(id, player, false));
         return id;
     }
 
@@ -41,18 +41,18 @@ public class MakeReservationUseCaseTests
     {
         var id = (
             (GameActionResult<StartGameResult>.Ok)
-                await new StartGameUseCase(repo, pub).ExecuteAsync(
+                await new StartGameHandler(repo, pub).ExecuteAsync(
                     new StartGameCommand(AppB.FourPlayerIds, RuleSet.Minimal())
                 )
         )
             .Value
             .GameId;
-        await new DealCardsUseCase(repo, pub, new Fakes.FakeDeckShuffler()).ExecuteAsync(
+        await new DealCardsHandler(repo, pub, new Fakes.FakeDeckShuffler()).ExecuteAsync(
             new DealCardsCommand(id)
         );
-        var healthUseCase = new DeclareHealthStatusUseCase(repo, pub);
+        var healthHandler = new DeclareHealthStatusHandler(repo, pub);
         foreach (var player in AppB.FourPlayerIds)
-            await healthUseCase.ExecuteAsync(new DeclareHealthStatusCommand(id, player, true));
+            await healthHandler.ExecuteAsync(new DeclareHealthStatusCommand(id, player, true));
         return id;
     }
 
@@ -61,7 +61,7 @@ public class MakeReservationUseCaseTests
     {
         var (repo, pub, _) = AppB.Infrastructure();
         var gameId = await GameInSoloCheckPhaseAllVorbehalt(repo, pub);
-        var useCase = new MakeReservationUseCase(repo, pub);
+        var useCase = new MakeReservationHandler(repo, pub);
 
         // P0 passes (no solo)
         var result = await useCase.ExecuteAsync(new MakeReservationCommand(gameId, AppB.P0, null));
@@ -78,7 +78,7 @@ public class MakeReservationUseCaseTests
     {
         var (repo, pub, _) = AppB.Infrastructure();
         var gameId = await GameInSoloCheckPhaseAllVorbehalt(repo, pub);
-        var useCase = new MakeReservationUseCase(repo, pub);
+        var useCase = new MakeReservationHandler(repo, pub);
 
         // All four Vorbehalt players pass on Solo
         await useCase.ExecuteAsync(new MakeReservationCommand(gameId, AppB.P0, null));
@@ -99,7 +99,7 @@ public class MakeReservationUseCaseTests
     {
         var (repo, pub, _) = AppB.Infrastructure();
         var gameId = await GameInSoloCheckPhaseAllVorbehalt(repo, pub);
-        var useCase = new MakeReservationUseCase(repo, pub);
+        var useCase = new MakeReservationHandler(repo, pub);
 
         // P0 declares; now it's P1's turn
         await useCase.ExecuteAsync(new MakeReservationCommand(gameId, AppB.P0, null));
@@ -120,13 +120,13 @@ public class MakeReservationUseCaseTests
         // Game in Dealing phase (not yet dealt)
         var id = (
             (GameActionResult<StartGameResult>.Ok)
-                await new StartGameUseCase(repo, pub).ExecuteAsync(
+                await new StartGameHandler(repo, pub).ExecuteAsync(
                     new StartGameCommand(AppB.FourPlayerIds)
                 )
         )
             .Value
             .GameId;
-        var useCase = new MakeReservationUseCase(repo, pub);
+        var useCase = new MakeReservationHandler(repo, pub);
 
         var result = await useCase.ExecuteAsync(new MakeReservationCommand(id, AppB.P0, null));
 
@@ -142,7 +142,7 @@ public class MakeReservationUseCaseTests
     {
         var (repo, pub, _) = AppB.Infrastructure();
         var gameId = await GameInSoloCheckPhaseAllVorbehalt(repo, pub);
-        var useCase = new MakeReservationUseCase(repo, pub);
+        var useCase = new MakeReservationHandler(repo, pub);
 
         // Pass all four check phases (minimal rules: no solos, no armut, no schmeissen, no hochzeit)
         // SoloCheck
@@ -172,19 +172,19 @@ public class MakeReservationUseCaseTests
         var (repo, pub, _) = AppB.Infrastructure();
         var gameId = (
             (GameActionResult<StartGameResult>.Ok)
-                await new StartGameUseCase(repo, pub).ExecuteAsync(
+                await new StartGameHandler(repo, pub).ExecuteAsync(
                     new StartGameCommand(AppB.FourPlayerIds, RuleSet.Minimal())
                 )
         )
             .Value
             .GameId;
-        await new DealCardsUseCase(repo, pub, new Fakes.FakeDeckShuffler()).ExecuteAsync(
+        await new DealCardsHandler(repo, pub, new Fakes.FakeDeckShuffler()).ExecuteAsync(
             new DealCardsCommand(gameId)
         );
 
-        var healthUseCase = new DeclareHealthStatusUseCase(repo, pub);
+        var healthHandler = new DeclareHealthStatusHandler(repo, pub);
         foreach (var player in AppB.FourPlayerIds)
-            await healthUseCase.ExecuteAsync(new DeclareHealthStatusCommand(gameId, player, false));
+            await healthHandler.ExecuteAsync(new DeclareHealthStatusCommand(gameId, player, false));
 
         var state = await repo.GetAsync(gameId);
         // All Gesund → skip all checks → directly to Playing
