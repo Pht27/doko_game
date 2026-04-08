@@ -35,8 +35,10 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
+            cd /root/opt/doko-staging
+            git fetch origin develop
+            git reset --hard origin/develop
             cd ${{ secrets.DEPLOY_PATH }}
-            git pull origin develop
             docker compose -f src/infrastructure/docker-compose.staging.yml \
               --env-file src/infrastructure/.env \
               up --build -d --no-deps backend-staging

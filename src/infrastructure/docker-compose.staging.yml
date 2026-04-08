@@ -44,7 +44,7 @@ services:
   backend-staging:
     container_name: backend-staging
     build:
-      context: ../..
+      context: /root/opt/doko-staging
       dockerfile: src/infrastructure/backend/Dockerfile
     environment:
       - Jwt__Key=${JWT_SECRET}
