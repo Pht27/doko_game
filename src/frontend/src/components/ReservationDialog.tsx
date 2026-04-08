@@ -1,3 +1,6 @@
+import { t } from '../translations';
+import './ReservationDialog.css';
+
 interface ReservationDialogProps {
   playerId: number;
   eligibleReservations: string[];
@@ -10,14 +13,14 @@ const HOCHZEIT_CONDITIONS = ['FirstTrick', 'FirstFehlTrick', 'FirstTrumpTrick'];
 export function ReservationDialog({ playerId, eligibleReservations, mustDeclare = false, onDeclare }: ReservationDialogProps) {
   return (
     <div className="bg-gray-800/95 rounded-2xl p-4 w-80 shadow-2xl flex flex-col gap-2 border border-white/10">
-      <h2 className="text-white font-bold text-sm">P{playerId}: Declare</h2>
+      <h2 className="text-white font-bold text-sm">{t.reservationTitle(playerId)}</h2>
 
       {!mustDeclare && (
         <button
           onClick={() => onDeclare(null, null, null)}
           className="w-full bg-white/10 hover:bg-white/20 text-white rounded-lg py-1.5 text-sm font-semibold transition-colors"
         >
-          Pass
+          {t.pass}
         </button>
       )}
 
@@ -31,7 +34,7 @@ export function ReservationDialog({ playerId, eligibleReservations, mustDeclare 
                   onClick={() => onDeclare('Hochzeit', cond, null)}
                   className="w-full bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg py-1.5 text-xs transition-colors"
                 >
-                  Hochzeit ({cond})
+                  {t.hochzeitLabel(cond)}
                 </button>
               ))}
             </div>

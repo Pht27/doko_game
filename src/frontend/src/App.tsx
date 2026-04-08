@@ -10,9 +10,11 @@ import { HandDisplay } from './components/HandDisplay';
 import { HealthCheckDialog } from './components/HealthCheckDialog';
 import { ReservationDialog } from './components/ReservationDialog';
 import { ArmutPartnerDialog } from './components/ArmutPartnerDialog';
+import { ArmutReturnDialog } from './components/ArmutReturnDialog';
 import { SonderkarteOverlay } from './components/SonderkarteOverlay';
 import { AnnouncementButton } from './components/AnnouncementButton';
 import { ResultScreen } from './components/ResultScreen';
+import { t } from './translations';
 import type { CardDto, SonderkarteInfoDto } from './types/api';
 
 function App() {
@@ -33,11 +35,11 @@ function App() {
   if (!session) {
     return (
       <div className="w-full h-full flex items-center justify-center">
-        {initLoading && <p className="text-white/60 text-lg">Starting game…</p>}
+        {initLoading && <p className="text-white/60 text-lg">{t.startingGame}</p>}
         {initError && (
           <div className="text-center">
             <p className="text-red-400 mb-4">{initError}</p>
-            <button onClick={restart} className="bg-indigo-500 text-white px-6 py-2 rounded-lg">Retry</button>
+            <button onClick={restart} className="bg-indigo-500 text-white px-6 py-2 rounded-lg">{t.retry}</button>
           </div>
         )}
       </div>
@@ -172,11 +174,10 @@ function App() {
         <PlayerSwitcher activePlayer={activePlayer} onSwitch={setActivePlayer} />
       </div>
 
-      {/* Armut exchange announcement — shown for all players throughout the Armut game */}
+      {/* Armut exchange info banner — shown for all players throughout the Armut game */}
       {view?.armutExchangeCardCount != null && view.armutReturnedTrump != null && (
         <div className="bg-orange-900/40 text-orange-200 text-xs text-center py-1 px-4">
-          Armut: {view.armutExchangeCardCount} Karte(n) zurückgegeben
-          {view.armutReturnedTrump ? ' · mit Trump' : ' · kein Trump'}
+          {t.armutInfoBanner(view.armutExchangeCardCount, view.armutReturnedTrump)}
         </div>
       )}
 
@@ -222,21 +223,12 @@ function App() {
               onRespond={handleArmutResponse}
             />
           ) : view?.shouldReturnArmutCards && view.armutCardReturnCount !== null ? (
-            <div className="bg-gray-800/95 rounded-2xl p-4 w-72 shadow-2xl flex flex-col gap-2 border border-white/10">
-              <h2 className="text-white font-bold text-sm">
-                P{activePlayer}: {view.armutCardReturnCount} Karte(n) zurückgeben
-              </h2>
-              <p className="text-white/60 text-xs">
-                Wähle {view.armutCardReturnCount} Karte(n) aus deiner Hand ({armutReturnSelected.size}/{view.armutCardReturnCount})
-              </p>
-              <button
-                disabled={armutReturnSelected.size !== view.armutCardReturnCount}
-                onClick={() => handleArmutExchange(Array.from(armutReturnSelected))}
-                className="w-full bg-orange-600 hover:bg-orange-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg py-1.5 text-sm font-semibold transition-colors"
-              >
-                Bestätigen
-              </button>
-            </div>
+            <ArmutReturnDialog
+              playerId={activePlayer}
+              cardReturnCount={view.armutCardReturnCount}
+              selectedCount={armutReturnSelected.size}
+              onConfirm={() => handleArmutExchange(Array.from(armutReturnSelected))}
+            />
           ) : (
             <TrickArea
               trick={view?.currentTrick ?? null}
@@ -282,7 +274,7 @@ function App() {
             maxSelection={view.armutCardReturnCount ?? undefined}
           />
         )}
-        {viewLoading && <div className="text-center text-white/40 text-xs py-1">Loading…</div>}
+        {viewLoading && <div className="text-center text-white/40 text-xs py-1">{t.loading}</div>}
         {viewError && <div className="text-center text-red-400 text-xs py-1">{viewError}</div>}
       </div>
 

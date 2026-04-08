@@ -1,5 +1,7 @@
 import type { TrickSummaryDto } from '../types/api';
 import { cardSvgPath } from '../api/cards';
+import { t } from '../translations';
+import './TrickArea.css';
 
 interface TrickAreaProps {
   trick: TrickSummaryDto | null;
@@ -12,7 +14,7 @@ export function TrickArea({ trick, requestingPlayer, seatOf }: TrickAreaProps) {
   if (!trick || trick.cards.length === 0) {
     return (
       <div className="flex items-center justify-center w-40 h-40 rounded-full border-2 border-white/10 text-white/20 text-sm">
-        No trick
+        {t.keinStich}
       </div>
     );
   }
@@ -36,7 +38,7 @@ export function TrickArea({ trick, requestingPlayer, seatOf }: TrickAreaProps) {
           >
             <img
               src={cardSvgPath(card.suit, card.rank)}
-              alt={`${card.rank} of ${card.suit}`}
+              alt={t.cardAlt(card.rank, card.suit)}
               className={`w-12 h-auto rounded shadow-lg drop-shadow ${isMe ? 'ring-2 ring-yellow-400' : ''}`}
             />
           </div>
