@@ -9,29 +9,26 @@ interface PlayerLabelProps {
 }
 
 export function PlayerLabel({ player, isCurrentTurn, orientation }: PlayerLabelProps) {
-  const base = 'flex flex-col items-center gap-1 px-3 py-2 rounded-xl text-xs transition-all';
-  const active = isCurrentTurn
-    ? 'ring-2 ring-yellow-400 bg-yellow-400/10 text-yellow-300'
-    : 'text-white/60';
+  const active = isCurrentTurn ? 'player-label-active' : 'player-label-inactive';
 
   const partyColor =
     player.knownParty === 'Re'
-      ? 'bg-blue-500'
+      ? 'player-party-re'
       : player.knownParty === 'Kontra'
-        ? 'bg-red-500'
-        : 'bg-white/20';
+        ? 'player-party-kontra'
+        : 'player-party-unknown';
 
   const layout =
     orientation === 'top'
-      ? 'flex-col'
+      ? 'player-label-top'
       : orientation === 'left'
-        ? 'flex-row'
-        : 'flex-row-reverse';
+        ? 'player-label-left'
+        : 'player-label-right';
 
   return (
-    <div className={`${base} ${active} ${layout}`}>
-      <span className="font-semibold">{t.playerName(player.id)}</span>
-      <span className={`w-2 h-2 rounded-full ${partyColor}`} title={player.knownParty ?? t.unbekanntePartei} />
+    <div className={`player-label ${active} ${layout}`}>
+      <span className="player-label-name">{t.playerName(player.id)}</span>
+      <span className={`player-party-dot ${partyColor}`} title={player.knownParty ?? t.unbekanntePartei} />
       <span>{t.kartenAnzahl(player.handCardCount)}</span>
     </div>
   );

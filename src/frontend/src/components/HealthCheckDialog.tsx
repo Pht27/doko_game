@@ -8,19 +8,19 @@ interface HealthCheckDialogProps {
 
 export function HealthCheckDialog({ playerId, onDeclare }: HealthCheckDialogProps) {
   return (
-    <div className="bg-gray-800/95 rounded-2xl p-4 w-72 shadow-2xl flex flex-col gap-2 border border-white/10">
-      <h2 className="text-white font-bold text-sm">{t.healthCheckTitle(playerId)}</h2>
+    <div className="health-check-dialog">
+      <h2 className="health-check-title">{t.healthCheckTitle(playerId)}</h2>
 
       <button
         onClick={() => onDeclare(false)}
-        className="w-full bg-green-700 hover:bg-green-600 text-white rounded-lg py-1.5 text-sm font-semibold transition-colors"
+        className="health-check-btn-gesund"
       >
         {t.gesund}
       </button>
 
       <button
         onClick={() => onDeclare(true)}
-        className="w-full bg-red-700 hover:bg-red-600 text-white rounded-lg py-1.5 text-sm font-semibold transition-colors"
+        className="health-check-btn-vorbehalt"
       >
         {t.vorbehalt}
       </button>

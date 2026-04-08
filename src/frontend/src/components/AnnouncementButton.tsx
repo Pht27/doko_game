@@ -10,12 +10,12 @@ export function AnnouncementButton({ legalAnnouncements, onAnnounce }: Announcem
   if (legalAnnouncements.length === 0) return null;
 
   return (
-    <div className="flex gap-2 justify-center">
+    <div className="announcement-buttons">
       {legalAnnouncements.map((type) => (
         <button
           key={type}
           onClick={() => onAnnounce(type)}
-          className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg px-4 py-2 text-sm shadow transition-colors"
+          className="announcement-btn"
         >
           {t.announcementLabel(type)}
         </button>

@@ -1,1 +1,38 @@
 /* TrickArea — styles for the compass-grid trick display */
+@reference "./index.css";
+
+.trick-empty {
+  @apply flex items-center justify-center w-40 h-40 rounded-full border-2 border-white/10 text-white/20 text-sm;
+}
+
+.trick-grid {
+  @apply grid grid-cols-3 grid-rows-3 gap-1 w-44 h-44;
+}
+
+.trick-card-cell {
+  @apply flex items-center justify-center;
+}
+
+.trick-card-top {
+  @apply row-start-1 col-start-2;
+}
+
+.trick-card-left {
+  @apply row-start-2 col-start-1;
+}
+
+.trick-card-bottom {
+  @apply row-start-3 col-start-2;
+}
+
+.trick-card-right {
+  @apply row-start-2 col-start-3;
+}
+
+.trick-card {
+  @apply w-12 h-auto rounded shadow-lg drop-shadow;
+}
+
+.trick-card-mine {
+  @apply ring-2 ring-yellow-400;
+}

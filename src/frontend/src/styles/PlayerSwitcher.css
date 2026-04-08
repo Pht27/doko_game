@@ -1,1 +1,18 @@
 /* PlayerSwitcher — styles for the P0–P3 hot-seat switcher row */
+@reference "./index.css";
+
+.player-switcher {
+  @apply flex gap-1 rounded-lg bg-white/10 p-1;
+}
+
+.player-switcher-btn {
+  @apply px-3 py-1 rounded-md text-sm font-semibold transition-colors;
+}
+
+.player-switcher-btn-active {
+  @apply bg-indigo-500 text-white shadow;
+}
+
+.player-switcher-btn-inactive {
+  @apply text-white/70 hover:text-white hover:bg-white/10;
+}

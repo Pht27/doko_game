@@ -27,28 +27,28 @@ export function SonderkarteOverlay({ sonderkarten, onConfirm, onCancel }: Sonder
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+    <div className="sonderkarte-overlay">
       <form
         onSubmit={handleSubmit}
-        className="bg-gray-800 rounded-2xl p-6 w-80 shadow-2xl flex flex-col gap-4"
+        className="sonderkarte-form"
       >
-        <h2 className="text-white font-bold text-lg">{t.aktiviereSonderkarten}</h2>
-        <p className="text-white/60 text-sm">{t.sonderkartenDescription}</p>
+        <h2 className="sonderkarte-title">{t.aktiviereSonderkarten}</h2>
+        <p className="sonderkarte-description">{t.sonderkartenDescription}</p>
 
         {sonderkarten.map((sk) => (
-          <label key={sk.type} className="flex items-start gap-3 cursor-pointer">
-            <input type="checkbox" name={`sk_${sk.type}`} className="mt-1" />
+          <label key={sk.type} className="sonderkarte-option">
+            <input type="checkbox" name={`sk_${sk.type}`} className="sonderkarte-option-checkbox" />
             <div>
-              <div className="text-white font-semibold text-sm">{sk.name}</div>
-              <div className="text-white/50 text-xs">{sk.description}</div>
+              <div className="sonderkarte-option-name">{sk.name}</div>
+              <div className="sonderkarte-option-description">{sk.description}</div>
             </div>
           </label>
         ))}
 
         {needsGenscher && (
           <div>
-            <label className="text-white/70 text-sm block mb-1">{t.genscherPartnerLabel}</label>
-            <select name="genscherPartner" className="w-full rounded bg-gray-700 text-white p-2 text-sm">
+            <label className="sonderkarte-partner-label">{t.genscherPartnerLabel}</label>
+            <select name="genscherPartner" className="sonderkarte-partner-select">
               {[0, 1, 2, 3].map((p) => (
                 <option key={p} value={p}>{t.playerLabel(p)}</option>
               ))}
@@ -56,17 +56,17 @@ export function SonderkarteOverlay({ sonderkarten, onConfirm, onCancel }: Sonder
           </div>
         )}
 
-        <div className="flex gap-3 mt-2">
+        <div className="sonderkarte-actions">
           <button
             type="submit"
-            className="flex-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg py-2 font-semibold transition-colors"
+            className="sonderkarte-btn-confirm"
           >
             {t.karteAusspielen}
           </button>
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 bg-white/10 hover:bg-white/20 text-white rounded-lg py-2 transition-colors"
+            className="sonderkarte-btn-cancel"
           >
             {t.abbrechen}
           </button>

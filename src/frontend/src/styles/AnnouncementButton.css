@@ -1,1 +1,10 @@
 /* AnnouncementButton — styles for the announcement action buttons */
+@reference "./index.css";
+
+.announcement-buttons {
+  @apply flex gap-2 justify-center;
+}
+
+.announcement-btn {
+  @apply bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg px-4 py-2 text-sm shadow transition-colors;
+}
