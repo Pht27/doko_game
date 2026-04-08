@@ -1,1 +1,0 @@
-Foe every message or button label etc I should have a file where I choose what it displays. SO i would have something like keine90announcement: "Keine 90 ansagen".
