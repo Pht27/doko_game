@@ -9,7 +9,7 @@
 }
 
 .card {
-  @apply h-28 w-auto rounded-md shadow-lg select-none;
+  @apply h-48 w-auto rounded-md shadow-lg select-none;
 }
 
 .card-playable {
