@@ -1,0 +1,18 @@
+services:
+  backend:
+    build:
+      context: ../..
+      dockerfile: src/infrastructure/backend/Dockerfile
+    environment:
+      - Jwt__Key=${JWT_SECRET}
+    restart: unless-stopped
+
+  nginx:
+    build:
+      context: ../..
+      dockerfile: src/infrastructure/nginx/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
