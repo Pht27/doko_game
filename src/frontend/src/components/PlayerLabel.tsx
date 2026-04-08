@@ -1,4 +1,6 @@
 import type { PlayerPublicStateDto } from '../types/api';
+import { t } from '../translations';
+import './PlayerLabel.css';
 
 interface PlayerLabelProps {
   player: PlayerPublicStateDto;
@@ -28,9 +30,9 @@ export function PlayerLabel({ player, isCurrentTurn, orientation }: PlayerLabelP
 
   return (
     <div className={`${base} ${active} ${layout}`}>
-      <span className="font-semibold">P{player.id}</span>
-      <span className={`w-2 h-2 rounded-full ${partyColor}`} title={player.knownParty ?? 'unknown'} />
-      <span>{player.handCardCount} cards</span>
+      <span className="font-semibold">{t.playerName(player.id)}</span>
+      <span className={`w-2 h-2 rounded-full ${partyColor}`} title={player.knownParty ?? t.unbekanntePartei} />
+      <span>{t.kartenAnzahl(player.handCardCount)}</span>
     </div>
   );
 }

@@ -1,3 +1,6 @@
+import { t } from '../translations';
+import './PlayerSwitcher.css';
+
 interface PlayerSwitcherProps {
   activePlayer: number;
   onSwitch: (player: number) => void;
@@ -17,7 +20,7 @@ export function PlayerSwitcher({ activePlayer, onSwitch }: PlayerSwitcherProps) 
               : 'text-white/70 hover:text-white hover:bg-white/10',
           ].join(' ')}
         >
-          P{p}
+          {t.playerName(p)}
         </button>
       ))}
     </div>

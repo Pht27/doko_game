@@ -1,4 +1,6 @@
 import type { SonderkarteInfoDto } from '../types/api';
+import { t } from '../translations';
+import './SonderkarteOverlay.css';
 
 interface SonderkarteOverlayProps {
   sonderkarten: SonderkarteInfoDto[];
@@ -30,8 +32,8 @@ export function SonderkarteOverlay({ sonderkarten, onConfirm, onCancel }: Sonder
         onSubmit={handleSubmit}
         className="bg-gray-800 rounded-2xl p-6 w-80 shadow-2xl flex flex-col gap-4"
       >
-        <h2 className="text-white font-bold text-lg">Activate Sonderkarten?</h2>
-        <p className="text-white/60 text-sm">Select which special cards to activate, or none.</p>
+        <h2 className="text-white font-bold text-lg">{t.aktiviereSonderkarten}</h2>
+        <p className="text-white/60 text-sm">{t.sonderkartenDescription}</p>
 
         {sonderkarten.map((sk) => (
           <label key={sk.type} className="flex items-start gap-3 cursor-pointer">
@@ -45,10 +47,10 @@ export function SonderkarteOverlay({ sonderkarten, onConfirm, onCancel }: Sonder
 
         {needsGenscher && (
           <div>
-            <label className="text-white/70 text-sm block mb-1">Genscher partner (player ID):</label>
+            <label className="text-white/70 text-sm block mb-1">{t.genscherPartnerLabel}</label>
             <select name="genscherPartner" className="w-full rounded bg-gray-700 text-white p-2 text-sm">
               {[0, 1, 2, 3].map((p) => (
-                <option key={p} value={p}>Player {p}</option>
+                <option key={p} value={p}>{t.playerLabel(p)}</option>
               ))}
             </select>
           </div>
@@ -59,14 +61,14 @@ export function SonderkarteOverlay({ sonderkarten, onConfirm, onCancel }: Sonder
             type="submit"
             className="flex-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg py-2 font-semibold transition-colors"
           >
-            Play card
+            {t.karteAusspielen}
           </button>
           <button
             type="button"
             onClick={onCancel}
             className="flex-1 bg-white/10 hover:bg-white/20 text-white rounded-lg py-2 transition-colors"
           >
-            Cancel
+            {t.abbrechen}
           </button>
         </div>
       </form>

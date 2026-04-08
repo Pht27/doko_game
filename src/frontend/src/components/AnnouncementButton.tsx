@@ -1,3 +1,6 @@
+import { t } from '../translations';
+import './AnnouncementButton.css';
+
 interface AnnouncementButtonProps {
   legalAnnouncements: string[];
   onAnnounce: (type: string) => void;
@@ -14,7 +17,7 @@ export function AnnouncementButton({ legalAnnouncements, onAnnounce }: Announcem
           onClick={() => onAnnounce(type)}
           className="bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg px-4 py-2 text-sm shadow transition-colors"
         >
-          {type}
+          {t.announcementLabel(type)}
         </button>
       ))}
     </div>
