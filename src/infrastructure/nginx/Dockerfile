@@ -3,7 +3,6 @@ WORKDIR /app
 COPY src/frontend/package*.json ./
 RUN npm ci
 COPY src/frontend/ ./
-ENV VITE_API_URL=""
 RUN npm run build
 
 FROM nginx:alpine
