@@ -1,1 +1,10 @@
 /* GameInfo — styles for the top-bar game phase / trick counter */
+@reference "./index.css";
+
+.game-info {
+  @apply text-xs text-white/60 leading-tight;
+}
+
+.game-info-phase {
+  @apply font-semibold text-white/80;
+}

@@ -1,1 +1,50 @@
 /* ResultScreen — styles for the end-of-game result overlay */
+@reference "./index.css";
+
+.result-overlay {
+  @apply fixed inset-0 bg-black/80 flex items-center justify-center z-50;
+}
+
+.result-screen {
+  @apply bg-gray-800 rounded-2xl p-8 w-96 shadow-2xl flex flex-col gap-4 text-white;
+}
+
+.result-title {
+  @apply text-2xl font-bold text-center;
+}
+
+.result-grid {
+  @apply grid grid-cols-2 gap-2 text-sm;
+}
+
+.result-label {
+  @apply text-white/60;
+}
+
+.result-value {
+  @apply font-semibold;
+}
+
+.result-feigheit {
+  @apply text-yellow-400;
+}
+
+.result-awards-header {
+  @apply text-white/60 text-sm mb-2;
+}
+
+.result-awards-list {
+  @apply flex flex-col gap-1;
+}
+
+.result-award-item {
+  @apply flex justify-between text-sm;
+}
+
+.result-award-delta {
+  @apply font-semibold;
+}
+
+.result-new-game-btn {
+  @apply mt-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg py-3 font-bold transition-colors;
+}
