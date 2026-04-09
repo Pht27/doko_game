@@ -14,6 +14,7 @@ phtanywhere.org {
 
     handle {
         root * /srv
+        header /index.html Cache-Control "no-cache, no-store, must-revalidate"
         try_files {path} /index.html
         file_server
     }
@@ -35,6 +36,7 @@ test.phtanywhere.org {
 
     handle {
         root * /srv-staging
+        header /index.html Cache-Control "no-cache, no-store, must-revalidate"
         try_files {path} /index.html
         file_server
     }
