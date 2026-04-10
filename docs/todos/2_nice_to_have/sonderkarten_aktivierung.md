@@ -1,0 +1,1 @@
+Das muss irgendwie schöner gehen, diese Dialoge sind ugly as hell.

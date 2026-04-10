@@ -1,1 +1,6 @@
 Pflichtansagen gehen nicht (oder werden nicht angezeigt, aber ich vermute ersteres). Bitte reviewe nochmal die Regeln für eine Pflichtansage und dann checke, ob sie im Backend richtig umgesetzt ist.
+
+Meine Recherche ergibt folgendes:
+
+1. In AnnouncementRules ist IsMandatory nicht ganz sinnvoll. Der Workflow muss so sein: Ein Stich wird beendet und dann muss (von der SPiel Engine) entschieden werden, ob aus diesem Stich für die STichgewinner eine Pflichtansage entsteht. Es müsste also eine Funktion geben, die einen Trick entgegen nimmt und einen boolean zurückgibt, ob daraus eine Pflichtansage folgt. (Die Regel ist, dass im ersten Stich >= 35 AUgen sein müssen, damit eine Pflichtansage entsteht. Im zweiten entsteht für den Gewinner nur eine Pflichtansage, wenn im ersten und zweiten Stich >= 35 Augen waren. Danach gibt es keine Pflichtansagen mehr. Pflichtansagen gibt es im Normalspiel, in Armut und in stiller Hochzeit sowie Kontrasolo)
+2. Im PlayCardHandler wird in CompleteTrickAsync nichts mit Pflichtansagen gemacht. Dort müsste bei einem CompleteTrick die oben beschreibene Funktion aufgerufen werden. Falls true 
