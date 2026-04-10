@@ -41,14 +41,14 @@ export default defineConfig({
         start_url: '/',
         icons: [
           {
-            src: '/krD.ico',
+            src: '/icon192.png',
             sizes: '192x192',
-            type: 'image/ico'
+            type: 'image/png'
           },
           {
-            src: '/krDbig.ico',
+            src: '/icon512.png',
             sizes: '512x512',
-            type: 'image/ico'
+            type: 'image/png'
           }
         ],
         "screenshots": [
