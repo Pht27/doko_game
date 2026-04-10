@@ -1,0 +1,1 @@
+Pflichtansagen gehen nicht (oder werden nicht angezeigt, aber ich vermute ersteres). Bitte reviewe nochmal die Regeln für eine Pflichtansage und dann checke, ob sie im Backend richtig umgesetzt ist.

@@ -1,0 +1,1 @@
+whenever i finish a game i do not get a results screen
