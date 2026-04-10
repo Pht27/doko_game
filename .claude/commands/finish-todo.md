@@ -2,7 +2,7 @@ Research, implement, and close out a todo item, then merge to main.
 
 ## Arguments
 $ARGUMENTS should be the path to the todo markdown file (e.g. `docs/todos/todo_fix_csharpier_problems.md`).
-If no argument is given, use the file currently open in the IDE. Create a new branch for this implementation.
+If no argument is given, use the file currently open in the IDE.
 
 ## Steps
 
@@ -17,6 +17,8 @@ If no argument is given, use the file currently open in the IDE. Create a new br
 
 4. **Implement** the changes described in the plan.
 
-5. **Mark as finished** — move the todo file into a `finished/` subfolder next to its current location (e.g. `docs/todos/finished/todo_fix_csharpier_problems.md`). Create the subfolder if it does not exist.
+5. **Ask for confirmation** - Let the user decide if he likes the changes or had something else in mind. If he declines, go back to step 4 or even 3.
 
-6. **Commit** the changes along the way with fitting commit messages that summarizes what was done in sensible chunks.
+6. **Mark as finished** — move the todo file into a `finished/` subfolder next to its current location (e.g. `docs/todos/finished/todo_fix_csharpier_problems.md`). Create the subfolder if it does not exist.
+
+7. **Commit** the changes along the way with fitting commit messages that summarizes what was done in sensible chunks.
