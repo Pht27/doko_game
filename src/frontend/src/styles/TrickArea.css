@@ -1,36 +1,41 @@
-/* TrickArea — styles for the compass-grid trick display */
+/* TrickArea — stacked card pile with compass offsets */
 @reference "./index.css";
 
+/* ── Configurable constants ───────────────────────────────────────────────────
+   These CSS custom properties mirror the TS constants in TrickArea.tsx.
+   Adjust here; update the TS side to match when changing layout behaviour.     */
+.trick-pile {
+  --trick-card-w:      clamp(2.4rem, 11vw, 3.45rem); /* 3rem × 1.15 ≈ 3.45rem; responsive floor */
+  --trick-card-aspect: 1.57;                          /* card height / width ratio */
+  --trick-card-h:      calc(var(--trick-card-w) * var(--trick-card-aspect));
+  --trick-offset-f:    0.30;                          /* fraction of card dim used as centre-offset (mirrors OFFSET_FACTOR in TS) */
+  --trick-max-tilt-deg: 15;                           /* informational — actual value lives in TS MAX_TILT_DEG */
+
+  /* container sized to card + offset on each side + small breathing room */
+  --trick-spread:      calc(1 + 2 * var(--trick-offset-f)); /* 1.60 */
+  width:  calc(var(--trick-card-w) * var(--trick-spread) + 0.75rem);
+  height: calc(var(--trick-card-h) * var(--trick-spread) + 0.75rem);
+
+  position: relative;
+}
+
+/* ── Empty state ──────────────────────────────────────────────────────────── */
 .trick-empty {
   @apply flex items-center justify-center w-40 h-40 rounded-full border-2 border-white/10 text-white/20 text-sm;
 }
 
-.trick-grid {
-  @apply grid grid-cols-3 grid-rows-3 gap-1 w-44 h-44;
-}
-
-.trick-card-cell {
-  @apply flex items-center justify-center;
-}
-
-.trick-card-top {
-  @apply row-start-1 col-start-2;
-}
-
-.trick-card-left {
-  @apply row-start-2 col-start-1;
-}
-
-.trick-card-bottom {
-  @apply row-start-3 col-start-2;
-}
-
-.trick-card-right {
-  @apply row-start-2 col-start-3;
-}
-
+/* ── Card base ────────────────────────────────────────────────────────────── */
 .trick-card {
-  @apply w-12 h-auto rounded shadow-lg drop-shadow;
+  position: absolute;
+  top:  50%;
+  left: 50%;
+  /* transform is set per-card via inline style (offset + tilt) */
+  width:  var(--trick-card-w);
+  height: auto;
+  border-radius: 0.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  /* smooth appearance when cards are added */
+  transition: transform 0.15s ease;
 }
 
 .trick-card-mine {
