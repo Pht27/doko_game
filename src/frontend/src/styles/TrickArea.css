@@ -55,7 +55,7 @@
 
 /* ── Winner pulse ─────────────────────────────────────────────────────────── */
 /*
-  Scale 1 → 1.3 → 1 over 1 s with a golden glow at peak.
+  Scale 1 → 1.3 → 1 over 1 s.
   The positioner wrapper keeps the card in the right seat position;
   this animation only touches the img's own transform (scale), so there
   is no conflict with the positional translate/rotate on the wrapper.

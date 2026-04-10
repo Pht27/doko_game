@@ -10,9 +10,9 @@ const NEXT: Record<string, AnimPhase> = {
 };
 
 const DURATION: Record<string, number> = {
-  winner: 1000,
-  flip:   50,
-  stack:  600,
+  winner: 2200,
+  flip:   100,
+  stack:  700,
   fly:    900,
 };
 
@@ -23,7 +23,7 @@ export interface TrickAnimationResult {
 
 /**
  * Watches completedTricks in the game view and drives a multi-phase trick animation:
- * winner (1s) → flip (50ms) → stack (600ms) → fly (900ms) → done
+ * winner (2200ms) → flip (100ms) → stack (700ms) → fly (900ms) → done
  */
 export function useTrickAnimation(view: PlayerGameViewResponse | null): TrickAnimationResult {
   const [animTrick, setAnimTrick] = useState<TrickSummaryDto | null>(null);
