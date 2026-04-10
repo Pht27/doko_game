@@ -18,9 +18,9 @@ public abstract class SonderkarteBase : ISonderkarte
     /// result of <see cref="ExtraEffects"/> when non-null. Not overridable — override
     /// <see cref="ExtraEffects"/> instead.
     /// </summary>
-    public IReadOnlyList<GameStateModification> Apply(GameState state)
+    public IReadOnlyList<GameStateModification> Apply(GameState state, ISonderkarteInputProvider inputs)
     {
-        var extra = ExtraEffects(state);
+        var extra = ExtraEffects(state, inputs);
         return extra is null
             ? [new ActivateSonderkarteModification(Type)]
             : [new ActivateSonderkarteModification(Type), extra];
@@ -28,9 +28,11 @@ public abstract class SonderkarteBase : ISonderkarte
 
     /// <summary>
     /// Override to return a single additional modification applied after activation.
-    /// Return null when activation alone is sufficient (e.g. Kemmerich, Genscherdamen).
+    /// Return null when activation alone is sufficient (e.g. Kemmerich).
+    /// Interactive sonderkarten (Genscherdamen, Gegengenscherdamen) use <paramref name="inputs"/>
+    /// to read the player's choice.
     /// </summary>
-    protected virtual GameStateModification? ExtraEffects(GameState state) => null;
+    protected virtual GameStateModification? ExtraEffects(GameState state, ISonderkarteInputProvider inputs) => null;
 
     /// <summary>
     /// Returns true if the current player's initial hand contained at least two copies of

@@ -291,14 +291,18 @@ public sealed class GameState
                 CurrentTrick = m.Trick;
                 break;
 
+            case AddCardToTrickModification m:
+                CurrentTrick!.Add(new Tricks.TrickCard(m.Card, m.Player));
+                break;
+
             case AddCompletedTrickModification m:
                 CompletedTricks = [.. CompletedTricks, m.Trick];
                 ScoredTricks = [.. ScoredTricks, m.Result];
                 CurrentTrick = null;
                 break;
 
-            case SetPartyResolverModification m:
-                PartyResolver = m.Resolver;
+            case SetGenscherPartnerModification m:
+                PartyResolver = new Parties.GenscherPartyResolver(m.Genscher, m.Partner);
                 break;
 
             case AddAnnouncementModification m:

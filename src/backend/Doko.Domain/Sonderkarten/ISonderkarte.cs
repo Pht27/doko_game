@@ -34,7 +34,7 @@ public interface ISonderkarte
     /// </summary>
     bool AreConditionsMet(GameState state);
 
-    IReadOnlyList<GameStateModification> Apply(GameState state);
+    IReadOnlyList<GameStateModification> Apply(GameState state, ISonderkarteInputProvider inputs);
 
     /// <summary>
     /// When true, the activation window for this sonderkarte closes permanently the moment

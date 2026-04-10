@@ -6,7 +6,6 @@ using Doko.Domain.Cards;
 using Doko.Domain.Extrapunkte;
 using Doko.Domain.GameFlow;
 using Doko.Domain.GameFlow.Events;
-using Doko.Domain.Parties;
 using Doko.Domain.Players;
 using Doko.Domain.Rules;
 using Doko.Domain.Scoring;
@@ -92,7 +91,7 @@ public sealed class PlayCardHandler(
 
     /// <summary>
     /// Validates and activates all sonderkarten requested by the command,
-    /// closes declined windows, and handles interactive Genscher partner assignment.
+    /// and closes declined windows.
     /// Returns null on success; a <see cref="GameError"/> if validation fails.
     /// </summary>
     private static GameError? ApplySonderkarten(
@@ -111,19 +110,21 @@ public sealed class PlayCardHandler(
             if (!eligibleSet.Contains(type))
                 return GameError.SonderkarteNotEligible;
 
+        var genscherError = ValidateGenscherIfNeeded(state, command, activateSet);
+        if (genscherError.HasValue)
+            return genscherError;
+
+        var inputs = new CommandInputProvider(command);
+
         foreach (var sonderkarte in eligible.Where(s => activateSet.Contains(s.Type)))
         {
-            var mods = sonderkarte.Apply(state);
+            var mods = sonderkarte.Apply(state, inputs);
             foreach (var mod in mods)
                 state.Apply(mod);
             events.Add(
                 new SonderkarteTriggeredEvent(state.Id, command.Player, sonderkarte.Type, mods)
             );
         }
-
-        var genscherError = ApplyGenscherIfNeeded(state, command, activateSet);
-        if (genscherError.HasValue)
-            return genscherError;
 
         foreach (
             var sonderkarte in eligible.Where(s =>
@@ -136,10 +137,11 @@ public sealed class PlayCardHandler(
     }
 
     /// <summary>
-    /// When Genscherdamen or Gegengenscherdamen was activated, validates the chosen partner
-    /// and swaps the party resolver.
+    /// When Genscherdamen or Gegengenscherdamen is being activated, validates that the
+    /// chosen partner is present and valid. Must run before Apply so errors surface as
+    /// <see cref="GameError"/> before any state is mutated.
     /// </summary>
-    private static GameError? ApplyGenscherIfNeeded(
+    private static GameError? ValidateGenscherIfNeeded(
         GameState state,
         PlayCardCommand command,
         HashSet<SonderkarteType> activateSet
@@ -158,12 +160,12 @@ public sealed class PlayCardHandler(
         if (state.Players.All(p => p.Id != command.GenscherPartner))
             return GameError.GenscherPartnerInvalid;
 
-        state.Apply(
-            new SetPartyResolverModification(
-                new GenscherPartyResolver(command.Player, command.GenscherPartner.Value)
-            )
-        );
         return null;
+    }
+
+    private sealed class CommandInputProvider(PlayCardCommand command) : ISonderkarteInputProvider
+    {
+        public PlayerId GetGenscherPartner() => command.GenscherPartner!.Value;
     }
 
     private static void PlayCardIntoTrick(
@@ -174,7 +176,7 @@ public sealed class PlayCardHandler(
     )
     {
         state.Apply(new UpdatePlayerHandModification(player, playerState.Hand.Remove(card)));
-        state.CurrentTrick!.Add(new TrickCard(card, player));
+        state.Apply(new AddCardToTrickModification(player, card));
     }
 
     private static List<IDomainEvent> BuildEvents(

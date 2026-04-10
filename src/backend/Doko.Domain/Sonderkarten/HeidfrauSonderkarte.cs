@@ -22,6 +22,6 @@ public sealed class HeidfrauSonderkarte : SonderkarteBase
         && !IsWindowClosed(state, SonderkarteType.Heidfrau)
         && OriginallyHeldBoth(state, PikDame);
 
-    protected override GameStateModification? ExtraEffects(GameState state) =>
+    protected override GameStateModification? ExtraEffects(GameState state, ISonderkarteInputProvider inputs) =>
         new RebuildTrumpEvaluatorModification();
 }

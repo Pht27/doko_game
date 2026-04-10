@@ -19,6 +19,6 @@ public sealed class SchatzSonderkarte : SonderkarteBase
     public override bool AreConditionsMet(GameState state) =>
         !IsActive(state, SonderkarteType.Schatz) && OriginallyHeldBoth(state, HerzNeun);
 
-    protected override GameStateModification? ExtraEffects(GameState state) =>
+    protected override GameStateModification? ExtraEffects(GameState state, ISonderkarteInputProvider inputs) =>
         new TransferCardPointsModification(HerzZehn, HerzNeun);
 }

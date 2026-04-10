@@ -87,6 +87,10 @@ public sealed record UpdatePlayerHandModification(PlayerId Player, Hand NewHand)
 /// <summary>Sets the current trick (null clears the current trick after it completes).</summary>
 public sealed record SetCurrentTrickModification(Tricks.Trick? Trick) : GameStateModification;
 
+/// <summary>Adds a card played by a player to the current trick.</summary>
+public sealed record AddCardToTrickModification(Players.PlayerId Player, Cards.Card Card)
+    : GameStateModification;
+
 /// <summary>
 /// Appends a completed trick to <c>CompletedTricks</c> and its scored result to <c>ScoredTricks</c>,
 /// then clears the current trick.
@@ -95,10 +99,11 @@ public sealed record AddCompletedTrickModification(Tricks.Trick Trick, Scoring.T
     : GameStateModification;
 
 /// <summary>
-/// Replaces the active party resolver without touching the trump evaluator.
-/// Used when Genscherdamen/Gegengenscherdamen fires and the Genscher picks a new partner.
+/// Records that a Genscher (Genscherdamen or Gegengenscherdamen) was activated and the
+/// playing player has chosen a partner. GameState.Apply creates the GenscherPartyResolver
+/// internally, so the Application layer does not need to know about it.
 /// </summary>
-public sealed record SetPartyResolverModification(Parties.IPartyResolver Resolver)
+public sealed record SetGenscherPartnerModification(Players.PlayerId Genscher, Players.PlayerId Partner)
     : GameStateModification;
 
 /// <summary>Appends an announcement to the game state.</summary>
