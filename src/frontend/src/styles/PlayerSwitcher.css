@@ -2,7 +2,7 @@
 @reference "./index.css";
 
 .player-switcher {
-  @apply flex gap-1 rounded-lg bg-white/10 p-1;
+  @apply flex flex-col gap-1 rounded-lg bg-black/40 p-1 backdrop-blur-sm;
 }
 
 .player-switcher-btn {

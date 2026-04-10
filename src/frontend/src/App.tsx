@@ -159,18 +159,20 @@ function App() {
   const legalCardIds = new Set(view?.legalCards.map((c) => c.id) ?? []);
 
   return (
-    <div className="w-full h-full flex flex-col bg-[#1a1a2e] select-none overflow-hidden">
-      {/* Top bar */}
-      <div className="flex items-center justify-between px-4 py-2 bg-black/30">
-        {view ? (
+    <div className="w-full h-full relative flex flex-col bg-[#1a1a2e] select-none overflow-hidden">
+      {/* Floating top-left: game info */}
+      {view && (
+        <div className="absolute top-2 left-2 z-10">
           <GameInfo
             phase={view.phase}
             trickNumber={(view.currentTrick?.trickNumber ?? 0) + 1}
             completedTricks={view.completedTricks.length}
           />
-        ) : (
-          <div />
-        )}
+        </div>
+      )}
+
+      {/* Floating top-right: player switcher */}
+      <div className="absolute top-2 right-2 z-10">
         <PlayerSwitcher activePlayer={activePlayer} onSwitch={setActivePlayer} />
       </div>
 
@@ -246,18 +248,20 @@ function App() {
           ) : <div />}
         </div>
 
-        {/* Announcement button */}
-        <AnnouncementButton
-          legalAnnouncements={view?.legalAnnouncements ?? []}
-          onAnnounce={handleAnnouncement}
-        />
-
         {/* Action error */}
         {actionError && (
           <div className="bg-red-500/20 text-red-300 text-sm px-4 py-2 rounded-lg mx-4">
             {actionError}
           </div>
         )}
+      </div>
+
+      {/* Floating announcement button — bottom-left at ~20% from bottom */}
+      <div className="absolute bottom-[20%] left-4 z-10">
+        <AnnouncementButton
+          legalAnnouncements={view?.legalAnnouncements ?? []}
+          onAnnounce={handleAnnouncement}
+        />
       </div>
 
       {/* Hand */}
