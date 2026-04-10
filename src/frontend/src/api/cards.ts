@@ -43,3 +43,5 @@ export function cardSvgComponent(suit: string, rank: string): React.FC<React.SVG
   if (!component) console.warn(`Card SVG component not found: ${filename}`);
   return component;
 }
+
+export const cardBackSvgPath: string = svgUrls['../assets/cards/card_back.svg'] ?? '';

@@ -5,39 +5,67 @@
    These CSS custom properties mirror the TS constants in TrickArea.tsx.
    Adjust here; update the TS side to match when changing layout behaviour.     */
 .trick-pile {
-  --trick-card-w:      clamp(2.4rem, 11vw, 3.45rem); /* 3rem × 1.15 ≈ 3.45rem; responsive floor */
-  --trick-card-aspect: 1.57;                          /* card height / width ratio */
-  --trick-card-h:      calc(var(--trick-card-w) * var(--trick-card-aspect));
-  --trick-offset-f:    0.30;                          /* fraction of card dim used as centre-offset (mirrors OFFSET_FACTOR in TS) */
-  --trick-max-tilt-deg: 15;                           /* informational — actual value lives in TS MAX_TILT_DEG */
+  --trick-card-w:       clamp(2.4rem, 11vw, 3.45rem);
+  --trick-card-aspect:  1.57;
+  --trick-card-h:       calc(var(--trick-card-w) * var(--trick-card-aspect));
+  --trick-offset-f:     0.30;
+  --trick-max-tilt-deg: 15; /* informational; actual value lives in TS */
 
-  /* container sized to card + offset on each side + small breathing room */
-  --trick-spread:      calc(1 + 2 * var(--trick-offset-f)); /* 1.60 */
+  --trick-spread: calc(1 + 2 * var(--trick-offset-f)); /* 1.60 */
   width:  calc(var(--trick-card-w) * var(--trick-spread) + 0.75rem);
   height: calc(var(--trick-card-h) * var(--trick-spread) + 0.75rem);
 
   position: relative;
+  /* Fly-away transition is set via inline style by the component */
 }
 
 /* ── Empty state ──────────────────────────────────────────────────────────── */
 .trick-empty {
-  @apply flex items-center justify-center w-40 h-40 rounded-full border-2 border-white/10 text-white/20 text-sm;
+  @apply flex items-center justify-center w-32 h-32 rounded-full border-2 border-white/10 text-white/20 text-sm;
 }
 
-/* ── Card base ────────────────────────────────────────────────────────────── */
-.trick-card {
+/* ── Card positioner (outer wrapper — handles seat-based placement) ──────── */
+.trick-card-positioner {
   position: absolute;
   top:  50%;
   left: 50%;
-  /* transform is set per-card via inline style (offset + tilt) */
-  width:  var(--trick-card-w);
-  height: auto;
+  display: block;
+  /* Position transition is intentionally NOT set here; it's added via the
+     -stacked modifier so only the slide-to-centre move is animated.          */
+}
+
+/* Smooth slide from seat position → stacked centre */
+.trick-card-positioner-stacked {
+  transition: transform 0.5s ease-out;
+}
+
+/* ── Card image (inner — handles face/back and scale animation) ───────────── */
+.trick-card {
+  display: block;
+  width:         var(--trick-card-w);
+  height:        auto;       /* let the SVG's own aspect ratio drive height */
   border-radius: 0.25rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  /* smooth appearance when cards are added */
-  transition: transform 0.15s ease;
+  box-shadow:    0 4px 12px rgba(0, 0, 0, 0.5);
+  transform-origin: center;
 }
 
 .trick-card-mine {
   @apply ring-2 ring-yellow-400;
+}
+
+/* ── Winner pulse ─────────────────────────────────────────────────────────── */
+/*
+  Scale 1 → 1.3 → 1 over 1 s with a golden glow at peak.
+  The positioner wrapper keeps the card in the right seat position;
+  this animation only touches the img's own transform (scale), so there
+  is no conflict with the positional translate/rotate on the wrapper.
+*/
+@keyframes trick-winner-pulse {
+  0%   { transform: scale(1);   box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+  40%  { transform: scale(1.3); box-shadow: 0 12px 32px rgba(0,0,0,0.7); }
+  100% { transform: scale(1);   box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+}
+
+.trick-card-winner-pulse {
+  animation: trick-winner-pulse 1s ease-in-out forwards;
 }

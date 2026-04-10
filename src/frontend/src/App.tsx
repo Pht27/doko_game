@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useHotSeat } from './hooks/useHotSeat';
 import { useGameState } from './hooks/useGameState';
 import { playCard, declareHealth, makeReservation, respondToArmut, exchangeArmutCards, makeAnnouncement } from './api/game';
@@ -15,7 +15,8 @@ import { SonderkarteOverlay } from './components/SonderkarteOverlay';
 import { AnnouncementButton } from './components/AnnouncementButton';
 import { ResultScreen } from './components/ResultScreen';
 import { t } from './translations';
-import type { CardDto, SonderkarteInfoDto } from './types/api';
+import type { CardDto, SonderkarteInfoDto, TrickSummaryDto } from './types/api';
+import type { AnimPhase } from './components/TrickArea';
 
 function App() {
   const { session, activePlayer, error: initError, loading: initLoading, setActivePlayer, restart } = useHotSeat();
@@ -31,6 +32,56 @@ function App() {
   const [actionError, setActionError] = useState<string | null>(null);
   // Cards selected for Armut return
   const [armutReturnSelected, setArmutReturnSelected] = useState<Set<number>>(new Set());
+
+  // ── Trick completion animation ─────────────────────────────────────────────
+  const [animTrick, setAnimTrick] = useState<TrickSummaryDto | null>(null);
+  const [animPhase, setAnimPhase] = useState<AnimPhase>(null);
+  // Tracks how many tricks were completed last time we checked, so we can detect a new completion.
+  const prevCompletedCountRef = useRef<number | null>(null);
+
+  // Detect when a new trick is added to completedTricks and start the animation.
+  useEffect(() => {
+    if (!view) {
+      prevCompletedCountRef.current = null;
+      return;
+    }
+    const count = view.completedTricks.length;
+    if (prevCompletedCountRef.current === null) {
+      prevCompletedCountRef.current = count;
+      return;
+    }
+    if (count > prevCompletedCountRef.current) {
+      const justCompleted = view.completedTricks[count - 1];
+      if (justCompleted?.winner != null) {
+        setAnimTrick(justCompleted);
+        setAnimPhase('winner');
+      }
+    }
+    prevCompletedCountRef.current = count;
+  }, [view]);
+
+  // Drive the animation phase sequence.
+  useEffect(() => {
+    if (!animPhase) return;
+    const NEXT: Record<string, AnimPhase> = {
+      winner: 'flip',
+      flip:   'stack',
+      stack:  'fly',
+      fly:    null,
+    };
+    const DURATION: Record<string, number> = {
+      winner: 1000,
+      flip:   50,
+      stack:  600,
+      fly:    900,
+    };
+    const tid = setTimeout(() => {
+      const next = NEXT[animPhase];
+      setAnimPhase(next);
+      if (next === null) setAnimTrick(null);
+    }, DURATION[animPhase]);
+    return () => clearTimeout(tid);
+  }, [animPhase]);
 
   if (!session) {
     return (
@@ -150,6 +201,10 @@ function App() {
     return seats[offset];
   }
 
+  // During animation show the frozen completed trick; otherwise show the live one.
+  const displayTrick = animTrick ?? (view?.currentTrick ?? null);
+  const winnerSeat = animTrick?.winner != null ? seatOf(animTrick.winner) : undefined;
+
   // Find opponents from view (excludes requesting player)
   const opponents = view?.otherPlayers ?? [];
   const topOpponent = opponents.find((p) => seatOf(p.id) === 'top');
@@ -233,9 +288,11 @@ function App() {
             />
           ) : (
             <TrickArea
-              trick={view?.currentTrick ?? null}
+              trick={displayTrick}
               requestingPlayer={activePlayer}
               seatOf={seatOf}
+              animPhase={animPhase}
+              winnerSeat={winnerSeat}
             />
           )}
 
