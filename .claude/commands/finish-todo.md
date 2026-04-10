@@ -16,10 +16,12 @@ If no argument is given, use the file currently open in the IDE.
    - Any non-obvious decisions or trade-offs
    - When doing frontend, always think in a mobile friendly way! This is mainly going to be used as an app
 
-4. **Implement** the changes described in the plan.
+4. **Ask for confirmation** - Let the user decide if they like the plan. If not, go back to the drawing board.
 
-5. **Ask for confirmation** - Let the user decide if he likes the changes or had something else in mind. If he declines, go back to step 4 or even 3.
+5. **Implement** the changes described in the plan.
 
-6. **Mark as finished** — move the todo file into a `finished/` subfolder next to its current location (e.g. `docs/todos/finished/todo_fix_csharpier_problems.md`). Create the subfolder if it does not exist.
+6. **Ask for confirmation** - Let the user decide if they like the changes or had something else in mind. If declined, go back to step 5 or even 3.
 
-7. **Commit** the changes along the way with fitting commit messages that summarizes what was done in sensible chunks.
+7. **Mark as finished** — move the todo file into a `finished/` subfolder next to its current location (e.g. `docs/todos/finished/todo_fix_csharpier_problems.md`). Create the subfolder if it does not exist.
+
+8. **Commit** the changes along the way with fitting commit messages that summarizes what was done in sensible chunks.
