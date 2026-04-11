@@ -1,4 +1,4 @@
-fischauge muss verdeckt liegen
+fischauge muss verdeckt liegen -> da der Sonderpunkt erst am Ende bestimmt wird, muss man am besten schauen, ob die Karten, die vorher gespielt wurden alle Trumpf waren. Wenn ja, dann soll die Karte verdeckt gelegt werden, wenn nein dann nicht.
 
 sonderkarten und extrapunkte sollen irgendwo angemerkt werden oder es soll eine Animation geben, wenn gemacht / aktiviert
 
