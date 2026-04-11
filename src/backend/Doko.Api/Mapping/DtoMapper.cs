@@ -2,6 +2,7 @@ using Doko.Api.DTOs.Requests;
 using Doko.Api.DTOs.Responses;
 using Doko.Application.Games.Queries;
 using Doko.Application.Games.Results;
+using Doko.Domain.Announcements;
 using Doko.Domain.Cards;
 using Doko.Domain.Extrapunkte;
 using Doko.Domain.Parties;
@@ -22,7 +23,11 @@ public static class DtoMapper
             Hand: view.Hand.Select(ToDto).ToList(),
             HandSorted: view.HandSorted.Select(ToDto).ToList(),
             LegalCards: view.LegalCards.Select(ToDto).ToList(),
-            LegalAnnouncements: view.LegalAnnouncements.Select(a => a.ToString()).ToList(),
+            LegalAnnouncements: view.LegalAnnouncements
+                .Select(a => a == AnnouncementType.Win
+                    ? (view.OwnParty == Party.Re ? "Re" : "Kontra")
+                    : a.ToString())
+                .ToList(),
             EligibleSonderkartenPerCard: view.EligibleSonderkartenPerCard.ToDictionary(
                 kvp => (int)kvp.Key.Value,
                 kvp => (IReadOnlyList<SonderkarteInfoDto>)kvp.Value.Select(ToDto).ToList()

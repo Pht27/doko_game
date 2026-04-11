@@ -30,99 +30,34 @@ public static class AnnouncementRules
         if (party is null)
             return false;
 
-        var expectedType = party == Party.Re ? AnnouncementType.Re : AnnouncementType.Kontra;
+        var partyAnnouncements = state
+            .Announcements.Where(a => state.PartyResolver.ResolveParty(a.Player, state) == party)
+            .Select(a => a.Type)
+            .ToHashSet();
 
-        // Consecutive ordering: Re/Kontra must come before Keine90, etc.
+        // Consecutive ordering: Win must come before Keine90, etc.
         // The player's party must have already made the preceding announcement.
-        var partyAnnouncements = state
-            .Announcements.Where(a => state.PartyResolver.ResolveParty(a.Player, state) == party)
-            .Select(a => a.Type)
-            .ToHashSet();
-
-        switch (type)
+        return type switch
         {
-            case AnnouncementType.Re or AnnouncementType.Kontra:
-                if (type != expectedType)
-                    return false;
-                return !partyAnnouncements.Contains(type);
-
-            case AnnouncementType.Keine90:
-                return partyAnnouncements.Contains(expectedType)
-                    && !partyAnnouncements.Contains(AnnouncementType.Keine90);
-
-            case AnnouncementType.Keine60:
-                return partyAnnouncements.Contains(AnnouncementType.Keine90)
-                    && !partyAnnouncements.Contains(AnnouncementType.Keine60);
-
-            case AnnouncementType.Keine30:
-                return partyAnnouncements.Contains(AnnouncementType.Keine60)
-                    && !partyAnnouncements.Contains(AnnouncementType.Keine30);
-
-            case AnnouncementType.Schwarz:
-                return partyAnnouncements.Contains(AnnouncementType.Keine30)
-                    && !partyAnnouncements.Contains(AnnouncementType.Schwarz);
-
-            default:
-                return false;
-        }
-    }
-
-    /// <summary>Returns true if the player is required to announce Re or Kontra (Pflichtansage rule).</summary>
-    public static bool IsMandatory(PlayerId player, GameState state)
-    {
-        if (!state.Rules.EnforcePflichtansage)
-            return false;
-        if (state.CompletedTricks.Count == 0)
-            return false;
-
-        var party = state.PartyResolver.ResolveParty(player, state);
-        if (party is null)
-            return false;
-
-        var partyAnnouncements = state
-            .Announcements.Where(a => state.PartyResolver.ResolveParty(a.Player, state) == party)
-            .Select(a => a.Type)
-            .ToHashSet();
-
-        var expectedBase = party == Party.Re ? AnnouncementType.Re : AnnouncementType.Kontra;
-
-        // First trick ≥ 35: winner must announce Re/Kontra
-        var firstTrick = state.CompletedTricks[0];
-        if (firstTrick.Points >= 35)
-        {
-            var firstWinner = firstTrick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
-            if (firstWinner == player && !partyAnnouncements.Contains(expectedBase))
-                return true;
-        }
-
-        // Second trick ≥ 35: winner must announce the next level consecutively,
-        // but only if the first trick also had ≥ 35 Augen.
-        if (state.CompletedTricks.Count >= 2)
-        {
-            var secondTrick = state.CompletedTricks[1];
-            if (firstTrick.Points >= 35 && secondTrick.Points >= 35)
-            {
-                var secondWinner = secondTrick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
-                if (secondWinner == player)
-                {
-                    // Must announce next level: Keine90 if same party already announced base, else base
-                    if (!partyAnnouncements.Contains(expectedBase))
-                        return true;
-                    if (!partyAnnouncements.Contains(AnnouncementType.Keine90))
-                        return true;
-                }
-            }
-        }
-
-        return false;
+            AnnouncementType.Win => !partyAnnouncements.Contains(AnnouncementType.Win),
+            AnnouncementType.Keine90 => partyAnnouncements.Contains(AnnouncementType.Win)
+                && !partyAnnouncements.Contains(AnnouncementType.Keine90),
+            AnnouncementType.Keine60 => partyAnnouncements.Contains(AnnouncementType.Keine90)
+                && !partyAnnouncements.Contains(AnnouncementType.Keine60),
+            AnnouncementType.Keine30 => partyAnnouncements.Contains(AnnouncementType.Keine60)
+                && !partyAnnouncements.Contains(AnnouncementType.Keine30),
+            AnnouncementType.Schwarz => partyAnnouncements.Contains(AnnouncementType.Keine30)
+                && !partyAnnouncements.Contains(AnnouncementType.Schwarz),
+            _ => false,
+        };
     }
 
     /// <summary>
-    /// After <see cref="AddCompletedTrickModification"/> has been applied, returns the announcement
-    /// type the trick winner is required to make (Pflichtansage), or null if none applies.
-    /// Only the first two tricks can trigger a Pflichtansage.
+    /// After <see cref="AddCompletedTrickModification"/> has been applied, returns the
+    /// <see cref="Announcement"/> the trick winner is required to make (Pflichtansage),
+    /// or null if none applies. Only the first two tricks can trigger a Pflichtansage.
     /// </summary>
-    public static AnnouncementType? GetMandatoryAnnouncement(PlayerId winner, GameState state)
+    public static Announcement? GetMandatoryAnnouncement(PlayerId winner, GameState state)
     {
         if (!state.Rules.EnforcePflichtansage)
             return null;
@@ -143,20 +78,23 @@ public static class AnnouncementRules
         if (party is null)
             return null;
 
-        var expectedBase = party == Party.Re ? AnnouncementType.Re : AnnouncementType.Kontra;
         var partyAnnouncements = state
             .Announcements.Where(a => state.PartyResolver.ResolveParty(a.Player, state) == party)
             .Select(a => a.Type)
             .ToHashSet();
 
-        if (!partyAnnouncements.Contains(expectedBase))
-            return expectedBase;
+        AnnouncementType? mandatoryType = null;
 
-        // Second trick: if base already announced, require the next level
-        if (count == 2 && !partyAnnouncements.Contains(AnnouncementType.Keine90))
-            return AnnouncementType.Keine90;
+        if (!partyAnnouncements.Contains(AnnouncementType.Win))
+            mandatoryType = AnnouncementType.Win;
+        else if (count == 2 && !partyAnnouncements.Contains(AnnouncementType.Keine90))
+            mandatoryType = AnnouncementType.Keine90;
 
-        return null;
+        if (mandatoryType is null)
+            return null;
+
+        int trickNum = count - 1;
+        return new Announcement(winner, mandatoryType.Value, trickNum, 0) { IsMandatory = true };
     }
 
     /// <summary>Returns true if the winning party violated the Feigheit (cowardice) rule.</summary>
@@ -177,10 +115,8 @@ public static class AnnouncementRules
             .Select(a => a.Type)
             .ToHashSet();
 
-        var baseAnnouncement = winner == Party.Re ? AnnouncementType.Re : AnnouncementType.Kontra;
-
         int missing = 0;
-        if (loserPoints < 120 && !winnerAnnounced.Contains(baseAnnouncement))
+        if (loserPoints < 120 && !winnerAnnounced.Contains(AnnouncementType.Win))
             missing++;
         if (loserPoints < 90 && !winnerAnnounced.Contains(AnnouncementType.Keine90))
             missing++;

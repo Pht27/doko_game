@@ -156,7 +156,7 @@ public class GameScorerTests
     public void Score_AnnouncementAddsOnePoint()
     {
         // Re wins with 1 announcement; loserPoints=132 ≥ 90 → no threshold bonuses
-        var state = SoloState(rules: NoFeigheit, announcements: [B.Ann(B.P0, AnnouncementType.Re)]);
+        var state = SoloState(rules: NoFeigheit, announcements: [B.Ann(B.P0, AnnouncementType.Win)]);
         var tricks = new List<TrickResult>
         {
             B.HighValueTrick(B.P0, 0),
@@ -179,7 +179,7 @@ public class GameScorerTests
     {
         var state = SoloState(
             rules: NoFeigheit,
-            announcements: [B.Ann(B.P0, AnnouncementType.Re), B.Ann(B.P1, AnnouncementType.Kontra)]
+            announcements: [B.Ann(B.P0, AnnouncementType.Win), B.Ann(B.P1, AnnouncementType.Win)]
         );
         var tricks = new List<TrickResult>
         {

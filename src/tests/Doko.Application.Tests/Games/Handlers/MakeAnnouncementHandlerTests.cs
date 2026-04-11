@@ -42,14 +42,14 @@ public class MakeAnnouncementHandlerTests
         var useCase = new MakeAnnouncementHandler(repo, pub);
 
         var result = await useCase.ExecuteAsync(
-            new MakeAnnouncementCommand(id, AppB.P0, AnnouncementType.Re)
+            new MakeAnnouncementCommand(id, AppB.P0, AnnouncementType.Win)
         );
 
         result.Should().BeOfType<GameActionResult<Unit>.Ok>();
 
         var state = await repo.GetAsync(id);
         state!.Announcements.Should().HaveCount(1);
-        state.Announcements[0].Type.Should().Be(AnnouncementType.Re);
+        state.Announcements[0].Type.Should().Be(AnnouncementType.Win);
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public class MakeAnnouncementHandlerTests
         var useCase = new MakeAnnouncementHandler(repo, pub);
 
         var result = await useCase.ExecuteAsync(
-            new MakeAnnouncementCommand(GameId.New(), AppB.P0, AnnouncementType.Re)
+            new MakeAnnouncementCommand(GameId.New(), AppB.P0, AnnouncementType.Win)
         );
 
         result
@@ -99,7 +99,7 @@ public class MakeAnnouncementHandlerTests
         var useCase = new MakeAnnouncementHandler(repo, pub);
 
         var result = await useCase.ExecuteAsync(
-            new MakeAnnouncementCommand(state.Id, AppB.P0, AnnouncementType.Re)
+            new MakeAnnouncementCommand(state.Id, AppB.P0, AnnouncementType.Win)
         );
 
         result

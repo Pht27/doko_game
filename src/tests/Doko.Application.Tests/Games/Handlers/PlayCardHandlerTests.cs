@@ -219,12 +219,12 @@ public class PlayCardHandlerTests
         pub.Published
             .OfType<AnnouncementMadeEvent>()
             .Should()
-            .ContainSingle(e => e.Player == AppB.P0 && e.Type == AnnouncementType.Re);
+            .ContainSingle(e => e.Player == AppB.P0 && e.Type == AnnouncementType.Win);
 
         // State should also have the announcement recorded
         var saved = await repo.GetAsync(id);
         saved!.Announcements.Should().ContainSingle(a =>
-            a.Player == AppB.P0 && a.Type == AnnouncementType.Re
+            a.Player == AppB.P0 && a.Type == AnnouncementType.Win
         );
     }
 

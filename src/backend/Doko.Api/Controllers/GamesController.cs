@@ -183,7 +183,9 @@ public class GamesController(
         if (!Guid.TryParse(gameId, out var guid))
             return NotFound(new ErrorResponse("game_not_found"));
 
-        if (!Enum.TryParse<AnnouncementType>(req.Type, ignoreCase: true, out var announcementType))
+        // "Re" and "Kontra" are legacy aliases for "Win" (party is determined from the player)
+        var typeString = req.Type is "Re" or "Kontra" ? "Win" : req.Type;
+        if (!Enum.TryParse<AnnouncementType>(typeString, ignoreCase: true, out var announcementType))
             return BadRequest(new ErrorResponse("invalid_announcement_type"));
 
         var player = GetPlayerId();

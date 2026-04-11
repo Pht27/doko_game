@@ -2,8 +2,7 @@ namespace Doko.Domain.Announcements;
 
 public enum AnnouncementType
 {
-    Re,
-    Kontra,
+    Win,
     Keine90,
     Keine60,
     Keine30,

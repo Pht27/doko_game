@@ -223,13 +223,17 @@ public sealed class PlayCardHandler(
         );
 
         // Auto-make Pflichtansage if the completed trick triggers one
-        var mandatoryType = AnnouncementRules.GetMandatoryAnnouncement(winner, state);
-        if (mandatoryType.HasValue)
+        var pflichtAnnouncement = AnnouncementRules.GetMandatoryAnnouncement(winner, state);
+        if (pflichtAnnouncement is not null)
         {
-            int trickNum = state.CompletedTricks.Count - 1;
-            var pflichtAnnouncement = new Announcement(winner, mandatoryType.Value, trickNum, 0);
             state.Apply(new AddAnnouncementModification(pflichtAnnouncement));
-            events.Add(new AnnouncementMadeEvent(state.Id, winner, mandatoryType.Value, trickNum, 0));
+            events.Add(new AnnouncementMadeEvent(
+                state.Id,
+                pflichtAnnouncement.Player,
+                pflichtAnnouncement.Type,
+                pflichtAnnouncement.TrickNumber,
+                pflichtAnnouncement.CardIndexInTrick
+            ));
         }
 
         if (state.Players.All(p => p.Hand.Cards.Count == 0))

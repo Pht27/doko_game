@@ -194,11 +194,8 @@ public sealed class GameScorer : IGameScorer
             .Select(a => a.Type)
             .ToHashSet();
 
-        var baseAnnouncement =
-            provisionalWinner == Party.Re ? AnnouncementType.Re : AnnouncementType.Kontra;
-
         int missing = 0;
-        if (loserPoints < 120 && !winnerAnnounced.Contains(baseAnnouncement))
+        if (loserPoints < 120 && !winnerAnnounced.Contains(AnnouncementType.Win))
             missing++;
         if (loserPoints < 90 && !winnerAnnounced.Contains(AnnouncementType.Keine90))
             missing++;

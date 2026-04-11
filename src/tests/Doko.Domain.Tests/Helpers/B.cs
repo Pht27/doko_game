@@ -68,9 +68,10 @@ internal static class B
     public static Announcement Ann(
         PlayerId player,
         AnnouncementType type,
+        bool isMandatory = false,
         int trickNum = 0,
         int cardIdx = 0
-    ) => new(player, type, trickNum, cardIdx);
+    ) => new(player, type, trickNum, cardIdx) { IsMandatory = isMandatory };
 
     // ── Party resolvers ───────────────────────────────────────────────────────
     /// <summary>P0 = Re, P1/P2/P3 = Kontra.</summary>

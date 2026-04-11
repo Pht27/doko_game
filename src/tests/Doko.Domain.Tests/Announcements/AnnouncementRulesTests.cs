@@ -10,7 +10,7 @@ public class AnnouncementRulesTests
     public void CanAnnounce_ReturnsFalse_WhenAnnouncementsDisabled()
     {
         var state = B.BasicState(rules: RuleSet.Minimal()); // AllowAnnouncements=false
-        AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Re, state).Should().BeFalse();
+        AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Win, state).Should().BeFalse();
     }
 
     // ── CanAnnounce: timing ───────────────────────────────────────────────────
@@ -20,7 +20,7 @@ public class AnnouncementRulesTests
     {
         // deadline = 5 + 4*0 = 5; 0 cards played < 5 → allowed
         var state = B.BasicState();
-        AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Re, state).Should().BeTrue();
+        AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Win, state).Should().BeTrue();
     }
 
     [Fact]
@@ -29,7 +29,7 @@ public class AnnouncementRulesTests
         // 1 completed trick = 4 cards; deadline=5 → 4 < 5 → allowed
         var trick = CompleteTrick(B.P0);
         var state = B.BasicState(completedTricks: [trick]);
-        AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Re, state).Should().BeTrue();
+        AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Win, state).Should().BeTrue();
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public class AnnouncementRulesTests
             currentTrick: current
         );
 
-        AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Re, state).Should().BeFalse();
+        AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Win, state).Should().BeFalse();
     }
 
     [Fact]
@@ -59,63 +59,63 @@ public class AnnouncementRulesTests
         var current = new Trick();
         current.Add(new TrickCard(B.Card(99, Suit.Kreuz, Rank.Neun), B.P0));
 
-        var re = B.Ann(B.P0, AnnouncementType.Re);
+        var win = B.Ann(B.P0, AnnouncementType.Win);
         var state = GameState.Create(
             rules: RuleSet.Default(),
             players: B.FourPlayers(),
             partyResolver: B.SoloResolver(),
             completedTricks: [completed],
             currentTrick: current,
-            announcements: [re]
+            announcements: [win]
         );
 
-        // P1=Kontra, deadline = 9, cards = 5 → allowed to announce Kontra
-        AnnouncementRules.CanAnnounce(B.P1, AnnouncementType.Kontra, state).Should().BeTrue();
+        // P1=Kontra, deadline = 9, cards = 5 → allowed to announce Win
+        AnnouncementRules.CanAnnounce(B.P1, AnnouncementType.Win, state).Should().BeTrue();
     }
 
     // ── CanAnnounce: party membership ─────────────────────────────────────────
 
     [Fact]
-    public void CanAnnounce_RePlayer_CanAnnounceRe()
+    public void CanAnnounce_RePlayer_CanAnnounceWin()
     {
         var state = B.BasicState(); // P0=Re via SoloResolver
-        AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Re, state).Should().BeTrue();
+        AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Win, state).Should().BeTrue();
     }
 
     [Fact]
-    public void CanAnnounce_RePlayer_CannotAnnounceKontra()
+    public void CanAnnounce_KontraPlayer_CanAnnounceWin()
     {
         var state = B.BasicState();
-        AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Kontra, state).Should().BeFalse();
+        AnnouncementRules.CanAnnounce(B.P1, AnnouncementType.Win, state).Should().BeTrue();
     }
 
     [Fact]
-    public void CanAnnounce_KontraPlayer_CanAnnounceKontra()
+    public void CanAnnounce_Win_BlockedWhenAlreadyAnnounced()
     {
-        var state = B.BasicState();
-        AnnouncementRules.CanAnnounce(B.P1, AnnouncementType.Kontra, state).Should().BeTrue();
+        var state = B.BasicState(announcements: [B.Ann(B.P0, AnnouncementType.Win)]);
+        AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Win, state).Should().BeFalse();
     }
 
     // ── CanAnnounce: consecutive ordering ─────────────────────────────────────
 
     [Fact]
-    public void CanAnnounce_Keine90_BlockedWithoutRe()
+    public void CanAnnounce_Keine90_BlockedWithoutWin()
     {
         var state = B.BasicState(); // no prior announcements
         AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Keine90, state).Should().BeFalse();
     }
 
     [Fact]
-    public void CanAnnounce_Keine90_AllowedAfterRe()
+    public void CanAnnounce_Keine90_AllowedAfterWin()
     {
-        var state = B.BasicState(announcements: [B.Ann(B.P0, AnnouncementType.Re)]);
+        var state = B.BasicState(announcements: [B.Ann(B.P0, AnnouncementType.Win)]);
         AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Keine90, state).Should().BeTrue();
     }
 
     [Fact]
     public void CanAnnounce_Keine60_BlockedWithoutKeine90()
     {
-        var state = B.BasicState(announcements: [B.Ann(B.P0, AnnouncementType.Re)]);
+        var state = B.BasicState(announcements: [B.Ann(B.P0, AnnouncementType.Win)]);
         AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Keine60, state).Should().BeFalse();
     }
 
@@ -123,105 +123,9 @@ public class AnnouncementRulesTests
     public void CanAnnounce_Keine60_AllowedAfterKeine90()
     {
         var state = B.BasicState(
-            announcements: [B.Ann(B.P0, AnnouncementType.Re), B.Ann(B.P0, AnnouncementType.Keine90)]
+            announcements: [B.Ann(B.P0, AnnouncementType.Win), B.Ann(B.P0, AnnouncementType.Keine90)]
         );
         AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Keine60, state).Should().BeTrue();
-    }
-
-    [Fact]
-    public void CanAnnounce_Re_BlockedWhenAlreadyAnnounced()
-    {
-        var state = B.BasicState(announcements: [B.Ann(B.P0, AnnouncementType.Re)]);
-        AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Re, state).Should().BeFalse();
-    }
-
-    // ── IsMandatory: rules disabled ───────────────────────────────────────────
-
-    [Fact]
-    public void IsMandatory_ReturnsFalse_WhenPflichtansageDisabled()
-    {
-        var trick = HighValueTrick(B.P0);
-        var state = B.BasicState(
-            rules: RuleSet.Minimal(), // EnforcePflichtansage=false
-            completedTricks: [trick]
-        );
-        AnnouncementRules.IsMandatory(B.P0, state).Should().BeFalse();
-    }
-
-    // ── IsMandatory: no tricks ────────────────────────────────────────────────
-
-    [Fact]
-    public void IsMandatory_ReturnsFalse_WhenNoTricksCompleted()
-    {
-        var state = B.BasicState(); // completedTricks = []
-        AnnouncementRules.IsMandatory(B.P0, state).Should().BeFalse();
-    }
-
-    // ── IsMandatory: first trick thresholds ───────────────────────────────────
-
-    [Fact]
-    public void IsMandatory_ReturnsFalse_WhenFirstTrickPointsBelowThreshold()
-    {
-        // Kreuz Ass (11) leads, 3 Nines follow → 11 Augen < 35
-        var trick = B.Trick(
-            (0, Suit.Kreuz, Rank.Ass, B.P0),
-            (1, Suit.Kreuz, Rank.Neun, B.P1),
-            (2, Suit.Pik, Rank.Neun, B.P2),
-            (3, Suit.Herz, Rank.Neun, B.P3)
-        );
-        var state = B.BasicState(completedTricks: [trick]);
-        AnnouncementRules.IsMandatory(B.P0, state).Should().BeFalse();
-    }
-
-    [Fact]
-    public void IsMandatory_ReturnsTrue_WhenFirstTrickWinnerHas35PlusAndNoAnnouncement()
-    {
-        var trick = HighValueTrick(B.P0); // P0 wins 43-Augen trick
-        var state = B.BasicState(completedTricks: [trick]);
-        AnnouncementRules.IsMandatory(B.P0, state).Should().BeTrue();
-    }
-
-    [Fact]
-    public void IsMandatory_ReturnsFalse_WhenFirstTrickWinnerAlreadyAnnounced()
-    {
-        var trick = HighValueTrick(B.P0);
-        var state = B.BasicState(
-            completedTricks: [trick],
-            announcements: [B.Ann(B.P0, AnnouncementType.Re)]
-        );
-        AnnouncementRules.IsMandatory(B.P0, state).Should().BeFalse();
-    }
-
-    [Fact]
-    public void IsMandatory_ReturnsFalse_WhenFirstTrickWinnerIsOtherPlayer()
-    {
-        var trick = HighValueTrick(B.P1); // P1 wins, not P0
-        var state = B.BasicState(completedTricks: [trick]);
-        AnnouncementRules.IsMandatory(B.P0, state).Should().BeFalse();
-    }
-
-    // ── IsMandatory: second trick conditions ──────────────────────────────────
-
-    [Fact]
-    public void IsMandatory_ReturnsFalse_WhenSecondTrickHighButFirstWasNot()
-    {
-        // Bug regression: second trick alone >= 35 should NOT trigger Pflichtansage
-        var firstTrick = CompleteTrick(B.P0);  // low-value trick
-        var secondTrick = HighValueTrick(B.P0); // high-value, but first was low
-        var state = B.BasicState(completedTricks: [firstTrick, secondTrick]);
-        AnnouncementRules.IsMandatory(B.P0, state).Should().BeFalse();
-    }
-
-    [Fact]
-    public void IsMandatory_ReturnsTrue_WhenBothTricksHighAndWinnerHasNotAnnounced()
-    {
-        var firstTrick = HighValueTrick(B.P0);
-        var secondTrick = HighValueTrick(B.P0, startId: 4);
-        var state = B.BasicState(
-            completedTricks: [firstTrick, secondTrick],
-            announcements: [B.Ann(B.P0, AnnouncementType.Re)] // base announced, but not Keine90
-        );
-        AnnouncementRules.IsMandatory(B.P0, state).Should().BeTrue();
     }
 
     // ── GetMandatoryAnnouncement ───────────────────────────────────────────────
@@ -243,11 +147,15 @@ public class AnnouncementRulesTests
     }
 
     [Fact]
-    public void GetMandatoryAnnouncement_ReturnsRe_WhenFirstTrickHighAndWinnerIsRe()
+    public void GetMandatoryAnnouncement_ReturnsWinMandatory_WhenFirstTrickHighAndNoAnnouncement()
     {
         var trick = HighValueTrick(B.P0); // P0 = Re (SoloResolver)
         var state = B.BasicState(completedTricks: [trick]);
-        AnnouncementRules.GetMandatoryAnnouncement(B.P0, state).Should().Be(AnnouncementType.Re);
+        var ann = AnnouncementRules.GetMandatoryAnnouncement(B.P0, state);
+        ann.Should().NotBeNull();
+        ann!.Type.Should().Be(AnnouncementType.Win);
+        ann.IsMandatory.Should().BeTrue();
+        ann.Player.Should().Be(B.P0);
     }
 
     [Fact]
@@ -256,7 +164,7 @@ public class AnnouncementRulesTests
         var trick = HighValueTrick(B.P0);
         var state = B.BasicState(
             completedTricks: [trick],
-            announcements: [B.Ann(B.P0, AnnouncementType.Re)]
+            announcements: [B.Ann(B.P0, AnnouncementType.Win)]
         );
         AnnouncementRules.GetMandatoryAnnouncement(B.P0, state).Should().BeNull();
     }
@@ -264,24 +172,26 @@ public class AnnouncementRulesTests
     [Fact]
     public void GetMandatoryAnnouncement_ReturnsNull_WhenSecondTrickHighButFirstWasNot()
     {
-        var firstTrick = CompleteTrick(B.P0);  // low
+        // Bug regression: second trick alone ≥ 35 must NOT trigger Pflichtansage
+        var firstTrick = CompleteTrick(B.P0);      // low
         var secondTrick = HighValueTrick(B.P0, startId: 4); // high
         var state = B.BasicState(completedTricks: [firstTrick, secondTrick]);
         AnnouncementRules.GetMandatoryAnnouncement(B.P0, state).Should().BeNull();
     }
 
     [Fact]
-    public void GetMandatoryAnnouncement_ReturnsKeine90_WhenBothTricksHighAndBaseAlreadyAnnounced()
+    public void GetMandatoryAnnouncement_ReturnsKeine90_WhenBothTricksHighAndWinAlreadyAnnounced()
     {
         var firstTrick = HighValueTrick(B.P0);
         var secondTrick = HighValueTrick(B.P0, startId: 4);
         var state = B.BasicState(
             completedTricks: [firstTrick, secondTrick],
-            announcements: [B.Ann(B.P0, AnnouncementType.Re)]
+            announcements: [B.Ann(B.P0, AnnouncementType.Win)]
         );
-        AnnouncementRules.GetMandatoryAnnouncement(B.P0, state)
-            .Should()
-            .Be(AnnouncementType.Keine90);
+        var ann = AnnouncementRules.GetMandatoryAnnouncement(B.P0, state);
+        ann.Should().NotBeNull();
+        ann!.Type.Should().Be(AnnouncementType.Keine90);
+        ann.IsMandatory.Should().BeTrue();
     }
 
     [Fact]
@@ -323,7 +233,7 @@ public class AnnouncementRulesTests
     [Fact]
     public void ViolatesFeigheit_ReturnsFalse_WhenOnlyTwoMissing()
     {
-        // Winner=Re, loserPoints=88: missing Re(+1) + Keine90(+1) = 2, not > 2 → no Feigheit.
+        // Winner=Re, loserPoints=88: missing Win(+1) + Keine90(+1) = 2, not > 2 → no Feigheit.
         // State includes a Kontra trick so loserWonNoTricks=false (avoids Schwarz missing point).
         var kontraTrick = B.Trick(
             (30, Suit.Kreuz, Rank.Ass, B.P1),
@@ -346,7 +256,7 @@ public class AnnouncementRulesTests
     [Fact]
     public void ViolatesFeigheit_ReturnsTrue_WhenThreeMissing()
     {
-        // Winner=Re, loserPoints=44: missing Re + Keine90 + Keine60 = 3 → Feigheit
+        // Winner=Re, loserPoints=44: missing Win + Keine90 + Keine60 = 3 → Feigheit
         var state = GameState.Create(
             rules: RuleSet.Default(),
             players: B.FourPlayers(),
@@ -360,14 +270,14 @@ public class AnnouncementRulesTests
     [Fact]
     public void ViolatesFeigheit_ReturnsFalse_WhenWinnerAnnouncedEnough()
     {
-        // Winner=Re, loserPoints=44, but Re announced Re+Keine90+Keine60 → missing=0
+        // Winner=Re, loserPoints=44, but Re announced Win+Keine90+Keine60 → missing=0
         var state = GameState.Create(
             rules: RuleSet.Default(),
             players: B.FourPlayers(),
             partyResolver: B.SoloResolver(),
             announcements:
             [
-                B.Ann(B.P0, AnnouncementType.Re),
+                B.Ann(B.P0, AnnouncementType.Win),
                 B.Ann(B.P0, AnnouncementType.Keine90),
                 B.Ann(B.P0, AnnouncementType.Keine60),
             ]
@@ -386,8 +296,8 @@ public class AnnouncementRulesTests
         var resolver = new HochzeitPartyResolver(B.P0, HochzeitCondition.FirstTrick);
         var state = B.BasicState(partyResolver: resolver);
 
-        AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Re, state).Should().BeFalse();
-        AnnouncementRules.CanAnnounce(B.P1, AnnouncementType.Kontra, state).Should().BeFalse();
+        AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Win, state).Should().BeFalse();
+        AnnouncementRules.CanAnnounce(B.P1, AnnouncementType.Win, state).Should().BeFalse();
     }
 
     [Fact]
@@ -400,9 +310,9 @@ public class AnnouncementRulesTests
             completedTricks: [HochzeitFindungsstichP1(0)]
         );
 
-        // P1 won the Findungsstich → P1 is Re; P2 is Kontra
-        AnnouncementRules.CanAnnounce(B.P1, AnnouncementType.Re, state).Should().BeTrue();
-        AnnouncementRules.CanAnnounce(B.P2, AnnouncementType.Kontra, state).Should().BeTrue();
+        // P1 won the Findungsstich → P1 is Re; P2 is Kontra — both can announce Win
+        AnnouncementRules.CanAnnounce(B.P1, AnnouncementType.Win, state).Should().BeTrue();
+        AnnouncementRules.CanAnnounce(B.P2, AnnouncementType.Win, state).Should().BeTrue();
     }
 
     [Fact]
@@ -420,7 +330,7 @@ public class AnnouncementRulesTests
             ]
         );
 
-        AnnouncementRules.CanAnnounce(B.P1, AnnouncementType.Re, state).Should().BeTrue();
+        AnnouncementRules.CanAnnounce(B.P1, AnnouncementType.Win, state).Should().BeTrue();
     }
 
     [Fact]
@@ -444,7 +354,7 @@ public class AnnouncementRulesTests
             currentTrick: current
         );
 
-        AnnouncementRules.CanAnnounce(B.P1, AnnouncementType.Re, state).Should().BeFalse();
+        AnnouncementRules.CanAnnounce(B.P1, AnnouncementType.Win, state).Should().BeFalse();
     }
 
     [Fact]
@@ -467,10 +377,10 @@ public class AnnouncementRulesTests
                 HochzeitFindungsstichP1(8),
             ],
             currentTrick: current,
-            announcements: [B.Ann(B.P1, AnnouncementType.Re)]
+            announcements: [B.Ann(B.P1, AnnouncementType.Win)]
         );
 
-        // P1 already announced Re; now Keine90 is next. Deadline=17, 13 cards → allowed.
+        // P1 already announced Win; now Keine90 is next. Deadline=17, 13 cards → allowed.
         AnnouncementRules.CanAnnounce(B.P1, AnnouncementType.Keine90, state).Should().BeTrue();
     }
 
@@ -508,7 +418,7 @@ public class AnnouncementRulesTests
         return trick;
     }
 
-    /// <summary>A low-value 4-card trick led by P0.</summary>
+    /// <summary>A low-value 4-card trick.</summary>
     private static Trick CompleteTrick(PlayerId winner)
     {
         var trick = new Trick();

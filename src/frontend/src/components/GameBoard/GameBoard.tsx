@@ -135,6 +135,7 @@ export function GameBoard({
       <div className="absolute bottom-[20%] left-4 z-10">
         <AnnouncementButton
           legalAnnouncements={view?.legalAnnouncements ?? []}
+          ownParty={view?.ownParty ?? null}
           onAnnounce={actions.handleAnnouncement}
         />
       </div>

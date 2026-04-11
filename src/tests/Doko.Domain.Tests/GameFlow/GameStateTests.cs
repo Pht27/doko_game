@@ -70,10 +70,10 @@ public class GameStateTests
     [Fact]
     public void Apply_WithdrawAnnouncement_RemovesMatchingAnnouncement()
     {
-        var ann = B.Ann(B.P0, AnnouncementType.Re);
+        var ann = B.Ann(B.P0, AnnouncementType.Win);
         var state = GameState.Create(announcements: [ann]);
 
-        state.Apply(new WithdrawAnnouncementModification(B.P0, AnnouncementType.Re));
+        state.Apply(new WithdrawAnnouncementModification(B.P0, AnnouncementType.Win));
 
         state.Announcements.Should().BeEmpty();
     }
@@ -81,11 +81,11 @@ public class GameStateTests
     [Fact]
     public void Apply_WithdrawAnnouncement_LeavesOtherAnnouncementsIntact()
     {
-        var re = B.Ann(B.P0, AnnouncementType.Re);
-        var kontra = B.Ann(B.P1, AnnouncementType.Kontra);
+        var re = B.Ann(B.P0, AnnouncementType.Win);
+        var kontra = B.Ann(B.P1, AnnouncementType.Win);
         var state = GameState.Create(announcements: [re, kontra]);
 
-        state.Apply(new WithdrawAnnouncementModification(B.P0, AnnouncementType.Re));
+        state.Apply(new WithdrawAnnouncementModification(B.P0, AnnouncementType.Win));
 
         state.Announcements.Should().ContainSingle().Which.Should().Be(kontra);
     }
