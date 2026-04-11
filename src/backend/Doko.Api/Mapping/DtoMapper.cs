@@ -23,10 +23,11 @@ public static class DtoMapper
             Hand: view.Hand.Select(ToDto).ToList(),
             HandSorted: view.HandSorted.Select(ToDto).ToList(),
             LegalCards: view.LegalCards.Select(ToDto).ToList(),
-            LegalAnnouncements: view.LegalAnnouncements
-                .Select(a => a == AnnouncementType.Win
-                    ? (view.OwnParty == Party.Re ? "Re" : "Kontra")
-                    : a.ToString())
+            LegalAnnouncements: view.LegalAnnouncements.Select(a =>
+                    a == AnnouncementType.Win
+                        ? (view.OwnParty == Party.Re ? "Re" : "Kontra")
+                        : a.ToString()
+                )
                 .ToList(),
             EligibleSonderkartenPerCard: view.EligibleSonderkartenPerCard.ToDictionary(
                 kvp => (int)kvp.Key.Value,
@@ -73,7 +74,9 @@ public static class DtoMapper
             r.GameValue,
             r.AllAwards.Select(ToDto).ToList(),
             r.Feigheit,
-            r.ValueComponents.Select(c => new GameValueComponentDto(c.Label, c.Value)).ToList()
+            r.ValueComponents.Select(c => new GameValueComponentDto(c.Label, c.Value)).ToList(),
+            r.SoloFactor,
+            r.TotalScore
         );
 
     public static ExtrapunktAwardDto ToDto(ExtrapunktAward a) =>

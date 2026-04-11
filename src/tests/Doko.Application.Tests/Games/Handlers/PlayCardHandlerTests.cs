@@ -186,8 +186,8 @@ public class PlayCardHandlerTests
         // NoTrump: highest ♣ wins the lead-suit trick
         var c0 = AppB.Card(0, Suit.Kreuz, Rank.Ass);
         var c1 = AppB.Card(1, Suit.Kreuz, Rank.Zehn);
-        var c2 = AppB.Card(2, Suit.Pik, Rank.Ass);   // no ♣ → can discard
-        var c3 = AppB.Card(3, Suit.Herz, Rank.Ass);   // no ♣ → can discard
+        var c2 = AppB.Card(2, Suit.Pik, Rank.Ass); // no ♣ → can discard
+        var c3 = AppB.Card(3, Suit.Herz, Rank.Ass); // no ♣ → can discard
 
         var players = new[]
         {
@@ -216,16 +216,15 @@ public class PlayCardHandlerTests
         await uc.ExecuteAsync(new PlayCardCommand(id, AppB.P3, c3.Id, []));
 
         // Expect an AnnouncementMadeEvent for Re auto-announced
-        pub.Published
-            .OfType<AnnouncementMadeEvent>()
+        pub.Published.OfType<AnnouncementMadeEvent>()
             .Should()
             .ContainSingle(e => e.Player == AppB.P0 && e.Type == AnnouncementType.Win);
 
         // State should also have the announcement recorded
         var saved = await repo.GetAsync(id);
-        saved!.Announcements.Should().ContainSingle(a =>
-            a.Player == AppB.P0 && a.Type == AnnouncementType.Win
-        );
+        saved!
+            .Announcements.Should()
+            .ContainSingle(a => a.Player == AppB.P0 && a.Type == AnnouncementType.Win);
     }
 
     [Fact]

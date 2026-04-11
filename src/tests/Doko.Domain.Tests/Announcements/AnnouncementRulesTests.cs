@@ -123,7 +123,11 @@ public class AnnouncementRulesTests
     public void CanAnnounce_Keine60_AllowedAfterKeine90()
     {
         var state = B.BasicState(
-            announcements: [B.Ann(B.P0, AnnouncementType.Win), B.Ann(B.P0, AnnouncementType.Keine90)]
+            announcements:
+            [
+                B.Ann(B.P0, AnnouncementType.Win),
+                B.Ann(B.P0, AnnouncementType.Keine90),
+            ]
         );
         AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Keine60, state).Should().BeTrue();
     }
@@ -173,7 +177,7 @@ public class AnnouncementRulesTests
     public void GetMandatoryAnnouncement_ReturnsNull_WhenSecondTrickHighButFirstWasNot()
     {
         // Bug regression: second trick alone ≥ 35 must NOT trigger Pflichtansage
-        var firstTrick = CompleteTrick(B.P0);      // low
+        var firstTrick = CompleteTrick(B.P0); // low
         var secondTrick = HighValueTrick(B.P0, startId: 4); // high
         var state = B.BasicState(completedTricks: [firstTrick, secondTrick]);
         AnnouncementRules.GetMandatoryAnnouncement(B.P0, state).Should().BeNull();
@@ -210,7 +214,17 @@ public class AnnouncementRulesTests
     public void ViolatesFeigheit_ReturnsFalse_WhenFeigheitDisabled()
     {
         var state = B.BasicState(rules: RuleSet.Minimal()); // EnforceFeigheit=false
-        var result = new GameResult(Party.Re, 180, 60, 1, [], Feigheit: false, []);
+        var result = new GameResult(
+            Party.Re,
+            180,
+            60,
+            1,
+            [],
+            Feigheit: false,
+            [],
+            SoloFactor: 1,
+            TotalScore: 1
+        );
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
     }
 
@@ -224,7 +238,17 @@ public class AnnouncementRulesTests
             partyResolver: B.SoloResolver(),
             activeReservation: new DamensoloReservation(B.P0)
         );
-        var result = new GameResult(Party.Re, 180, 20, 1, [], Feigheit: false, []);
+        var result = new GameResult(
+            Party.Re,
+            180,
+            20,
+            1,
+            [],
+            Feigheit: false,
+            [],
+            SoloFactor: 1,
+            TotalScore: 1
+        );
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
     }
 
@@ -233,7 +257,7 @@ public class AnnouncementRulesTests
     [Fact]
     public void ViolatesFeigheit_ReturnsFalse_WhenOnlyTwoMissing()
     {
-        // Winner=Re, loserPoints=88: missing Win(+1) + Keine90(+1) = 2, not > 2 → no Feigheit.
+        // Winner=Re, loserAugen=88: missing Win(+1) + Keine90(+1) = 2, not > 2 → no Feigheit.
         // State includes a Kontra trick so loserWonNoTricks=false (avoids Schwarz missing point).
         var kontraTrick = B.Trick(
             (30, Suit.Kreuz, Rank.Ass, B.P1),
@@ -249,28 +273,48 @@ public class AnnouncementRulesTests
             completedTricks: [kontraTrick]
         );
 
-        var result = new GameResult(Party.Re, 152, 88, 1, [], Feigheit: false, []);
+        var result = new GameResult(
+            Party.Re,
+            152,
+            88,
+            1,
+            [],
+            Feigheit: false,
+            [],
+            SoloFactor: 1,
+            TotalScore: 1
+        );
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
     }
 
     [Fact]
     public void ViolatesFeigheit_ReturnsTrue_WhenThreeMissing()
     {
-        // Winner=Re, loserPoints=44: missing Win + Keine90 + Keine60 = 3 → Feigheit
+        // Winner=Re, loserAugen=44: missing Win + Keine90 + Keine60 = 3 → Feigheit
         var state = GameState.Create(
             rules: RuleSet.Default(),
             players: B.FourPlayers(),
             partyResolver: B.SoloResolver()
         );
 
-        var result = new GameResult(Party.Re, 196, 44, 1, [], Feigheit: false, []);
+        var result = new GameResult(
+            Party.Re,
+            196,
+            44,
+            1,
+            [],
+            Feigheit: false,
+            [],
+            SoloFactor: 1,
+            TotalScore: 1
+        );
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeTrue();
     }
 
     [Fact]
     public void ViolatesFeigheit_ReturnsFalse_WhenWinnerAnnouncedEnough()
     {
-        // Winner=Re, loserPoints=44, but Re announced Win+Keine90+Keine60 → missing=0
+        // Winner=Re, loserAugen=44, but Re announced Win+Keine90+Keine60 → missing=0
         var state = GameState.Create(
             rules: RuleSet.Default(),
             players: B.FourPlayers(),
@@ -283,7 +327,17 @@ public class AnnouncementRulesTests
             ]
         );
 
-        var result = new GameResult(Party.Re, 196, 44, 1, [], Feigheit: false, []);
+        var result = new GameResult(
+            Party.Re,
+            196,
+            44,
+            1,
+            [],
+            Feigheit: false,
+            [],
+            SoloFactor: 1,
+            TotalScore: 1
+        );
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
     }
 

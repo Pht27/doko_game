@@ -72,12 +72,14 @@ export interface GameValueComponentDto {
 
 export interface GameResultDto {
   winner: string;
-  rePoints: number;
-  kontraPoints: number;
+  reAugen: number;
+  kontraAugen: number;
   gameValue: number;
   allAwards: ExtrapunktAwardDto[];
   feigheit: boolean;
   valueComponents: GameValueComponentDto[];
+  soloFactor: number;
+  totalScore: number;
 }
 
 // ── Responses ─────────────────────────────────────────────────────────────────

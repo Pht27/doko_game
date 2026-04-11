@@ -108,7 +108,7 @@ public static class AnnouncementRules
             return false;
 
         var winner = result.Winner;
-        var loserPoints = winner == Party.Re ? result.KontraPoints : result.RePoints;
+        var loserAugen = winner == Party.Re ? result.KontraPoints : result.RePoints;
 
         var winnerAnnounced = state
             .Announcements.Where(a => state.PartyResolver.ResolveParty(a.Player, state) == winner)
@@ -116,13 +116,13 @@ public static class AnnouncementRules
             .ToHashSet();
 
         int missing = 0;
-        if (loserPoints < 120 && !winnerAnnounced.Contains(AnnouncementType.Win))
+        if (loserAugen < 120 && !winnerAnnounced.Contains(AnnouncementType.Win))
             missing++;
-        if (loserPoints < 90 && !winnerAnnounced.Contains(AnnouncementType.Keine90))
+        if (loserAugen < 90 && !winnerAnnounced.Contains(AnnouncementType.Keine90))
             missing++;
-        if (loserPoints < 60 && !winnerAnnounced.Contains(AnnouncementType.Keine60))
+        if (loserAugen < 60 && !winnerAnnounced.Contains(AnnouncementType.Keine60))
             missing++;
-        if (loserPoints < 30 && !winnerAnnounced.Contains(AnnouncementType.Keine30))
+        if (loserAugen < 30 && !winnerAnnounced.Contains(AnnouncementType.Keine30))
             missing++;
 
         bool loserWonNoTricks = !state.CompletedTricks.Any(t =>

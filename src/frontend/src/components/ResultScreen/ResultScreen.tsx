@@ -18,9 +18,9 @@ export function ResultScreen({ result, onNewGame }: ResultScreenProps) {
         {/* Augen */}
         <div className="result-grid">
           <div className="result-label">{t.reAugen}</div>
-          <div className="result-value">{result.rePoints}</div>
+          <div className="result-value">{result.reAugen}</div>
           <div className="result-label">{t.kontraAugen}</div>
-          <div className="result-value">{result.kontraPoints}</div>
+          <div className="result-value">{result.kontraAugen}</div>
         </div>
 
         {/* Spielwert breakdown */}
@@ -42,6 +42,38 @@ export function ResultScreen({ result, onNewGame }: ResultScreenProps) {
 
         {result.feigheit && (
           <div className="result-feigheit-banner">{t.feigheit}</div>
+        )}
+
+        {/* Gesamtergebnis — only shown when it differs from GameValue */}
+        {result.totalScore !== result.gameValue && (
+          <div>
+            <div className="result-section-header">{t.gesamtergebnis}</div>
+            <div className="result-breakdown">
+              <div className="result-breakdown-row">
+                <span className="result-label">{t.spielwert}</span>
+                <span className="result-breakdown-value">{result.gameValue}</span>
+              </div>
+              {result.soloFactor > 1 && (
+                <div className="result-breakdown-row">
+                  <span className="result-label">{t.soloFaktor(result.soloFactor)}</span>
+                  <span className="result-breakdown-value">{result.gameValue * result.soloFactor}</span>
+                </div>
+              )}
+              {result.totalScore !== result.gameValue * result.soloFactor && (
+                <div className="result-breakdown-row">
+                  <span className="result-label">{t.extrapunkteNetto}</span>
+                  <span className="result-breakdown-value">
+                    {result.totalScore - result.gameValue * result.soloFactor > 0 ? '+' : ''}
+                    {result.totalScore - result.gameValue * result.soloFactor}
+                  </span>
+                </div>
+              )}
+              <div className="result-breakdown-total">
+                <span>{t.gesamtergebnis}</span>
+                <span>{result.totalScore}</span>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* Zusatzpunkte */}

@@ -53,6 +53,9 @@ export const t = {
   hinweis: 'Hinweis',
   feigheit: 'Feigheit',
   zusatzpunkte: 'Zusatzpunkte:',
+  gesamtergebnis: 'Gesamtergebnis',
+  soloFaktor: (factor: number) => `× ${factor} (Solo)`,
+  extrapunkteNetto: 'Extrapunkte',
   neuesSpiel: 'Neues Spiel',
   awardLabel: (type: string, player: number) => `${type} (S${player})`,
 

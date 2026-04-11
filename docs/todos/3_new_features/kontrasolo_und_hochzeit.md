@@ -6,7 +6,7 @@ Die Regeln für das Kontrasolo stehen recht gut beschrieben, sie müssen dann nu
 
 Für die stille Hochzeit muss nochmal Code Recherche betrieben werden. Wie der Stand da ist.
 
-
+Vielleicht sollte es sowas wie SilentReservations geben? Damit könnte im Frontend auch immer easy die ActiveReservation angezeigt werden, ohne das stille Solo zu verraten. Dann muss man sich überlegen, wie ActiveReservation und SilentReservation zusammenhängen / gekoppelt sind.
 ---
 
 Bei einer stillen Hochzeit steht in den Regeln, dass keine der Genscherdamen aktiviert werden kann. Das ist unpräzise und muss geupdated werden: Damit ein verhindertes Aktivieren der (Gegen-)Genscherdamen nicht die stille Hochzeit verrät, falls diese bei einem der Kontra-Spieler liegen, müssen die Genscherdamen nach wie vor aktivierbar sein. Allerdings dürfen sie am Ende des Spiels keine Auswirkungen haben, da feststeht, wie im stillen Solo die Parteien sind und das hat Vorrang. Da muss man genau in die PartyResolver Logik schauen! Bitte auch in den Regeln ergänzen.

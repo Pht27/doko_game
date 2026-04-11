@@ -227,13 +227,15 @@ public sealed class PlayCardHandler(
         if (pflichtAnnouncement is not null)
         {
             state.Apply(new AddAnnouncementModification(pflichtAnnouncement));
-            events.Add(new AnnouncementMadeEvent(
-                state.Id,
-                pflichtAnnouncement.Player,
-                pflichtAnnouncement.Type,
-                pflichtAnnouncement.TrickNumber,
-                pflichtAnnouncement.CardIndexInTrick
-            ));
+            events.Add(
+                new AnnouncementMadeEvent(
+                    state.Id,
+                    pflichtAnnouncement.Player,
+                    pflichtAnnouncement.Type,
+                    pflichtAnnouncement.TrickNumber,
+                    pflichtAnnouncement.CardIndexInTrick
+                )
+            );
         }
 
         if (state.Players.All(p => p.Hand.Cards.Count == 0))

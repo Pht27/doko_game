@@ -12,5 +12,7 @@ public record GameResult(
     int GameValue,
     IReadOnlyList<ExtrapunktAward> AllAwards,
     bool Feigheit,
-    IReadOnlyList<GameValueComponent> ValueComponents
+    IReadOnlyList<GameValueComponent> ValueComponents,
+    int SoloFactor,
+    int TotalScore
 );
