@@ -1,4 +1,4 @@
-<This feature was started but im not really happy with the turnout. Maybe you can go over it again and second guess some parts of the Implementation Plan or the requirements I wrote>
+<This feature was started but im not really happy with the turnout. Maybe you can go over it again and second guess some parts of the Implementation Plan or the requirements I wrote. Now it is the game board variable thats bloated, i think it could be separated into subcomponents. Also, the subcomponent structure is not coherent.>
 
 The App.tsx is way too bloated. It uses a lot of hooks which could be separate files, it kind of declares components, which arent real components (like Main Area), that could be put into their own component file. Then we could have a component/folder structure, where the component folder contains folders for each high level component which in turn contains the tsx file and a folder for all the subcomponents that are in that component. ofcourse shared components need their own folder. Like how is there not a component / file for Card, does that make sense?
 

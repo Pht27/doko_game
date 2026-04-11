@@ -1,1 +1,3 @@
-Das muss irgendwie schöner gehen, diese Dialoge sind ugly as hell.
+Das muss irgendwie schöner gehen, diese Dialoge sind ugly as hell. Momentan gibt es ja keine doppelt besetzten Sonderkarten, also kann man auch einfach einen Dialog poppen mit "<Sonderkarte> aktivieren?". Beim Genschern sollten dann auch zwei Dialoge kommen, oder der "neuen Partner auswählen" Teil soll erst auftauchen, wenn man genschern aktiviert hat.
+
+Außerdem soll beim Genschern es gar nicht erst möglich sein, sich selbst auszuwählen (im Frontend), um den Fehler zu vermeiden.

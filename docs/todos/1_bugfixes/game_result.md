@@ -1,0 +1,1 @@
+Game Result zeigt gerade keine Augen an. Außerdem scheint es manchmal zu crashen und gar nicht aufzutauchen. Bitte mal den ganzen Flow mit GameResult aus dem Backend nachvollziehen und checken.
