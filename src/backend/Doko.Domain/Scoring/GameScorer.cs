@@ -60,31 +60,58 @@ public sealed class GameScorer : IGameScorer
 
         // ── 5. Build base game value ───────────────────────────────────────────────
         int gameValue = 0;
+        var components = new List<GameValueComponent>();
 
         // Gewonnen
         gameValue++;
+        components.Add(new("Gewonnen", 1));
 
         // Gegen die Alten (Kontra party wins)
         if (winner == Party.Kontra)
+        {
             gameValue++;
+            components.Add(new("Gegen die Alten", 1));
+        }
 
         // Threshold bonuses (loser didn't reach the threshold)
         if (loserPoints < 90)
-            gameValue++; // Keine 90
+        {
+            gameValue++;
+            components.Add(new("Keine 90", 1));
+        }
         if (loserPoints < 60)
-            gameValue++; // Keine 60
+        {
+            gameValue++;
+            components.Add(new("Keine 60", 1));
+        }
         if (loserPoints < 30)
-            gameValue++; // Keine 30
+        {
+            gameValue++;
+            components.Add(new("Keine 30", 1));
+        }
         if (loserWonNoTricks)
-            gameValue++; // Schwarz
+        {
+            gameValue++;
+            components.Add(new("Schwarz", 1));
+        }
 
         // One point per announcement (by any party)
-        gameValue += state.Announcements.Count;
+        int announcementsCount = state.Announcements.Count;
+        if (announcementsCount > 0)
+        {
+            gameValue += announcementsCount;
+            components.Add(new("Ansagen", announcementsCount));
+        }
 
         // Net Extrapunkte offset
         int winnerExtra = winner == Party.Re ? reExtra : kontraExtra;
         int loserExtra = winner == Party.Re ? kontraExtra : reExtra;
-        gameValue += winnerExtra - loserExtra;
+        int netExtra = winnerExtra - loserExtra;
+        if (netExtra != 0)
+        {
+            gameValue += netExtra;
+            components.Add(new("Extrapunkte", netExtra));
+        }
 
         // ── 6. Feigheit ────────────────────────────────────────────────────────────
         var provisionalResult = new GameResult(
@@ -93,7 +120,8 @@ public sealed class GameScorer : IGameScorer
             kontraPoints,
             gameValue,
             allAwards,
-            Feigheit: false
+            Feigheit: false,
+            components
         );
 
         bool feigheit = AnnouncementRules.ViolatesFeigheit(provisionalResult, state);
@@ -106,9 +134,21 @@ public sealed class GameScorer : IGameScorer
             // Recalculate extra penalty: each announcement beyond 2 that was missing adds 1
             int extraPenalty = ComputeFeigheitPenalty(provisionalResult, state);
             gameValue = 1 + extraPenalty; // Gewonnen + extra
+
+            components = [new("Gewonnen", 1)];
+            if (extraPenalty > 0)
+                components.Add(new("Feigheit-Strafe", extraPenalty));
         }
 
-        return new GameResult(winner, rePoints, kontraPoints, gameValue, allAwards, feigheit);
+        return new GameResult(
+            winner,
+            rePoints,
+            kontraPoints,
+            gameValue,
+            allAwards,
+            feigheit,
+            components
+        );
     }
 
     private static int ComputeEffectiveAugen(

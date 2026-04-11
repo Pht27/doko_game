@@ -66,7 +66,8 @@ public static class DtoMapper
             r.KontraPoints,
             r.GameValue,
             r.AllAwards.Select(ToDto).ToList(),
-            r.Feigheit
+            r.Feigheit,
+            r.ValueComponents.Select(c => new GameValueComponentDto(c.Label, c.Value)).ToList()
         );
 
     public static ExtrapunktAwardDto ToDto(ExtrapunktAward a) =>

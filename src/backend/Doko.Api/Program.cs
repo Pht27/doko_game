@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json;
 using Doko.Api.Extensions;
 using Doko.Api.Hubs;
 using Doko.Application;
@@ -17,6 +18,9 @@ builder
     .AddDokoInfrastructure()
     .AddDokoApi()
     .AddSignalR()
+    .AddJsonProtocol(options =>
+        options.PayloadSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+    )
     .Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -53,7 +57,12 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>
     {
         policy
-            .WithOrigins("http://localhost:5173", "http://localhost:4173", "http://192.168.178.22:5173", "http://192.168.178.22:4173")
+            .WithOrigins(
+                "http://localhost:5173",
+                "http://localhost:4173",
+                "http://192.168.178.22:5173",
+                "http://192.168.178.22:4173"
+            )
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials(); // required for SignalR

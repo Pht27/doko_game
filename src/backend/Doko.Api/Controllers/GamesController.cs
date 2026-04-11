@@ -5,8 +5,8 @@ using Doko.Api.Hubs;
 using Doko.Api.Mapping;
 using Doko.Application.Abstractions;
 using Doko.Application.Games.Commands;
-using Doko.Application.Games.Queries;
 using Doko.Application.Games.Handlers;
+using Doko.Application.Games.Queries;
 using Doko.Domain.Announcements;
 using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
@@ -163,7 +163,11 @@ public class GamesController(
             if (r.GameFinished && r.FinishedResult is { } finished)
                 await hub
                     .Clients.Group(gameId)
-                    .SendAsync("gameFinished", DtoMapper.ToDto(finished.Result), ct);
+                    .SendAsync(
+                        "gameFinished",
+                        new { result = DtoMapper.ToDto(finished.Result) },
+                        ct
+                    );
 
             return Ok(DtoMapper.ToResponse(r));
         });

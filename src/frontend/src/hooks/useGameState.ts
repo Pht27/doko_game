@@ -40,6 +40,11 @@ export function useGameState(
     }
   }, [token, gameId]);
 
+  // Reset finished result when the game changes
+  useEffect(() => {
+    setFinishedResult(null);
+  }, [gameId]);
+
   // Re-fetch whenever active player changes
   useEffect(() => {
     refetch();

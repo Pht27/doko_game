@@ -64,6 +64,11 @@ export interface ExtrapunktAwardDto {
   delta: number;
 }
 
+export interface GameValueComponentDto {
+  label: string;
+  value: number;
+}
+
 export interface GameResultDto {
   winner: string;
   rePoints: number;
@@ -71,6 +76,7 @@ export interface GameResultDto {
   gameValue: number;
   allAwards: ExtrapunktAwardDto[];
   feigheit: boolean;
+  valueComponents: GameValueComponentDto[];
 }
 
 // ── Responses ─────────────────────────────────────────────────────────────────

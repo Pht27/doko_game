@@ -206,7 +206,7 @@ public class AnnouncementRulesTests
     public void ViolatesFeigheit_ReturnsFalse_WhenFeigheitDisabled()
     {
         var state = B.BasicState(rules: RuleSet.Minimal()); // EnforceFeigheit=false
-        var result = new GameResult(Party.Re, 180, 60, 1, [], Feigheit: false);
+        var result = new GameResult(Party.Re, 180, 60, 1, [], Feigheit: false, []);
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
     }
 
@@ -220,7 +220,7 @@ public class AnnouncementRulesTests
             partyResolver: B.SoloResolver(),
             activeReservation: new DamensoloReservation(B.P0)
         );
-        var result = new GameResult(Party.Re, 180, 20, 1, [], Feigheit: false);
+        var result = new GameResult(Party.Re, 180, 20, 1, [], Feigheit: false, []);
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
     }
 
@@ -245,7 +245,7 @@ public class AnnouncementRulesTests
             completedTricks: [kontraTrick]
         );
 
-        var result = new GameResult(Party.Re, 152, 88, 1, [], Feigheit: false);
+        var result = new GameResult(Party.Re, 152, 88, 1, [], Feigheit: false, []);
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
     }
 
@@ -259,7 +259,7 @@ public class AnnouncementRulesTests
             partyResolver: B.SoloResolver()
         );
 
-        var result = new GameResult(Party.Re, 196, 44, 1, [], Feigheit: false);
+        var result = new GameResult(Party.Re, 196, 44, 1, [], Feigheit: false, []);
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeTrue();
     }
 
@@ -279,7 +279,7 @@ public class AnnouncementRulesTests
             ]
         );
 
-        var result = new GameResult(Party.Re, 196, 44, 1, [], Feigheit: false);
+        var result = new GameResult(Party.Re, 196, 44, 1, [], Feigheit: false, []);
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
     }
 
@@ -341,7 +341,12 @@ public class AnnouncementRulesTests
             rules: RuleSet.Default(),
             players: B.FourPlayers(),
             partyResolver: resolver,
-            completedTricks: [HochzeitP0WinsTrick(0), HochzeitP0WinsTrick(4), HochzeitFindungsstichP1(8)],
+            completedTricks:
+            [
+                HochzeitP0WinsTrick(0),
+                HochzeitP0WinsTrick(4),
+                HochzeitFindungsstichP1(8),
+            ],
             currentTrick: current
         );
 
@@ -361,7 +366,12 @@ public class AnnouncementRulesTests
             rules: RuleSet.Default(),
             players: B.FourPlayers(),
             partyResolver: resolver,
-            completedTricks: [HochzeitP0WinsTrick(0), HochzeitP0WinsTrick(4), HochzeitFindungsstichP1(8)],
+            completedTricks:
+            [
+                HochzeitP0WinsTrick(0),
+                HochzeitP0WinsTrick(4),
+                HochzeitFindungsstichP1(8),
+            ],
             currentTrick: current,
             announcements: [B.Ann(B.P1, AnnouncementType.Re)]
         );

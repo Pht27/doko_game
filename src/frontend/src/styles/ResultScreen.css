@@ -2,11 +2,11 @@
 @reference "./index.css";
 
 .result-overlay {
-  @apply fixed inset-0 bg-black/80 flex items-center justify-center z-50;
+  @apply fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4;
 }
 
 .result-screen {
-  @apply bg-gray-800 rounded-2xl p-8 w-96 shadow-2xl flex flex-col gap-4 text-white;
+  @apply bg-gray-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl flex flex-col gap-4 text-white max-h-[90vh] overflow-y-auto;
 }
 
 .result-title {
@@ -14,7 +14,7 @@
 }
 
 .result-grid {
-  @apply grid grid-cols-2 gap-2 text-sm;
+  @apply grid grid-cols-2 gap-x-4 gap-y-1 text-sm;
 }
 
 .result-label {
@@ -25,12 +25,28 @@
   @apply font-semibold;
 }
 
-.result-feigheit {
-  @apply text-yellow-400;
+.result-section-header {
+  @apply text-white/50 text-xs uppercase tracking-wide mb-2;
 }
 
-.result-awards-header {
-  @apply text-white/60 text-sm mb-2;
+.result-breakdown {
+  @apply flex flex-col gap-1 text-sm;
+}
+
+.result-breakdown-row {
+  @apply flex justify-between;
+}
+
+.result-breakdown-value {
+  @apply font-semibold tabular-nums;
+}
+
+.result-breakdown-total {
+  @apply flex justify-between font-bold border-t border-white/20 mt-1 pt-1;
+}
+
+.result-feigheit-banner {
+  @apply text-center text-yellow-400 font-semibold bg-yellow-400/10 rounded-lg py-2 text-sm;
 }
 
 .result-awards-list {
@@ -42,7 +58,7 @@
 }
 
 .result-award-delta {
-  @apply font-semibold;
+  @apply font-semibold tabular-nums;
 }
 
 .result-new-game-btn {

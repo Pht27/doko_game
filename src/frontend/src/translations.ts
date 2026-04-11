@@ -46,9 +46,10 @@ export const t = {
 
   // ── ResultScreen ───────────────────────────────────────────────────────────
   winnerLabel: (winner: string) => `${winner} gewinnt!`,
-  rePunkte: 'Re-Punkte',
-  kontraPunkte: 'Kontra-Punkte',
+  reAugen: 'Re Augen',
+  kontraAugen: 'Kontra Augen',
   spielwert: 'Spielwert',
+  spielwertBerechnung: 'Berechnung:',
   hinweis: 'Hinweis',
   feigheit: 'Feigheit',
   zusatzpunkte: 'Zusatzpunkte:',

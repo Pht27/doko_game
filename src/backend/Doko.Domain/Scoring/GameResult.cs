@@ -3,11 +3,14 @@ using Doko.Domain.Parties;
 
 namespace Doko.Domain.Scoring;
 
+public record GameValueComponent(string Label, int Value);
+
 public record GameResult(
     Party Winner,
     int RePoints,
     int KontraPoints,
     int GameValue,
     IReadOnlyList<ExtrapunktAward> AllAwards,
-    bool Feigheit
+    bool Feigheit,
+    IReadOnlyList<GameValueComponent> ValueComponents
 );

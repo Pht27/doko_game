@@ -8,6 +8,7 @@ export interface GameActions {
   setPendingCard: (val: { card: CardDto; sonderkarten: SonderkarteInfoDto[] } | null) => void;
   actionError: string | null;
   armutReturnSelected: Set<number>;
+  playingCardId: number | null;
   handleCardClick: (card: CardDto) => void;
   submitPlayCard: (cardId: number, activateSonderkarten: string[], genscherPartnerId: number | null) => Promise<void>;
   handleHealthCheck: (hasVorbehalt: boolean) => Promise<void>;
@@ -30,6 +31,7 @@ export function useGameActions(
   const [pendingCard, setPendingCard] = useState<{ card: CardDto; sonderkarten: SonderkarteInfoDto[] } | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [armutReturnSelected, setArmutReturnSelected] = useState<Set<number>>(new Set());
+  const [playingCardId, setPlayingCardId] = useState<number | null>(null);
 
   const token = session?.tokens[activePlayer] ?? '';
   const gameId = session?.gameId ?? '';
@@ -61,11 +63,14 @@ export function useGameActions(
   async function submitPlayCard(cardId: number, activateSonderkarten: string[], genscherPartnerId: number | null) {
     setPendingCard(null);
     setActionError(null);
+    setPlayingCardId(cardId);
     try {
       await playCard(token, gameId, { cardId, activateSonderkarten, genscherPartnerId });
       refetch();
     } catch (e) {
       setActionError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setPlayingCardId(null);
     }
   }
 
@@ -128,6 +133,7 @@ export function useGameActions(
     setPendingCard,
     actionError,
     armutReturnSelected,
+    playingCardId,
     handleCardClick,
     submitPlayCard,
     handleHealthCheck,
