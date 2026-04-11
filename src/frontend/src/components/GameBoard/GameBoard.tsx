@@ -140,7 +140,7 @@ export function GameBoard({
       </div>
 
       {/* Loading / error feedback above the hand */}
-      {viewLoading && <div className="text-center text-white/40 text-xs py-1">{t.loading}</div>}
+      {viewLoading && !view && <div className="text-center text-white/40 text-xs py-1">{t.loading}</div>}
       {viewError && <div className="text-center text-red-400 text-xs py-1">{viewError}</div>}
 
       {/* Hand — .hand-container clips the bottom half of the cards so they
