@@ -32,6 +32,9 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
         var hand = playerState.Hand.Cards;
         bool isMyTurn = state.Phase == GamePhase.Playing && state.CurrentTurn == requestingPlayer;
 
+        // Own party — null when not yet known (e.g. Hochzeit before Findungsstich)
+        var ownParty = state.PartyResolver.ResolveParty(requestingPlayer, state);
+
         // Legal cards: only relevant when it's this player's turn
         IReadOnlyList<Card> legalCards = [];
         if (isMyTurn && state.CurrentTrick is not null or { Cards.Count: 0 })
@@ -174,6 +177,7 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             gameId,
             state.Phase,
             requestingPlayer,
+            ownParty,
             hand,
             legalCards,
             legalAnnouncements,

@@ -36,6 +36,7 @@ export interface PlayerGameViewResponse {
   gameId: string;
   phase: string;
   requestingPlayer: number;
+  ownParty: string | null;
   hand: CardDto[];
   handSorted: CardDto[];
   legalCards: CardDto[];

@@ -4,6 +4,7 @@ public record PlayerGameViewResponse(
     string GameId,
     string Phase,
     int RequestingPlayer,
+    string? OwnParty,
     IReadOnlyList<CardDto> Hand,
     IReadOnlyList<CardDto> HandSorted,
     IReadOnlyList<CardDto> LegalCards,

@@ -1,6 +1,7 @@
 using Doko.Domain.Announcements;
 using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
+using Doko.Domain.Parties;
 using Doko.Domain.Players;
 using Doko.Domain.Reservations;
 
@@ -10,6 +11,7 @@ public record PlayerGameView(
     GameId GameId,
     GamePhase Phase,
     PlayerId RequestingPlayer,
+    Party? OwnParty,
     IReadOnlyList<Card> Hand,
     IReadOnlyList<Card> LegalCards,
     IReadOnlyList<AnnouncementType> LegalAnnouncements,

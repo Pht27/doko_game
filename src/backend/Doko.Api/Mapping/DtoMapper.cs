@@ -18,6 +18,7 @@ public static class DtoMapper
             GameId: view.GameId.ToString(),
             Phase: view.Phase.ToString(),
             RequestingPlayer: view.RequestingPlayer.Value,
+            OwnParty: view.OwnParty?.ToString(),
             Hand: view.Hand.Select(ToDto).ToList(),
             HandSorted: view.HandSorted.Select(ToDto).ToList(),
             LegalCards: view.LegalCards.Select(ToDto).ToList(),
