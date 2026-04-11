@@ -200,6 +200,100 @@ public class AnnouncementRulesTests
         AnnouncementRules.IsMandatory(B.P0, state).Should().BeFalse();
     }
 
+    // ── IsMandatory: second trick conditions ──────────────────────────────────
+
+    [Fact]
+    public void IsMandatory_ReturnsFalse_WhenSecondTrickHighButFirstWasNot()
+    {
+        // Bug regression: second trick alone >= 35 should NOT trigger Pflichtansage
+        var firstTrick = CompleteTrick(B.P0);  // low-value trick
+        var secondTrick = HighValueTrick(B.P0); // high-value, but first was low
+        var state = B.BasicState(completedTricks: [firstTrick, secondTrick]);
+        AnnouncementRules.IsMandatory(B.P0, state).Should().BeFalse();
+    }
+
+    [Fact]
+    public void IsMandatory_ReturnsTrue_WhenBothTricksHighAndWinnerHasNotAnnounced()
+    {
+        var firstTrick = HighValueTrick(B.P0);
+        var secondTrick = HighValueTrick(B.P0, startId: 4);
+        var state = B.BasicState(
+            completedTricks: [firstTrick, secondTrick],
+            announcements: [B.Ann(B.P0, AnnouncementType.Re)] // base announced, but not Keine90
+        );
+        AnnouncementRules.IsMandatory(B.P0, state).Should().BeTrue();
+    }
+
+    // ── GetMandatoryAnnouncement ───────────────────────────────────────────────
+
+    [Fact]
+    public void GetMandatoryAnnouncement_ReturnsNull_WhenDisabled()
+    {
+        var trick = HighValueTrick(B.P0);
+        var state = B.BasicState(rules: RuleSet.Minimal(), completedTricks: [trick]);
+        AnnouncementRules.GetMandatoryAnnouncement(B.P0, state).Should().BeNull();
+    }
+
+    [Fact]
+    public void GetMandatoryAnnouncement_ReturnsNull_WhenFirstTrickBelowThreshold()
+    {
+        var trick = CompleteTrick(B.P0); // low-value
+        var state = B.BasicState(completedTricks: [trick]);
+        AnnouncementRules.GetMandatoryAnnouncement(B.P0, state).Should().BeNull();
+    }
+
+    [Fact]
+    public void GetMandatoryAnnouncement_ReturnsRe_WhenFirstTrickHighAndWinnerIsRe()
+    {
+        var trick = HighValueTrick(B.P0); // P0 = Re (SoloResolver)
+        var state = B.BasicState(completedTricks: [trick]);
+        AnnouncementRules.GetMandatoryAnnouncement(B.P0, state).Should().Be(AnnouncementType.Re);
+    }
+
+    [Fact]
+    public void GetMandatoryAnnouncement_ReturnsNull_WhenFirstTrickHighButAlreadyAnnounced()
+    {
+        var trick = HighValueTrick(B.P0);
+        var state = B.BasicState(
+            completedTricks: [trick],
+            announcements: [B.Ann(B.P0, AnnouncementType.Re)]
+        );
+        AnnouncementRules.GetMandatoryAnnouncement(B.P0, state).Should().BeNull();
+    }
+
+    [Fact]
+    public void GetMandatoryAnnouncement_ReturnsNull_WhenSecondTrickHighButFirstWasNot()
+    {
+        var firstTrick = CompleteTrick(B.P0);  // low
+        var secondTrick = HighValueTrick(B.P0, startId: 4); // high
+        var state = B.BasicState(completedTricks: [firstTrick, secondTrick]);
+        AnnouncementRules.GetMandatoryAnnouncement(B.P0, state).Should().BeNull();
+    }
+
+    [Fact]
+    public void GetMandatoryAnnouncement_ReturnsKeine90_WhenBothTricksHighAndBaseAlreadyAnnounced()
+    {
+        var firstTrick = HighValueTrick(B.P0);
+        var secondTrick = HighValueTrick(B.P0, startId: 4);
+        var state = B.BasicState(
+            completedTricks: [firstTrick, secondTrick],
+            announcements: [B.Ann(B.P0, AnnouncementType.Re)]
+        );
+        AnnouncementRules.GetMandatoryAnnouncement(B.P0, state)
+            .Should()
+            .Be(AnnouncementType.Keine90);
+    }
+
+    [Fact]
+    public void GetMandatoryAnnouncement_ReturnsNull_AfterThirdTrick()
+    {
+        var t0 = HighValueTrick(B.P0);
+        var t1 = HighValueTrick(B.P0, startId: 4);
+        var t2 = HighValueTrick(B.P0, startId: 8);
+        var state = B.BasicState(completedTricks: [t0, t1, t2]);
+        AnnouncementRules.GetMandatoryAnnouncement(B.P0, state).Should().BeNull();
+    }
+
     // ── ViolatesFeigheit: rules / solo guards ─────────────────────────────────
 
     [Fact]
@@ -401,17 +495,16 @@ public class AnnouncementRulesTests
         );
 
     /// <summary>
-    /// A trick where P0 wins ~43 Augen: leads ♣A (plain), ♣10, ♠A, ♥A follow.
-    /// P0 wins (highest ♣ and no trump played).
+    /// A trick where <paramref name="winner"/> wins ~43 Augen: ♣A, ♣10, ♠A, ♥A.
+    /// Card IDs start at <paramref name="startId"/> to avoid conflicts in multi-trick states.
     /// </summary>
-    private static Trick HighValueTrick(PlayerId winner)
+    private static Trick HighValueTrick(PlayerId winner, byte startId = 10)
     {
-        // Use B.P0 as first card to ensure P0 wins when winner=P0
         var trick = new Trick();
-        trick.Add(new TrickCard(B.Card(10, Suit.Kreuz, Rank.Ass), winner));
-        trick.Add(new TrickCard(B.Card(11, Suit.Kreuz, Rank.Zehn), B.P1));
-        trick.Add(new TrickCard(B.Card(12, Suit.Pik, Rank.Ass), B.P2));
-        trick.Add(new TrickCard(B.Card(13, Suit.Herz, Rank.Ass), B.P3));
+        trick.Add(new TrickCard(B.Card(startId, Suit.Kreuz, Rank.Ass), winner));
+        trick.Add(new TrickCard(B.Card((byte)(startId + 1), Suit.Kreuz, Rank.Zehn), B.P1));
+        trick.Add(new TrickCard(B.Card((byte)(startId + 2), Suit.Pik, Rank.Ass), B.P2));
+        trick.Add(new TrickCard(B.Card((byte)(startId + 3), Suit.Herz, Rank.Ass), B.P3));
         return trick;
     }
 

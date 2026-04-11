@@ -1,4 +1,7 @@
 using Doko.Application.Tests.Helpers;
+using Doko.Domain.Announcements;
+using Doko.Domain.GameFlow.Events;
+using Doko.Domain.Parties;
 using Doko.Domain.Scoring;
 using Doko.Domain.Trump;
 
@@ -174,6 +177,55 @@ public class PlayCardHandlerTests
 
         var saved = await repo.GetAsync(id);
         saved!.CompletedTricks.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public async Task PlayCard_CompleteTrick_AutoMakesPflichtansage_WhenFirstTrickHasHighPoints()
+    {
+        // P0 leads ♣A (11), P1 plays ♣10 (10), P2 plays ♠A (11), P3 plays ♥A (11) → 43 Augen, P0 wins
+        // NoTrump: highest ♣ wins the lead-suit trick
+        var c0 = AppB.Card(0, Suit.Kreuz, Rank.Ass);
+        var c1 = AppB.Card(1, Suit.Kreuz, Rank.Zehn);
+        var c2 = AppB.Card(2, Suit.Pik, Rank.Ass);   // no ♣ → can discard
+        var c3 = AppB.Card(3, Suit.Herz, Rank.Ass);   // no ♣ → can discard
+
+        var players = new[]
+        {
+            new PlayerState(AppB.P0, PlayerSeat.First, AppB.HandOf(c0), null),
+            new PlayerState(AppB.P1, PlayerSeat.Second, AppB.HandOf(c1), null),
+            new PlayerState(AppB.P2, PlayerSeat.Third, AppB.HandOf(c2), null),
+            new PlayerState(AppB.P3, PlayerSeat.Fourth, AppB.HandOf(c3), null),
+        };
+
+        var (repo, pub, _) = AppB.Infrastructure();
+        var state = GameState.Create(
+            phase: GamePhase.Playing,
+            players: players,
+            currentTurn: AppB.P0,
+            trumpEvaluator: NoTrumpEvaluator.Instance,
+            partyResolver: new SoloPartyResolver(AppB.P0), // P0 = Re
+            rules: new RuleSet { EnforcePflichtansage = true }
+        );
+        await repo.SaveAsync(state);
+        var id = state.Id;
+        var uc = Handler(repo, pub);
+
+        await uc.ExecuteAsync(new PlayCardCommand(id, AppB.P0, c0.Id, []));
+        await uc.ExecuteAsync(new PlayCardCommand(id, AppB.P1, c1.Id, []));
+        await uc.ExecuteAsync(new PlayCardCommand(id, AppB.P2, c2.Id, []));
+        await uc.ExecuteAsync(new PlayCardCommand(id, AppB.P3, c3.Id, []));
+
+        // Expect an AnnouncementMadeEvent for Re auto-announced
+        pub.Published
+            .OfType<AnnouncementMadeEvent>()
+            .Should()
+            .ContainSingle(e => e.Player == AppB.P0 && e.Type == AnnouncementType.Re);
+
+        // State should also have the announcement recorded
+        var saved = await repo.GetAsync(id);
+        saved!.Announcements.Should().ContainSingle(a =>
+            a.Player == AppB.P0 && a.Type == AnnouncementType.Re
+        );
     }
 
     [Fact]

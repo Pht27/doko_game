@@ -2,6 +2,7 @@ using Doko.Application.Abstractions;
 using Doko.Application.Common;
 using Doko.Application.Games.Commands;
 using Doko.Application.Games.Results;
+using Doko.Domain.Announcements;
 using Doko.Domain.Cards;
 using Doko.Domain.Extrapunkte;
 using Doko.Domain.GameFlow;
@@ -220,6 +221,16 @@ public sealed class PlayCardHandler(
         events.Add(
             new TrickCompletedEvent(state.Id, state.CompletedTricks.Count - 1, winner, result)
         );
+
+        // Auto-make Pflichtansage if the completed trick triggers one
+        var mandatoryType = AnnouncementRules.GetMandatoryAnnouncement(winner, state);
+        if (mandatoryType.HasValue)
+        {
+            int trickNum = state.CompletedTricks.Count - 1;
+            var pflichtAnnouncement = new Announcement(winner, mandatoryType.Value, trickNum, 0);
+            state.Apply(new AddAnnouncementModification(pflichtAnnouncement));
+            events.Add(new AnnouncementMadeEvent(state.Id, winner, mandatoryType.Value, trickNum, 0));
+        }
 
         if (state.Players.All(p => p.Hand.Cards.Count == 0))
         {
