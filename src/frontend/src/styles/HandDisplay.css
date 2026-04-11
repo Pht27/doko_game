@@ -4,8 +4,29 @@
    --card-overlap : how much adjacent cards slide under each other horizontally
    Fan arc, lift, and spread are JS constants in HandDisplay.tsx.
    ─────────────────────────────────────────────────────────────────────────── */
+
+/*
+  .hand-container clips the bottom portion of cards so they appear to rise
+  from below the table edge.  Height = amount of card that stays VISIBLE.
+  Mobile  : card = 8 rem  → show top 4 rem  (50 % visible, 50 % clipped)
+  Tablet+ : card = 12 rem → show top 6 rem  (50 % visible, 50 % clipped)
+  Outer cards drop an extra 1 rem (ARC_DEPTH_REM) so they end up ~62 % clipped.
+  Using height+overflow instead of transform avoids GPU compositing layer
+  issues that cause overflow:hidden on ancestors to be ignored on mobile.
+*/
+.hand-container {
+  height: 4rem;
+  overflow: hidden;
+}
+
+@media (min-width: 640px) {
+  .hand-container {
+    height: 6rem;
+  }
+}
+
 .hand {
-  @apply flex items-end justify-center px-4 pb-2 overflow-visible;
+  @apply flex items-end justify-center px-4 overflow-visible;
   --card-overlap: 3.5rem;
 }
 
@@ -16,8 +37,9 @@
 }
 
 .card-wrapper {
-  @apply relative transition-transform duration-150;
+  @apply relative;
   transform-origin: 50% 100%; /* rotate around card bottom-center */
+  transition: transform 250ms ease-in-out;
 }
 
 .card-wrapper:not(:first-child) {
@@ -48,4 +70,18 @@
 
 .card-selected {
   @apply cursor-pointer ring-2 ring-orange-500 transition-transform;
+}
+
+/* ─── Play-exit animation ─────────────────────────────────────────────────── */
+/* Applied to the card SVG (not the wrapper) so it layers on top of the fan   */
+/* transform without interfering with wrapper's transform-origin rotation.     */
+@keyframes card-play-exit {
+  0%   { transform: scale(1)    translateY(0);       opacity: 1; }
+  20%  { transform: scale(1.06) translateY(-0.75rem); opacity: 1; }
+  100% { transform: scale(0.8)  translateY(-5rem);   opacity: 0; }
+}
+
+.card-playing {
+  animation: card-play-exit 0.4s ease-in forwards;
+  pointer-events: none;
 }

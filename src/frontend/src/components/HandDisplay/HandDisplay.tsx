@@ -12,6 +12,8 @@ interface HandDisplayProps {
   selectionMode?: boolean;
   selectedCardIds?: Set<number>;
   maxSelection?: number;
+  /** Card currently being played (shows fly-out animation). */
+  playingCardId?: number | null;
 }
 
 /** Rotation angle for card at `index` in a hand of `total` cards. */
@@ -31,7 +33,7 @@ function getCardTransform(index: number, total: number, isSelected: boolean): st
   const angle = getFanAngle(index, total);
   const outerAngle = getFanAngle(total - 1, total); // positive max angle
   const arcDrop = outerAngle > 0
-    ? ARC_DEPTH_REM * Math.pow(angle / outerAngle, 2)
+    ? ARC_DEPTH_REM * Math.pow(angle / outerAngle, 2) + (Math.abs(angle / outerAngle) * (SELECTED_LIFT_REM / 2))
     : 0;
   const totalY = arcDrop - (isSelected ? SELECTED_LIFT_REM : 0);
   return `translateY(${totalY.toFixed(3)}rem) rotate(${angle.toFixed(2)}deg)`;
@@ -42,13 +44,12 @@ function getCardClass(
   isSelected: boolean,
   canSelect: boolean,
   clickable: boolean,
+  isPlaying: boolean,
 ): string {
-  if (selectionMode) {
-    if (isSelected) return 'card card-selected';
-    if (canSelect) return 'card card-selectable';
-    return 'card card-unplayable';
-  }
-  return `card ${clickable ? 'card-playable' : 'card-unplayable'}`;
+  const base = selectionMode
+    ? (isSelected ? 'card card-selected' : canSelect ? 'card card-selectable' : 'card card-unplayable')
+    : `card ${clickable ? 'card-playable' : 'card-unplayable'}`;
+  return isPlaying ? `${base} card-playing` : base;
 }
 
 export function HandDisplay({
@@ -59,6 +60,7 @@ export function HandDisplay({
   selectionMode = false,
   selectedCardIds,
   maxSelection,
+  playingCardId,
 }: HandDisplayProps) {
   return (
     <div className="hand">
@@ -66,6 +68,7 @@ export function HandDisplay({
         const isSelected = selectedCardIds?.has(card.id) ?? false;
         const canSelect = selectionMode && (isSelected || (selectedCardIds?.size ?? 0) < (maxSelection ?? Infinity));
         const clickable = selectionMode ? canSelect : (isMyTurn && legalCardIds.has(card.id));
+        const isPlaying = playingCardId === card.id;
         const CardSvg = cardSvgComponent(card.suit, card.rank);
 
         return (
@@ -75,8 +78,8 @@ export function HandDisplay({
             style={{ zIndex: i, transform: getCardTransform(i, cards.length, isSelected) }}
           >
             <CardSvg
-              onClick={() => clickable && onCardClick(card)}
-              className={getCardClass(selectionMode, isSelected, canSelect, clickable)}
+              onClick={() => clickable && !isPlaying && onCardClick(card)}
+              className={getCardClass(selectionMode, isSelected, canSelect, clickable, isPlaying)}
             />
           </div>
         );

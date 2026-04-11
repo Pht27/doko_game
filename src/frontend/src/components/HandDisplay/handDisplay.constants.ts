@@ -5,7 +5,7 @@ export const FAN_SPREAD_DEG = 30;
 export const MAX_CARD_ANGLE_DEG = 4;
 
 /** Vertical drop (rem) at the outermost card. Controls arc curvature. */
-export const ARC_DEPTH_REM = 2;
+export const ARC_DEPTH_REM = 1;
 
 /** How much (rem) a selected card lifts above the arc. */
 export const SELECTED_LIFT_REM = 1.25;

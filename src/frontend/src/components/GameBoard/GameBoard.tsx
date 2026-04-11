@@ -139,8 +139,13 @@ export function GameBoard({
         />
       </div>
 
-      {/* Hand */}
-      <div className="pb-2">
+      {/* Loading / error feedback above the hand */}
+      {viewLoading && <div className="text-center text-white/40 text-xs py-1">{t.loading}</div>}
+      {viewError && <div className="text-center text-red-400 text-xs py-1">{viewError}</div>}
+
+      {/* Hand — .hand-container clips the bottom half of the cards so they
+           appear to rise from below the table edge (see HandDisplay.css) */}
+      <div className="hand-container">
         {view && (
           <HandDisplay
             cards={view.handSorted}
@@ -150,10 +155,9 @@ export function GameBoard({
             selectionMode={view.shouldReturnArmutCards}
             selectedCardIds={actions.armutReturnSelected}
             maxSelection={view.armutCardReturnCount ?? undefined}
+            playingCardId={actions.playingCardId}
           />
         )}
-        {viewLoading && <div className="text-center text-white/40 text-xs py-1">{t.loading}</div>}
-        {viewError && <div className="text-center text-red-400 text-xs py-1">{viewError}</div>}
       </div>
 
       {/* Overlays */}
