@@ -22,6 +22,8 @@ public sealed class GegengenscherdamenSonderkarte : SonderkarteBase
         && !IsWindowClosed(state, SonderkarteType.Gegengenscherdamen)
         && OriginallyHeldBoth(state, KaroDame);
 
-    protected override GameStateModification? ExtraEffects(GameState state, ISonderkarteInputProvider inputs) =>
-        new SetGenscherPartnerModification(state.CurrentTurn, inputs.GetGenscherPartner());
+    protected override GameStateModification? ExtraEffects(
+        GameState state,
+        ISonderkarteInputProvider inputs
+    ) => new SetGenscherPartnerModification(state.CurrentTurn, inputs.GetGenscherPartner());
 }

@@ -165,8 +165,9 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
         int? armutCardReturnCount = shouldReturnArmutCards ? state.ArmutTransferCount : null;
 
         // Armut exchange announcement — shown to all players after exchange completes
-        int? armutExchangeCardCount =
-            state.ArmutReturnedTrump.HasValue ? state.ArmutTransferCount : null;
+        int? armutExchangeCardCount = state.ArmutReturnedTrump.HasValue
+            ? state.ArmutTransferCount
+            : null;
         bool? armutReturnedTrump = state.ArmutReturnedTrump;
 
         return new PlayerGameView(

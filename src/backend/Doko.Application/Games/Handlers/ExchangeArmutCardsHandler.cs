@@ -58,7 +58,14 @@ public sealed class ExchangeArmutCardsHandler(
             validCardsResult
         );
 
-        ApplyHandUpdates(state, command.RichPlayer, poorPlayer, newRichHand, newPoorHand, returnedTrumpCount);
+        ApplyHandUpdates(
+            state,
+            command.RichPlayer,
+            poorPlayer,
+            newRichHand,
+            newPoorHand,
+            returnedTrumpCount
+        );
 
         var startingPlayer = FindStartingPlayer(state, command.RichPlayer, poorPlayer);
         state.Apply(new AdvancePhaseModification(GamePhase.Playing));
@@ -87,7 +94,10 @@ public sealed class ExchangeArmutCardsHandler(
     /// Resolves the card objects for the given IDs from the rich player's hand.
     /// Returns null if any ID is not found.
     /// </summary>
-    private static List<Card>? ResolveCardsToReturn(GameState state, ExchangeArmutCardsCommand command)
+    private static List<Card>? ResolveCardsToReturn(
+        GameState state,
+        ExchangeArmutCardsCommand command
+    )
     {
         var richHand = state.Players.First(p => p.Id == command.RichPlayer).Hand;
         var cards = command
@@ -137,11 +147,15 @@ public sealed class ExchangeArmutCardsHandler(
     /// <summary>
     /// Finds the first player to the left of the rich player who is not in the rich party.
     /// </summary>
-    private static PlayerId FindStartingPlayer(GameState state, PlayerId richPlayer, PlayerId poorPlayer)
+    private static PlayerId FindStartingPlayer(
+        GameState state,
+        PlayerId richPlayer,
+        PlayerId poorPlayer
+    )
     {
         var richSeat = (int)state.Players.First(p => p.Id == richPlayer).Seat;
-        return state.Players
-            .OrderBy(p => ((int)p.Seat - richSeat - 1 + 4) % 4)
+        return state
+            .Players.OrderBy(p => ((int)p.Seat - richSeat - 1 + 4) % 4)
             .First(p => p.Id != richPlayer && p.Id != poorPlayer)
             .Id;
     }

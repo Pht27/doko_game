@@ -28,7 +28,12 @@ public class ExchangeArmutCardsHandlerTests
         // Start in ArmutPartnerFinding so ArmutGiveTrumpsModification can fire
         var players = new[]
         {
-            new PlayerState(AppB.P0, PlayerSeat.First, AppB.HandOf(Trump1, Trump2, NonTrump0), null),
+            new PlayerState(
+                AppB.P0,
+                PlayerSeat.First,
+                AppB.HandOf(Trump1, Trump2, NonTrump0),
+                null
+            ),
             new PlayerState(AppB.P1, PlayerSeat.Second, AppB.HandOf(NonTrump1), null),
             new PlayerState(AppB.P2, PlayerSeat.Third, AppB.HandOf(NonTrump2), null),
             new PlayerState(AppB.P3, PlayerSeat.Fourth, AppB.HandOf(NonTrump3), null),
@@ -169,7 +174,9 @@ public class ExchangeArmutCardsHandlerTests
         var (repo, pub, id) = await ArmutCardExchangeGame();
         var useCase = new ExchangeArmutCardsHandler(repo, pub);
 
-        await useCase.ExecuteAsync(new ExchangeArmutCardsCommand(id, AppB.P1, [Trump1.Id, Trump2.Id]));
+        await useCase.ExecuteAsync(
+            new ExchangeArmutCardsCommand(id, AppB.P1, [Trump1.Id, Trump2.Id])
+        );
 
         var state = await repo.GetAsync(id);
         state!.CurrentTurn.Should().Be(AppB.P2);

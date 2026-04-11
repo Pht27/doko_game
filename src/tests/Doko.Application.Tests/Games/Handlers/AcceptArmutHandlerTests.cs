@@ -26,7 +26,12 @@ public class AcceptArmutHandlerTests
 
         var players = new[]
         {
-            new PlayerState(AppB.P0, PlayerSeat.First, AppB.HandOf(Trump1, Trump2, NonTrump0), null),
+            new PlayerState(
+                AppB.P0,
+                PlayerSeat.First,
+                AppB.HandOf(Trump1, Trump2, NonTrump0),
+                null
+            ),
             new PlayerState(AppB.P1, PlayerSeat.Second, AppB.HandOf(NonTrump1), null),
             new PlayerState(AppB.P2, PlayerSeat.Third, AppB.HandOf(NonTrump2), null),
             new PlayerState(AppB.P3, PlayerSeat.Fourth, AppB.HandOf(NonTrump3), null),

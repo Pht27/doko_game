@@ -22,6 +22,8 @@ public sealed class SchweinSonderkarte : SonderkarteBase
         && !IsWindowClosed(state, SonderkarteType.Schweinchen)
         && OriginallyHeldBoth(state, KaroAss);
 
-    protected override GameStateModification? ExtraEffects(GameState state, ISonderkarteInputProvider inputs) =>
-        new RebuildTrumpEvaluatorModification();
+    protected override GameStateModification? ExtraEffects(
+        GameState state,
+        ISonderkarteInputProvider inputs
+    ) => new RebuildTrumpEvaluatorModification();
 }

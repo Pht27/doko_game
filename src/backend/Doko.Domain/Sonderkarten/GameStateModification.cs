@@ -103,8 +103,10 @@ public sealed record AddCompletedTrickModification(Tricks.Trick Trick, Scoring.T
 /// playing player has chosen a partner. GameState.Apply creates the GenscherPartyResolver
 /// internally, so the Application layer does not need to know about it.
 /// </summary>
-public sealed record SetGenscherPartnerModification(Players.PlayerId Genscher, Players.PlayerId Partner)
-    : GameStateModification;
+public sealed record SetGenscherPartnerModification(
+    Players.PlayerId Genscher,
+    Players.PlayerId Partner
+) : GameStateModification;
 
 /// <summary>Appends an announcement to the game state.</summary>
 public sealed record AddAnnouncementModification(Announcements.Announcement Announcement)

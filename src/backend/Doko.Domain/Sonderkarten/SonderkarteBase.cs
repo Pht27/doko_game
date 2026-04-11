@@ -18,7 +18,10 @@ public abstract class SonderkarteBase : ISonderkarte
     /// result of <see cref="ExtraEffects"/> when non-null. Not overridable — override
     /// <see cref="ExtraEffects"/> instead.
     /// </summary>
-    public IReadOnlyList<GameStateModification> Apply(GameState state, ISonderkarteInputProvider inputs)
+    public IReadOnlyList<GameStateModification> Apply(
+        GameState state,
+        ISonderkarteInputProvider inputs
+    )
     {
         var extra = ExtraEffects(state, inputs);
         return extra is null
@@ -32,7 +35,10 @@ public abstract class SonderkarteBase : ISonderkarte
     /// Interactive sonderkarten (Genscherdamen, Gegengenscherdamen) use <paramref name="inputs"/>
     /// to read the player's choice.
     /// </summary>
-    protected virtual GameStateModification? ExtraEffects(GameState state, ISonderkarteInputProvider inputs) => null;
+    protected virtual GameStateModification? ExtraEffects(
+        GameState state,
+        ISonderkarteInputProvider inputs
+    ) => null;
 
     /// <summary>
     /// Returns true if the current player's initial hand contained at least two copies of

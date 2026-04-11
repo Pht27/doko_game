@@ -1,0 +1,1 @@
+now the hand display overflow is cut off at the top also, so when i play on pc and a selected card gets emphasized its cut off.
