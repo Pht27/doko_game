@@ -1,6 +1,10 @@
+import { useState, useEffect } from 'react';
 import type { CardDto } from '../../types/api';
 import { cardSvgComponent } from '../../api/cards';
-import { FAN_SPREAD_DEG, MAX_CARD_ANGLE_DEG, ARC_DEPTH_REM, SELECTED_LIFT_REM } from './handDisplay.constants';
+import {
+  FAN_SPREAD_DEG, MAX_CARD_ANGLE_DEG, ARC_DEPTH_REM, SELECTED_LIFT_REM,
+  MOBILE_CARD_STEP_REM, TABLET_CARD_STEP_REM, TABLET_BREAKPOINT_PX,
+} from './handDisplay.constants';
 import '../../styles/HandDisplay.css';
 
 interface HandDisplayProps {
@@ -16,6 +20,21 @@ interface HandDisplayProps {
   playingCardId?: number | null;
 }
 
+/** Returns the horizontal step (rem) between adjacent card centers for the current viewport. */
+function useCardStep(): number {
+  const [step, setStep] = useState(
+    window.innerWidth >= TABLET_BREAKPOINT_PX ? TABLET_CARD_STEP_REM : MOBILE_CARD_STEP_REM,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia(`(min-width: ${TABLET_BREAKPOINT_PX}px)`);
+    const handler = (e: MediaQueryListEvent) =>
+      setStep(e.matches ? TABLET_CARD_STEP_REM : MOBILE_CARD_STEP_REM);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+  return step;
+}
+
 /** Rotation angle for card at `index` in a hand of `total` cards. */
 function getFanAngle(index: number, total: number): number {
   if (total <= 1) return 0;
@@ -26,17 +45,24 @@ function getFanAngle(index: number, total: number): number {
 
 /**
  * Full CSS transform for a card.
- * Outer cards drop along a parabolic arc; selected cards lift above it.
- * Order: translateY first (page space), then rotate around card's bottom-center.
+ * All positioning (X fan offset, parabolic arc drop, rotation) is encoded here
+ * so that every change animates via the single `transition: transform` on .card-wrapper.
+ *
+ * Assuming .card-wrapper is `position: absolute; left: 50%`:
+ *   translateX(xOffset - 50%)  →  positions card center at `xOffset` from the hand's midpoint
+ *   translateY(arcDrop)        →  drops outer cards along the parabolic arc
+ *   rotate(angle)              →  fans the card around its bottom-center (transform-origin)
  */
-function getCardTransform(index: number, total: number, isSelected: boolean): string {
+function getCardTransform(index: number, total: number, isSelected: boolean, cardStep: number): string {
   const angle = getFanAngle(index, total);
   const outerAngle = getFanAngle(total - 1, total); // positive max angle
   const arcDrop = outerAngle > 0
     ? ARC_DEPTH_REM * Math.pow(angle / outerAngle, 2) + (Math.abs(angle / outerAngle) * (SELECTED_LIFT_REM / 2))
     : 0;
   const totalY = arcDrop - (isSelected ? SELECTED_LIFT_REM : 0);
-  return `translateY(${totalY.toFixed(3)}rem) rotate(${angle.toFixed(2)}deg)`;
+  const xOffset = (index - (total - 1) / 2) * cardStep;
+  // calc() mixes rem (fan position) and % (card's own half-width) to center the card on xOffset.
+  return `translateX(calc(${xOffset.toFixed(3)}rem - 50%)) translateY(${totalY.toFixed(3)}rem) rotate(${angle.toFixed(2)}deg)`;
 }
 
 function getCardClass(
@@ -62,6 +88,8 @@ export function HandDisplay({
   maxSelection,
   playingCardId,
 }: HandDisplayProps) {
+  const cardStep = useCardStep();
+
   return (
     <div className="hand">
       {cards.map((card, i) => {
@@ -75,7 +103,7 @@ export function HandDisplay({
           <div
             key={card.id}
             className="card-wrapper"
-            style={{ zIndex: i, transform: getCardTransform(i, cards.length, isSelected) }}
+            style={{ zIndex: i, transform: getCardTransform(i, cards.length, isSelected, cardStep) }}
           >
             <CardSvg
               onClick={() => clickable && !isPlaying && onCardClick(card)}

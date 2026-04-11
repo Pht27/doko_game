@@ -40,10 +40,9 @@
 }
 
 /* ── Card image (inner — handles face/back and scale animation) ───────────── */
-@keyframes trick-card-appear {
-  0%   { transform: scale(0.6); opacity: 0; }
-  60%  { transform: scale(1.1); opacity: 1; }
-  100% { transform: scale(1);   opacity: 1; }
+@keyframes trick-card-fly-in {
+  0%   { transform: translate(var(--fly-from-x, 0px), var(--fly-from-y, 0px)); opacity: 0; }
+  100% { transform: translate(0, 0); opacity: 1; }
 }
 
 .trick-card {
@@ -53,7 +52,7 @@
   border-radius: 0.25rem;
   box-shadow:    0 4px 12px rgba(0, 0, 0, 0.5);
   transform-origin: center;
-  animation: trick-card-appear 0.3s ease-out forwards;
+  animation: trick-card-fly-in 0.2s ease-out forwards;
 }
 
 .trick-card-mine {

@@ -3,6 +3,7 @@ import type { PlayerGameViewResponse, TrickSummaryDto } from '../types/api';
 import type { AnimPhase } from '../components/TrickArea/TrickArea';
 
 const NEXT: Record<string, AnimPhase> = {
+  appear: 'winner',
   winner: 'flip',
   flip:   'stack',
   stack:  'fly',
@@ -10,6 +11,7 @@ const NEXT: Record<string, AnimPhase> = {
 };
 
 const DURATION: Record<string, number> = {
+  appear: 300, // matches trick-card-appear animation duration
   winner: 2200,
   flip:   100,
   stack:  700,
@@ -45,7 +47,7 @@ export function useTrickAnimation(view: PlayerGameViewResponse | null): TrickAni
       const justCompleted = view.completedTricks[count - 1];
       if (justCompleted?.winner != null) {
         setAnimTrick(justCompleted);
-        setAnimPhase('winner');
+        setAnimPhase('appear');
       }
     }
     prevCompletedCountRef.current = count;

@@ -1,3 +1,4 @@
+import React from 'react';
 import type { CSSProperties } from 'react';
 import type { TrickSummaryDto } from '../../types/api';
 import { Card } from '../Card/Card';
@@ -11,7 +12,7 @@ import {
 } from './trickArea.constants';
 import '../../styles/TrickArea.css';
 
-export type AnimPhase = 'winner' | 'flip' | 'stack' | 'fly' | null;
+export type AnimPhase = 'appear' | 'winner' | 'flip' | 'stack' | 'fly' | null;
 
 interface TrickAreaProps {
   trick: TrickSummaryDto | null;
@@ -23,6 +24,13 @@ interface TrickAreaProps {
   /** Seat of the trick winner — used to determine fly-away direction */
   winnerSeat?: 'bottom' | 'left' | 'top' | 'right';
 }
+
+const FLY_FROM: Record<'bottom' | 'left' | 'top' | 'right', { x: string; y: string }> = {
+  bottom: { x: '0px',     y: '1rem'  },
+  top:    { x: '0px',     y: '-1rem' },
+  left:   { x: '-1rem',   y: '0px'   },
+  right:  { x: '1rem',    y: '0px'   },
+};
 
 /**
  * Deterministic tilt — pure hash of player + cardId so it never changes on re-render.
@@ -119,13 +127,20 @@ export function TrickArea({ trick, requestingPlayer, seatOf, animPhase = null, w
           ? trick.cards.length + 1
           : index + 1;
 
+        const flyFrom = FLY_FROM[seat];
+
         return (
           <span
             key={card.id}
             className={posClass}
             style={{ zIndex, transform: posTransform }}
           >
-            <Card card={card} faceDown={isFlipped} className={imgClass} />
+            <Card
+              card={card}
+              faceDown={isFlipped}
+              className={imgClass}
+              style={{ '--fly-from-x': flyFrom.x, '--fly-from-y': flyFrom.y } as React.CSSProperties}
+            />
           </span>
         );
       })}

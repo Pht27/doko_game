@@ -1,10 +1,5 @@
 @reference "./index.css";
 
-/* ─── Layout variables ───────────────────────────────────────────────────────
-   --card-overlap : how much adjacent cards slide under each other horizontally
-   Fan arc, lift, and spread are JS constants in HandDisplay.tsx.
-   ─────────────────────────────────────────────────────────────────────────── */
-
 /*
   .hand-container clips the bottom portion of cards so they appear to rise
   from below the table edge.  Height = amount of card that stays VISIBLE.
@@ -28,24 +23,25 @@
 }
 
 .hand {
-  @apply flex items-end justify-center px-4 overflow-visible;
-  --card-overlap: 3.5rem;
+  /* All card positioning is done via transform in JS so that layout changes
+     animate via the single `transition: transform` on .card-wrapper.
+     Height must match the card height so `bottom: 0` aligns correctly. */
+  @apply relative overflow-visible;
+  height: 8rem; /* mobile: matches .card h-32 */
 }
 
 @media (min-width: 640px) {
   .hand {
-    --card-overlap: 5.3rem;
+    height: 12rem; /* tablet: matches .card 12rem */
   }
 }
 
 .card-wrapper {
-  @apply relative;
+  @apply absolute;
+  left: 50%;   /* anchor point; X fan offset applied via transform */
+  bottom: 0;
   transform-origin: 50% 100%; /* rotate around card bottom-center */
   transition: transform 250ms ease-in-out;
-}
-
-.card-wrapper:not(:first-child) {
-  margin-left: calc(-1 * var(--card-overlap));
 }
 
 .card {
