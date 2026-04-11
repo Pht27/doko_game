@@ -300,7 +300,7 @@ ExtrapunktRegistry
 |---|---|---|
 | `TrickResult` | record | `(Trick Trick, PlayerId Winner, IReadOnlyList<ExtrapunktAward> Awards)` |
 | `CompletedGame` | record | `(GameState FinalState, IReadOnlyList<TrickResult> Tricks)` |
-| `GameResult` | record | `(Party Winner, int RePoints, int KontraPoints, int GameValue, IReadOnlyList<ExtrapunktAward> AllAwards, bool Feigheit)` |
+| `GameResult` | record | `(Party Winner, int ReAugen, int KontraAugen, int GameValue, IReadOnlyList<ExtrapunktAward> AllAwards, bool Feigheit)` |
 
 #### Interface and Default Implementation
 

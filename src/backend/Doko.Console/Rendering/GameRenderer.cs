@@ -99,8 +99,8 @@ public sealed class GameRenderer
         System.Console.WriteLine("╚══════════════════════════════╝");
         System.Console.WriteLine();
         System.Console.WriteLine($"  Winner:        {result.Winner}");
-        System.Console.WriteLine($"  Re points:     {result.RePoints}");
-        System.Console.WriteLine($"  Kontra points: {result.KontraPoints}");
+        System.Console.WriteLine($"  Re points:     {result.ReAugen}");
+        System.Console.WriteLine($"  Kontra points: {result.KontraAugen}");
         System.Console.WriteLine($"  Game value:    {result.GameValue}");
         if (result.Feigheit)
             System.Console.WriteLine("  *** Feigheit! ***");

@@ -6,8 +6,8 @@ public record GameValueComponentDto(string Label, int Value);
 
 public record GameResultDto(
     string Winner,
-    int RePoints,
-    int KontraPoints,
+    int ReAugen,
+    int KontraAugen,
     int GameValue,
     IReadOnlyList<ExtrapunktAwardDto> AllAwards,
     bool Feigheit,

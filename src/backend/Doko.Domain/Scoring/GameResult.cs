@@ -7,8 +7,8 @@ public record GameValueComponent(string Label, int Value);
 
 public record GameResult(
     Party Winner,
-    int RePoints,
-    int KontraPoints,
+    int ReAugen,
+    int KontraAugen,
     int GameValue,
     IReadOnlyList<ExtrapunktAward> AllAwards,
     bool Feigheit,

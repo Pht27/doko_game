@@ -26,8 +26,8 @@ public class GameScorerTests
         var result = Sut.Score(new CompletedGame(state, tricks));
 
         result.Winner.Should().Be(Party.Re);
-        result.RePoints.Should().Be(132);
-        result.KontraPoints.Should().Be(44);
+        result.ReAugen.Should().Be(132);
+        result.KontraAugen.Should().Be(44);
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class GameScorerTests
         var result = Sut.Score(new CompletedGame(state, tricks));
 
         result.Winner.Should().Be(Party.Kontra);
-        result.RePoints.Should().Be(0);
+        result.ReAugen.Should().Be(0);
     }
 
     // ── gameValue components ──────────────────────────────────────────────────
@@ -66,7 +66,7 @@ public class GameScorerTests
         var result = Sut.Score(new CompletedGame(state, tricks));
 
         result.Winner.Should().Be(Party.Re);
-        result.KontraPoints.Should().Be(132); // ≥ 90
+        result.KontraAugen.Should().Be(132); // ≥ 90
         result.GameValue.Should().Be(1); // only Gewonnen
     }
 
@@ -105,7 +105,7 @@ public class GameScorerTests
         var result = Sut.Score(new CompletedGame(state, tricks));
 
         result.Winner.Should().Be(Party.Re);
-        result.KontraPoints.Should().Be(44);
+        result.KontraAugen.Should().Be(44);
         // gameValue = 1 (Gewonnen) + 1 (Keine90) + 1 (Keine60) = 3; 44≥30 so no Keine30
         result.GameValue.Should().Be(3);
     }
@@ -125,7 +125,7 @@ public class GameScorerTests
         var result = Sut.Score(new CompletedGame(state, tricks));
 
         result.Winner.Should().Be(Party.Re);
-        result.KontraPoints.Should().Be(0);
+        result.KontraAugen.Should().Be(0);
         // gameValue = 1 + 1(Keine90) + 1(Keine60) + 1(Keine30) + 1(Schwarz) = 5
         result.GameValue.Should().Be(5);
     }
@@ -150,7 +150,7 @@ public class GameScorerTests
         var result = Sut.Score(new CompletedGame(state, tricks));
 
         result.Winner.Should().Be(Party.Re);
-        result.KontraPoints.Should().Be(132); // ≥ 90
+        result.KontraAugen.Should().Be(132); // ≥ 90
         // gameValue = 1 (Gewonnen) + 1 (announcement) = 2
         result.GameValue.Should().Be(2);
     }
@@ -290,8 +290,8 @@ public class GameScorerTests
         };
         var result = Sut.Score(new CompletedGame(state, tricks));
 
-        result.RePoints.Should().Be(22); // ♣A = 11 + 11 (absorbed ♦A points)
-        result.KontraPoints.Should().Be(0); // ♦A = 0 (transferred away)
+        result.ReAugen.Should().Be(22); // ♣A = 11 + 11 (absorbed ♦A points)
+        result.KontraAugen.Should().Be(0); // ♦A = 0 (transferred away)
     }
 
     // ── SoloFactor + TotalScore ───────────────────────────────────────────────

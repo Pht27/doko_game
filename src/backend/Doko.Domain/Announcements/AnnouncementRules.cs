@@ -108,7 +108,7 @@ public static class AnnouncementRules
             return false;
 
         var winner = result.Winner;
-        var loserAugen = winner == Party.Re ? result.KontraPoints : result.RePoints;
+        var loserAugen = winner == Party.Re ? result.KontraAugen : result.ReAugen;
 
         var winnerAnnounced = state
             .Announcements.Where(a => state.PartyResolver.ResolveParty(a.Player, state) == winner)

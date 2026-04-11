@@ -69,8 +69,8 @@ public static class DtoMapper
     public static GameResultDto ToDto(GameResult r) =>
         new(
             r.Winner.ToString(),
-            r.RePoints,
-            r.KontraPoints,
+            r.ReAugen,
+            r.KontraAugen,
             r.GameValue,
             r.AllAwards.Select(ToDto).ToList(),
             r.Feigheit,

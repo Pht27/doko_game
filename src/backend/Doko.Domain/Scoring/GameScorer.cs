@@ -181,8 +181,8 @@ public sealed class GameScorer : IGameScorer
         var provisionalWinner = provisionalResult.Winner;
         int loserAugen =
             provisionalWinner == Party.Re
-                ? provisionalResult.KontraPoints
-                : provisionalResult.RePoints;
+                ? provisionalResult.KontraAugen
+                : provisionalResult.ReAugen;
 
         var winnerAnnounced = state
             .Announcements.Where(a =>
