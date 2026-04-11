@@ -40,3 +40,6 @@ appsettings.Development.json
 # OS
 .DS_Store
 Thumbs.db
+
+# Todos
+docs/todos/*
