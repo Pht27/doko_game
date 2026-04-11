@@ -15,13 +15,15 @@
   issues that cause overflow:hidden on ancestors to be ignored on mobile.
 */
 .hand-container {
-  height: 4rem;
+  margin-top: -1.5rem;
+  padding-top: 1.5rem;
+  height: 5.5rem; /* 4rem visible card + 1.5rem lift buffer (border-box) */
   overflow: hidden;
 }
 
 @media (min-width: 640px) {
   .hand-container {
-    height: 6rem;
+    height: 7.5rem; /* 6rem visible card + 1.5rem lift buffer (border-box) */
   }
 }
 
