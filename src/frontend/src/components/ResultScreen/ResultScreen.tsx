@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom';
 import type { GameResultDto } from '../../types/api';
 import { t } from '../../translations';
 import '../../styles/ResultScreen.css';
@@ -8,7 +9,7 @@ interface ResultScreenProps {
 }
 
 export function ResultScreen({ result, onNewGame }: ResultScreenProps) {
-  return (
+  return createPortal(
     <div className="result-overlay">
       <div className="result-screen">
         <h2 className="result-title">
@@ -98,6 +99,7 @@ export function ResultScreen({ result, onNewGame }: ResultScreenProps) {
           {t.neuesSpiel}
         </button>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

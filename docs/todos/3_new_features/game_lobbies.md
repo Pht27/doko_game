@@ -5,3 +5,5 @@ I only know the idea from playing games myself and do not know how complicated i
 So what Im picturing is: You load the website and have 2 options. One is to start a game where noone can join and you can play every player (via playerSwitcher). Kind of a test game (maybe we can hind that behind a feature flag to be only visible in the test environment)
 
 The other option is to create a lobby, where you will be waiting for 3 other players. When 3 other players join you can press start game and a game commences.
+
+We should also think about what that means for the frontend, what components are there, how do you get there, what gets shown where.
