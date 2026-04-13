@@ -5,6 +5,8 @@ import { useGameActions } from './hooks/useGameActions';
 import { GameBoard } from './components/GameBoard/GameBoard';
 import { GameLoader } from './components/GameLoader';
 
+const PLAYER_SWITCHING_ENABLED = true;
+
 function App() {
   const { session, activePlayer, error: initError, loading: initLoading, setActivePlayer, restart } = useHotSeat();
 
@@ -16,7 +18,7 @@ function App() {
 
   const { animTrick, animPhase } = useTrickAnimation(view);
 
-  const actions = useGameActions(session, activePlayer, setActivePlayer, view, refetch);
+  const actions = useGameActions(session, activePlayer, view, refetch);
 
   if (!session) {
     return <GameLoader loading={initLoading} error={initError} onRetry={restart} />;
@@ -32,6 +34,7 @@ function App() {
       finishedResult={finishedResult}
       viewLoading={viewLoading}
       viewError={viewError}
+      allowPlayerSwitching={PLAYER_SWITCHING_ENABLED}
       onPlayerSwitch={setActivePlayer}
       onNewGame={restart}
     />

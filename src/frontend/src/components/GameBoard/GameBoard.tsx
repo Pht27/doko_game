@@ -2,7 +2,6 @@ import type { PlayerGameViewResponse, GameResultDto, TrickSummaryDto } from '../
 import type { AnimPhase } from '../TrickArea/TrickArea';
 import type { GameActions } from '../../hooks/useGameActions';
 import { GameInfo } from '../shared/GameInfo';
-import { PlayerSwitcher } from '../shared/PlayerSwitcher';
 import { PlayerLabel } from '../shared/PlayerLabel';
 import { OwnPartyLabel } from '../shared/OwnPartyLabel';
 import { HandDisplay } from '../HandDisplay/HandDisplay';
@@ -22,6 +21,7 @@ interface GameBoardProps {
   finishedResult: GameResultDto | null;
   viewLoading: boolean;
   viewError: string | null;
+  allowPlayerSwitching: boolean;
   onPlayerSwitch: (player: number) => void;
   onNewGame: () => void;
 }
@@ -41,6 +41,7 @@ export function GameBoard({
   finishedResult,
   viewLoading,
   viewError,
+  allowPlayerSwitching,
   onPlayerSwitch,
   onNewGame,
 }: GameBoardProps) {
@@ -58,9 +59,9 @@ export function GameBoard({
 
   return (
     <div className="w-full h-full relative flex flex-col bg-[#1a1a2e] select-none overflow-hidden">
-      {/* Floating top-left: game info */}
+      {/* Floating top-right: game info */}
       {view && (
-        <div className="absolute top-2 left-2 z-10">
+        <div className="absolute top-2 right-2 z-10">
           <GameInfo
             phase={view.phase}
             trickNumber={(view.currentTrick?.trickNumber ?? 0) + 1}
@@ -68,11 +69,6 @@ export function GameBoard({
           />
         </div>
       )}
-
-      {/* Floating top-right: player switcher */}
-      <div className="absolute top-2 right-2 z-10">
-        <PlayerSwitcher activePlayer={activePlayer} onSwitch={onPlayerSwitch} />
-      </div>
 
       {/* Armut exchange info banner */}
       {view?.armutExchangeCardCount != null && view.armutReturnedTrump != null && (
@@ -91,6 +87,7 @@ export function GameBoard({
               player={topOpponent}
               isCurrentTurn={view?.currentTurn === topOpponent.id}
               orientation="top"
+              onClick={allowPlayerSwitching ? () => onPlayerSwitch(topOpponent.id) : undefined}
             />
           )}
         </div>
@@ -102,6 +99,7 @@ export function GameBoard({
               player={leftOpponent}
               isCurrentTurn={view?.currentTurn === leftOpponent.id}
               orientation="left"
+              onClick={allowPlayerSwitching ? () => onPlayerSwitch(leftOpponent.id) : undefined}
             />
           ) : <div />}
 
@@ -120,6 +118,7 @@ export function GameBoard({
               player={rightOpponent}
               isCurrentTurn={view?.currentTurn === rightOpponent.id}
               orientation="right"
+              onClick={allowPlayerSwitching ? () => onPlayerSwitch(rightOpponent.id) : undefined}
             />
           ) : <div />}
         </div>

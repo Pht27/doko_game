@@ -44,3 +44,7 @@
 .player-party-unknown {
   @apply bg-white/20;
 }
+
+.player-label-clickable {
+  @apply cursor-pointer hover:bg-white/10 hover:scale-105 transition-transform;
+}

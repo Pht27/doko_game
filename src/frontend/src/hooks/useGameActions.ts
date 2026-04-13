@@ -24,7 +24,6 @@ export interface GameActions {
 export function useGameActions(
   session: HotSeatSession | null,
   activePlayer: number,
-  setActivePlayer: (player: number) => void,
   view: PlayerGameViewResponse | null,
   refetch: () => void,
 ): GameActions {
@@ -78,7 +77,6 @@ export function useGameActions(
     setActionError(null);
     try {
       await declareHealth(token, gameId, { hasVorbehalt });
-      setActivePlayer((activePlayer + 1) % 4);
       refetch();
     } catch (e) {
       setActionError(e instanceof Error ? e.message : String(e));
@@ -89,7 +87,6 @@ export function useGameActions(
     setActionError(null);
     try {
       await makeReservation(token, gameId, { reservation, hochzeitCondition, armutPartner });
-      setActivePlayer((activePlayer + 1) % 4);
       refetch();
     } catch (e) {
       setActionError(e instanceof Error ? e.message : String(e));
@@ -100,7 +97,6 @@ export function useGameActions(
     setActionError(null);
     try {
       await respondToArmut(token, gameId, { accepts });
-      setActivePlayer((activePlayer + 1) % 4);
       refetch();
     } catch (e) {
       setActionError(e instanceof Error ? e.message : String(e));
