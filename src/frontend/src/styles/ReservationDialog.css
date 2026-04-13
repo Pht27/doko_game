@@ -2,11 +2,13 @@
 @reference "./index.css";
 
 .rd-dialog {
-  @apply bg-gray-800/95 rounded-2xl shadow-2xl border border-white/10 flex flex-col w-full max-w-sm overflow-hidden mb-4;
+  @apply bg-gray-800/95 rounded-2xl shadow-2xl border border-white/10 flex flex-col w-full max-w-sm overflow-hidden;
+  /* Never taller than the usable viewport minus space for hand + top player */
+  max-height: calc(100svh - 10rem);
 }
 
 .rd-header {
-  @apply flex items-center justify-between px-4 py-3 border-b border-white/10;
+  @apply flex items-center justify-between px-4 py-3 border-b border-white/10 flex-shrink-0;
 }
 
 .rd-title {
@@ -18,16 +20,16 @@
 }
 
 .rd-body {
-  @apply flex min-h-0;
+  @apply flex min-h-0 flex-1 overflow-hidden;
 }
 
 /* Left column: category tabs */
 .rd-left {
-  @apply flex flex-col gap-1 p-2 border-r border-white/10 min-w-[108px];
+  @apply flex flex-col gap-1 p-2 border-r border-white/10 min-w-[108px] overflow-y-auto;
 }
 
 .rd-cat-btn {
-  @apply w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
+  @apply w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-colors flex-shrink-0
     text-white/50 hover:text-white/80 hover:bg-white/8 active:bg-white/12;
 }
 
@@ -38,7 +40,6 @@
 /* Right column: detail options */
 .rd-right {
   @apply flex flex-col gap-1 p-2 flex-1 overflow-y-auto;
-  max-height: 260px;
 }
 
 .rd-detail-btn {
