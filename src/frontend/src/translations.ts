@@ -19,8 +19,15 @@ export const t = {
   // ── ReservationDialog ──────────────────────────────────────────────────────
   reservationTitle: (playerId: number) => `S${playerId}: Ansagen`,
   pass: 'Passen',
+  bestaetigenSolo: 'Bestätigen',
   hochzeitLabel: (condition: string) =>
     `Hochzeit (${hochzeitConditionLabels[condition] ?? condition})`,
+  hochzeitConditionLabel: (condition: string) =>
+    hochzeitConditionLabels[condition] ?? condition,
+  reservationCategoryLabel: (category: string) =>
+    (reservationCategoryLabels[category] as string | undefined) ?? category,
+  soloLabel: (reservation: string) =>
+    (soloLabels[reservation] as string | undefined) ?? reservation,
 
   // ── ArmutPartnerDialog ─────────────────────────────────────────────────────
   armutPartnerTitle: (playerId: number) => `S${playerId}: Armut annehmen?`,
@@ -93,6 +100,27 @@ const hochzeitConditionLabels: Record<string, string> = {
   FirstTrick: 'Erster Stich',
   FirstFehlTrick: 'Erster Fehlstich',
   FirstTrumpTrick: 'Erster Trumpfstich',
+};
+
+// Mapping from reservation category keys to German display labels
+const reservationCategoryLabels: Record<string, string> = {
+  Solo: 'Solo',
+  SchlankerMartin: 'Schlanker Martin',
+  Armut: 'Armut',
+  Schmeissen: 'Schmeißen',
+  Hochzeit: 'Hochzeit',
+};
+
+// Mapping from solo reservation names to German display labels
+const soloLabels: Record<string, string> = {
+  KaroSolo: 'Karo-Solo',
+  KreuzSolo: 'Kreuz-Solo',
+  PikSolo: 'Pik-Solo',
+  HerzSolo: 'Herz-Solo',
+  Damensolo: 'Damen-Solo',
+  Bubensolo: 'Buben-Solo',
+  Fleischloses: 'Fleischloses',
+  Knochenloses: 'Knochenloses',
 };
 
 // Mapping from SonderkarteType enum names to German display names
