@@ -37,12 +37,13 @@
 
 /* Right column: detail options */
 .rd-right {
-  @apply flex flex-col gap-1.5 p-2 flex-1;
+  @apply flex flex-col gap-1 p-2 flex-1 overflow-y-auto;
+  max-height: 260px;
 }
 
 .rd-detail-btn {
   @apply w-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white
-    rounded-xl py-2.5 text-sm font-semibold transition-colors;
+    rounded-lg py-1.5 text-sm font-medium transition-colors flex-shrink-0;
 }
 
 .rd-detail-btn-confirm {

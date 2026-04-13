@@ -45,54 +45,56 @@ export function ReservationDialog({ playerId, eligibleReservations, mustDeclare 
         )}
       </div>
 
-      <div className="rd-body">
-        {/* Left column: categories */}
-        <div className="rd-left">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              className={`rd-cat-btn ${selectedCategory === cat ? 'rd-cat-btn-active' : ''}`}
-              onClick={() => setSelectedCategory(cat)}
-            >
-              {t.reservationCategoryLabel(cat)}
-            </button>
-          ))}
+      {categories.length > 0 && (
+        <div className="rd-body">
+          {/* Left column: categories */}
+          <div className="rd-left">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                className={`rd-cat-btn ${selectedCategory === cat ? 'rd-cat-btn-active' : ''}`}
+                onClick={() => setSelectedCategory(cat)}
+              >
+                {t.reservationCategoryLabel(cat)}
+              </button>
+            ))}
+          </div>
+
+          {/* Right column: detail options */}
+          <div className="rd-right">
+            {selectedCategory === 'Solo' && eligibleSolos.map((res) => (
+              <button
+                key={res}
+                className="rd-detail-btn"
+                onClick={() => onDeclare(res, null, null)}
+              >
+                {t.soloLabel(res)}
+              </button>
+            ))}
+
+            {selectedCategory === 'Hochzeit' && HOCHZEIT_CONDITIONS.map((cond) => (
+              <button
+                key={cond}
+                className="rd-detail-btn"
+                onClick={() => onDeclare('Hochzeit', cond, null)}
+              >
+                {t.hochzeitConditionLabel(cond)}
+              </button>
+            ))}
+
+            {(selectedCategory === 'SchlankerMartin' ||
+              selectedCategory === 'Armut' ||
+              selectedCategory === 'Schmeissen') && (
+              <button
+                className="rd-detail-btn rd-detail-btn-confirm"
+                onClick={() => onDeclare(selectedCategory, null, null)}
+              >
+                {t.bestaetigenSolo}
+              </button>
+            )}
+          </div>
         </div>
-
-        {/* Right column: detail options */}
-        <div className="rd-right">
-          {selectedCategory === 'Solo' && eligibleSolos.map((res) => (
-            <button
-              key={res}
-              className="rd-detail-btn"
-              onClick={() => onDeclare(res, null, null)}
-            >
-              {t.soloLabel(res)}
-            </button>
-          ))}
-
-          {selectedCategory === 'Hochzeit' && HOCHZEIT_CONDITIONS.map((cond) => (
-            <button
-              key={cond}
-              className="rd-detail-btn"
-              onClick={() => onDeclare('Hochzeit', cond, null)}
-            >
-              {t.hochzeitConditionLabel(cond)}
-            </button>
-          ))}
-
-          {(selectedCategory === 'SchlankerMartin' ||
-            selectedCategory === 'Armut' ||
-            selectedCategory === 'Schmeissen') && (
-            <button
-              className="rd-detail-btn rd-detail-btn-confirm"
-              onClick={() => onDeclare(selectedCategory, null, null)}
-            >
-              {t.bestaetigenSolo}
-            </button>
-          )}
-        </div>
-      </div>
+      )}
     </div>
   );
 }
