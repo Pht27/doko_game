@@ -1,4 +1,4 @@
-import { t } from '../translations';
+import { t } from '../../translations';
 
 interface GameLoaderProps {
   loading: boolean;

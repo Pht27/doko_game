@@ -3,7 +3,7 @@ import { useGameState } from './hooks/useGameState';
 import { useTrickAnimation } from './hooks/useTrickAnimation';
 import { useGameActions } from './hooks/useGameActions';
 import { GameBoard } from './components/GameBoard/GameBoard';
-import { GameLoader } from './components/GameLoader';
+import { GameLoader } from './components/GameLoader/GameLoader';
 
 const PLAYER_SWITCHING_ENABLED = true;
 

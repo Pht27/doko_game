@@ -6,10 +6,10 @@ import { PlayerLabel } from '../shared/PlayerLabel';
 import { OwnPartyLabel } from '../shared/OwnPartyLabel';
 import { HandDisplay } from '../HandDisplay/HandDisplay';
 import { AnnouncementButton } from '../AnnouncementButton/AnnouncementButton';
-import { SonderkarteOverlay } from '../SonderkarteOverlay/SonderkarteOverlay';
-import { ResultScreen } from '../ResultScreen/ResultScreen';
 import { ArmutBanner } from './subcomponents/ArmutBanner';
 import { CenterArea } from './subcomponents/CenterArea';
+import { PlayerGrid } from './subcomponents/PlayerGrid';
+import { GameOverlays } from './subcomponents/GameOverlays';
 import { t } from '../../translations';
 
 interface GameBoardProps {
@@ -78,31 +78,25 @@ export function GameBoard({
         />
       )}
 
-      {/* Main game area */}
-      <div className="flex-1 relative flex flex-col items-center justify-between py-2">
-        {/* Top opponent */}
-        <div className="flex justify-center">
-          {topOpponent && (
-            <PlayerLabel
-              player={topOpponent}
-              isCurrentTurn={view?.currentTurn === topOpponent.id}
-              orientation="top"
-              onClick={allowPlayerSwitching ? () => onPlayerSwitch(topOpponent.id) : undefined}
-            />
-          )}
-        </div>
-
-        {/* Middle row: left opponent | center | right opponent */}
-        <div className="flex items-center justify-between w-full px-6">
-          {leftOpponent ? (
-            <PlayerLabel
-              player={leftOpponent}
-              isCurrentTurn={view?.currentTurn === leftOpponent.id}
-              orientation="left"
-              onClick={allowPlayerSwitching ? () => onPlayerSwitch(leftOpponent.id) : undefined}
-            />
-          ) : <div />}
-
+      {/* Main game area: compass layout with opponents + center */}
+      <PlayerGrid
+        top={topOpponent && (
+          <PlayerLabel
+            player={topOpponent}
+            isCurrentTurn={view?.currentTurn === topOpponent.id}
+            orientation="top"
+            onClick={allowPlayerSwitching ? () => onPlayerSwitch(topOpponent.id) : undefined}
+          />
+        )}
+        left={leftOpponent ? (
+          <PlayerLabel
+            player={leftOpponent}
+            isCurrentTurn={view?.currentTurn === leftOpponent.id}
+            orientation="left"
+            onClick={allowPlayerSwitching ? () => onPlayerSwitch(leftOpponent.id) : undefined}
+          />
+        ) : <div />}
+        center={
           <CenterArea
             view={view}
             activePlayer={activePlayer}
@@ -112,24 +106,21 @@ export function GameBoard({
             winnerSeat={winnerSeat}
             actions={actions}
           />
-
-          {rightOpponent ? (
-            <PlayerLabel
-              player={rightOpponent}
-              isCurrentTurn={view?.currentTurn === rightOpponent.id}
-              orientation="right"
-              onClick={allowPlayerSwitching ? () => onPlayerSwitch(rightOpponent.id) : undefined}
-            />
-          ) : <div />}
-        </div>
-
-        {/* Action error */}
-        {actions.actionError && (
+        }
+        right={rightOpponent ? (
+          <PlayerLabel
+            player={rightOpponent}
+            isCurrentTurn={view?.currentTurn === rightOpponent.id}
+            orientation="right"
+            onClick={allowPlayerSwitching ? () => onPlayerSwitch(rightOpponent.id) : undefined}
+          />
+        ) : <div />}
+        bottom={actions.actionError && (
           <div className="bg-red-500/20 text-red-300 text-sm px-4 py-2 rounded-lg mx-4">
             {actions.actionError}
           </div>
         )}
-      </div>
+      />
 
       {/* Floating announcement button — bottom-left at ~20% from bottom */}
       <div className="absolute bottom-[20%] left-4 z-10">
@@ -164,20 +155,14 @@ export function GameBoard({
         )}
       </div>
 
-      {/* Overlays */}
-      {actions.pendingCard && (
-        <SonderkarteOverlay
-          sonderkarten={actions.pendingCard.sonderkarten}
-          onConfirm={(selected, genscherPartnerId) =>
-            actions.submitPlayCard(actions.pendingCard!.card.id, selected, genscherPartnerId)
-          }
-          onCancel={() => actions.setPendingCard(null)}
-        />
-      )}
-
-      {finishedResult && (
-        <ResultScreen result={finishedResult} onNewGame={onNewGame} />
-      )}
+      {/* Full-screen overlays: Sonderkarte confirmation + result screen */}
+      <GameOverlays
+        pendingCard={actions.pendingCard}
+        finishedResult={finishedResult}
+        onSubmitPlayCard={actions.submitPlayCard}
+        onCancelPendingCard={() => actions.setPendingCard(null)}
+        onNewGame={onNewGame}
+      />
     </div>
   );
 }
