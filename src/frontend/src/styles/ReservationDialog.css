@@ -2,7 +2,7 @@
 @reference "./index.css";
 
 .rd-dialog {
-  @apply bg-gray-800/95 rounded-2xl shadow-2xl border border-white/10 flex flex-col w-full max-w-sm overflow-hidden;
+  @apply bg-gray-800/95 rounded-2xl shadow-2xl border border-white/10 flex flex-col w-full max-w-sm overflow-hidden mb-4;
 }
 
 .rd-header {
