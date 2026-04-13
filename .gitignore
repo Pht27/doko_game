@@ -42,4 +42,4 @@ appsettings.Development.json
 Thumbs.db
 
 # Todos
-docs/todos/*
+docs/todos/

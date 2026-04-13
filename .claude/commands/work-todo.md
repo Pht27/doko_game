@@ -22,6 +22,6 @@ If no argument is given, use the file currently open in the IDE.
 
 6. **Ask for confirmation** - Let the user decide if they like the changes or had something else in mind. If declined, go back to step 5 or even 3. DO NOT ADVANCE FURTHER WITHOUT CONFIRMATION.
 
-7. **Mark as finished** — move the todo file into a `finished/` subfolder next to its current location (e.g. `docs/todos/finished/todo_fix_csharpier_problems.md`). Create the subfolder if it does not exist.
+7. **Mark as finished** — move the todo file into a `finished/` subfolder next to its current location (e.g. `docs/todos/99_finished/todo_fix_csharpier_problems.md`). Create the subfolder if it does not exist.
 
-8. **Commit** the changes along the way with fitting commit messages that summarizes what was done in sensible chunks.
+8. **Commit** the changes along the way with fitting commit messages that summarizes what was done in sensible chunks. DO NOT MERGE TO MAIN.
