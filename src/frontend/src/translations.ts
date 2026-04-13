@@ -71,6 +71,8 @@ export const t = {
   playerName: (id: number) => `S${id}`,
   kartenAnzahl: (count: number) => `${count} Karten`,
   unbekanntePartei: 'unbekannt',
+  sonderkarteName: (type: string) =>
+    (sonderkarteNames[type] as string | undefined) ?? type,
 
   // ── AnnouncementButton ─────────────────────────────────────────────────────
   // Announcement type labels shown on the buttons (keyed by the type string from the API)
@@ -91,4 +93,19 @@ const hochzeitConditionLabels: Record<string, string> = {
   FirstTrick: 'Erster Stich',
   FirstFehlTrick: 'Erster Fehlstich',
   FirstTrumpTrick: 'Erster Trumpfstich',
+};
+
+// Mapping from SonderkarteType enum names to German display names
+const sonderkarteNames: Record<string, string> = {
+  Schweinchen: 'Schweinchen',
+  Superschweinchen: 'Superschweinchen',
+  Hyperschweinchen: 'Hyperschweinchen',
+  LinksGehangter: 'Links­gehängter',
+  RechtsGehangter: 'Rechts­gehängter',
+  Genscherdamen: 'Genscherdamen',
+  Gegengenscherdamen: 'Gegengenscherdamen',
+  Heidmann: 'Heidmann',
+  Heidfrau: 'Heidfrau',
+  Kemmerich: 'Kemmerich',
+  Schatz: 'Schatz',
 };

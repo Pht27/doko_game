@@ -1,4 +1,4 @@
-import type { PlayerGameViewResponse, GameResultDto, TrickSummaryDto } from '../../types/api';
+import type { PlayerGameViewResponse, GameResultDto, TrickSummaryDto, SonderkarteNotification } from '../../types/api';
 import type { AnimPhase } from '../TrickArea/TrickArea';
 import type { GameActions } from '../../hooks/useGameActions';
 import { GameInfo } from '../shared/GameInfo';
@@ -19,6 +19,7 @@ interface GameBoardProps {
   animPhase: AnimPhase;
   actions: GameActions;
   finishedResult: GameResultDto | null;
+  sonderkarteNotification: SonderkarteNotification | null;
   viewLoading: boolean;
   viewError: string | null;
   allowPlayerSwitching: boolean;
@@ -39,6 +40,7 @@ export function GameBoard({
   animPhase,
   actions,
   finishedResult,
+  sonderkarteNotification,
   viewLoading,
   viewError,
   allowPlayerSwitching,
@@ -85,6 +87,7 @@ export function GameBoard({
             player={topOpponent}
             isCurrentTurn={view?.currentTurn === topOpponent.id}
             orientation="top"
+            sonderkarteNotif={sonderkarteNotification?.player === topOpponent.id ? sonderkarteNotification.type : null}
             onClick={allowPlayerSwitching ? () => onPlayerSwitch(topOpponent.id) : undefined}
           />
         )}
@@ -93,6 +96,7 @@ export function GameBoard({
             player={leftOpponent}
             isCurrentTurn={view?.currentTurn === leftOpponent.id}
             orientation="left"
+            sonderkarteNotif={sonderkarteNotification?.player === leftOpponent.id ? sonderkarteNotification.type : null}
             onClick={allowPlayerSwitching ? () => onPlayerSwitch(leftOpponent.id) : undefined}
           />
         ) : <div />}
@@ -112,6 +116,7 @@ export function GameBoard({
             player={rightOpponent}
             isCurrentTurn={view?.currentTurn === rightOpponent.id}
             orientation="right"
+            sonderkarteNotif={sonderkarteNotification?.player === rightOpponent.id ? sonderkarteNotification.type : null}
             onClick={allowPlayerSwitching ? () => onPlayerSwitch(rightOpponent.id) : undefined}
           />
         ) : <div />}

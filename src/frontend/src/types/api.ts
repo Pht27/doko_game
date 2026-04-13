@@ -19,6 +19,7 @@ export interface PlayerPublicStateDto {
   seat: string;
   knownParty: string | null;
   handCardCount: number;
+  highestAnnouncement: string | null;
 }
 
 export interface TrickCardDto {
@@ -158,3 +159,8 @@ export type SignalREvent =
   | 'GameFinished'
   | 'SonderkarteTriggered'
   | 'ArmutCardsExchanged';
+
+export interface SonderkarteNotification {
+  player: number;
+  type: string;
+}

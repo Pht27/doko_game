@@ -6,10 +6,11 @@ interface PlayerLabelProps {
   player: PlayerPublicStateDto;
   isCurrentTurn: boolean;
   orientation: 'top' | 'left' | 'right';
+  sonderkarteNotif?: string | null;
   onClick?: () => void;
 }
 
-export function PlayerLabel({ player, isCurrentTurn, orientation, onClick }: PlayerLabelProps) {
+export function PlayerLabel({ player, isCurrentTurn, orientation, sonderkarteNotif, onClick }: PlayerLabelProps) {
   const active = isCurrentTurn ? 'player-label-active' : 'player-label-inactive';
 
   const partyColor =
@@ -28,21 +29,40 @@ export function PlayerLabel({ player, isCurrentTurn, orientation, onClick }: Pla
 
   const clickable = onClick ? 'player-label-clickable' : '';
 
+  const annColor =
+    player.highestAnnouncement === 'Re'
+      ? 'player-ann-re'
+      : player.highestAnnouncement === 'Kontra'
+        ? 'player-ann-kontra'
+        : 'player-ann-other';
+
+  const inner = (
+    <>
+      <span className="player-label-name">{t.playerName(player.id)}</span>
+      <span className={`player-party-dot ${partyColor}`} title={player.knownParty ?? t.unbekanntePartei} />
+      {player.highestAnnouncement && (
+        <span className={`player-ann-badge ${annColor}`}>
+          {t.announcementLabel(player.highestAnnouncement)}
+        </span>
+      )}
+      <span>{t.kartenAnzahl(player.handCardCount)}</span>
+      {sonderkarteNotif && (
+        <span className="player-sonderkarte-notif">{t.sonderkarteName(sonderkarteNotif)}</span>
+      )}
+    </>
+  );
+
   if (onClick) {
     return (
       <button className={`player-label ${active} ${layout} ${clickable}`} onClick={onClick}>
-        <span className="player-label-name">{t.playerName(player.id)}</span>
-        <span className={`player-party-dot ${partyColor}`} title={player.knownParty ?? t.unbekanntePartei} />
-        <span>{t.kartenAnzahl(player.handCardCount)}</span>
+        {inner}
       </button>
     );
   }
 
   return (
     <div className={`player-label ${active} ${layout}`}>
-      <span className="player-label-name">{t.playerName(player.id)}</span>
-      <span className={`player-party-dot ${partyColor}`} title={player.knownParty ?? t.unbekanntePartei} />
-      <span>{t.kartenAnzahl(player.handCardCount)}</span>
+      {inner}
     </div>
   );
 }

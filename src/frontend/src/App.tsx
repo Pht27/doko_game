@@ -10,7 +10,7 @@ const PLAYER_SWITCHING_ENABLED = true;
 function App() {
   const { session, activePlayer, error: initError, loading: initLoading, setActivePlayer, restart } = useHotSeat();
 
-  const { view, loading: viewLoading, error: viewError, finishedResult, refetch } = useGameState(
+  const { view, loading: viewLoading, error: viewError, finishedResult, sonderkarteNotification, refetch } = useGameState(
     session?.tokens ?? [],
     session?.gameId ?? null,
     activePlayer,
@@ -32,6 +32,7 @@ function App() {
       animPhase={animPhase}
       actions={actions}
       finishedResult={finishedResult}
+      sonderkarteNotification={sonderkarteNotification}
       viewLoading={viewLoading}
       viewError={viewError}
       allowPlayerSwitching={PLAYER_SWITCHING_ENABLED}

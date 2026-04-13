@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import * as signalR from '@microsoft/signalr';
 import { getGameView } from '../api/game';
 import { createHubConnection, joinGameGroup } from '../api/signalr';
-import type { PlayerGameViewResponse, GameResultDto } from '../types/api';
+import type { PlayerGameViewResponse, GameResultDto, SonderkarteNotification } from '../types/api';
 
 export interface GameStateResult {
   view: PlayerGameViewResponse | null;
@@ -10,6 +10,8 @@ export interface GameStateResult {
   error: string | null;
   /** Last finished result — set when GameFinished event arrives */
   finishedResult: GameResultDto | null;
+  /** Brief notification when a sonderkarte was just triggered; auto-clears after 3 s */
+  sonderkarteNotification: SonderkarteNotification | null;
   refetch: () => void;
 }
 
@@ -22,6 +24,9 @@ export function useGameState(
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [finishedResult, setFinishedResult] = useState<GameResultDto | null>(null);
+  const [sonderkarteNotification, setSonderkarteNotification] =
+    useState<SonderkarteNotification | null>(null);
+  const notifTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const connectionRef = useRef<signalR.HubConnection | null>(null);
 
   const token = tokens[activePlayer];
@@ -65,11 +70,18 @@ export function useGameState(
       refetch();
     };
 
+    const handleSonderkarteTriggered = (payload: SonderkarteNotification) => {
+      if (notifTimerRef.current) clearTimeout(notifTimerRef.current);
+      setSonderkarteNotification(payload);
+      notifTimerRef.current = setTimeout(() => setSonderkarteNotification(null), 3000);
+      refetch();
+    };
+
     connection.on('CardPlayed', handleEvent);
     connection.on('TrickCompleted', handleEvent);
     connection.on('AnnouncementMade', handleEvent);
     connection.on('ReservationMade', handleEvent);
-    connection.on('SonderkarteTriggered', handleEvent);
+    connection.on('SonderkarteTriggered', handleSonderkarteTriggered);
     connection.on('GameFinished', handleGameFinished);
 
     connection
@@ -82,5 +94,5 @@ export function useGameState(
     };
   }, [gameId, tokens]);
 
-  return { view, loading, error, finishedResult, refetch };
+  return { view, loading, error, finishedResult, sonderkarteNotification, refetch };
 }

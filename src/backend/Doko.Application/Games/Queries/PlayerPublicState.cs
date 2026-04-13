@@ -4,4 +4,15 @@ using Doko.Domain.Players;
 namespace Doko.Application.Games.Queries;
 
 /// <summary>What one player can see about another player's public state.</summary>
-public record PlayerPublicState(PlayerId Id, PlayerSeat Seat, Party? KnownParty, int HandCardCount);
+public record PlayerPublicState(
+    PlayerId Id,
+    PlayerSeat Seat,
+    Party? KnownParty,
+    int HandCardCount,
+    /// <summary>
+    /// The most specific announcement this player has made, if any.
+    /// "Re" or "Kontra" for <see cref="AnnouncementType.Win"/>; enum name otherwise.
+    /// Null when the player has not announced.
+    /// </summary>
+    string? HighestAnnouncement = null
+);

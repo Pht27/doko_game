@@ -77,7 +77,39 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
         // Other players' public state
         var others = state
             .Players.Where(p => p.Id != requestingPlayer)
-            .Select(p => new PlayerPublicState(p.Id, p.Seat, p.KnownParty, p.Hand.Cards.Count))
+            .Select(p =>
+            {
+                // Reveal party for players who have announced (even in silent solos)
+                var hasAnnounced = state.Announcements.Any(a => a.Player == p.Id);
+                var knownParty =
+                    p.KnownParty
+                    ?? (hasAnnounced ? state.PartyResolver.ResolveParty(p.Id, state) : null);
+
+                // Most specific announcement: highest enum value wins
+                var highestAnn = state.Announcements
+                    .Where(a => a.Player == p.Id)
+                    .MaxBy(a => a.Type);
+                string? announcementLabel = null;
+                if (highestAnn is not null)
+                {
+                    announcementLabel =
+                        highestAnn.Type == AnnouncementType.Win
+                            ? knownParty == Party.Re
+                                ? "Re"
+                                : knownParty == Party.Kontra
+                                    ? "Kontra"
+                                    : null
+                            : highestAnn.Type.ToString();
+                }
+
+                return new PlayerPublicState(
+                    p.Id,
+                    p.Seat,
+                    knownParty,
+                    p.Hand.Cards.Count,
+                    announcementLabel
+                );
+            })
             .ToList();
 
         // Current trick summary

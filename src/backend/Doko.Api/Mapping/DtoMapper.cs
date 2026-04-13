@@ -57,7 +57,7 @@ public static class DtoMapper
         new(info.Type.ToString(), info.Name, info.Description);
 
     public static PlayerPublicStateDto ToDto(PlayerPublicState p) =>
-        new(p.Id.Value, p.Seat.ToString(), p.KnownParty?.ToString(), p.HandCardCount);
+        new(p.Id.Value, p.Seat.ToString(), p.KnownParty?.ToString(), p.HandCardCount, p.HighestAnnouncement);
 
     public static TrickSummaryDto ToDto(TrickSummary t) =>
         new(
