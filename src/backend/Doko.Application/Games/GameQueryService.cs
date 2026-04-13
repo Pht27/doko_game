@@ -223,6 +223,7 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
         {
             HandSorted = handSorted,
             ShouldDeclareHealth = shouldDeclareHealth,
+            ShouldDeclareReservation = isCheckPhaseTurn,
             EligibleReservations = eligibleReservations,
             MustDeclareReservation = mustDeclareReservation,
             ShouldRespondToArmut = shouldRespondToArmut,

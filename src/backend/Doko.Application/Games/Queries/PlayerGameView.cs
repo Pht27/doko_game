@@ -45,6 +45,13 @@ public record PlayerGameView(
     public IReadOnlyList<ReservationPriority> EligibleReservations { get; init; } = [];
 
     /// <summary>
+    /// True when it is this player's turn to declare in any reservation check phase
+    /// (SoloCheck, ArmutCheck, SchmeissenCheck, HochzeitCheck), even if no specific reservation
+    /// is eligible (in which case the player must pass).
+    /// </summary>
+    public bool ShouldDeclareReservation { get; init; } = false;
+
+    /// <summary>
     /// True when the player is not permitted to pass — they are the sole Vorbehalt player and
     /// must declare a specific reservation.
     /// </summary>

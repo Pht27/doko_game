@@ -49,6 +49,7 @@ export interface PlayerGameViewResponse {
   currentTurn: number;
   isMyTurn: boolean;
   eligibleReservations: string[];
+  shouldDeclareReservation: boolean;
   mustDeclareReservation: boolean;
   shouldDeclareHealth: boolean;
   shouldRespondToArmut: boolean;

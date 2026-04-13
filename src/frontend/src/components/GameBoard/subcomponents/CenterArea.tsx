@@ -30,7 +30,7 @@ export function CenterArea({ view, activePlayer, seatOf, displayTrick, animPhase
     );
   }
 
-  if (view?.eligibleReservations && view.eligibleReservations.length > 0) {
+  if (view?.shouldDeclareReservation) {
     return (
       <ReservationDialog
         playerId={activePlayer}

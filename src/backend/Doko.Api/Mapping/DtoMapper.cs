@@ -42,6 +42,7 @@ public static class DtoMapper
         )
         {
             ShouldDeclareHealth = view.ShouldDeclareHealth,
+            ShouldDeclareReservation = view.ShouldDeclareReservation,
             MustDeclareReservation = view.MustDeclareReservation,
             ShouldRespondToArmut = view.ShouldRespondToArmut,
             ShouldReturnArmutCards = view.ShouldReturnArmutCards,
