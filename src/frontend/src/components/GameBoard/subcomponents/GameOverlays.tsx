@@ -4,6 +4,7 @@ import { ResultScreen } from '../../ResultScreen/ResultScreen';
 
 interface GameOverlaysProps {
   pendingCard: { card: CardDto; sonderkarten: SonderkarteInfoDto[] } | null;
+  activePlayer: number;
   finishedResult: GameResultDto | null;
   onSubmitPlayCard: (cardId: number, activateSonderkarten: string[], genscherPartnerId: number | null) => Promise<void>;
   onCancelPendingCard: () => void;
@@ -13,12 +14,13 @@ interface GameOverlaysProps {
 /**
  * Renders all full-screen overlays: the Sonderkarte confirmation dialog and the result screen.
  */
-export function GameOverlays({ pendingCard, finishedResult, onSubmitPlayCard, onCancelPendingCard, onNewGame }: GameOverlaysProps) {
+export function GameOverlays({ pendingCard, activePlayer, finishedResult, onSubmitPlayCard, onCancelPendingCard, onNewGame }: GameOverlaysProps) {
   return (
     <>
       {pendingCard && (
         <SonderkarteOverlay
           sonderkarten={pendingCard.sonderkarten}
+          activePlayer={activePlayer}
           onConfirm={(selected, genscherPartnerId) =>
             onSubmitPlayCard(pendingCard.card.id, selected, genscherPartnerId)
           }

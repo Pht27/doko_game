@@ -37,11 +37,11 @@ export const t = {
   bestaetigen: 'Bestätigen',
 
   // ── SonderkarteOverlay ─────────────────────────────────────────────────────
-  aktiviereSonderkarten: 'Sonderkarten aktivieren?',
-  sonderkartenDescription: 'Wähle aus, welche Sonderkarten aktiviert werden sollen, oder keine.',
-  genscherPartnerLabel: 'Genscher-Partner (Spieler-ID):',
-  playerLabel: (id: number) => `Spieler ${id}`,
-  karteAusspielen: 'Karte ausspielen',
+  sonderkarteBadge: 'Sonderkarte',
+  genscherBadge: 'Genscher',
+  aktivieren: 'Aktivieren',
+  nichtAktivieren: 'Nicht aktivieren',
+  genscherPartnerWaehlen: 'Neuen Partner wählen',
   abbrechen: 'Abbrechen',
 
   // ── ResultScreen ───────────────────────────────────────────────────────────

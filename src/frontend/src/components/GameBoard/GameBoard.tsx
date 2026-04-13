@@ -163,6 +163,7 @@ export function GameBoard({
       {/* Full-screen overlays: Sonderkarte confirmation + result screen */}
       <GameOverlays
         pendingCard={actions.pendingCard}
+        activePlayer={activePlayer}
         finishedResult={finishedResult}
         onSubmitPlayCard={actions.submitPlayCard}
         onCancelPendingCard={() => actions.setPendingCard(null)}

@@ -1,54 +1,59 @@
-/* SonderkarteOverlay — styles for the special-card activation overlay */
+/* SonderkarteOverlay — centered hovering dialog for special-card activation */
 @reference "./index.css";
 
-.sonderkarte-overlay {
-  @apply fixed inset-0 bg-black/60 flex items-center justify-center z-50;
+.sk-overlay {
+  @apply fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4;
 }
 
-.sonderkarte-form {
-  @apply bg-gray-800 rounded-2xl p-6 w-80 shadow-2xl flex flex-col gap-4;
+.sk-card {
+  @apply bg-gray-800/95 rounded-2xl p-5 w-80 shadow-2xl flex flex-col gap-4 border border-white/10;
 }
 
-.sonderkarte-title {
-  @apply text-white font-bold text-lg;
+.sk-badge {
+  @apply text-indigo-400 text-xs font-semibold uppercase tracking-wider;
 }
 
-.sonderkarte-description {
-  @apply text-white/60 text-sm;
+.sk-title {
+  @apply text-white font-bold text-lg leading-tight;
 }
 
-.sonderkarte-option {
-  @apply flex items-start gap-3 cursor-pointer;
+.sk-description {
+  @apply text-white/55 text-sm leading-relaxed;
 }
 
-.sonderkarte-option-checkbox {
-  @apply mt-1;
+.sk-actions {
+  @apply flex flex-col gap-2 mt-1;
 }
 
-.sonderkarte-option-name {
-  @apply text-white font-semibold text-sm;
+.sk-btn-primary {
+  @apply w-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white rounded-xl py-3
+    font-bold text-sm transition-colors;
 }
 
-.sonderkarte-option-description {
-  @apply text-white/50 text-xs;
+.sk-btn-secondary {
+  @apply w-full bg-white/8 hover:bg-white/12 active:bg-white/18 text-white/70 rounded-xl py-3
+    font-semibold text-sm transition-colors;
 }
 
-.sonderkarte-partner-label {
-  @apply text-white/70 text-sm block mb-1;
+.sk-btn-link {
+  @apply w-full text-white/30 text-xs py-1 text-center hover:text-white/50 active:text-white/60
+    transition-colors;
 }
 
-.sonderkarte-partner-select {
-  @apply w-full rounded bg-gray-700 text-white p-2 text-sm;
+.sk-divider {
+  @apply border-t border-white/10;
 }
 
-.sonderkarte-actions {
-  @apply flex gap-3 mt-2;
+/* Partner selection */
+.sk-partner-grid {
+  @apply grid grid-cols-2 gap-2;
 }
 
-.sonderkarte-btn-confirm {
-  @apply flex-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg py-2 font-semibold transition-colors;
+.sk-partner-btn {
+  @apply px-4 py-3 rounded-xl bg-white/8 hover:bg-white/12 text-white font-semibold text-sm
+    transition-colors active:bg-white/18 border border-transparent;
 }
 
-.sonderkarte-btn-cancel {
-  @apply flex-1 bg-white/10 hover:bg-white/20 text-white rounded-lg py-2 transition-colors;
+.sk-partner-btn-active {
+  @apply bg-indigo-600/30 border-indigo-500 text-indigo-200;
 }
