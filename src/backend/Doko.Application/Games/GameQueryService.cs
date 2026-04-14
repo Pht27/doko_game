@@ -39,7 +39,7 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
 
         // Legal cards: only relevant when it's this player's turn
         IReadOnlyList<Card> legalCards = [];
-        if (isMyTurn && state.CurrentTrick is not null or { Cards.Count: 0 })
+        if (isMyTurn && state.CurrentTrick is not null)
         {
             var trick = state.CurrentTrick ?? new Trick();
             legalCards = hand.Where(c =>
@@ -251,11 +251,13 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
     {
         bool hasFischauge = result.Awards.Any(a => a.Type == ExtrapunktType.Fischauge);
 
-        var cards = result.Trick.Cards.Select(tc =>
-        {
-            bool faceDown = hasFischauge && tc.Card.Type == KaroNeun;
-            return new TrickCardSummary(tc.Player, tc.Card, faceDown);
-        }).ToList();
+        var cards = result
+            .Trick.Cards.Select(tc =>
+            {
+                bool faceDown = hasFischauge && tc.Card.Type == KaroNeun;
+                return new TrickCardSummary(tc.Player, tc.Card, faceDown);
+            })
+            .ToList();
 
         return new TrickSummary(trickNumber, cards, result.Winner);
     }
