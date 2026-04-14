@@ -90,14 +90,14 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             {
                 // Reveal party when mode dictates it, or when the player has announced
                 var hasAnnounced = state.Announcements.Any(a => a.Player == p.Id);
-                var knownParty =
-                    revealParties
-                        ? state.PartyResolver.ResolveParty(p.Id, state)
-                        : p.KnownParty ?? (hasAnnounced ? state.PartyResolver.ResolveParty(p.Id, state) : null);
+                var knownParty = revealParties
+                    ? state.PartyResolver.ResolveParty(p.Id, state)
+                    : p.KnownParty
+                        ?? (hasAnnounced ? state.PartyResolver.ResolveParty(p.Id, state) : null);
 
                 // Most specific announcement: highest enum value wins
-                var highestAnn = state.Announcements
-                    .Where(a => a.Player == p.Id)
+                var highestAnn = state
+                    .Announcements.Where(a => a.Player == p.Id)
                     .MaxBy(a => a.Type);
                 string? announcementLabel = null;
                 if (highestAnn is not null)
@@ -261,18 +261,25 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
     private static TrickSummary ToCurrentTrickSummary(int trickNumber, Trick trick, GameState state)
     {
         bool fischaugeActive = state.CompletedTricks.Any(t =>
-            t.Cards.Any(tc => state.TrumpEvaluator.IsTrump(tc.Card.Type)));
+            t.Cards.Any(tc => state.TrumpEvaluator.IsTrump(tc.Card.Type))
+        );
 
-        var cards = trick.Cards.Select((tc, index) =>
-        {
-            bool faceDown =
-                fischaugeActive
-                && tc.Card.Type == KaroNeun
-                && index > 0
-                && trick.Cards.Take(index).All(prev => !state.TrumpEvaluator.IsTrump(prev.Card.Type));
+        var cards = trick
+            .Cards.Select(
+                (tc, index) =>
+                {
+                    bool faceDown =
+                        fischaugeActive
+                        && tc.Card.Type == KaroNeun
+                        && index > 0
+                        && trick
+                            .Cards.Take(index)
+                            .All(prev => !state.TrumpEvaluator.IsTrump(prev.Card.Type));
 
-            return new TrickCardSummary(tc.Player, tc.Card, faceDown);
-        }).ToList();
+                    return new TrickCardSummary(tc.Player, tc.Card, faceDown);
+                }
+            )
+            .ToList();
 
         return new TrickSummary(trickNumber, cards, null);
     }
