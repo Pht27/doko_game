@@ -4,6 +4,7 @@ import { cardSvgComponent } from '../../api/cards';
 import {
   FAN_SPREAD_DEG, MAX_CARD_ANGLE_DEG, ARC_DEPTH_REM, SELECTED_LIFT_REM,
   MOBILE_CARD_STEP_REM, TABLET_CARD_STEP_REM, TABLET_BREAKPOINT_PX,
+  COMPACT_HAND_THRESHOLD, MOBILE_COMPACT_CARD_STEP_REM, TABLET_COMPACT_CARD_STEP_REM,
 } from './handDisplay.constants';
 import '../../styles/HandDisplay.css';
 
@@ -20,19 +21,19 @@ interface HandDisplayProps {
   playingCardId?: number | null;
 }
 
-/** Returns the horizontal step (rem) between adjacent card centers for the current viewport. */
-function useCardStep(): number {
-  const [step, setStep] = useState(
-    window.innerWidth >= TABLET_BREAKPOINT_PX ? TABLET_CARD_STEP_REM : MOBILE_CARD_STEP_REM,
-  );
+/** Returns the horizontal step (rem) between adjacent card centers for the current viewport and card count. */
+function useCardStep(cardCount: number): number {
+  const [isTablet, setIsTablet] = useState(window.innerWidth >= TABLET_BREAKPOINT_PX);
   useEffect(() => {
     const mq = window.matchMedia(`(min-width: ${TABLET_BREAKPOINT_PX}px)`);
-    const handler = (e: MediaQueryListEvent) =>
-      setStep(e.matches ? TABLET_CARD_STEP_REM : MOBILE_CARD_STEP_REM);
+    const handler = (e: MediaQueryListEvent) => setIsTablet(e.matches);
     mq.addEventListener('change', handler);
     return () => mq.removeEventListener('change', handler);
   }, []);
-  return step;
+  if (cardCount >= COMPACT_HAND_THRESHOLD) {
+    return isTablet ? TABLET_COMPACT_CARD_STEP_REM : MOBILE_COMPACT_CARD_STEP_REM;
+  }
+  return isTablet ? TABLET_CARD_STEP_REM : MOBILE_CARD_STEP_REM;
 }
 
 /** Rotation angle for card at `index` in a hand of `total` cards. */
@@ -88,7 +89,7 @@ export function HandDisplay({
   maxSelection,
   playingCardId,
 }: HandDisplayProps) {
-  const cardStep = useCardStep();
+  const cardStep = useCardStep(cards.length);
 
   return (
     <div className="hand">

@@ -31,3 +31,12 @@ export const TABLET_CARD_STEP_REM =
 
 /** CSS breakpoint matching the tablet media query in HandDisplay.css. */
 export const TABLET_BREAKPOINT_PX = 640;
+
+// ─── Compact hand (Armut card reception) ─────────────────────────────────────
+
+/** Card count at which the hand switches to compact step to avoid overflow. */
+export const COMPACT_HAND_THRESHOLD = 13;
+
+/** Compact card step (rem) — same card height, tighter overlap. */
+export const MOBILE_COMPACT_CARD_STEP_REM = 1.0;
+export const TABLET_COMPACT_CARD_STEP_REM = 1.8;
