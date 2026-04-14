@@ -1,1 +1,0 @@
-lock the screen orientation for the pwa to landscape mode (on android and ios!)
