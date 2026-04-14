@@ -2,9 +2,9 @@
 @reference "./index.css";
 
 .rd-dialog {
-  @apply bg-gray-800/95 rounded-2xl shadow-2xl border border-white/10 flex flex-col w-full max-w-sm overflow-hidden;
-  /* Never taller than the usable viewport minus space for hand + top player */
-  max-height: calc(100svh - 10rem);
+  @apply bg-gray-800/95 rounded-2xl shadow-2xl border border-white/10 flex flex-col w-full overflow-hidden;
+  /* Never taller than ~60% of the viewport so it doesn't reach the hand */
+  max-height: 60svh;
 }
 
 .rd-header {

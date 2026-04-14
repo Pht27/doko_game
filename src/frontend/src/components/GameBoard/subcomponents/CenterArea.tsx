@@ -1,70 +1,25 @@
-import type { PlayerGameViewResponse, TrickSummaryDto } from '../../../types/api';
+import type { TrickSummaryDto } from '../../../types/api';
 import type { AnimPhase } from '../../TrickArea/TrickArea';
-import type { GameActions } from '../../../hooks/useGameActions';
-import { HealthCheckDialog } from '../../dialogs/HealthCheckDialog';
-import { ReservationDialog } from '../../dialogs/ReservationDialog';
-import { ArmutPartnerDialog } from '../../dialogs/ArmutPartnerDialog';
-import { ArmutReturnDialog } from '../../dialogs/ArmutReturnDialog';
 import { TrickArea } from '../../TrickArea/TrickArea';
 
 interface CenterAreaProps {
-  view: PlayerGameViewResponse | null;
-  activePlayer: number;
+  requestingPlayer: number;
   seatOf: (player: number) => 'bottom' | 'left' | 'top' | 'right';
   displayTrick: TrickSummaryDto | null;
   animPhase: AnimPhase;
   winnerSeat?: 'bottom' | 'left' | 'top' | 'right';
-  actions: GameActions;
 }
 
 /**
- * Renders the correct dialog for the current game phase, or the trick area during play.
+ * Renders the trick area in the center of the board.
+ * Dialog overlays (reservation, health check, armut) are rendered
+ * as absolute overlays in GameBoard.tsx.
  */
-export function CenterArea({ view, activePlayer, seatOf, displayTrick, animPhase, winnerSeat, actions }: CenterAreaProps) {
-  if (view?.shouldDeclareHealth) {
-    return (
-      <HealthCheckDialog
-        playerId={activePlayer}
-        onDeclare={actions.handleHealthCheck}
-      />
-    );
-  }
-
-  if (view?.shouldDeclareReservation) {
-    return (
-      <ReservationDialog
-        playerId={activePlayer}
-        eligibleReservations={view.eligibleReservations}
-        mustDeclare={view.mustDeclareReservation}
-        onDeclare={actions.handleReservation}
-      />
-    );
-  }
-
-  if (view?.shouldRespondToArmut) {
-    return (
-      <ArmutPartnerDialog
-        playerId={activePlayer}
-        onRespond={actions.handleArmutResponse}
-      />
-    );
-  }
-
-  if (view?.shouldReturnArmutCards && view.armutCardReturnCount !== null) {
-    return (
-      <ArmutReturnDialog
-        playerId={activePlayer}
-        cardReturnCount={view.armutCardReturnCount}
-        selectedCount={actions.armutReturnSelected.size}
-        onConfirm={() => actions.handleArmutExchange(Array.from(actions.armutReturnSelected))}
-      />
-    );
-  }
-
+export function CenterArea({ requestingPlayer, seatOf, displayTrick, animPhase, winnerSeat }: CenterAreaProps) {
   return (
     <TrickArea
       trick={displayTrick}
-      requestingPlayer={activePlayer}
+      requestingPlayer={requestingPlayer}
       seatOf={seatOf}
       animPhase={animPhase}
       winnerSeat={winnerSeat}

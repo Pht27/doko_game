@@ -10,6 +10,10 @@ import { ArmutBanner } from './subcomponents/ArmutBanner';
 import { CenterArea } from './subcomponents/CenterArea';
 import { PlayerGrid } from './subcomponents/PlayerGrid';
 import { GameOverlays } from './subcomponents/GameOverlays';
+import { HealthCheckDialog } from '../dialogs/HealthCheckDialog';
+import { ReservationDialog } from '../dialogs/ReservationDialog';
+import { ArmutPartnerDialog } from '../dialogs/ArmutPartnerDialog';
+import { ArmutReturnDialog } from '../dialogs/ArmutReturnDialog';
 import { t } from '../../translations';
 
 interface GameBoardProps {
@@ -103,13 +107,11 @@ export function GameBoard({
         ) : <div />}
         center={
           <CenterArea
-            view={view}
-            activePlayer={activePlayer}
+            requestingPlayer={activePlayer}
             seatOf={seatOfPlayer}
             displayTrick={displayTrick}
             animPhase={animPhase}
             winnerSeat={winnerSeat}
-            actions={actions}
           />
         }
         right={rightOpponent ? (
@@ -160,6 +162,47 @@ export function GameBoard({
           />
         )}
       </div>
+
+      {/* Dialog overlays: centered, top-anchored, hover over hand */}
+      {view?.shouldDeclareHealth && (
+        <div className="absolute left-1/2 -translate-x-1/2 top-[20%] z-20">
+          <HealthCheckDialog
+            playerId={activePlayer}
+            onDeclare={actions.handleHealthCheck}
+          />
+        </div>
+      )}
+
+      {view?.shouldDeclareReservation && (
+        <div className="absolute left-1/2 -translate-x-1/2 top-[20%] z-20 w-[calc(100%-2rem)] max-w-sm">
+          <ReservationDialog
+            playerId={activePlayer}
+            eligibleReservations={view.eligibleReservations}
+            mustDeclare={view.mustDeclareReservation}
+            onDeclare={actions.handleReservation}
+          />
+        </div>
+      )}
+
+      {view?.shouldRespondToArmut && (
+        <div className="absolute left-1/2 -translate-x-1/2 top-[20%] z-20">
+          <ArmutPartnerDialog
+            playerId={activePlayer}
+            onRespond={actions.handleArmutResponse}
+          />
+        </div>
+      )}
+
+      {view?.shouldReturnArmutCards && view.armutCardReturnCount !== null && (
+        <div className="absolute left-1/2 -translate-x-1/2 top-[20%] z-20">
+          <ArmutReturnDialog
+            playerId={activePlayer}
+            cardReturnCount={view.armutCardReturnCount}
+            selectedCount={actions.armutReturnSelected.size}
+            onConfirm={() => actions.handleArmutExchange(Array.from(actions.armutReturnSelected))}
+          />
+        </div>
+      )}
 
       {/* Full-screen overlays: Sonderkarte confirmation + result screen */}
       <GameOverlays
