@@ -2,12 +2,14 @@ using Doko.Application.Abstractions;
 using Doko.Application.Games.Queries;
 using Doko.Domain.Announcements;
 using Doko.Domain.Cards;
+using Doko.Domain.Extrapunkte;
 using Doko.Domain.GameFlow;
 using Doko.Domain.Hands;
 using Doko.Domain.Parties;
 using Doko.Domain.Players;
 using Doko.Domain.Reservations;
 using Doko.Domain.Rules;
+using Doko.Domain.Scoring;
 using Doko.Domain.Sonderkarten;
 using Doko.Domain.Tricks;
 
@@ -129,7 +131,7 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
 
         // Completed tricks summaries
         var completedSummaries = state
-            .ScoredTricks.Select((r, i) => ToTrickSummary(i, r.Trick, r.Winner))
+            .ScoredTricks.Select((r, i) => ToCompletedTrickSummary(i, r))
             .ToList();
 
         // Hand sorted by trump (highest to lowest), then plain suits grouped by suit and sorted
@@ -245,10 +247,17 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
         };
     }
 
-    private static TrickSummary ToTrickSummary(int trickNumber, Trick trick, PlayerId? winner)
+    private static TrickSummary ToCompletedTrickSummary(int trickNumber, TrickResult result)
     {
-        var cards = trick.Cards.Select(tc => new TrickCardSummary(tc.Player, tc.Card)).ToList();
-        return new TrickSummary(trickNumber, cards, winner);
+        bool hasFischauge = result.Awards.Any(a => a.Type == ExtrapunktType.Fischauge);
+
+        var cards = result.Trick.Cards.Select(tc =>
+        {
+            bool faceDown = hasFischauge && tc.Card.Type == KaroNeun;
+            return new TrickCardSummary(tc.Player, tc.Card, faceDown);
+        }).ToList();
+
+        return new TrickSummary(trickNumber, cards, result.Winner);
     }
 
     private static readonly CardType KaroNeun = new(Suit.Karo, Rank.Neun);
