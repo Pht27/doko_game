@@ -49,6 +49,7 @@ public static class DtoMapper
             ArmutCardReturnCount = view.ArmutCardReturnCount,
             ArmutExchangeCardCount = view.ArmutExchangeCardCount,
             ArmutReturnedTrump = view.ArmutReturnedTrump,
+            ActiveGameMode = view.ActiveGameMode,
         };
 
     public static CardDto ToDto(Card card) =>

@@ -41,4 +41,7 @@ public record PlayerGameViewResponse(
 
     /// <summary>Whether the returned cards included trump. Non-null after exchange completes.</summary>
     public bool? ArmutReturnedTrump { get; init; } = null;
+
+    /// <summary>The active game mode (e.g. "KaroSolo", "Hochzeit", "Armut"). Null = Normalspiel.</summary>
+    public string? ActiveGameMode { get; init; } = null;
 }

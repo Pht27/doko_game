@@ -74,16 +74,26 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             }
         }
 
+        // Parties are revealed immediately in: all solos, Armut, and Hochzeit once partner found.
+        // In Normalspiel and pre-Findungsstich Hochzeit parties stay hidden until announced.
+        bool revealParties =
+            state.ActiveReservation is not null
+            && (state.ActiveReservation.IsSolo || state.PartyResolver.IsFullyResolved(state));
+
+        // Active game mode label (null = Normalspiel)
+        var activeGameMode = state.ActiveReservation?.Priority.ToString();
+
         // Other players' public state
         var others = state
             .Players.Where(p => p.Id != requestingPlayer)
             .Select(p =>
             {
-                // Reveal party for players who have announced (even in silent solos)
+                // Reveal party when mode dictates it, or when the player has announced
                 var hasAnnounced = state.Announcements.Any(a => a.Player == p.Id);
                 var knownParty =
-                    p.KnownParty
-                    ?? (hasAnnounced ? state.PartyResolver.ResolveParty(p.Id, state) : null);
+                    revealParties
+                        ? state.PartyResolver.ResolveParty(p.Id, state)
+                        : p.KnownParty ?? (hasAnnounced ? state.PartyResolver.ResolveParty(p.Id, state) : null);
 
                 // Most specific announcement: highest enum value wins
                 var highestAnn = state.Announcements
@@ -231,6 +241,7 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             ArmutCardReturnCount = armutCardReturnCount,
             ArmutExchangeCardCount = armutExchangeCardCount,
             ArmutReturnedTrump = armutReturnedTrump,
+            ActiveGameMode = activeGameMode,
         };
     }
 

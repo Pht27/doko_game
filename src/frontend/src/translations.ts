@@ -69,6 +69,10 @@ export const t = {
   // ── GameInfo ───────────────────────────────────────────────────────────────
   stichInfo: (trickNumber: number, completed: number) =>
     `Stich ${trickNumber} · ${completed} gespielt`,
+  gameModeLabel: (mode: string | null) =>
+    mode ? ((gameModeLabels[mode] as string | undefined) ?? mode) : 'Normalspiel',
+  phaseLabel: (phase: string) =>
+    (phaseLabels[phase] as string | undefined) ?? phase,
 
   // ── TrickArea ──────────────────────────────────────────────────────────────
   keinStich: 'Kein Stich',
@@ -121,6 +125,34 @@ const soloLabels: Record<string, string> = {
   Bubensolo: 'Buben-Solo',
   Fleischloses: 'Fleischloses',
   Knochenloses: 'Knochenloses',
+};
+
+// Mapping from ReservationPriority enum names to German game mode labels
+const gameModeLabels: Record<string, string> = {
+  KaroSolo: 'Karo-Solo',
+  KreuzSolo: 'Kreuz-Solo',
+  PikSolo: 'Pik-Solo',
+  HerzSolo: 'Herz-Solo',
+  Damensolo: 'Damen-Solo',
+  Bubensolo: 'Buben-Solo',
+  Fleischloses: 'Fleischloses',
+  Knochenloses: 'Knochenloses',
+  SchlankerMartin: 'Schlanker Martin',
+  Armut: 'Armut',
+  Hochzeit: 'Hochzeit',
+};
+
+// Mapping from GamePhase enum names to German labels
+const phaseLabels: Record<string, string> = {
+  ReservationHealthCheck: 'Gesund/Vorbehalt',
+  ReservationSoloCheck: 'Solo-Runde',
+  ReservationArmutCheck: 'Armut-Runde',
+  ReservationSchmeissenCheck: 'Schmeißen-Runde',
+  ReservationHochzeitCheck: 'Hochzeit-Runde',
+  ArmutPartnerFinding: 'Partner suchen',
+  ArmutCardExchange: 'Karten tauschen',
+  Playing: 'Normalspiel',
+  Scoring: 'Abrechnung',
 };
 
 // Mapping from SonderkarteType enum names to German display names

@@ -66,6 +66,7 @@ export function GameBoard({
         <div className="absolute top-2 right-2 z-10">
           <GameInfo
             phase={view.phase}
+            gameMode={view.activeGameMode}
             trickNumber={(view.currentTrick?.trickNumber ?? 0) + 1}
             completedTricks={view.completedTricks.length}
           />

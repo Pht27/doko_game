@@ -82,4 +82,10 @@ public record PlayerGameView(
     /// Whether the rich player's returned cards included any trump. Non-null after the exchange.
     /// </summary>
     public bool? ArmutReturnedTrump { get; init; } = null;
+
+    /// <summary>
+    /// The active game mode, derived from the winning reservation's priority
+    /// (e.g. "KaroSolo", "Hochzeit", "Armut"). Null means Normalspiel.
+    /// </summary>
+    public string? ActiveGameMode { get; init; } = null;
 }
