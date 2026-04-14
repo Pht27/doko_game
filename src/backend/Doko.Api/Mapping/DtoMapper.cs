@@ -64,7 +64,7 @@ public static class DtoMapper
     public static TrickSummaryDto ToDto(TrickSummary t) =>
         new(
             t.TrickNumber,
-            t.Cards.Select(c => new TrickCardDto(c.Player.Value, ToDto(c.Card))).ToList(),
+            t.Cards.Select(c => new TrickCardDto(c.Player.Value, ToDto(c.Card), c.FaceDown)).ToList(),
             t.Winner?.Value
         );
 

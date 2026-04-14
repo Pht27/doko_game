@@ -124,7 +124,7 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
 
         // Current trick summary
         TrickSummary? currentTrickSummary = state.CurrentTrick is { Cards.Count: > 0 }
-            ? ToTrickSummary(state.CompletedTricks.Count, state.CurrentTrick, null)
+            ? ToCurrentTrickSummary(state.CompletedTricks.Count, state.CurrentTrick, state)
             : null;
 
         // Completed tricks summaries
@@ -249,5 +249,31 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
     {
         var cards = trick.Cards.Select(tc => new TrickCardSummary(tc.Player, tc.Card)).ToList();
         return new TrickSummary(trickNumber, cards, winner);
+    }
+
+    private static readonly CardType KaroNeun = new(Suit.Karo, Rank.Neun);
+
+    /// <summary>
+    /// Builds a TrickSummary for the current (incomplete) trick, computing per-card FaceDown flags.
+    /// A ♦9 is shown face-down when: Fischauge is active, it is not the first card in the trick,
+    /// and all previously played cards in the trick are Fehl (not trump).
+    /// </summary>
+    private static TrickSummary ToCurrentTrickSummary(int trickNumber, Trick trick, GameState state)
+    {
+        bool fischaugeActive = state.CompletedTricks.Any(t =>
+            t.Cards.Any(tc => state.TrumpEvaluator.IsTrump(tc.Card.Type)));
+
+        var cards = trick.Cards.Select((tc, index) =>
+        {
+            bool faceDown =
+                fischaugeActive
+                && tc.Card.Type == KaroNeun
+                && index > 0
+                && trick.Cards.Take(index).All(prev => !state.TrumpEvaluator.IsTrump(prev.Card.Type));
+
+            return new TrickCardSummary(tc.Player, tc.Card, faceDown);
+        }).ToList();
+
+        return new TrickSummary(trickNumber, cards, null);
     }
 }

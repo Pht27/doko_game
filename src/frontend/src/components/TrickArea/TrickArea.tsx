@@ -91,7 +91,7 @@ export function TrickArea({ trick, requestingPlayer, seatOf, animPhase = null, w
 
   return (
     <div className={pileClass} style={pileStyle}>
-      {trick.cards.map(({ player, card }, index) => {
+      {trick.cards.map(({ player, card, faceDown }, index) => {
         const seat     = seatOf(player);
         const isWinner = player === trick.winner;
         const tilt     = cardTilt(player, card.id);
@@ -137,7 +137,7 @@ export function TrickArea({ trick, requestingPlayer, seatOf, animPhase = null, w
           >
             <Card
               card={card}
-              faceDown={isFlipped}
+              faceDown={isFlipped || faceDown}
               className={imgClass}
               style={{ '--fly-from-x': flyFrom.x, '--fly-from-y': flyFrom.y } as React.CSSProperties}
             />

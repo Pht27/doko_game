@@ -25,6 +25,7 @@ export interface PlayerPublicStateDto {
 export interface TrickCardDto {
   player: number;
   card: CardDto;
+  faceDown: boolean;
 }
 
 export interface TrickSummaryDto {
