@@ -1,8 +1,0 @@
-@reference "./index.css";
-
-.own-party-label {
-  @apply absolute bottom-0 left-1/2 -translate-x-1/2 z-30 pointer-events-none select-none;
-  @apply text-[0.6rem] tracking-widest uppercase text-white;
-  @apply bg-gray-800/75 px-3 py-0.5;
-  border-radius: 0.375rem 0.375rem 0 0;
-}

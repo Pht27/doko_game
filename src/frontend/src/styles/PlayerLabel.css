@@ -13,16 +13,10 @@
   @apply text-white/60;
 }
 
-.player-label-top {
-  @apply flex-col;
-}
-
-.player-label-left {
-  @apply flex-row;
-}
-
+.player-label-top,
+.player-label-left,
 .player-label-right {
-  @apply flex-row-reverse;
+  @apply flex-col;
 }
 
 .player-label-name {

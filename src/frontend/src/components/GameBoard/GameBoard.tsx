@@ -3,7 +3,6 @@ import type { AnimPhase } from '../TrickArea/TrickArea';
 import type { GameActions } from '../../hooks/useGameActions';
 import { GameInfo } from '../shared/GameInfo';
 import { PlayerLabel } from '../shared/PlayerLabel';
-import { OwnPartyLabel } from '../shared/OwnPartyLabel';
 import { HandDisplay } from '../HandDisplay/HandDisplay';
 import { AnnouncementButton } from '../AnnouncementButton/AnnouncementButton';
 import { ArmutBanner } from './subcomponents/ArmutBanner';
@@ -142,9 +141,6 @@ export function GameBoard({
       {/* Loading / error feedback above the hand */}
       {viewLoading && !view && <div className="text-center text-white/40 text-xs py-1">{t.loading}</div>}
       {viewError && <div className="text-center text-red-400 text-xs py-1">{viewError}</div>}
-
-      {/* Own party label — floats above the hand, always visible */}
-      {view?.ownParty && <OwnPartyLabel party={view.ownParty} />}
 
       {/* Hand — .hand-container clips the bottom half of the cards so they
            appear to rise from below the table edge (see HandDisplay.css) */}

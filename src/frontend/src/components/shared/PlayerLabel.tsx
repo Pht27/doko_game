@@ -45,7 +45,6 @@ export function PlayerLabel({ player, isCurrentTurn, orientation, sonderkarteNot
           {t.announcementLabel(player.highestAnnouncement)}
         </span>
       )}
-      <span>{t.kartenAnzahl(player.handCardCount)}</span>
       {sonderkarteNotif && (
         <span className="player-sonderkarte-notif">{t.sonderkarteName(sonderkarteNotif)}</span>
       )}

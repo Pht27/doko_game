@@ -14,10 +14,10 @@ export function PlayerGrid({ top, left, center, right, bottom }: PlayerGridProps
   return (
     <div className="flex-1 relative flex flex-col items-center justify-between py-2">
       <div className="flex justify-center">{top}</div>
-      <div className="flex items-center justify-between w-full px-6">
-        {left}
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center w-full px-2">
+        <div className="flex justify-start">{left}</div>
         {center}
-        {right}
+        <div className="flex justify-end">{right}</div>
       </div>
       {bottom}
     </div>
