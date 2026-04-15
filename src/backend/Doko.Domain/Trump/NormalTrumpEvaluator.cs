@@ -27,8 +27,8 @@ public sealed class NormalTrumpEvaluator : ITrumpEvaluator
             { Rank: Rank.Bube, Suit: Suit.Herz } => 12,
             { Rank: Rank.Bube, Suit: Suit.Karo } => 10,
             { Suit: Suit.Karo, Rank: Rank.Ass } => 8,
-            { Suit: Suit.Karo, Rank: Rank.Koenig } => 6,
-            { Suit: Suit.Karo, Rank: Rank.Zehn } => 4,
+            { Suit: Suit.Karo, Rank: Rank.Zehn } => 6,
+            { Suit: Suit.Karo, Rank: Rank.Koenig } => 4,
             { Suit: Suit.Karo, Rank: Rank.Neun } => 2,
             _ => throw new ArgumentOutOfRangeException(nameof(card), $"Not a trump card: {card}"),
         };

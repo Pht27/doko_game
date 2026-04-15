@@ -34,12 +34,12 @@ public sealed class FarbsoloTrumpEvaluator : ITrumpEvaluator
             };
         }
 
-        // Chosen suit bottom trumps: A > K > 10 > 9
+        // Chosen suit bottom trumps: A > 10 > K > 9
         return card.Rank switch
         {
             Rank.Ass => 8,
-            Rank.Koenig => 6,
-            Rank.Zehn => 4,
+            Rank.Zehn => 6,
+            Rank.Koenig => 4,
             Rank.Neun => 2,
             _ => throw new ArgumentOutOfRangeException(nameof(card), $"Not a trump card: {card}"),
         };

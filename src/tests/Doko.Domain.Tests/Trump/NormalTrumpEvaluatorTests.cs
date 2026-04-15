@@ -75,9 +75,9 @@ public class NormalTrumpEvaluatorTests
         int koenig = Sut.GetTrumpRank(new CardType(Suit.Karo, Rank.Koenig));
         int zehn = Sut.GetTrumpRank(new CardType(Suit.Karo, Rank.Zehn));
         int neun = Sut.GetTrumpRank(new CardType(Suit.Karo, Rank.Neun));
-        ass.Should().BeGreaterThan(koenig).And.BeGreaterThan(zehn).And.BeGreaterThan(neun);
-        koenig.Should().BeGreaterThan(zehn).And.BeGreaterThan(neun);
-        zehn.Should().BeGreaterThan(neun);
+        ass.Should().BeGreaterThan(zehn).And.BeGreaterThan(koenig).And.BeGreaterThan(neun);
+        zehn.Should().BeGreaterThan(koenig).And.BeGreaterThan(neun);
+        koenig.Should().BeGreaterThan(neun);
     }
 
     // ── Plain rank ordering ───────────────────────────────────────────────────
