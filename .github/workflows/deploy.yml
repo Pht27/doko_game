@@ -21,7 +21,7 @@ jobs:
           script: |
             cd ${{ secrets.DEPLOY_PATH }}
             git pull origin main
-            docker compose -f Code/infrastructure/docker-compose.staging.yml \
+            docker compose -f Code/infrastructure/docker-compose.yml \
               --env-file Code/infrastructure/.env \
               up --build -d --no-deps backend
             docker exec caddy caddy reload --config /etc/caddy/Caddyfile

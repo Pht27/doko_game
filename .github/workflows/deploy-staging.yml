@@ -22,7 +22,7 @@ jobs:
             cd ${{ secrets.DEPLOY_STAGING_PATH }}
             git fetch origin develop
             git reset --hard origin/develop
-            docker compose -f Code/infrastructure/docker-compose.staging.yml \
+            docker compose -f Code/infrastructure/docker-compose.yml \
               --env-file Code/infrastructure/.env \
               up --build -d --no-deps backend-staging
 
