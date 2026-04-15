@@ -1,7 +1,7 @@
 # =========================
 # Production
 # =========================
-phtanywhere.org {
+doko.phtanywhere.org {
 
     handle /api/* {
         uri strip_prefix /api
@@ -23,7 +23,7 @@ phtanywhere.org {
 # =========================
 # Staging
 # =========================
-test.phtanywhere.org {
+doko-test.phtanywhere.org {
 
     handle /api/* {
         uri strip_prefix /api

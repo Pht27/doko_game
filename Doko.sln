@@ -3,27 +3,27 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{196828B5-7FA5-49A8-B9B6-C6C916A72567}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Code", "Code", "{196828B5-7FA5-49A8-B9B6-C6C916A72567}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Domain", "src\backend\Doko.Domain\Doko.Domain.csproj", "{368C37FE-1449-42DE-AAD9-27903CC3D691}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Domain", "Code\backend\Doko.Domain\Doko.Domain.csproj", "{368C37FE-1449-42DE-AAD9-27903CC3D691}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7569D44E-D048-4D29-9C5D-65639A42BAFF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Domain.Tests", "src\tests\Doko.Domain.Tests\Doko.Domain.Tests.csproj", "{20F3A8F8-9E79-42FE-8E65-7F84DE658B71}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Domain.Tests", "Code\tests\Doko.Domain.Tests\Doko.Domain.Tests.csproj", "{20F3A8F8-9E79-42FE-8E65-7F84DE658B71}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Application", "src\backend\Doko.Application\Doko.Application.csproj", "{33BA240F-2AED-48E8-A3B8-D94CA31CB452}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Application", "Code\backend\Doko.Application\Doko.Application.csproj", "{33BA240F-2AED-48E8-A3B8-D94CA31CB452}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Application.Tests", "src\tests\Doko.Application.Tests\Doko.Application.Tests.csproj", "{181102C4-D09D-42A5-ADA0-5F345BE69D12}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Application.Tests", "Code\tests\Doko.Application.Tests\Doko.Application.Tests.csproj", "{181102C4-D09D-42A5-ADA0-5F345BE69D12}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Infrastructure", "src\backend\Doko.Infrastructure\Doko.Infrastructure.csproj", "{41A0667C-A5DD-4FA4-8BF8-F8A73C0EC3FF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Infrastructure", "Code\backend\Doko.Infrastructure\Doko.Infrastructure.csproj", "{41A0667C-A5DD-4FA4-8BF8-F8A73C0EC3FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Console", "src\backend\Doko.Console\Doko.Console.csproj", "{20298E77-6A31-4D5A-85C0-FE4A1E279C3C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Console", "Code\backend\Doko.Console\Doko.Console.csproj", "{20298E77-6A31-4D5A-85C0-FE4A1E279C3C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Api", "src\backend\Doko.Api\Doko.Api.csproj", "{C5D6E7F8-A9B0-4C1D-8E2F-3A4B5C6D7E8F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Api", "Code\backend\Doko.Api\Doko.Api.csproj", "{C5D6E7F8-A9B0-4C1D-8E2F-3A4B5C6D7E8F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Api.Tests", "src\tests\Doko.Api.Tests\Doko.Api.Tests.csproj", "{D6E7F8A9-B0C1-4D2E-9F3A-4B5C6D7E8F9A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Api.Tests", "Code\tests\Doko.Api.Tests\Doko.Api.Tests.csproj", "{D6E7F8A9-B0C1-4D2E-9F3A-4B5C6D7E8F9A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Api.IntegrationTests", "src\tests\Doko.Api.IntegrationTests\Doko.Api.IntegrationTests.csproj", "{E7F8A9B0-C1D2-4E3F-A04B-5C6D7E8F9A0B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Api.IntegrationTests", "Code\tests\Doko.Api.IntegrationTests\Doko.Api.IntegrationTests.csproj", "{E7F8A9B0-C1D2-4E3F-A04B-5C6D7E8F9A0B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

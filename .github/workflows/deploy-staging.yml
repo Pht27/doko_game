@@ -19,18 +19,18 @@ jobs:
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
-            cd ${{ secrets.DEPLOY_PATH }}
+            cd ${{ secrets.DEPLOY_STAGING_PATH }}
             git fetch origin develop
             git reset --hard origin/develop
-            docker compose -f src/infrastructure/docker-compose.staging.yml \
-              --env-file src/infrastructure/.env \
+            docker compose -f Code/infrastructure/docker-compose.staging.yml \
+              --env-file Code/infrastructure/.env \
               up --build -d --no-deps backend-staging
 
       - name: Build frontend
         run: |
-          cd src/frontend
+          cd Code/frontend
           npm ci
-          npm run build
+          npm run build -- --mode staging
 
       - name: Upload frontend to staging
         uses: appleboy/scp-action@v0.1.7
@@ -38,6 +38,6 @@ jobs:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
-          source: "src/frontend/dist/"
+          source: "Code/frontend/dist/"
           target: ${{ secrets.DEPLOY_STAGING_FRONTEND_PATH }}
           strip_components: 3

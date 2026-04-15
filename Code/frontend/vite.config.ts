@@ -1,11 +1,13 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import svgr from 'vite-plugin-svgr'
 import { VitePWA } from 'vite-plugin-pwa'
 import mkcert from 'vite-plugin-mkcert'
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  return {
   server: {
     proxy: {
       '/api': {
@@ -32,8 +34,8 @@ export default defineConfig({
       },
       manifest: {
         id: "/",
-        name: 'Doppelkopf',
-        short_name: 'Doko',
+        name: env.VITE_APP_NAME ?? 'Doppelkopf',
+        short_name: env.VITE_APP_SHORT_NAME ?? 'Doko',
         description: 'A multiplayer card game',
         theme_color: '#ffffff',
         background_color: '#ffffff',
@@ -66,8 +68,9 @@ export default defineConfig({
             "type": "image/png",
             "label": "Application"
           }
-        ]        
+        ]
       }
     }),
   ],
+  }
 })

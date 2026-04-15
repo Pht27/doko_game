@@ -15,9 +15,9 @@ project.fragment.lock.json
 artifacts/
 
 # Frontend
-src/frontend/node_modules/
-src/frontend/dist/
-src/frontend/dist-ssr/
+Code/frontend/node_modules/
+Code/frontend/dist/
+Code/frontend/dist-ssr/
 
 # Logs
 *.log
@@ -28,8 +28,8 @@ pnpm-debug.log*
 
 # Environment / secrets
 .env
-.env.*
-*.env.*
+.env.local
+.env.*.local
 appsettings.Development.json
 
 # IDE

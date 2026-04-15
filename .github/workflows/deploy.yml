@@ -21,14 +21,14 @@ jobs:
           script: |
             cd ${{ secrets.DEPLOY_PATH }}
             git pull origin main
-            docker compose -f src/infrastructure/docker-compose.staging.yml \
-              --env-file src/infrastructure/.env \
+            docker compose -f Code/infrastructure/docker-compose.staging.yml \
+              --env-file Code/infrastructure/.env \
               up --build -d --no-deps backend
             docker exec caddy caddy reload --config /etc/caddy/Caddyfile
 
       - name: Build frontend
         run: |
-          cd src/frontend
+          cd Code/frontend
           npm ci
           npm run build
 
@@ -38,6 +38,6 @@ jobs:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
-          source: "src/frontend/dist/"
+          source: "Code/frontend/dist/"
           target: ${{ secrets.DEPLOY_FRONTEND_PATH }}
           strip_components: 3
