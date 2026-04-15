@@ -7,6 +7,25 @@ export const t = {
   retry: 'Wiederholen',
   loading: 'Laden…',
 
+  // ── LandingPage ────────────────────────────────────────────────────────────
+  landingTitle: 'Doppelkopf',
+  createLobby: 'Lobby erstellen',
+  testGame: 'Testspiel starten',
+
+  // ── LobbyPage ──────────────────────────────────────────────────────────────
+  lobbyTitle: 'Lobby',
+  waitingForPlayers: 'Warte auf Spieler…',
+  inviteLink: 'Einladungslink',
+  copyLink: 'Link kopieren',
+  linkCopied: 'Kopiert!',
+  startGame: 'Spiel starten',
+  playerSlot: (n: number) => `Spieler ${n + 1}`,
+  youSuffix: ' (Du)',
+  playerCount: (current: number, total: number) => `${current} von ${total} Spielern`,
+  joiningLobby: 'Trete Lobby bei…',
+  lobbyFull: 'Lobby ist voll',
+  lobbyNotFound: 'Lobby nicht gefunden',
+
   // ── ArmutInfoBanner ────────────────────────────────────────────────────────
   armutInfoBanner: (count: number, hasTrump: boolean) =>
     `Armut: ${count} Karte(n) zurückgegeben${hasTrump ? ' · mit Trump' : ' · kein Trump'}`,
