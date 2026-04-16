@@ -13,9 +13,7 @@ public sealed class InMemoryLobbyRepository : ILobbyRepository
 
     public Task<IReadOnlyList<LobbyState>> GetAllAsync(CancellationToken ct = default)
     {
-        IReadOnlyList<LobbyState> result = _store.Values
-            .Where(l => !l.IsStarted)
-            .ToList();
+        IReadOnlyList<LobbyState> result = _store.Values.ToList();
         return Task.FromResult(result);
     }
 

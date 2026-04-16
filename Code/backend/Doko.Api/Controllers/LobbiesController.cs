@@ -48,7 +48,8 @@ public class LobbiesController(
         var response = lobbies
             .Select(l => new LobbyListItemResponse(
                 l.Id.ToString(),
-                l.Seats.Select(s => s != null).ToArray()
+                l.Seats.Select(s => s != null).ToArray(),
+                l.IsStarted
             ))
             .ToArray();
         return Ok(response);
@@ -147,8 +148,9 @@ public class LobbiesController(
         if (lobby is null)
             return NotFound(new ErrorResponse("lobby_not_found"));
 
+        // Allow restart: if the previous game is finished the lobby can host a new one
         if (lobby.IsStarted)
-            return Conflict(new ErrorResponse("lobby_already_started"));
+            lobby.MarkGameFinished();
 
         if (!lobby.IsFull)
             return BadRequest(new ErrorResponse("lobby_not_full"));
@@ -172,7 +174,7 @@ public class LobbiesController(
         var gameId = startOk.Value.GameId;
         await dealCards.ExecuteAsync(new DealCardsCommand(gameId), ct);
 
-        lobby.MarkStarted();
+        lobby.MarkStarted(gameId);
         await lobbyRepository.SaveAsync(lobby, ct);
 
         var groupName = $"lobby_{lobbyId}";

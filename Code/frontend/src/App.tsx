@@ -19,7 +19,7 @@ type AppView =
   | { kind: 'joining'; lobbyId: string }
   | { kind: 'multiplayer-browser'; selectedLobbyId?: string }
   | { kind: 'hot-seat' }
-  | { kind: 'game'; tokens: string[]; gameId: string; myPlayerId: number };
+  | { kind: 'game'; tokens: string[]; gameId: string; myPlayerId: number; lobbySession?: LobbySession };
 
 function detectInitialView(): AppView {
   const params = new URLSearchParams(window.location.search);
@@ -86,7 +86,7 @@ export default function App() {
     const { token, playerId } = session;
     const tokens = Array<string>(4).fill(token);
     window.history.replaceState({}, '', window.location.pathname);
-    setView({ kind: 'game', tokens, gameId, myPlayerId: playerId });
+    setView({ kind: 'game', tokens, gameId, myPlayerId: playerId, lobbySession: session });
   }
 
   // ── Game wiring (hot-seat and multiplayer share the same hooks) ─────────────
@@ -187,7 +187,16 @@ export default function App() {
         viewError={viewError}
         allowPlayerSwitching={isHotSeat}
         onPlayerSwitch={isHotSeat ? hotSeat.setActivePlayer : () => {}}
-        onNewGame={isHotSeat ? hotSeat.restart : () => setView({ kind: 'home' })}
+        onNewGame={
+          isHotSeat
+            ? hotSeat.restart
+            : isGame && view.lobbySession
+              ? () => {
+                  saveLobbySession(view.lobbySession!);
+                  setView({ kind: 'multiplayer-browser', selectedLobbyId: view.lobbySession!.lobbyId });
+                }
+              : () => setView({ kind: 'home' })
+        }
       />
     </>
   );

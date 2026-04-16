@@ -114,9 +114,16 @@ export function MultiplayerBrowserPage({
                       <span className="text-sm font-medium truncate">
                         Lobby
                       </span>
-                      <span className={`text-xs shrink-0 ${isSelected ? 'text-white/80' : 'text-white/40'}`}>
-                        {filledCount}/4
-                      </span>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {lobby.isStarted && (
+                          <span className={`text-xs font-medium ${isSelected ? 'text-orange-300' : 'text-orange-400'}`}>
+                            Spiel läuft
+                          </span>
+                        )}
+                        <span className={`text-xs ${isSelected ? 'text-white/80' : 'text-white/40'}`}>
+                          {filledCount}/4
+                        </span>
+                      </div>
                     </div>
                     {/* Seat indicator dots */}
                     <div className="flex gap-1 mt-1">

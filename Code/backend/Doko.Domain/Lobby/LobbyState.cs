@@ -1,3 +1,4 @@
+using Doko.Domain.GameFlow;
 using Doko.Domain.Players;
 
 namespace Doko.Domain.Lobby;
@@ -19,6 +20,9 @@ public class LobbyState
 
     public bool IsFull => _seats.All(s => s != null);
     public bool IsStarted { get; private set; }
+
+    /// <summary>The game that is currently running in this lobby, if any.</summary>
+    public GameId? ActiveGameId { get; private set; }
 
     private LobbyState(LobbyId id, DateTimeOffset createdAt)
     {
@@ -63,5 +67,16 @@ public class LobbyState
     public bool HasPlayer(PlayerId playerId) =>
         playerId.Value < 4 && _seats[playerId.Value] != null;
 
-    public void MarkStarted() => IsStarted = true;
+    public void MarkStarted(GameId gameId)
+    {
+        IsStarted = true;
+        ActiveGameId = gameId;
+    }
+
+    /// <summary>Resets the lobby so a new game can be started with the same players.</summary>
+    public void MarkGameFinished()
+    {
+        IsStarted = false;
+        ActiveGameId = null;
+    }
 }

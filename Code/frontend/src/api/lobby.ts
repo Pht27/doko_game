@@ -10,6 +10,7 @@ export interface LobbyJoinResponse {
 export interface LobbyListItemResponse {
   lobbyId: string;
   seats: boolean[];
+  isStarted: boolean;
 }
 
 export interface LobbyViewResponse {

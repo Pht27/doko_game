@@ -7,7 +7,7 @@ public record LobbyJoinResponse(
     int SeatIndex
 );
 
-public record LobbyListItemResponse(string LobbyId, bool[] Seats);
+public record LobbyListItemResponse(string LobbyId, bool[] Seats, bool IsStarted);
 
 public record LobbyViewResponse(string LobbyId, bool[] Seats, bool IsStarted);
 
