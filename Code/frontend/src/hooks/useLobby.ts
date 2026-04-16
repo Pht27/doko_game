@@ -34,6 +34,16 @@ export function loadLobbySession(lobbyId: string): LobbySession | null {
   }
 }
 
+/** Returns whatever session is stored, regardless of which lobby it belongs to. */
+export function loadAnySession(): LobbySession | null {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    return raw ? (JSON.parse(raw) as LobbySession) : null;
+  } catch {
+    return null;
+  }
+}
+
 export function clearLobbySession(): void {
   sessionStorage.removeItem(SESSION_KEY);
 }

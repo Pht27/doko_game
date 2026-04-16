@@ -1,7 +1,13 @@
 import { useState, useEffect } from 'react';
 import { t } from '../../translations';
 import { startLobbyGame, leaveLobby, joinSeat } from '../../api/lobby';
-import { useLobby, loadLobbySession, saveLobbySession, clearLobbySession } from '../../hooks/useLobby';
+import {
+  useLobby,
+  loadLobbySession,
+  loadAnySession,
+  saveLobbySession,
+  clearLobbySession,
+} from '../../hooks/useLobby';
 import type { LobbySession } from '../../hooks/useLobby';
 
 interface LobbyDetailViewProps {
@@ -18,7 +24,7 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed }: Lobby
   const [copied, setCopied] = useState(false);
   const [starting, setStarting] = useState(false);
   const [leaving, setLeaving] = useState(false);
-  const [joiningIndex, setJoiningIndex] = useState<number | null>(null);
+  const [busySeat, setBusySeat] = useState<number | null>(null); // index being joined/swapped
   const [actionError, setActionError] = useState<string | null>(null);
 
   const inviteUrl = `${window.location.origin}${window.location.pathname}?lobby=${lobbyId}`;
@@ -46,11 +52,12 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed }: Lobby
     setTimeout(() => setCopied(false), 2000);
   }
 
-  async function handleJoinSeat(seatIndex: number) {
-    setJoiningIndex(seatIndex);
+  /** Join an empty seat for the first time (no existing session in this lobby). */
+  async function doJoin(targetSeat: number) {
+    setBusySeat(targetSeat);
     setActionError(null);
     try {
-      const res = await joinSeat(lobbyId, seatIndex);
+      const res = await joinSeat(lobbyId, targetSeat);
       const newSession: LobbySession = {
         lobbyId: res.lobbyId,
         token: res.token,
@@ -62,7 +69,38 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed }: Lobby
     } catch (e) {
       setActionError(e instanceof Error ? e.message : String(e));
     } finally {
-      setJoiningIndex(null);
+      setBusySeat(null);
+    }
+  }
+
+  /** Leave current seat and immediately occupy a different one in the same lobby. */
+  async function doSwap(targetSeat: number) {
+    if (!session) return;
+    setBusySeat(targetSeat);
+    setActionError(null);
+    try {
+      // Leave first — ignore backend errors (e.g. lobby already gone) so we don't get stuck
+      try {
+        await leaveLobby(session.token, lobbyId);
+      } catch {
+        // best-effort
+      }
+      clearLobbySession();
+      setSession(null);
+
+      const res = await joinSeat(lobbyId, targetSeat);
+      const newSession: LobbySession = {
+        lobbyId: res.lobbyId,
+        token: res.token,
+        playerId: res.playerId,
+        seatIndex: res.seatIndex,
+      };
+      saveLobbySession(newSession);
+      setSession(newSession);
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusySeat(null);
     }
   }
 
@@ -97,8 +135,8 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed }: Lobby
 
   const filledCount = seats.filter(Boolean).length;
   const isMyLobby = session !== null;
-  // Block joining if user already has a session (in any lobby)
-  const hasAnySession = loadLobbySession(session?.lobbyId ?? '') !== null || isMyLobby;
+  // True if user has a session stored for a *different* lobby — blocks joining seats here
+  const isInAnotherLobby = !isMyLobby && loadAnySession() !== null;
 
   return (
     <div className="flex flex-col h-full gap-3 p-4 overflow-y-auto">
@@ -107,20 +145,29 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed }: Lobby
         {([0, 3, 1, 2] as const).map((i) => {
           const occupied = seats[i];
           const isMe = isMyLobby && session!.seatIndex === i;
-          const isJoining = joiningIndex === i;
-          const canJoin = !occupied && !hasAnySession;
+          const isBusy = busySeat === i;
+          // Can click if: seat is empty AND not blocked by a session elsewhere AND not own current seat
+          const canInteract = !occupied && !isInAnotherLobby && !isMe;
+
+          function handleClick() {
+            if (!canInteract || isBusy) return;
+            if (isMyLobby) doSwap(i);
+            else doJoin(i);
+          }
 
           return (
             <button
               key={i}
-              onClick={canJoin ? () => handleJoinSeat(i) : undefined}
-              disabled={occupied || hasAnySession || isJoining}
+              onClick={handleClick}
+              disabled={!canInteract || isBusy}
               className={`flex items-center gap-2 px-3 py-3 rounded-xl transition-colors text-left w-full ${
-                occupied
-                  ? 'bg-white/15 text-white'
-                  : canJoin
-                    ? 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white/70 cursor-pointer'
-                    : 'bg-white/5 text-white/25 cursor-default'
+                isMe
+                  ? 'bg-indigo-600/50 text-white ring-1 ring-indigo-400'
+                  : occupied
+                    ? 'bg-white/15 text-white cursor-default'
+                    : canInteract
+                      ? 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white/80 cursor-pointer'
+                      : 'bg-white/5 text-white/20 cursor-default'
               }`}
             >
               <div
@@ -129,7 +176,7 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed }: Lobby
                 }`}
               />
               <span className="text-sm font-medium truncate">
-                {isJoining ? (
+                {isBusy ? (
                   t.joiningLobby
                 ) : occupied ? (
                   <>

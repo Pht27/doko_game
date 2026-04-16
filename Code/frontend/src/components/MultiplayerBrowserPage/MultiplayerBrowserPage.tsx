@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { t } from '../../translations';
-import { listLobbies, createLobby } from '../../api/lobby';
-import { saveLobbySession, clearLobbySession } from '../../hooks/useLobby';
+import { listLobbies, createLobby, leaveLobby } from '../../api/lobby';
+import { saveLobbySession, clearLobbySession, loadAnySession } from '../../hooks/useLobby';
 import { LobbyDetailView } from './LobbyDetailView';
 import type { LobbyListItemResponse } from '../../api/lobby';
 import type { LobbySession } from '../../hooks/useLobby';
@@ -41,6 +41,17 @@ export function MultiplayerBrowserPage({
   async function handleCreateLobby() {
     setCreating(true);
     try {
+      // Leave any existing seat before creating a new lobby
+      const existing = loadAnySession();
+      if (existing) {
+        try {
+          await leaveLobby(existing.token, existing.lobbyId);
+        } catch {
+          // Best-effort: lobby may already be gone
+        }
+        clearLobbySession();
+      }
+
       const res = await createLobby();
       const session: LobbySession = {
         lobbyId: res.lobbyId,
@@ -60,8 +71,7 @@ export function MultiplayerBrowserPage({
   }
 
   function handleLobbyClosed() {
-    clearLobbySession();
-    // Deselect and refresh list
+    // Session is already cleared by LobbyDetailView before this is called
     onSelectLobby('');
     fetchLobbies();
   }
