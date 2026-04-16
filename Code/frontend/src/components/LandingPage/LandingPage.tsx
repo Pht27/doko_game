@@ -1,4 +1,5 @@
 import { t } from '../../translations';
+import { showTestFeatures } from '../../env';
 
 interface LandingPageProps {
   onCreateLobby: () => void;
@@ -18,7 +19,7 @@ export function LandingPage({ onCreateLobby, onTestGame }: LandingPageProps) {
           {t.createLobby}
         </button>
 
-        {import.meta.env.DEV && (
+        {showTestFeatures && (
           <button
             onClick={onTestGame}
             className="w-full py-4 text-xl font-semibold rounded-2xl bg-white/10 hover:bg-white/20 active:bg-white/5 text-white/70 transition-colors"

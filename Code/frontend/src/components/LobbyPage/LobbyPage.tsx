@@ -35,68 +35,70 @@ export function LobbyPage({ session, playerCount, onGameStarted }: LobbyPageProp
   }
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center gap-8 px-6">
-      <h1 className="text-3xl font-bold text-white">{t.lobbyTitle}</h1>
+    <div className="w-full h-full overflow-y-auto">
+      <div className="min-h-full flex flex-col items-center justify-center gap-4 px-6 py-8">
+        <h1 className="text-3xl font-bold text-white">{t.lobbyTitle}</h1>
 
-      {/* Player slots */}
-      <div className="flex flex-col gap-3 w-full max-w-sm">
-        {Array.from({ length: 4 }, (_, i) => {
-          const filled = i < playerCount;
-          const isMe = i === session.playerId;
-          return (
-            <div
-              key={i}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
-                filled ? 'bg-white/15 text-white' : 'bg-white/5 text-white/30'
-              }`}
-            >
+        {/* Player slots */}
+        <div className="flex flex-col gap-2 w-full max-w-sm">
+          {Array.from({ length: 4 }, (_, i) => {
+            const filled = i < playerCount;
+            const isMe = i === session.playerId;
+            return (
               <div
-                className={`w-3 h-3 rounded-full flex-shrink-0 ${
-                  filled ? 'bg-green-400' : 'bg-white/20'
+                key={i}
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-colors ${
+                  filled ? 'bg-white/15 text-white' : 'bg-white/5 text-white/30'
                 }`}
-              />
-              <span className="text-lg">
-                {t.playerSlot(i)}
-                {isMe && <span className="text-white/50 text-base">{t.youSuffix}</span>}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-
-      <p className="text-white/50 text-sm">
-        {t.playerCount(playerCount, 4)}
-        {playerCount < 4 && ` · ${t.waitingForPlayers}`}
-      </p>
-
-      {/* Invite link */}
-      <div className="flex flex-col gap-2 w-full max-w-sm">
-        <span className="text-white/50 text-xs uppercase tracking-wider">{t.inviteLink}</span>
-        <div className="flex gap-2">
-          <div className="flex-1 bg-white/10 rounded-xl px-3 py-3 text-white/60 text-sm font-mono truncate">
-            {inviteUrl}
-          </div>
-          <button
-            onClick={copyLink}
-            className="px-4 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-sm font-semibold transition-colors flex-shrink-0"
-          >
-            {copied ? t.linkCopied : t.copyLink}
-          </button>
+              >
+                <div
+                  className={`w-3 h-3 rounded-full shrink-0 ${
+                    filled ? 'bg-green-400' : 'bg-white/20'
+                  }`}
+                />
+                <span className="text-lg">
+                  {t.playerSlot(i)}
+                  {isMe && <span className="text-white/50 text-base">{t.youSuffix}</span>}
+                </span>
+              </div>
+            );
+          })}
         </div>
+
+        <p className="text-white/50 text-sm">
+          {t.playerCount(playerCount, 4)}
+          {playerCount < 4 && ` · ${t.waitingForPlayers}`}
+        </p>
+
+        {/* Invite link */}
+        <div className="flex flex-col gap-2 w-full max-w-sm">
+          <span className="text-white/50 text-xs uppercase tracking-wider">{t.inviteLink}</span>
+          <div className="flex gap-2">
+            <div className="flex-1 bg-white/10 rounded-xl px-3 py-2.5 text-white/60 text-sm font-mono truncate">
+              {inviteUrl}
+            </div>
+            <button
+              onClick={copyLink}
+              className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-sm font-semibold transition-colors shrink-0"
+            >
+              {copied ? t.linkCopied : t.copyLink}
+            </button>
+          </div>
+        </div>
+
+        {/* Start button (host only) */}
+        {session.isHost && (
+          <button
+            onClick={handleStartGame}
+            disabled={playerCount < 4 || starting}
+            className="w-full max-w-sm py-3.5 text-xl font-semibold rounded-2xl bg-green-600 hover:bg-green-500 active:bg-green-700 text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {starting ? t.loading : t.startGame}
+          </button>
+        )}
+
+        {error && <p className="text-red-400 text-sm text-center">{error}</p>}
       </div>
-
-      {/* Start button (host only) */}
-      {session.isHost && (
-        <button
-          onClick={handleStartGame}
-          disabled={playerCount < 4 || starting}
-          className="w-full max-w-sm py-4 text-xl font-semibold rounded-2xl bg-green-600 hover:bg-green-500 active:bg-green-700 text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          {starting ? t.loading : t.startGame}
-        </button>
-      )}
-
-      {error && <p className="text-red-400 text-sm text-center">{error}</p>}
     </div>
   );
 }
