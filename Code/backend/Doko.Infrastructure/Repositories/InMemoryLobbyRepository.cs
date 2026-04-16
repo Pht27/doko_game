@@ -11,9 +11,23 @@ public sealed class InMemoryLobbyRepository : ILobbyRepository
     public Task<LobbyState?> GetAsync(LobbyId id, CancellationToken ct = default) =>
         Task.FromResult(_store.GetValueOrDefault(id));
 
+    public Task<IReadOnlyList<LobbyState>> GetAllAsync(CancellationToken ct = default)
+    {
+        IReadOnlyList<LobbyState> result = _store.Values
+            .Where(l => !l.IsStarted)
+            .ToList();
+        return Task.FromResult(result);
+    }
+
     public Task SaveAsync(LobbyState lobby, CancellationToken ct = default)
     {
         _store[lobby.Id] = lobby;
+        return Task.CompletedTask;
+    }
+
+    public Task DeleteAsync(LobbyId id, CancellationToken ct = default)
+    {
+        _store.TryRemove(id, out _);
         return Task.CompletedTask;
     }
 }

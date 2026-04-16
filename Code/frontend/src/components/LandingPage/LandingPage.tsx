@@ -2,21 +2,21 @@ import { t } from '../../translations';
 import { showTestFeatures } from '../../env';
 
 interface LandingPageProps {
-  onCreateLobby: () => void;
+  onMultiplayer: () => void;
   onTestGame: () => void;
 }
 
-export function LandingPage({ onCreateLobby, onTestGame }: LandingPageProps) {
+export function LandingPage({ onMultiplayer, onTestGame }: LandingPageProps) {
   return (
     <div className="w-full h-full flex flex-col items-center justify-center gap-10 px-6">
       <h1 className="text-5xl font-bold tracking-wide text-white">{t.landingTitle}</h1>
 
       <div className="flex flex-col gap-4 w-full max-w-xs">
         <button
-          onClick={onCreateLobby}
+          onClick={onMultiplayer}
           className="w-full py-4 text-xl font-semibold rounded-2xl bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white transition-colors"
         >
-          {t.createLobby}
+          {t.multiplayer}
         </button>
 
         {showTestFeatures && (

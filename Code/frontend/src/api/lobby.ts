@@ -3,15 +3,18 @@ import { apiFetch } from './client';
 export interface LobbyJoinResponse {
   lobbyId: string;
   playerId: number;
-  isHost: boolean;
   token: string;
-  playerCount: number;
+  seatIndex: number;
+}
+
+export interface LobbyListItemResponse {
+  lobbyId: string;
+  seats: boolean[];
 }
 
 export interface LobbyViewResponse {
   lobbyId: string;
-  playerCount: number;
-  isFull: boolean;
+  seats: boolean[];
   isStarted: boolean;
 }
 
@@ -19,8 +22,16 @@ export function createLobby(): Promise<LobbyJoinResponse> {
   return apiFetch('/lobbies', null, { method: 'POST' });
 }
 
-export function joinLobby(lobbyId: string): Promise<LobbyJoinResponse> {
-  return apiFetch(`/lobbies/${lobbyId}/join`, null, { method: 'POST' });
+export function listLobbies(): Promise<LobbyListItemResponse[]> {
+  return apiFetch('/lobbies', null);
+}
+
+export function joinSeat(lobbyId: string, seatIndex: number): Promise<LobbyJoinResponse> {
+  return apiFetch(`/lobbies/${lobbyId}/seats/${seatIndex}/join`, null, { method: 'POST' });
+}
+
+export function leaveLobby(token: string, lobbyId: string): Promise<void> {
+  return apiFetch(`/lobbies/${lobbyId}/leave`, token, { method: 'POST' });
 }
 
 export function getLobby(lobbyId: string): Promise<LobbyViewResponse> {

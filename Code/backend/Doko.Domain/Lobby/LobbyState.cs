@@ -6,13 +6,18 @@ public record LobbyPlayer(PlayerId Id, DateTimeOffset JoinedAt);
 
 public class LobbyState
 {
-    private readonly List<LobbyPlayer> _players = [];
+    private readonly LobbyPlayer?[] _seats = new LobbyPlayer?[4];
 
     public LobbyId Id { get; }
     public DateTimeOffset CreatedAt { get; }
-    public IReadOnlyList<LobbyPlayer> Players => _players.AsReadOnly();
-    public PlayerId HostId => _players[0].Id;
-    public bool IsFull => _players.Count == 4;
+
+    /// <summary>All currently seated players (non-null seats).</summary>
+    public IEnumerable<LobbyPlayer> Players => _seats.Where(s => s != null).Cast<LobbyPlayer>();
+
+    /// <summary>Snapshot of the 4 seats; null means empty.</summary>
+    public IReadOnlyList<LobbyPlayer?> Seats => _seats.AsReadOnly();
+
+    public bool IsFull => _seats.All(s => s != null);
     public bool IsStarted { get; private set; }
 
     private LobbyState(LobbyId id, DateTimeOffset createdAt)
@@ -21,30 +26,42 @@ public class LobbyState
         CreatedAt = createdAt;
     }
 
-    /// <summary>Creates a new lobby with the first player (seat 0) as host.</summary>
+    /// <summary>Creates a new lobby; the creator automatically occupies seat 0.</summary>
     public static LobbyState Create()
     {
         var lobby = new LobbyState(LobbyId.New(), DateTimeOffset.UtcNow);
-        lobby._players.Add(new LobbyPlayer(new PlayerId(0), DateTimeOffset.UtcNow));
+        lobby._seats[0] = new LobbyPlayer(new PlayerId(0), DateTimeOffset.UtcNow);
         return lobby;
     }
 
     /// <summary>
-    /// Tries to add the next player. Returns false if the lobby is already full.
-    /// The assigned <paramref name="newPlayerId"/> is the seat index (1, 2, or 3).
+    /// Tries to occupy a specific seat. Returns false if the index is out of range,
+    /// the seat is already taken, or the lobby is full/started.
     /// </summary>
-    public bool TryAddPlayer(out PlayerId newPlayerId)
+    public bool TryOccupySeat(int seatIndex, out PlayerId playerId)
     {
-        if (IsFull)
-        {
-            newPlayerId = default;
-            return false;
-        }
+        playerId = default;
+        if (seatIndex < 0 || seatIndex >= 4) return false;
+        if (IsStarted) return false;
+        if (_seats[seatIndex] != null) return false;
 
-        newPlayerId = new PlayerId((byte)_players.Count);
-        _players.Add(new LobbyPlayer(newPlayerId, DateTimeOffset.UtcNow));
+        playerId = new PlayerId((byte)seatIndex);
+        _seats[seatIndex] = new LobbyPlayer(playerId, DateTimeOffset.UtcNow);
         return true;
     }
+
+    /// <summary>
+    /// Removes the player from their seat. Returns true if the lobby is now completely empty.
+    /// </summary>
+    public bool TryRemovePlayer(PlayerId playerId)
+    {
+        _seats[playerId.Value] = null;
+        return _seats.All(s => s == null);
+    }
+
+    /// <summary>Returns true if the given player currently holds a seat.</summary>
+    public bool HasPlayer(PlayerId playerId) =>
+        playerId.Value < 4 && _seats[playerId.Value] != null;
 
     public void MarkStarted() => IsStarted = true;
 }

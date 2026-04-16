@@ -7,12 +7,13 @@ export interface LobbySession {
   lobbyId: string;
   token: string;
   playerId: number;
-  isHost: boolean;
+  seatIndex: number;
 }
 
 export interface LobbyHookState {
-  playerCount: number;
+  seats: boolean[];
   gameId: string | null;
+  lobbyClosed: boolean;
   error: string | null;
 }
 
@@ -38,8 +39,9 @@ export function clearLobbySession(): void {
 }
 
 export function useLobby(session: LobbySession | null): LobbyHookState {
-  const [playerCount, setPlayerCount] = useState(1);
+  const [seats, setSeats] = useState<boolean[]>(Array(4).fill(false));
   const [gameId, setGameId] = useState<string | null>(null);
+  const [lobbyClosed, setLobbyClosed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const hubRef = useRef<HubConnection | null>(null);
 
@@ -55,11 +57,8 @@ export function useLobby(session: LobbySession | null): LobbyHookState {
       try {
         const view = await getLobby(session.lobbyId);
         if (cancelled) return;
-        setPlayerCount(view.playerCount);
-        if (view.isStarted) {
-          // Lobby already started before we connected
-          return;
-        }
+        setSeats(view.seats);
+        if (view.isStarted) return;
       } catch {
         // Non-fatal: SignalR events will keep us updated
       }
@@ -68,12 +67,30 @@ export function useLobby(session: LobbySession | null): LobbyHookState {
       const hub = createHubConnection(session.token);
       hubRef.current = hub;
 
-      hub.on('playerJoined', (data: { playerCount: number }) => {
-        if (!cancelled) setPlayerCount(data.playerCount);
+      hub.on('playerJoined', (data: { seatIndex: number }) => {
+        if (cancelled) return;
+        setSeats((prev) => {
+          const next = [...prev];
+          next[data.seatIndex] = true;
+          return next;
+        });
+      });
+
+      hub.on('playerLeft', (data: { seatIndex: number }) => {
+        if (cancelled) return;
+        setSeats((prev) => {
+          const next = [...prev];
+          next[data.seatIndex] = false;
+          return next;
+        });
       });
 
       hub.on('gameStarted', (data: { gameId: string }) => {
         if (!cancelled) setGameId(data.gameId);
+      });
+
+      hub.on('lobbyClosed', () => {
+        if (!cancelled) setLobbyClosed(true);
       });
 
       try {
@@ -94,5 +111,5 @@ export function useLobby(session: LobbySession | null): LobbyHookState {
     };
   }, [session?.lobbyId, session?.token]);
 
-  return { playerCount, gameId, error };
+  return { seats, gameId, lobbyClosed, error };
 }

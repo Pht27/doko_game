@@ -3,12 +3,12 @@ import { useHotSeat } from './hooks/useHotSeat';
 import { useGameState } from './hooks/useGameState';
 import { useTrickAnimation } from './hooks/useTrickAnimation';
 import { useGameActions } from './hooks/useGameActions';
-import { useLobby, saveLobbySession, loadLobbySession, clearLobbySession } from './hooks/useLobby';
-import { createLobby, joinLobby } from './api/lobby';
+import { saveLobbySession, loadLobbySession } from './hooks/useLobby';
+import { joinSeat, getLobby } from './api/lobby';
 import { GameBoard } from './components/GameBoard/GameBoard';
 import { GameLoader } from './components/GameLoader/GameLoader';
 import { LandingPage } from './components/LandingPage/LandingPage';
-import { LobbyPage } from './components/LobbyPage/LobbyPage';
+import { MultiplayerBrowserPage } from './components/MultiplayerBrowserPage/MultiplayerBrowserPage';
 import { PortraitOverlay } from './components/PortraitOverlay/PortraitOverlay';
 import { t } from './translations';
 import type { LobbySession } from './hooks/useLobby';
@@ -17,7 +17,7 @@ import type { HotSeatSession } from './hooks/useHotSeat';
 type AppView =
   | { kind: 'home' }
   | { kind: 'joining'; lobbyId: string }
-  | { kind: 'lobby'; session: LobbySession }
+  | { kind: 'multiplayer-browser'; selectedLobbyId?: string }
   | { kind: 'hot-seat' }
   | { kind: 'game'; tokens: string[]; gameId: string; myPlayerId: number };
 
@@ -26,7 +26,7 @@ function detectInitialView(): AppView {
   const lobbyId = params.get('lobby');
   if (lobbyId) {
     const stored = loadLobbySession(lobbyId);
-    if (stored) return { kind: 'lobby', session: stored };
+    if (stored) return { kind: 'multiplayer-browser', selectedLobbyId: lobbyId };
     return { kind: 'joining', lobbyId };
   }
   return { kind: 'home' };
@@ -49,64 +49,45 @@ export default function App() {
     let cancelled = false;
     setJoinError(null);
 
-    joinLobby(joiningLobbyId)
-      .then((res) => {
+    async function autoJoin() {
+      try {
+        // Find first available seat
+        const lobbyView = await getLobby(joiningLobbyId!);
         if (cancelled) return;
+
+        const seatIndex = lobbyView.seats.findIndex((occupied) => !occupied);
+        if (seatIndex === -1) {
+          if (!cancelled) setJoinError(t.lobbyFull);
+          return;
+        }
+
+        const res = await joinSeat(joiningLobbyId!, seatIndex);
+        if (cancelled) return;
+
         const session: LobbySession = {
           lobbyId: res.lobbyId,
           token: res.token,
           playerId: res.playerId,
-          isHost: false,
+          seatIndex: res.seatIndex,
         };
         saveLobbySession(session);
         window.history.replaceState({}, '', `?lobby=${res.lobbyId}`);
-        setView({ kind: 'lobby', session });
-      })
-      .catch((e: unknown) => {
+        setView({ kind: 'multiplayer-browser', selectedLobbyId: res.lobbyId });
+      } catch (e: unknown) {
         if (!cancelled) setJoinError(e instanceof Error ? e.message : String(e));
-      });
+      }
+    }
 
+    autoJoin();
     return () => { cancelled = true; };
   }, [joiningLobbyId]);
 
-  async function handleCreateLobby() {
-    try {
-      const res = await createLobby();
-      const session: LobbySession = {
-        lobbyId: res.lobbyId,
-        token: res.token,
-        playerId: res.playerId,
-        isHost: true,
-      };
-      saveLobbySession(session);
-      window.history.pushState({}, '', `?lobby=${res.lobbyId}`);
-      setView({ kind: 'lobby', session });
-    } catch (e) {
-      console.error('Failed to create lobby', e);
-    }
-  }
-
-  function handleGameStarted(gameId: string) {
-    if (view.kind !== 'lobby') return;
-    const { token, playerId } = view.session;
-    // Each slot holds the player's own token; activePlayer is locked to myPlayerId.
+  function handleGameStarted(gameId: string, session: LobbySession) {
+    const { token, playerId } = session;
     const tokens = Array<string>(4).fill(token);
-    clearLobbySession();
     window.history.replaceState({}, '', window.location.pathname);
     setView({ kind: 'game', tokens, gameId, myPlayerId: playerId });
   }
-
-  // Lobby SignalR subscription (only active when in lobby view)
-  const lobbySession = view.kind === 'lobby' ? view.session : null;
-  const { playerCount, gameId: lobbyGameId } = useLobby(lobbySession);
-
-  // Transition to game when backend broadcasts gameStarted
-  useEffect(() => {
-    if (lobbyGameId && view.kind === 'lobby') {
-      handleGameStarted(lobbyGameId);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lobbyGameId]);
 
   // ── Game wiring (hot-seat and multiplayer share the same hooks) ─────────────
 
@@ -143,7 +124,7 @@ export default function App() {
       <>
         <PortraitOverlay />
         <LandingPage
-          onCreateLobby={handleCreateLobby}
+          onMultiplayer={() => setView({ kind: 'multiplayer-browser' })}
           onTestGame={() => setView({ kind: 'hot-seat' })}
         />
       </>
@@ -163,13 +144,14 @@ export default function App() {
     );
   }
 
-  if (view.kind === 'lobby') {
+  if (view.kind === 'multiplayer-browser') {
     return (
       <>
         <PortraitOverlay />
-        <LobbyPage
-          session={view.session}
-          playerCount={playerCount}
+        <MultiplayerBrowserPage
+          selectedLobbyId={view.selectedLobbyId}
+          onBack={() => setView({ kind: 'home' })}
+          onSelectLobby={(lobbyId) => setView({ kind: 'multiplayer-browser', selectedLobbyId: lobbyId })}
           onGameStarted={handleGameStarted}
         />
       </>

@@ -5,8 +5,6 @@ using Doko.Application.Games.Commands;
 using Doko.Application.Games.Handlers;
 using Doko.Application.Lobbies;
 using Doko.Application.Lobbies.Handlers;
-using Doko.Application.Lobbies.Queries;
-using Doko.Domain.GameFlow;
 using Doko.Domain.Lobby;
 using Doko.Domain.Players;
 using Microsoft.AspNetCore.Authorization;
@@ -19,7 +17,8 @@ namespace Doko.Api.Controllers;
 [Route("lobbies")]
 public class LobbiesController(
     ICreateLobbyHandler createLobby,
-    IJoinLobbyHandler joinLobby,
+    IJoinSeatHandler joinSeat,
+    ILeaveLobbyHandler leaveLobby,
     ILobbyRepository lobbyRepository,
     IStartGameHandler startGame,
     IDealCardsHandler dealCards,
@@ -37,52 +36,89 @@ public class LobbiesController(
 
         var token = tokenService.GenerateToken(ok.Value.PlayerId);
         return Ok(
-            new LobbyJoinResponse(
-                ok.Value.LobbyId.ToString(),
-                ok.Value.PlayerId.Value,
-                IsHost: true,
-                token,
-                PlayerCount: 1
-            )
+            new LobbyJoinResponse(ok.Value.LobbyId.ToString(), ok.Value.PlayerId.Value, token, SeatIndex: 0)
         );
     }
 
-    [HttpPost("{lobbyId}/join")]
+    [HttpGet]
     [AllowAnonymous]
-    public async Task<IActionResult> JoinLobby(string lobbyId, CancellationToken ct)
+    public async Task<IActionResult> ListLobbies(CancellationToken ct)
+    {
+        var lobbies = await lobbyRepository.GetAllAsync(ct);
+        var response = lobbies
+            .Select(l => new LobbyListItemResponse(
+                l.Id.ToString(),
+                l.Seats.Select(s => s != null).ToArray()
+            ))
+            .ToArray();
+        return Ok(response);
+    }
+
+    [HttpPost("{lobbyId}/seats/{seatIndex:int}/join")]
+    [AllowAnonymous]
+    public async Task<IActionResult> JoinSeat(string lobbyId, int seatIndex, CancellationToken ct)
     {
         if (!Guid.TryParse(lobbyId, out var guid))
             return NotFound(new ErrorResponse("lobby_not_found"));
 
-        var result = await joinLobby.ExecuteAsync(new LobbyId(guid), ct);
+        var command = new JoinSeatCommand(new LobbyId(guid), seatIndex);
+        var result = await joinSeat.ExecuteAsync(command, ct);
 
-        if (result is LobbyActionResult<JoinLobbyResult>.Failure failure)
+        if (result is LobbyActionResult<JoinSeatResult>.Failure failure)
             return failure.Error switch
             {
                 LobbyError.LobbyNotFound => NotFound(new ErrorResponse("lobby_not_found")),
-                LobbyError.LobbyFull => Conflict(new ErrorResponse("lobby_full")),
-                LobbyError.LobbyAlreadyStarted => Conflict(
-                    new ErrorResponse("lobby_already_started")
-                ),
+                LobbyError.LobbyAlreadyStarted => Conflict(new ErrorResponse("lobby_already_started")),
+                LobbyError.SeatOccupied => Conflict(new ErrorResponse("seat_occupied")),
                 _ => StatusCode(500, new ErrorResponse("unknown_error")),
             };
 
-        var ok = ((LobbyActionResult<JoinLobbyResult>.Ok)result).Value;
-        var playerCount = ok.PlayerId.Value + 1;
+        var ok = ((LobbyActionResult<JoinSeatResult>.Ok)result).Value;
 
         await hub
             .Clients.Group($"lobby_{lobbyId}")
-            .SendAsync("playerJoined", new { playerCount }, ct);
+            .SendAsync("playerJoined", new { seatIndex, playerCount = ok.IsNowFull ? 4 : 0 }, ct);
 
         return Ok(
             new LobbyJoinResponse(
                 lobbyId,
                 ok.PlayerId.Value,
-                IsHost: false,
                 tokenService.GenerateToken(ok.PlayerId),
-                PlayerCount: playerCount
+                SeatIndex: seatIndex
             )
         );
+    }
+
+    [HttpPost("{lobbyId}/leave")]
+    [Authorize]
+    public async Task<IActionResult> LeaveLobby(string lobbyId, CancellationToken ct)
+    {
+        if (!Guid.TryParse(lobbyId, out var guid))
+            return NotFound(new ErrorResponse("lobby_not_found"));
+
+        var callerIdClaim = User.FindFirst("player_id")?.Value ?? "255";
+        var callerId = new PlayerId((byte)int.Parse(callerIdClaim));
+
+        var command = new LeaveLobbyCommand(new LobbyId(guid), callerId);
+        var result = await leaveLobby.ExecuteAsync(command, ct);
+
+        if (result is LobbyActionResult<LeaveLobbyResult>.Failure failure)
+            return failure.Error switch
+            {
+                LobbyError.LobbyNotFound => NotFound(new ErrorResponse("lobby_not_found")),
+                LobbyError.PlayerNotInLobby => Conflict(new ErrorResponse("player_not_in_lobby")),
+                _ => StatusCode(500, new ErrorResponse("unknown_error")),
+            };
+
+        var ok = ((LobbyActionResult<LeaveLobbyResult>.Ok)result).Value;
+
+        if (ok.LobbyDeleted)
+            await hub.Clients.Group($"lobby_{lobbyId}").SendAsync("lobbyClosed", ct);
+        else
+            await hub.Clients.Group($"lobby_{lobbyId}")
+                .SendAsync("playerLeft", new { seatIndex = callerId.Value }, ct);
+
+        return NoContent();
     }
 
     [HttpGet("{lobbyId}")]
@@ -96,15 +132,8 @@ public class LobbiesController(
         if (lobby is null)
             return NotFound(new ErrorResponse("lobby_not_found"));
 
-        var view = new LobbyView(lobby.Id, lobby.Players.Count, lobby.IsFull, lobby.IsStarted);
-        return Ok(
-            new LobbyViewResponse(
-                view.LobbyId.ToString(),
-                view.PlayerCount,
-                view.IsFull,
-                view.IsStarted
-            )
-        );
+        var seats = lobby.Seats.Select(s => s != null).ToArray();
+        return Ok(new LobbyViewResponse(lobbyId, seats, lobby.IsStarted));
     }
 
     [HttpPost("{lobbyId}/start")]
@@ -126,7 +155,7 @@ public class LobbiesController(
 
         var callerIdClaim = User.FindFirst("player_id")?.Value ?? "255";
         var callerId = new PlayerId((byte)int.Parse(callerIdClaim));
-        if (callerId != lobby.HostId)
+        if (!lobby.HasPlayer(callerId))
             return Forbid();
 
         var players = lobby.Players.Select(p => p.Id).ToList();

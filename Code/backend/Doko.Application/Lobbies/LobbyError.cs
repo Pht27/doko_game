@@ -5,5 +5,6 @@ public enum LobbyError
     LobbyNotFound,
     LobbyFull,
     LobbyAlreadyStarted,
-    NotHost,
+    SeatOccupied,
+    PlayerNotInLobby,
 }

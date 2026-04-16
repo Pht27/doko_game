@@ -9,16 +9,21 @@ export const t = {
 
   // ── LandingPage ────────────────────────────────────────────────────────────
   landingTitle: 'Doppelkopf',
+  multiplayer: 'Mehrspieler',
   createLobby: 'Lobby erstellen',
   testGame: 'Testspiel starten',
 
-  // ── LobbyPage ──────────────────────────────────────────────────────────────
+  // ── MultiplayerBrowserPage / LobbyDetailView ───────────────────────────────
+  back: '← Zurück',
   lobbyTitle: 'Lobby',
+  noLobbiesAvailable: 'Keine Lobbys vorhanden',
+  seatLabel: (n: number) => `Sitz ${n + 1}`,
   waitingForPlayers: 'Warte auf Spieler…',
   inviteLink: 'Einladungslink',
   copyLink: 'Link kopieren',
   linkCopied: 'Kopiert!',
   startGame: 'Spiel starten',
+  leaveSeat: 'Platz verlassen',
   playerSlot: (n: number) => `Spieler ${n + 1}`,
   youSuffix: ' (Du)',
   playerCount: (current: number, total: number) => `${current} von ${total} Spielern`,

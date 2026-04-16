@@ -28,7 +28,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IGameScorer, GameScorer>();
 
         services.AddScoped<ICreateLobbyHandler, CreateLobbyHandler>();
-        services.AddScoped<IJoinLobbyHandler, JoinLobbyHandler>();
+        services.AddScoped<IJoinSeatHandler, JoinSeatHandler>();
+        services.AddScoped<ILeaveLobbyHandler, LeaveLobbyHandler>();
 
         return services;
     }
