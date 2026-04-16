@@ -155,13 +155,16 @@ export interface ExchangeArmutCardsResponse {
 // ── SignalR events ─────────────────────────────────────────────────────────────
 
 export type SignalREvent =
+  | 'HealthDeclared'
   | 'CardPlayed'
   | 'TrickCompleted'
   | 'AnnouncementMade'
   | 'ReservationMade'
+  | 'ArmutResponse'
+  | 'ArmutCardsExchanged'
+  | 'PartyRevealed'
   | 'GameFinished'
-  | 'SonderkarteTriggered'
-  | 'ArmutCardsExchanged';
+  | 'SonderkarteTriggered';
 
 export interface SonderkarteNotification {
   player: number;

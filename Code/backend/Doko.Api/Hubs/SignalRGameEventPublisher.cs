@@ -53,6 +53,12 @@ public sealed class SignalRGameEventPublisher(IHubContext<GameHub> hubContext) :
                     ct
                 ),
 
+                HealthDeclaredEvent e => group.SendAsync(
+                    "healthDeclared",
+                    new { player = e.Player.Value },
+                    ct
+                ),
+
                 ReservationMadeEvent e => group.SendAsync(
                     "reservationMade",
                     new
@@ -72,6 +78,12 @@ public sealed class SignalRGameEventPublisher(IHubContext<GameHub> hubContext) :
                 PartyRevealedEvent e => group.SendAsync(
                     "partyRevealed",
                     new { player = e.Player.Value, party = e.Party.ToString() },
+                    ct
+                ),
+
+                ArmutResponseEvent e => group.SendAsync(
+                    "armutResponse",
+                    new { player = e.Player.Value, accepted = e.Accepted },
                     ct
                 ),
 

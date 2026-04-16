@@ -28,6 +28,7 @@ export function useGameState(
     useState<SonderkarteNotification | null>(null);
   const notifTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const connectionRef = useRef<signalR.HubConnection | null>(null);
+  const refetchRef = useRef<(() => void) | null>(null);
 
   const token = tokens[activePlayer];
 
@@ -50,6 +51,11 @@ export function useGameState(
     setFinishedResult(null);
   }, [gameId]);
 
+  // Keep ref in sync so SignalR handlers always call the latest refetch
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
+
   // Re-fetch whenever active player changes
   useEffect(() => {
     refetch();
@@ -62,25 +68,29 @@ export function useGameState(
     connectionRef.current = connection;
 
     const handleEvent = (_payload: unknown) => {
-      refetch();
+      refetchRef.current?.();
     };
 
     const handleGameFinished = (payload: { result: GameResultDto }) => {
       setFinishedResult(payload.result);
-      refetch();
+      refetchRef.current?.();
     };
 
     const handleSonderkarteTriggered = (payload: SonderkarteNotification) => {
       if (notifTimerRef.current) clearTimeout(notifTimerRef.current);
       setSonderkarteNotification(payload);
       notifTimerRef.current = setTimeout(() => setSonderkarteNotification(null), 3000);
-      refetch();
+      refetchRef.current?.();
     };
 
+    connection.on('HealthDeclared', handleEvent);
     connection.on('CardPlayed', handleEvent);
     connection.on('TrickCompleted', handleEvent);
     connection.on('AnnouncementMade', handleEvent);
     connection.on('ReservationMade', handleEvent);
+    connection.on('ArmutResponse', handleEvent);
+    connection.on('ArmutCardsExchanged', handleEvent);
+    connection.on('PartyRevealed', handleEvent);
     connection.on('SonderkarteTriggered', handleSonderkarteTriggered);
     connection.on('GameFinished', handleGameFinished);
 
