@@ -19,7 +19,7 @@ interface LobbyDetailViewProps {
 export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed }: LobbyDetailViewProps) {
   const [session, setSession] = useState<LobbySession | null>(() => loadLobbySession(lobbyId));
 
-  const { seats, gameId, lobbyClosed, error } = useLobby(session);
+  const { seats, gameId, lobbyClosed, error } = useLobby(session, lobbyId);
 
   const [copied, setCopied] = useState(false);
   const [starting, setStarting] = useState(false);

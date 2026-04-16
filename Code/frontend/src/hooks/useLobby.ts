@@ -48,33 +48,32 @@ export function clearLobbySession(): void {
   sessionStorage.removeItem(SESSION_KEY);
 }
 
-export function useLobby(session: LobbySession | null): LobbyHookState {
+export function useLobby(session: LobbySession | null, lobbyId: string): LobbyHookState {
   const [seats, setSeats] = useState<boolean[]>(Array(4).fill(false));
   const [gameId, setGameId] = useState<string | null>(null);
   const [lobbyClosed, setLobbyClosed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const hubRef = useRef<HubConnection | null>(null);
 
+  // Fetch current seat state — getLobby is unauthenticated, so this runs even
+  // before the user joins. Re-fetches on join (session?.token changes) to get
+  // a fresh snapshot before SignalR takes over.
+  useEffect(() => {
+    let cancelled = false;
+    getLobby(lobbyId)
+      .then((view) => { if (!cancelled) setSeats(view.seats); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [lobbyId, session?.token]);
+
+  // Connect to SignalR for live updates — requires an authenticated session.
   useEffect(() => {
     if (!session) return;
 
     let cancelled = false;
 
     async function setup() {
-      if (!session) return;
-
-      // Fetch initial lobby state
-      try {
-        const view = await getLobby(session.lobbyId);
-        if (cancelled) return;
-        setSeats(view.seats);
-        if (view.isStarted) return;
-      } catch {
-        // Non-fatal: SignalR events will keep us updated
-      }
-
-      // Connect to SignalR and subscribe to lobby events
-      const hub = createHubConnection(session.token);
+      const hub = createHubConnection(session!.token);
       hubRef.current = hub;
 
       hub.on('playerJoined', (data: { seatIndex: number }) => {
@@ -106,7 +105,7 @@ export function useLobby(session: LobbySession | null): LobbyHookState {
       try {
         await hub.start();
         if (cancelled) { await hub.stop(); return; }
-        await joinLobbyGroup(hub, session.lobbyId);
+        await joinLobbyGroup(hub, session!.lobbyId);
       } catch (e) {
         if (!cancelled) setError(e instanceof Error ? e.message : String(e));
       }
