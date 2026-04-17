@@ -39,6 +39,28 @@ export default function App() {
     });
   }, []);
 
+  useEffect(() => {
+    const isPwa =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.matchMedia('(display-mode: fullscreen)').matches ||
+      (window.navigator as { standalone?: boolean }).standalone === true;
+
+    if (!isPwa) return;
+
+    function enterFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      }
+    }
+
+    window.addEventListener('click', enterFullscreen, { once: true });
+    window.addEventListener('touchstart', enterFullscreen, { once: true });
+    return () => {
+      window.removeEventListener('click', enterFullscreen);
+      window.removeEventListener('touchstart', enterFullscreen);
+    };
+  }, []);
+
   const [view, setView] = useState<AppView>(detectInitialView);
   const [joinError, setJoinError] = useState<string | null>(null);
 
