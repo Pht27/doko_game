@@ -66,19 +66,6 @@ export function useLobby(session: LobbySession | null, lobbyId: string): LobbyHo
     return () => { cancelled = true; };
   }, [lobbyId, session?.token]);
 
-  // Viewer polling: detect lobby deletion when there's no session (no SignalR connection).
-  useEffect(() => {
-    if (session) return;
-    const id = setInterval(async () => {
-      try {
-        await getLobby(lobbyId);
-      } catch {
-        setLobbyClosed(true);
-      }
-    }, 3000);
-    return () => clearInterval(id);
-  }, [lobbyId, session]);
-
   // Connect to SignalR for live updates — requires an authenticated session.
   useEffect(() => {
     if (!session) return;

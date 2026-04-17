@@ -21,11 +21,13 @@ export function MultiplayerBrowserPage({
 }: MultiplayerBrowserPageProps) {
   const [lobbies, setLobbies] = useState<LobbyListItemResponse[]>([]);
   const [creating, setCreating] = useState(false);
+  const [hasFetchedLobbies, setHasFetchedLobbies] = useState(false);
 
   const fetchLobbies = useCallback(async () => {
     try {
       const result = await listLobbies();
       setLobbies(result);
+      setHasFetchedLobbies(true);
     } catch {
       // Non-fatal — keep showing last known list
     }
@@ -37,6 +39,15 @@ export function MultiplayerBrowserPage({
     const id = setInterval(fetchLobbies, 3000);
     return () => clearInterval(id);
   }, [fetchLobbies]);
+
+  // Close detail view if the selected lobby disappears from the list
+  useEffect(() => {
+    if (!hasFetchedLobbies || !selectedLobbyId) return;
+    if (!lobbies.some((l) => l.lobbyId === selectedLobbyId)) {
+      handleLobbyClosed();
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lobbies, selectedLobbyId, hasFetchedLobbies]);
 
   async function handleCreateLobby() {
     setCreating(true);
