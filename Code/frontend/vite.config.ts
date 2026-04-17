@@ -39,7 +39,7 @@ export default defineConfig(({ mode }) => {
         description: 'A multiplayer card game',
         theme_color: '#ffffff',
         background_color: '#ffffff',
-        display: 'standalone',
+        display: 'fullscreen',
         orientation: 'landscape',
         start_url: '/',
         icons: [
