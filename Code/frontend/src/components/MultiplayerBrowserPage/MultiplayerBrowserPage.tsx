@@ -71,9 +71,10 @@ export function MultiplayerBrowserPage({
         seatIndex: res.seatIndex,
       };
       saveLobbySession(session);
-      onSelectLobby(res.lobbyId);
-      // Refresh list immediately so new lobby appears
+      // Refresh list before selecting so the lobby is already in lobbies
+      // when the "disappeared from list" effect runs.
       await fetchLobbies();
+      onSelectLobby(res.lobbyId);
     } catch (e) {
       console.error('Failed to create lobby', e);
     } finally {
