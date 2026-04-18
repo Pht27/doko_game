@@ -11,6 +11,7 @@ public class LobbyState
     private readonly LobbyPlayer?[] _seats = new LobbyPlayer?[4];
     private readonly int[] _standings = new int[4];
     private readonly HashSet<byte> _newGameVoters = [];
+    private readonly HashSet<byte> _lobbyStartVoters = [];
     private readonly List<(GameResult Result, string? GameMode, int[] NetPoints)> _gameHistory = [];
     private bool _advanceRauskommer = true;
 
@@ -45,6 +46,9 @@ public class LobbyState
 
     /// <summary>Number of players who have voted to start a new game.</summary>
     public int NewGameVoteCount => _newGameVoters.Count;
+
+    /// <summary>Number of players who have voted ready to start the initial lobby game.</summary>
+    public int LobbyStartVoteCount => _lobbyStartVoters.Count;
 
     private LobbyState(LobbyId id, DateTimeOffset createdAt)
     {
@@ -119,6 +123,19 @@ public class LobbyState
 
     /// <summary>Clears all new-game votes (called when the new game actually starts).</summary>
     public void ResetNewGameVotes() => _newGameVoters.Clear();
+
+    /// <summary>Adds a vote to start the initial lobby game. Returns true when all 4 have voted.</summary>
+    public bool AddLobbyStartVote(PlayerId playerId)
+    {
+        _lobbyStartVoters.Add(playerId.Value);
+        return _lobbyStartVoters.Count >= 4;
+    }
+
+    /// <summary>Withdraws a player's lobby-start vote.</summary>
+    public void RemoveLobbyStartVote(PlayerId playerId) => _lobbyStartVoters.Remove(playerId.Value);
+
+    /// <summary>Clears all lobby-start votes (called when the game actually starts).</summary>
+    public void ResetLobbyStartVotes() => _lobbyStartVoters.Clear();
 
     /// <summary>
     /// Records whether the VorbehaltRauskommer should advance after the current game.

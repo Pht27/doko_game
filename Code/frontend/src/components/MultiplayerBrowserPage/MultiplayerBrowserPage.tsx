@@ -5,12 +5,14 @@ import { saveLobbySession, clearLobbySession, loadAnySession } from '../../hooks
 import { LobbyDetailView } from './LobbyDetailView';
 import type { LobbyListItemResponse } from '../../api/lobby';
 import type { LobbySession } from '../../hooks/useLobby';
+import type { GameResultDto } from '../../types/api';
 
 interface MultiplayerBrowserPageProps {
   selectedLobbyId?: string;
   onBack: () => void;
   onSelectLobby: (lobbyId: string) => void;
   onGameStarted: (gameId: string, session: LobbySession) => void;
+  lastFinishedResult?: GameResultDto | null;
 }
 
 export function MultiplayerBrowserPage({
@@ -18,6 +20,7 @@ export function MultiplayerBrowserPage({
   onBack,
   onSelectLobby,
   onGameStarted,
+  lastFinishedResult,
 }: MultiplayerBrowserPageProps) {
   const [lobbies, setLobbies] = useState<LobbyListItemResponse[]>([]);
   const [creating, setCreating] = useState(false);
@@ -176,6 +179,7 @@ export function MultiplayerBrowserPage({
               lobbyId={selectedLobbyId}
               onGameStarted={onGameStarted}
               onLobbyClosed={handleLobbyClosed}
+              lastFinishedResult={lastFinishedResult}
             />
           ) : (
             <div className="h-full flex items-center justify-center text-white/30 text-sm">

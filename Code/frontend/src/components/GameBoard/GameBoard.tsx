@@ -3,8 +3,8 @@ import type { PlayerGameViewResponse, GameResultDto, TrickSummaryDto, Sonderkart
 import type { AnimPhase } from '../TrickArea/TrickArea';
 import type { GameActions } from '../../hooks/useGameActions';
 import type { MultiplayerNewGameProps } from '../ResultScreen/ResultScreen';
+import { ResultScreen } from '../ResultScreen/ResultScreen';
 import { GameInfo } from '../shared/GameInfo';
-import { GameInfoOverlay } from '../shared/GameInfoOverlay';
 import { PlayerLabel } from '../shared/PlayerLabel';
 import { HandDisplay } from '../HandDisplay/HandDisplay';
 import { AnnouncementButton } from '../AnnouncementButton/AnnouncementButton';
@@ -30,9 +30,9 @@ interface GameBoardProps {
   viewError: string | null;
   allowPlayerSwitching: boolean;
   onPlayerSwitch: (player: number) => void;
-  lobbyId?: string;
   onNewGame: () => void;
   multiplayerNewGame?: MultiplayerNewGameProps;
+  lastFinishedResult?: GameResultDto | null;
 }
 
 /** Returns which compass direction a player sits relative to the active player. */
@@ -53,9 +53,9 @@ export function GameBoard({
   viewError,
   allowPlayerSwitching,
   onPlayerSwitch,
-  lobbyId,
   onNewGame,
   multiplayerNewGame,
+  lastFinishedResult,
 }: GameBoardProps) {
   const [showInfoOverlay, setShowInfoOverlay] = useState(false);
   const seatOfPlayer = (player: number) => seatOf(player, activePlayer);
@@ -209,16 +209,12 @@ export function GameBoard({
         </div>
       )}
 
-      {/* Game info overlay: game details + lobby standings */}
-      {showInfoOverlay && view && (
-        <GameInfoOverlay
-          phase={view.phase}
-          gameMode={view.activeGameMode}
-          trickNumber={(view.currentTrick?.trickNumber ?? 0) + 1}
-          completedTricks={view.completedTricks.length}
-          lobbyId={lobbyId}
-          activePlayer={activePlayer}
-          onClose={() => setShowInfoOverlay(false)}
+      {/* Game info overlay: show match history when available */}
+      {showInfoOverlay && lastFinishedResult && (
+        <ResultScreen
+          result={lastFinishedResult}
+          onNewGame={() => setShowInfoOverlay(false)}
+          viewOnly
         />
       )}
 

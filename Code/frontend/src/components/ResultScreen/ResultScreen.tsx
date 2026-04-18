@@ -18,9 +18,10 @@ interface ResultScreenProps {
   result: GameResultDto;
   onNewGame: () => void;
   multiplayerNewGame?: MultiplayerNewGameProps;
+  viewOnly?: boolean;
 }
 
-export function ResultScreen({ result, onNewGame, multiplayerNewGame }: ResultScreenProps) {
+export function ResultScreen({ result, onNewGame, multiplayerNewGame, viewOnly }: ResultScreenProps) {
   const [hasVoted, setHasVoted] = useState(false);
   const [voting, setVoting] = useState(false);
 
@@ -101,6 +102,10 @@ export function ResultScreen({ result, onNewGame, multiplayerNewGame }: ResultSc
                   {hasVoted ? t.zurueckziehen : t.bereit}
                 </span>
                 <span className="result-bereit-spacer" />
+              </button>
+            ) : viewOnly ? (
+              <button onClick={onNewGame} className="result-new-game-btn">
+                {t.schliessen}
               </button>
             ) : (
               <button onClick={onNewGame} className="result-new-game-btn">

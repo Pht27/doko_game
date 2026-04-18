@@ -14,6 +14,7 @@ export interface LobbyHookState {
   seats: boolean[];
   gameId: string | null;
   lobbyClosed: boolean;
+  startVoteCount: number;
   error: string | null;
 }
 
@@ -52,6 +53,7 @@ export function useLobby(session: LobbySession | null, lobbyId: string): LobbyHo
   const [seats, setSeats] = useState<boolean[]>(Array(4).fill(false));
   const [gameId, setGameId] = useState<string | null>(null);
   const [lobbyClosed, setLobbyClosed] = useState(false);
+  const [startVoteCount, setStartVoteCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const hubRef = useRef<HubConnection | null>(null);
 
@@ -61,7 +63,12 @@ export function useLobby(session: LobbySession | null, lobbyId: string): LobbyHo
   useEffect(() => {
     let cancelled = false;
     getLobby(lobbyId)
-      .then((view) => { if (!cancelled) setSeats(view.seats); })
+      .then((view) => {
+        if (!cancelled) {
+          setSeats(view.seats);
+          setStartVoteCount(view.startVoteCount ?? 0);
+        }
+      })
       .catch(() => {});
     return () => { cancelled = true; };
   }, [lobbyId, session?.token]);
@@ -98,6 +105,10 @@ export function useLobby(session: LobbySession | null, lobbyId: string): LobbyHo
         if (!cancelled) setGameId(data.gameId);
       });
 
+      hub.on('lobbyReadyVoteChanged', (data: { count: number }) => {
+        if (!cancelled) setStartVoteCount(data.count);
+      });
+
       hub.on('lobbyClosed', () => {
         if (!cancelled) setLobbyClosed(true);
       });
@@ -120,5 +131,5 @@ export function useLobby(session: LobbySession | null, lobbyId: string): LobbyHo
     };
   }, [session?.lobbyId, session?.token]);
 
-  return { seats, gameId, lobbyClosed, error };
+  return { seats, gameId, lobbyClosed, startVoteCount, error };
 }

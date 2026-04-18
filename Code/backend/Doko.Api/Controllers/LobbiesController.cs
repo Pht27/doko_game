@@ -143,8 +143,100 @@ public class LobbiesController(
 
         var seats = lobby.Seats.Select(s => s != null).ToArray();
         return Ok(
-            new LobbyViewResponse(lobbyId, seats, lobby.IsStarted, lobby.Standings.ToArray())
+            new LobbyViewResponse(
+                lobbyId,
+                seats,
+                lobby.IsStarted,
+                lobby.Standings.ToArray(),
+                lobby.LobbyStartVoteCount
+            )
         );
+    }
+
+    [HttpPost("{lobbyId}/ready")]
+    [Authorize]
+    public async Task<IActionResult> VoteLobbyReady(string lobbyId, CancellationToken ct)
+    {
+        if (!Guid.TryParse(lobbyId, out var guid))
+            return NotFound(new ErrorResponse("lobby_not_found"));
+
+        var lobby = await lobbyRepository.GetAsync(new LobbyId(guid), ct);
+        if (lobby is null)
+            return NotFound(new ErrorResponse("lobby_not_found"));
+
+        if (lobby.IsStarted)
+            return Conflict(new ErrorResponse("lobby_already_started"));
+
+        if (!lobby.IsFull)
+            return BadRequest(new ErrorResponse("lobby_not_full"));
+
+        var callerIdClaim = User.FindFirst("player_id")?.Value ?? "255";
+        var callerId = new PlayerId((byte)int.Parse(callerIdClaim));
+        if (!lobby.HasPlayer(callerId))
+            return Forbid();
+
+        bool allReady = lobby.AddLobbyStartVote(callerId);
+
+        if (allReady)
+        {
+            lobby.ResetLobbyStartVotes();
+
+            var players = lobby.Players.Select(p => p.Id).ToList();
+            var startResult = await startGame.ExecuteAsync(
+                new StartGameCommand(players, Rules: null),
+                ct
+            );
+            if (
+                startResult
+                is not Application.Common.GameActionResult<Application.Games.Results.StartGameResult>.Ok startOk
+            )
+                return StatusCode(500, new ErrorResponse("game_start_failed"));
+
+            var gameId = startOk.Value.GameId;
+            await dealCards.ExecuteAsync(new DealCardsCommand(gameId), ct);
+
+            lobby.MarkStarted(gameId);
+            await lobbyRepository.SaveAsync(lobby, ct);
+
+            await hub
+                .Clients.Group($"lobby_{lobbyId}")
+                .SendAsync("gameStarted", new { gameId = gameId.ToString() }, ct);
+        }
+        else
+        {
+            await lobbyRepository.SaveAsync(lobby, ct);
+            await hub
+                .Clients.Group($"lobby_{lobbyId}")
+                .SendAsync("lobbyReadyVoteChanged", new { count = lobby.LobbyStartVoteCount }, ct);
+        }
+
+        return Ok(new { voteCount = lobby.LobbyStartVoteCount });
+    }
+
+    [HttpPost("{lobbyId}/ready/withdraw")]
+    [Authorize]
+    public async Task<IActionResult> WithdrawLobbyReady(string lobbyId, CancellationToken ct)
+    {
+        if (!Guid.TryParse(lobbyId, out var guid))
+            return NotFound(new ErrorResponse("lobby_not_found"));
+
+        var lobby = await lobbyRepository.GetAsync(new LobbyId(guid), ct);
+        if (lobby is null)
+            return NotFound(new ErrorResponse("lobby_not_found"));
+
+        var callerIdClaim = User.FindFirst("player_id")?.Value ?? "255";
+        var callerId = new PlayerId((byte)int.Parse(callerIdClaim));
+        if (!lobby.HasPlayer(callerId))
+            return Forbid();
+
+        lobby.RemoveLobbyStartVote(callerId);
+        await lobbyRepository.SaveAsync(lobby, ct);
+
+        await hub
+            .Clients.Group($"lobby_{lobbyId}")
+            .SendAsync("lobbyReadyVoteChanged", new { count = lobby.LobbyStartVoteCount }, ct);
+
+        return Ok(new { voteCount = lobby.LobbyStartVoteCount });
     }
 
     [HttpPost("{lobbyId}/new-game/ready")]

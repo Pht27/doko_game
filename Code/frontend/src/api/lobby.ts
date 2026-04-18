@@ -18,6 +18,7 @@ export interface LobbyViewResponse {
   seats: boolean[];
   isStarted: boolean;
   standings: number[];
+  startVoteCount: number;
 }
 
 export function createLobby(): Promise<LobbyJoinResponse> {
@@ -42,6 +43,14 @@ export function getLobby(lobbyId: string): Promise<LobbyViewResponse> {
 
 export function startLobbyGame(token: string, lobbyId: string): Promise<{ gameId: string }> {
   return apiFetch(`/lobbies/${lobbyId}/start`, token, { method: 'POST' });
+}
+
+export function voteReady(token: string, lobbyId: string): Promise<{ voteCount: number }> {
+  return apiFetch(`/lobbies/${lobbyId}/ready`, token, { method: 'POST' });
+}
+
+export function withdrawReady(token: string, lobbyId: string): Promise<{ voteCount: number }> {
+  return apiFetch(`/lobbies/${lobbyId}/ready/withdraw`, token, { method: 'POST' });
 }
 
 export function voteNewGame(token: string, lobbyId: string): Promise<{ voteCount: number }> {

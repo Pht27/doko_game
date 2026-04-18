@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { t } from '../../translations';
-import { startLobbyGame, leaveLobby, joinSeat } from '../../api/lobby';
+import { leaveLobby, joinSeat, voteReady, withdrawReady } from '../../api/lobby';
 import {
   useLobby,
   loadLobbySession,
@@ -8,22 +8,27 @@ import {
   saveLobbySession,
   clearLobbySession,
 } from '../../hooks/useLobby';
+import { ResultScreen } from '../ResultScreen/ResultScreen';
 import type { LobbySession } from '../../hooks/useLobby';
+import type { GameResultDto } from '../../types/api';
 
 interface LobbyDetailViewProps {
   lobbyId: string;
   onGameStarted: (gameId: string, session: LobbySession) => void;
   onLobbyClosed: () => void;
+  lastFinishedResult?: GameResultDto | null;
 }
 
-export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed }: LobbyDetailViewProps) {
+export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFinishedResult }: LobbyDetailViewProps) {
   const [session, setSession] = useState<LobbySession | null>(() => loadLobbySession(lobbyId));
 
-  const { seats, gameId, lobbyClosed, error } = useLobby(session, lobbyId);
+  const { seats, gameId, lobbyClosed, startVoteCount, error } = useLobby(session, lobbyId);
 
   const [copied, setCopied] = useState(false);
-  const [starting, setStarting] = useState(false);
+  const [hasVoted, setHasVoted] = useState(false);
+  const [voting, setVoting] = useState(false);
   const [leaving, setLeaving] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
   const [busySeat, setBusySeat] = useState<number | null>(null); // index being joined/swapped
   const [actionError, setActionError] = useState<string | null>(null);
 
@@ -104,17 +109,31 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed }: Lobby
     }
   }
 
-  async function handleStartGame() {
-    if (!session) return;
-    setStarting(true);
+  async function handleVote() {
+    if (!session || voting) return;
+    setVoting(true);
     setActionError(null);
     try {
-      const res = await startLobbyGame(session.token, lobbyId);
-      clearLobbySession();
-      onGameStarted(res.gameId, session);
+      await voteReady(session.token, lobbyId);
+      setHasVoted(true);
     } catch (e) {
       setActionError(e instanceof Error ? e.message : String(e));
-      setStarting(false);
+    } finally {
+      setVoting(false);
+    }
+  }
+
+  async function handleWithdraw() {
+    if (!session || voting) return;
+    setVoting(true);
+    setActionError(null);
+    try {
+      await withdrawReady(session.token, lobbyId);
+      setHasVoted(false);
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setVoting(false);
     }
   }
 
@@ -217,11 +236,17 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed }: Lobby
       {isMyLobby && (
         <div className="flex flex-col gap-2 shrink-0">
           <button
-            onClick={handleStartGame}
-            disabled={filledCount < 4 || starting}
-            className="w-full py-3 text-base font-semibold rounded-2xl bg-green-600 hover:bg-green-500 active:bg-green-700 text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            onClick={hasVoted ? handleWithdraw : handleVote}
+            disabled={filledCount < 4 || voting}
+            className={`w-full py-3 text-base font-semibold rounded-2xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-between px-4 ${
+              hasVoted
+                ? 'bg-green-600 hover:bg-green-500 active:bg-green-700 text-white'
+                : 'bg-white/15 hover:bg-white/25 active:bg-white/10 text-white'
+            }`}
           >
-            {starting ? t.loading : t.startGame}
+            <span className="text-sm opacity-70">{startVoteCount}/4 👤</span>
+            <span>{hasVoted ? t.zurueckziehen : t.bereit}</span>
+            <span className="w-12" />
           </button>
           <button
             onClick={handleLeaveSeat}
@@ -233,8 +258,26 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed }: Lobby
         </div>
       )}
 
+      {/* Match history button — only when previous game data is available */}
+      {lastFinishedResult && (
+        <button
+          onClick={() => setShowHistory(true)}
+          className="w-full py-2.5 text-sm font-semibold rounded-2xl bg-white/10 hover:bg-white/20 active:bg-white/5 text-white/70 transition-colors shrink-0"
+        >
+          {t.spielverlauf}
+        </button>
+      )}
+
       {(error || actionError) && (
         <p className="text-red-400 text-xs text-center shrink-0">{error ?? actionError}</p>
+      )}
+
+      {showHistory && lastFinishedResult && (
+        <ResultScreen
+          result={lastFinishedResult}
+          onNewGame={() => setShowHistory(false)}
+          viewOnly
+        />
       )}
     </div>
   );

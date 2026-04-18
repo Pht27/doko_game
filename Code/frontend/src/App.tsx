@@ -13,6 +13,7 @@ import { PortraitOverlay } from './components/PortraitOverlay/PortraitOverlay';
 import { t } from './translations';
 import type { LobbySession } from './hooks/useLobby';
 import type { HotSeatSession } from './hooks/useHotSeat';
+import type { GameResultDto } from './types/api';
 
 type AppView =
   | { kind: 'home' }
@@ -143,6 +144,11 @@ export default function App() {
     setView(prev => prev.kind === 'game' ? { ...prev, gameId: newGameId } : prev);
   }, [newGameId]);
 
+  const [lastFinishedResult, setLastFinishedResult] = useState<GameResultDto | null>(null);
+  useEffect(() => {
+    if (finishedResult) setLastFinishedResult(finishedResult);
+  }, [finishedResult]);
+
   const { animTrick, animPhase } = useTrickAnimation(gameView);
 
   const actions = useGameActions(gameSession, activePlayer, gameView, refetch);
@@ -183,6 +189,7 @@ export default function App() {
           onBack={() => setView({ kind: 'home' })}
           onSelectLobby={(lobbyId) => setView({ kind: 'multiplayer-browser', selectedLobbyId: lobbyId })}
           onGameStarted={handleGameStarted}
+          lastFinishedResult={lastFinishedResult}
         />
       </>
     );
@@ -217,8 +224,8 @@ export default function App() {
         viewError={viewError}
         allowPlayerSwitching={isHotSeat}
         onPlayerSwitch={isHotSeat ? hotSeat.setActivePlayer : () => {}}
-        lobbyId={isGame ? view.lobbySession?.lobbyId : undefined}
         onNewGame={isHotSeat ? hotSeat.restart : () => setView({ kind: 'home' })}
+        lastFinishedResult={lastFinishedResult}
         multiplayerNewGame={
           isGame && view.lobbySession
             ? {
