@@ -99,11 +99,14 @@ public sealed class GameScorer : IGameScorer
         }
 
         // One point per announcement (by any party)
-        int announcementsCount = state.Announcements.Count;
-        if (announcementsCount > 0)
+        var announcementRecords = new List<AnnouncementRecord>();
+        foreach (var announcement in state.Announcements)
         {
-            gameValue += announcementsCount;
-            components.Add(new("Ansagen", announcementsCount));
+            var party = state.PartyResolver.ResolveParty(announcement.Player, state);
+            if (party is null)
+                continue;
+            gameValue++;
+            announcementRecords.Add(new(party.Value, announcement.Type));
         }
 
         // ── 5. SoloFactor ─────────────────────────────────────────────────────────
@@ -121,7 +124,8 @@ public sealed class GameScorer : IGameScorer
             Feigheit: false,
             components,
             soloFactor,
-            TotalScore: 0 // placeholder; recomputed below
+            TotalScore: 0, // placeholder; recomputed below
+            announcementRecords
         );
 
         bool feigheit = AnnouncementRules.ViolatesFeigheit(provisionalResult, state);
@@ -156,7 +160,8 @@ public sealed class GameScorer : IGameScorer
             feigheit,
             components,
             soloFactor,
-            totalScore
+            totalScore,
+            announcementRecords
         );
     }
 

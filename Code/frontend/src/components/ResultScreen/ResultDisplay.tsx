@@ -1,4 +1,4 @@
-import type { GameResultDto } from '../../types/api';
+import type { AnnouncementRecordDto, GameResultDto } from '../../types/api';
 import { t } from '../../translations';
 
 interface ResultDisplayProps {
@@ -7,6 +7,55 @@ interface ResultDisplayProps {
 }
 
 type Party = 'Re' | 'Kontra';
+
+const componentAnnouncementType: Record<string, string> = {
+  'Gewonnen': 'Win',
+  'Keine 90': 'Keine90',
+  'Keine 60': 'Keine60',
+  'Keine 30': 'Keine30',
+  'Schwarz': 'Schwarz',
+};
+
+function buildComponentRows(
+  valueComponents: GameResultDto['valueComponents'],
+  announcementRecords: AnnouncementRecordDto[],
+  winner: string,
+  feigheit: boolean,
+): { label: string; value: number }[] {
+  if (feigheit) return valueComponents.map(c => ({ label: c.label, value: c.value }));
+
+  const matched = new Set<number>();
+
+  const rows = valueComponents.map(c => {
+    const aType = componentAnnouncementType[c.label];
+    if (!aType) return { label: c.label, value: c.value };
+
+    const matchingIndices = announcementRecords
+      .map((r, i) => ({ r, i }))
+      .filter(({ r, i }) =>
+        r.type === aType &&
+        !matched.has(i) &&
+        (aType !== 'Win' || r.party === winner),
+      )
+      .map(({ i }) => i);
+
+    matchingIndices.forEach(i => matched.add(i));
+    const bonus = matchingIndices.length;
+    return {
+      label: bonus > 0 ? `${c.label} ${t.announcedSuffix}` : c.label,
+      value: c.value + bonus,
+    };
+  });
+
+  const unmatchedRows = announcementRecords
+    .filter((_, i) => !matched.has(i))
+    .map(r => ({
+      label: `${t.announcementLabel(r.type === 'Win' ? r.party : r.type)} ${t.announcedSuffix}`,
+      value: 1,
+    }));
+
+  return [...rows, ...unmatchedRows];
+}
 
 function getSeatParty(seat: number, result: GameResultDto): Party | null {
   const pts = result.netPointsPerSeat[seat];
@@ -39,6 +88,13 @@ export function ResultDisplay({ result, mySeat }: ResultDisplayProps) {
   const headerLabel = gameModeLabel
     ? `${gameModeLabel}: ${winner} gewinnt`
     : `${winner} gewinnt`;
+
+  const componentRows = buildComponentRows(
+    result.valueComponents,
+    result.announcementRecords,
+    winner,
+    result.feigheit,
+  );
 
   return (
     <div className="rd-container">
@@ -78,7 +134,7 @@ export function ResultDisplay({ result, mySeat }: ResultDisplayProps) {
       <div className="rd-separator" />
 
       <div className="rd-table">
-        {result.valueComponents.map((c, i) => (
+        {componentRows.map((c, i) => (
           <div key={i} className="rd-row">
             <span className="rd-row-label">{c.label}</span>
             <span className={sign * c.value >= 0 ? 'rd-row-value rd-value-pos' : 'rd-row-value rd-value-neg'}>

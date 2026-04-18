@@ -74,6 +74,11 @@ export interface GameValueComponentDto {
   value: number;
 }
 
+export interface AnnouncementRecordDto {
+  party: string;
+  type: string;
+}
+
 export interface GameResultDto {
   winner: string;
   reAugen: number;
@@ -85,6 +90,7 @@ export interface GameResultDto {
   allAwards: ExtrapunktAwardDto[];
   feigheit: boolean;
   valueComponents: GameValueComponentDto[];
+  announcementRecords: AnnouncementRecordDto[];
   soloFactor: number;
   totalScore: number;
   netPointsPerSeat: number[];

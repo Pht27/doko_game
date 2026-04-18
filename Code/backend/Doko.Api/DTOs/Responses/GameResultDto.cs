@@ -4,6 +4,8 @@ public record ExtrapunktAwardDto(string Type, int BenefittingPlayer, int Delta);
 
 public record GameValueComponentDto(string Label, int Value);
 
+public record AnnouncementRecordDto(string Party, string Type);
+
 public record GameResultDto(
     string Winner,
     int ReAugen,
@@ -19,6 +21,7 @@ public record GameResultDto(
     int TotalScore,
     IReadOnlyList<int> NetPointsPerSeat,
     IReadOnlyList<int> LobbyStandings,
+    IReadOnlyList<AnnouncementRecordDto> AnnouncementRecords,
     bool IsGeschmissen = false,
     IReadOnlyList<GameResultDto>? MatchHistory = null
 );

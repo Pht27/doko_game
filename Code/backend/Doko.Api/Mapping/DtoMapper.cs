@@ -98,6 +98,9 @@ public static class DtoMapper
             r.TotalScore,
             (IReadOnlyList<int>?)netPointsPerSeat ?? [],
             (IReadOnlyList<int>?)lobbyStandings ?? [],
+            r.AnnouncementRecords
+                .Select(ar => new AnnouncementRecordDto(ar.Party.ToString(), ar.AnnouncementType.ToString()))
+                .ToList(),
             isGeschmissen,
             matchHistory
         );
@@ -121,6 +124,7 @@ public static class DtoMapper
             TotalScore: 0,
             NetPointsPerSeat: new int[4],
             LobbyStandings: (IReadOnlyList<int>?)lobbyStandings ?? [],
+            AnnouncementRecords: [],
             IsGeschmissen: true,
             MatchHistory: matchHistory
         );

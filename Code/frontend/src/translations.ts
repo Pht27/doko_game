@@ -139,6 +139,7 @@ export const t = {
   } as Record<string, string>,
   announcementLabel: (type: string) =>
     (t.announcementLabels[type] as string | undefined) ?? type,
+  announcedSuffix: '(angesagt)',
 } as const;
 
 // Mapping from API condition keys to German display labels
