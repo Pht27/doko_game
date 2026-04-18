@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using Doko.Application.Lobbies;
+using Doko.Domain.GameFlow;
 using Doko.Domain.Lobby;
 
 namespace Doko.Infrastructure.Repositories;
@@ -10,6 +11,9 @@ public sealed class InMemoryLobbyRepository : ILobbyRepository
 
     public Task<LobbyState?> GetAsync(LobbyId id, CancellationToken ct = default) =>
         Task.FromResult(_store.GetValueOrDefault(id));
+
+    public Task<LobbyState?> GetByGameIdAsync(GameId gameId, CancellationToken ct = default) =>
+        Task.FromResult(_store.Values.FirstOrDefault(l => l.ActiveGameId == gameId));
 
     public Task<IReadOnlyList<LobbyState>> GetAllAsync(CancellationToken ct = default)
     {
