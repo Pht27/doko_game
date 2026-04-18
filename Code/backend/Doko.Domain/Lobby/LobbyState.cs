@@ -40,7 +40,8 @@ public class LobbyState
     public IReadOnlyList<int> Standings => Array.AsReadOnly(_standings);
 
     /// <summary>Ordered list of completed game results with their net points per seat.</summary>
-    public IReadOnlyList<(GameResult Result, string? GameMode, int[] NetPoints)> GameHistory => _gameHistory.AsReadOnly();
+    public IReadOnlyList<(GameResult Result, string? GameMode, int[] NetPoints)> GameHistory =>
+        _gameHistory.AsReadOnly();
 
     /// <summary>Number of players who have voted to start a new game.</summary>
     public int NewGameVoteCount => _newGameVoters.Count;
@@ -66,9 +67,12 @@ public class LobbyState
     public bool TryOccupySeat(int seatIndex, out PlayerId playerId)
     {
         playerId = default;
-        if (seatIndex < 0 || seatIndex >= 4) return false;
-        if (IsStarted) return false;
-        if (_seats[seatIndex] != null) return false;
+        if (seatIndex < 0 || seatIndex >= 4)
+            return false;
+        if (IsStarted)
+            return false;
+        if (_seats[seatIndex] != null)
+            return false;
 
         playerId = new PlayerId((byte)seatIndex);
         _seats[seatIndex] = new LobbyPlayer(playerId, DateTimeOffset.UtcNow);
@@ -111,8 +115,7 @@ public class LobbyState
     }
 
     /// <summary>Withdraws a player's vote to start a new game.</summary>
-    public void RemoveNewGameVote(PlayerId playerId) =>
-        _newGameVoters.Remove(playerId.Value);
+    public void RemoveNewGameVote(PlayerId playerId) => _newGameVoters.Remove(playerId.Value);
 
     /// <summary>Clears all new-game votes (called when the new game actually starts).</summary>
     public void ResetNewGameVotes() => _newGameVoters.Clear();

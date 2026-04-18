@@ -231,7 +231,11 @@ public class GamesController(
 
         await hub
             .Clients.Group(gameIdString)
-            .SendAsync("gameFinished", new { result = DtoMapper.ToGeschmissenDto(standings, matchHistory) }, ct);
+            .SendAsync(
+                "gameFinished",
+                new { result = DtoMapper.ToGeschmissenDto(standings, matchHistory) },
+                ct
+            );
     }
 
     private async Task HandleGameFinishedAsync(
@@ -260,15 +264,23 @@ public class GamesController(
             .Clients.Group(gameIdString)
             .SendAsync(
                 "gameFinished",
-                new { result = DtoMapper.ToDto(finished.Result, netPoints, standings, matchHistory: matchHistory, gameMode: finished.GameMode) },
+                new
+                {
+                    result = DtoMapper.ToDto(
+                        finished.Result,
+                        netPoints,
+                        standings,
+                        matchHistory: matchHistory,
+                        gameMode: finished.GameMode
+                    ),
+                },
                 ct
             );
     }
 
     private static IReadOnlyList<GameResultDto> BuildMatchHistory(
         IEnumerable<(GameResult Result, string? GameMode, int[] NetPoints)> history
-    ) =>
-        history.Select(e => DtoMapper.ToDto(e.Result, e.NetPoints, gameMode: e.GameMode)).ToList();
+    ) => history.Select(e => DtoMapper.ToDto(e.Result, e.NetPoints, gameMode: e.GameMode)).ToList();
 
     private PlayerId GetPlayerId()
     {

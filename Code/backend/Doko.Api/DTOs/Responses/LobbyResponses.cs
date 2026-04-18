@@ -1,11 +1,6 @@
 namespace Doko.Api.DTOs.Responses;
 
-public record LobbyJoinResponse(
-    string LobbyId,
-    byte PlayerId,
-    string Token,
-    int SeatIndex
-);
+public record LobbyJoinResponse(string LobbyId, byte PlayerId, string Token, int SeatIndex);
 
 public record LobbyListItemResponse(string LobbyId, bool[] Seats, bool IsStarted);
 

@@ -52,8 +52,8 @@ public sealed class DealCardsHandler(
         var rauskommer = command.VorbehaltRauskommer ?? state.Players[0].Id;
         state.Apply(new SetVorbehaltRauskommerModification(rauskommer));
         var rauskommerSeat = (int)state.Players.First(p => p.Id == rauskommer).Seat;
-        var allPlayers = state.Players
-            .OrderBy(p => ((int)p.Seat - rauskommerSeat + 4) % 4)
+        var allPlayers = state
+            .Players.OrderBy(p => ((int)p.Seat - rauskommerSeat + 4) % 4)
             .Select(p => p.Id)
             .ToList();
         state.Apply(new SetPendingRespondersModification(allPlayers));

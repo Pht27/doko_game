@@ -179,7 +179,11 @@ public sealed class GameScorer : IGameScorer
         return reAugen >= 121 ? Party.Re : Party.Kontra;
     }
 
-    private static bool HasUnfulfilledAbsagen(Party party, int opponentAugen, GameFlow.GameState state)
+    private static bool HasUnfulfilledAbsagen(
+        Party party,
+        int opponentAugen,
+        GameFlow.GameState state
+    )
     {
         var absagen = state
             .Announcements.Where(a => state.PartyResolver.ResolveParty(a.Player, state) == party)

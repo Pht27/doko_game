@@ -379,11 +379,7 @@ public class AnnouncementRulesTests
     {
         // Kontra (P1) only has Win, no Absage → Re can still announce Keine90.
         var state = B.BasicState(
-            announcements:
-            [
-                B.Ann(B.P0, AnnouncementType.Win),
-                B.Ann(B.P1, AnnouncementType.Win),
-            ]
+            announcements: [B.Ann(B.P0, AnnouncementType.Win), B.Ann(B.P1, AnnouncementType.Win)]
         );
         AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Keine90, state).Should().BeTrue();
     }

@@ -17,13 +17,12 @@ public static class NetPointsCalculator
         {
             int seat = (int)player.Seat;
             var party = state.PartyResolver.ResolveParty(player.Id, state);
-            if (party is null) continue; // Party unresolvable (e.g. undecided Hochzeit)
+            if (party is null)
+                continue; // Party unresolvable (e.g. undecided Hochzeit)
             bool isWinner = party == result.Winner;
             bool isSoloPlayer = result.SoloFactor > 1 && party == Party.Re;
 
-            int score = isSoloPlayer
-                ? result.TotalScore
-                : result.TotalScore / result.SoloFactor;
+            int score = isSoloPlayer ? result.TotalScore : result.TotalScore / result.SoloFactor;
 
             netPoints[seat] = isWinner ? score : -score;
         }

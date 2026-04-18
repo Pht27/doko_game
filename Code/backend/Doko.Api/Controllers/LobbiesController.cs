@@ -36,7 +36,12 @@ public class LobbiesController(
 
         var token = tokenService.GenerateToken(ok.Value.PlayerId);
         return Ok(
-            new LobbyJoinResponse(ok.Value.LobbyId.ToString(), ok.Value.PlayerId.Value, token, SeatIndex: 0)
+            new LobbyJoinResponse(
+                ok.Value.LobbyId.ToString(),
+                ok.Value.PlayerId.Value,
+                token,
+                SeatIndex: 0
+            )
         );
     }
 
@@ -69,7 +74,9 @@ public class LobbiesController(
             return failure.Error switch
             {
                 LobbyError.LobbyNotFound => NotFound(new ErrorResponse("lobby_not_found")),
-                LobbyError.LobbyAlreadyStarted => Conflict(new ErrorResponse("lobby_already_started")),
+                LobbyError.LobbyAlreadyStarted => Conflict(
+                    new ErrorResponse("lobby_already_started")
+                ),
                 LobbyError.SeatOccupied => Conflict(new ErrorResponse("seat_occupied")),
                 _ => StatusCode(500, new ErrorResponse("unknown_error")),
             };
@@ -116,7 +123,8 @@ public class LobbiesController(
         if (ok.LobbyDeleted)
             await hub.Clients.Group($"lobby_{lobbyId}").SendAsync("lobbyClosed", ct);
         else
-            await hub.Clients.Group($"lobby_{lobbyId}")
+            await hub
+                .Clients.Group($"lobby_{lobbyId}")
                 .SendAsync("playerLeft", new { seatIndex = callerId.Value }, ct);
 
         return NoContent();
@@ -134,7 +142,9 @@ public class LobbiesController(
             return NotFound(new ErrorResponse("lobby_not_found"));
 
         var seats = lobby.Seats.Select(s => s != null).ToArray();
-        return Ok(new LobbyViewResponse(lobbyId, seats, lobby.IsStarted, lobby.Standings.ToArray()));
+        return Ok(
+            new LobbyViewResponse(lobbyId, seats, lobby.IsStarted, lobby.Standings.ToArray())
+        );
     }
 
     [HttpPost("{lobbyId}/new-game/ready")]
