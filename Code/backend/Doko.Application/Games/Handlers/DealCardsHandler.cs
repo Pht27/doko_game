@@ -48,10 +48,16 @@ public sealed class DealCardsHandler(
 
         state.Apply(new DealHandsModification(hands));
         state.Apply(new AdvancePhaseModification(GamePhase.ReservationHealthCheck));
-        // All four players must declare health status — prime the pending queue.
-        var allPlayers = state.Players.Select(p => p.Id).ToList();
+
+        var rauskommer = command.VorbehaltRauskommer ?? state.Players[0].Id;
+        state.Apply(new SetVorbehaltRauskommerModification(rauskommer));
+        var rauskommerSeat = (int)state.Players.First(p => p.Id == rauskommer).Seat;
+        var allPlayers = state.Players
+            .OrderBy(p => ((int)p.Seat - rauskommerSeat + 4) % 4)
+            .Select(p => p.Id)
+            .ToList();
         state.Apply(new SetPendingRespondersModification(allPlayers));
-        state.Apply(new SetCurrentTurnModification(state.Players[0].Id));
+        state.Apply(new SetCurrentTurnModification(rauskommer));
 
         await repository.SaveAsync(state, ct);
         await publisher.PublishAsync(state.Id, [], ct);

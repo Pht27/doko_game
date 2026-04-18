@@ -23,6 +23,13 @@ public class LobbyState
     public bool IsFull => _seats.All(s => s != null);
     public bool IsStarted { get; private set; }
 
+    /// <summary>
+    /// Seat index (0–3) of the player who leads the next reservation-check phase.
+    /// Advances counter-clockwise (+1 mod 4) after each completed game.
+    /// Stays the same after Schmeißen.
+    /// </summary>
+    public int VorbehaltRauskommer { get; private set; }
+
     /// <summary>The game that is currently running in this lobby, if any.</summary>
     public GameId? ActiveGameId { get; private set; }
 
@@ -103,6 +110,12 @@ public class LobbyState
 
     /// <summary>Clears all new-game votes (called when the new game actually starts).</summary>
     public void ResetNewGameVotes() => _newGameVoters.Clear();
+
+    /// <summary>
+    /// Rotates the VorbehaltRauskommer one seat counter-clockwise.
+    /// Call this after each completed game (not after Schmeißen).
+    /// </summary>
+    public void AdvanceRauskommer() => VorbehaltRauskommer = (VorbehaltRauskommer + 1) % 4;
 
     /// <summary>Applies per-seat net point deltas to the running lobby standings.</summary>
     public void UpdateStandings(int[] netPointsPerSeat)

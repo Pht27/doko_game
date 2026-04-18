@@ -113,6 +113,13 @@ public sealed class GameState
     public IReadOnlyList<TransferCardPointsModification> CardPointTransfers => _cardPointTransfers;
     private readonly List<TransferCardPointsModification> _cardPointTransfers = new();
 
+    /// <summary>
+    /// The player who leads the reservation-check ordering for this round.
+    /// Rotates counter-clockwise each game. Always rotates; SpieleRauskommer
+    /// (who actually plays first) may differ for Solo/Armut.
+    /// </summary>
+    public PlayerId VorbehaltRauskommer { get; private set; }
+
 #pragma warning disable CS8618 // Non-nullable fields initialized via factory/Apply
     private GameState() { }
 #pragma warning restore CS8618
@@ -307,6 +314,10 @@ public sealed class GameState
 
             case AddAnnouncementModification m:
                 Announcements = [.. Announcements, m.Announcement];
+                break;
+
+            case SetVorbehaltRauskommerModification m:
+                VorbehaltRauskommer = m.Player;
                 break;
 
             default:

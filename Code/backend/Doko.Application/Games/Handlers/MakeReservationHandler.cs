@@ -314,7 +314,11 @@ public sealed class MakeReservationHandler(
     {
         state.Apply(new SetGameModeModification(winner));
         state.Apply(new AdvancePhaseModification(GamePhase.Playing));
-        state.Apply(new SetCurrentTurnModification(state.Players[0].Id));
+        // Solo declarer leads in Solo games; VorbehaltRauskommer leads otherwise.
+        var spieleRauskommer = IsSoloReservation(winner)
+            ? FirstDeclarantId(state, winner)
+            : state.VorbehaltRauskommer;
+        state.Apply(new SetCurrentTurnModification(spieleRauskommer));
     }
 
     /// <summary>
@@ -333,7 +337,7 @@ public sealed class MakeReservationHandler(
             : null;
         state.Apply(new SetGameModeModification(gameMode));
         state.Apply(new AdvancePhaseModification(GamePhase.Playing));
-        state.Apply(new SetCurrentTurnModification(state.Players[0].Id));
+        state.Apply(new SetCurrentTurnModification(state.VorbehaltRauskommer));
     }
 
     /// <summary>

@@ -160,6 +160,7 @@ public class LobbiesController(
             var oldGameId = lobby.ActiveGameId?.ToString();
             lobby.MarkGameFinished();
             lobby.ResetNewGameVotes();
+            lobby.AdvanceRauskommer();
 
             var players = lobby.Players.Select(p => p.Id).ToList();
             var startResult = await startGame.ExecuteAsync(
@@ -173,7 +174,8 @@ public class LobbiesController(
                 return StatusCode(500, new ErrorResponse("game_start_failed"));
 
             var newGameId = startOk.Value.GameId;
-            await dealCards.ExecuteAsync(new DealCardsCommand(newGameId), ct);
+            var vorbehaltRauskommer = new PlayerId((byte)lobby.VorbehaltRauskommer);
+            await dealCards.ExecuteAsync(new DealCardsCommand(newGameId, vorbehaltRauskommer), ct);
 
             lobby.MarkStarted(newGameId);
             await lobbyRepository.SaveAsync(lobby, ct);
