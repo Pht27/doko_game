@@ -1,0 +1,1 @@
+make the pwa fullscreen if opened as an app.

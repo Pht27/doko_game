@@ -1,0 +1,1 @@
+sonderkarten nicht in solos sind nicht aktivierbar / existieren nicht. genauso sonderpunkte
