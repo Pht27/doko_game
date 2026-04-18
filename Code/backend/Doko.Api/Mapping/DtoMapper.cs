@@ -75,7 +75,11 @@ public static class DtoMapper
             t.Winner?.Value
         );
 
-    public static GameResultDto ToDto(GameResult r) =>
+    public static GameResultDto ToDto(
+        GameResult r,
+        int[]? netPointsPerSeat = null,
+        int[]? lobbyStandings = null
+    ) =>
         new(
             r.Winner.ToString(),
             r.ReAugen,
@@ -85,7 +89,9 @@ public static class DtoMapper
             r.Feigheit,
             r.ValueComponents.Select(c => new GameValueComponentDto(c.Label, c.Value)).ToList(),
             r.SoloFactor,
-            r.TotalScore
+            r.TotalScore,
+            (IReadOnlyList<int>?)netPointsPerSeat ?? [],
+            (IReadOnlyList<int>?)lobbyStandings ?? []
         );
 
     public static ExtrapunktAwardDto ToDto(ExtrapunktAward a) =>

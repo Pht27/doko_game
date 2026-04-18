@@ -13,5 +13,7 @@ public record GameResultDto(
     bool Feigheit,
     IReadOnlyList<GameValueComponentDto> ValueComponents,
     int SoloFactor,
-    int TotalScore
+    int TotalScore,
+    IReadOnlyList<int> NetPointsPerSeat,
+    IReadOnlyList<int> LobbyStandings
 );

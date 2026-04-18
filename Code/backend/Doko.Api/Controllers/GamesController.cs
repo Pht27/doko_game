@@ -7,6 +7,7 @@ using Doko.Application.Abstractions;
 using Doko.Application.Games.Commands;
 using Doko.Application.Games.Handlers;
 using Doko.Application.Games.Queries;
+using Doko.Application.Lobbies;
 using Doko.Domain.Announcements;
 using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
@@ -33,6 +34,7 @@ public class GamesController(
     IPlayCardHandler playCard,
     IMakeAnnouncementHandler makeAnnouncement,
     IGameQueryService gameQuery,
+    ILobbyRepository lobbyRepository,
     IHubContext<GameHub> hub
 ) : ControllerBase
 {
@@ -161,13 +163,26 @@ public class GamesController(
         return await result.ToActionResult(async r =>
         {
             if (r.GameFinished && r.FinishedResult is { } finished)
+            {
+                var netPoints = finished.NetPointsPerSeat.ToArray();
+                int[]? standings = null;
+
+                var lobby = await lobbyRepository.GetByGameIdAsync(new GameId(guid), ct);
+                if (lobby != null)
+                {
+                    lobby.UpdateStandings(netPoints);
+                    standings = lobby.Standings.ToArray();
+                    await lobbyRepository.SaveAsync(lobby, ct);
+                }
+
                 await hub
                     .Clients.Group(gameId)
                     .SendAsync(
                         "gameFinished",
-                        new { result = DtoMapper.ToDto(finished.Result) },
+                        new { result = DtoMapper.ToDto(finished.Result, netPoints, standings) },
                         ct
                     );
+            }
 
             return Ok(DtoMapper.ToResponse(r));
         });
