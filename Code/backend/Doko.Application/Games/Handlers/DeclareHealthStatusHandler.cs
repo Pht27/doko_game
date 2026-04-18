@@ -75,21 +75,23 @@ public sealed class DeclareHealthStatusHandler(
 
     private static void ResolveNextPhaseAfterAllDeclared(GameState state)
     {
+        var rauskommerSeat = (int)state.Players.First(p => p.Id == state.VorbehaltRauskommer).Seat;
         var vorbehaltPlayers = state
             .Players.Where(p => state.HealthDeclarations.TryGetValue(p.Id, out var hasV) && hasV)
+            .OrderBy(p => ((int)p.Seat - rauskommerSeat + 4) % 4)
             .Select(p => p.Id)
             .ToList();
 
         if (vorbehaltPlayers.Count == 0)
         {
-            // No reservation — normal game
+            // No reservation — normal game; VorbehaltRauskommer plays the first card
             state.Apply(new SetGameModeModification(null));
             state.Apply(new AdvancePhaseModification(GamePhase.Playing));
-            state.Apply(new SetCurrentTurnModification(state.Players[0].Id));
+            state.Apply(new SetCurrentTurnModification(state.VorbehaltRauskommer));
         }
         else
         {
-            // One or more Vorbehalt players → move to Solo check
+            // One or more Vorbehalt players → move to Solo check, ordered from VorbehaltRauskommer
             state.Apply(new SetPendingRespondersModification(vorbehaltPlayers));
             state.Apply(new AdvancePhaseModification(GamePhase.ReservationSoloCheck));
             state.Apply(new SetCurrentTurnModification(vorbehaltPlayers[0]));
