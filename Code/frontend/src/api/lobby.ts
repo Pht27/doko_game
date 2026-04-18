@@ -17,6 +17,7 @@ export interface LobbyViewResponse {
   lobbyId: string;
   seats: boolean[];
   isStarted: boolean;
+  standings: number[];
 }
 
 export function createLobby(): Promise<LobbyJoinResponse> {

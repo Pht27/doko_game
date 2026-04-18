@@ -31,6 +31,7 @@ interface GameBoardProps {
   viewError: string | null;
   allowPlayerSwitching: boolean;
   onPlayerSwitch: (player: number) => void;
+  lobbyId?: string;
   onNewGame: () => void;
   multiplayerNewGame?: MultiplayerNewGameProps;
   multiplayerGeschmissenNewGame?: MultiplayerNewGameProps;
@@ -54,6 +55,7 @@ export function GameBoard({
   viewError,
   allowPlayerSwitching,
   onPlayerSwitch,
+  lobbyId,
   onNewGame,
   multiplayerNewGame,
   multiplayerGeschmissenNewGame,
@@ -213,7 +215,7 @@ export function GameBoard({
       {/* Schmeißen result screen */}
       {view?.phase === 'Geschmissen' && (
         <GeschmissenResultScreen
-          lobbyStandings={view.lobbyStandings}
+          lobbyId={lobbyId}
           activePlayer={activePlayer}
           onNewGame={onNewGame}
           multiplayerNewGame={multiplayerGeschmissenNewGame}
@@ -227,7 +229,7 @@ export function GameBoard({
           gameMode={view.activeGameMode}
           trickNumber={(view.currentTrick?.trickNumber ?? 0) + 1}
           completedTricks={view.completedTricks.length}
-          lobbyStandings={view.lobbyStandings}
+          lobbyId={lobbyId}
           activePlayer={activePlayer}
           onClose={() => setShowInfoOverlay(false)}
         />

@@ -163,26 +163,7 @@ public class GamesController(
         return await result.ToActionResult(async r =>
         {
             if (r.GameFinished && r.FinishedResult is { } finished)
-            {
-                var netPoints = finished.NetPointsPerSeat.ToArray();
-                int[]? standings = null;
-
-                var lobby = await lobbyRepository.GetByGameIdAsync(new GameId(guid), ct);
-                if (lobby != null)
-                {
-                    lobby.UpdateStandings(netPoints);
-                    standings = lobby.Standings.ToArray();
-                    await lobbyRepository.SaveAsync(lobby, ct);
-                }
-
-                await hub
-                    .Clients.Group(gameId)
-                    .SendAsync(
-                        "gameFinished",
-                        new { result = DtoMapper.ToDto(finished.Result, netPoints, standings) },
-                        ct
-                    );
-            }
+                await HandleGameFinishedAsync(gameId, new GameId(guid), finished, ct);
 
             return Ok(DtoMapper.ToResponse(r));
         });
@@ -222,12 +203,35 @@ public class GamesController(
         if (view is null)
             return NotFound(new ErrorResponse("game_not_found"));
 
-        var lobby = await lobbyRepository.GetByGameIdAsync(new GameId(guid), ct);
-        var response = DtoMapper.ToResponse(view);
-        if (lobby != null)
-            response = response with { LobbyStandings = lobby.Standings };
+        return Ok(DtoMapper.ToResponse(view));
+    }
 
-        return Ok(response);
+    private async Task HandleGameFinishedAsync(
+        string gameIdString,
+        GameId gameId,
+        Application.Games.Results.GameFinishedResult finished,
+        CancellationToken ct
+    )
+    {
+        var netPoints = finished.NetPointsPerSeat.ToArray();
+        int[]? standings = null;
+
+        var lobby = await lobbyRepository.GetByGameIdAsync(gameId, ct);
+        if (lobby != null)
+        {
+            lobby.UpdateStandings(netPoints);
+            lobby.SetAdvanceRauskommer(finished.ShouldAdvanceRauskommer);
+            standings = lobby.Standings.ToArray();
+            await lobbyRepository.SaveAsync(lobby, ct);
+        }
+
+        await hub
+            .Clients.Group(gameIdString)
+            .SendAsync(
+                "gameFinished",
+                new { result = DtoMapper.ToDto(finished.Result, netPoints, standings) },
+                ct
+            );
     }
 
     private PlayerId GetPlayerId()

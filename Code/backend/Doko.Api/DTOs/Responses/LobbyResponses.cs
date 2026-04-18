@@ -9,6 +9,6 @@ public record LobbyJoinResponse(
 
 public record LobbyListItemResponse(string LobbyId, bool[] Seats, bool IsStarted);
 
-public record LobbyViewResponse(string LobbyId, bool[] Seats, bool IsStarted);
+public record LobbyViewResponse(string LobbyId, bool[] Seats, bool IsStarted, int[] Standings);
 
 public record StartLobbyGameResponse(string GameId);

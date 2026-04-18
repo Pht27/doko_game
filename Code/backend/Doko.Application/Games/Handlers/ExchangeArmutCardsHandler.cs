@@ -67,9 +67,9 @@ public sealed class ExchangeArmutCardsHandler(
             returnedTrumpCount
         );
 
+        var startingPlayer = FindStartingPlayer(state, command.RichPlayer, poorPlayer);
         state.Apply(new AdvancePhaseModification(GamePhase.Playing));
-        // Poor player (Arme) leads in Armut games.
-        state.Apply(new SetCurrentTurnModification(poorPlayer));
+        state.Apply(new SetCurrentTurnModification(startingPlayer));
 
         var events = new List<IDomainEvent>
         {
@@ -144,4 +144,20 @@ public sealed class ExchangeArmutCardsHandler(
         state.Apply(new SetArmutReturnedTrumpModification(returnedTrumpCount > 0));
     }
 
+    /// <summary>
+    /// Finds the first player to the left of the rich player who is not in the Re party
+    /// (neither rich nor poor). This player leads the first trick after the Armut exchange.
+    /// </summary>
+    private static PlayerId FindStartingPlayer(
+        GameState state,
+        PlayerId richPlayer,
+        PlayerId poorPlayer
+    )
+    {
+        var richSeat = (int)state.Players.First(p => p.Id == richPlayer).Seat;
+        return state
+            .Players.OrderBy(p => ((int)p.Seat - richSeat - 1 + 4) % 4)
+            .First(p => p.Id != richPlayer && p.Id != poorPlayer)
+            .Id;
+    }
 }

@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+import { getLobby } from '../../api/lobby';
 import { t } from '../../translations';
 import '../../styles/GameInfo.css';
 
@@ -6,7 +8,7 @@ interface GameInfoOverlayProps {
   gameMode: string | null;
   trickNumber: number;
   completedTricks: number;
-  lobbyStandings: number[];
+  lobbyId?: string;
   activePlayer: number;
   onClose: () => void;
 }
@@ -16,15 +18,22 @@ export function GameInfoOverlay({
   gameMode,
   trickNumber,
   completedTricks,
-  lobbyStandings,
+  lobbyId,
   activePlayer,
   onClose,
 }: GameInfoOverlayProps) {
+  const [standings, setStandings] = useState<number[] | null>(null);
+
+  useEffect(() => {
+    if (!lobbyId) return;
+    getLobby(lobbyId)
+      .then((lobby) => setStandings(lobby.standings))
+      .catch(() => {});
+  }, [lobbyId]);
+
   const modeLabel = phase === 'Playing'
     ? t.gameModeLabel(gameMode)
     : t.phaseLabel(phase);
-
-  const hasStandings = lobbyStandings.length === 4;
 
   return (
     <div className="game-info-overlay" onClick={onClose}>
@@ -42,11 +51,11 @@ export function GameInfoOverlay({
           </div>
         </div>
 
-        {hasStandings && (
+        {standings && standings.length === 4 && (
           <div>
             <div className="game-info-section-header">{t.gesamtstand}</div>
             <div className="flex flex-col gap-1">
-              {lobbyStandings.map((pts, seat) => {
+              {standings.map((pts, seat) => {
                 const isMe = seat === activePlayer;
                 return (
                   <div key={seat} className={isMe ? 'game-info-standings-row-me' : 'game-info-standings-row'}>

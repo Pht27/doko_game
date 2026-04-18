@@ -10,6 +10,7 @@ public class LobbyState
     private readonly LobbyPlayer?[] _seats = new LobbyPlayer?[4];
     private readonly int[] _standings = new int[4];
     private readonly HashSet<byte> _newGameVoters = [];
+    private bool _advanceRauskommer = true;
 
     public LobbyId Id { get; }
     public DateTimeOffset CreatedAt { get; }
@@ -112,10 +113,22 @@ public class LobbyState
     public void ResetNewGameVotes() => _newGameVoters.Clear();
 
     /// <summary>
-    /// Rotates the VorbehaltRauskommer one seat counter-clockwise.
-    /// Call this after each completed game (not after Schmeißen).
+    /// Records whether the VorbehaltRauskommer should advance after the current game.
+    /// Call this when a game finishes, before VoteNewGame triggers the advance.
     /// </summary>
-    public void AdvanceRauskommer() => VorbehaltRauskommer = (VorbehaltRauskommer + 1) % 4;
+    public void SetAdvanceRauskommer(bool advance) => _advanceRauskommer = advance;
+
+    /// <summary>
+    /// Rotates the VorbehaltRauskommer one seat counter-clockwise, but only if
+    /// the last completed game was a Normal or Hochzeit game.
+    /// Soli, Armut, and Schmeißen keep the same leader.
+    /// </summary>
+    public void AdvanceRauskommerIfRequired()
+    {
+        if (_advanceRauskommer)
+            VorbehaltRauskommer = (VorbehaltRauskommer + 1) % 4;
+        _advanceRauskommer = true; // reset for next game
+    }
 
     /// <summary>Applies per-seat net point deltas to the running lobby standings.</summary>
     public void UpdateStandings(int[] netPointsPerSeat)

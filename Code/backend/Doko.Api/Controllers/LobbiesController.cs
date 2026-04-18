@@ -134,7 +134,7 @@ public class LobbiesController(
             return NotFound(new ErrorResponse("lobby_not_found"));
 
         var seats = lobby.Seats.Select(s => s != null).ToArray();
-        return Ok(new LobbyViewResponse(lobbyId, seats, lobby.IsStarted));
+        return Ok(new LobbyViewResponse(lobbyId, seats, lobby.IsStarted, lobby.Standings.ToArray()));
     }
 
     [HttpPost("{lobbyId}/new-game/ready")]
@@ -160,7 +160,7 @@ public class LobbiesController(
             var oldGameId = lobby.ActiveGameId?.ToString();
             lobby.MarkGameFinished();
             lobby.ResetNewGameVotes();
-            lobby.AdvanceRauskommer();
+            lobby.AdvanceRauskommerIfRequired();
 
             var players = lobby.Players.Select(p => p.Id).ToList();
             var startResult = await startGame.ExecuteAsync(

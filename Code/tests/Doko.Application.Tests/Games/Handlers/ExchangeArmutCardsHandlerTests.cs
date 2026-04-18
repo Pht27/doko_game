@@ -166,9 +166,11 @@ public class ExchangeArmutCardsHandlerTests
     }
 
     [Fact]
-    public async Task ExchangeArmutCards_ValidExchange_PoorPlayerLeads()
+    public async Task ExchangeArmutCards_ValidExchange_FirstNonRichPartyPlayerLeftOfRichLeads()
     {
-        // Poor player (P0) always leads in Armut games.
+        // P0 = poor (seat 0), P1 = rich (seat 1)
+        // Left of rich: P2 (seat 2), then P3 (seat 3), then P0 (poor — skip).
+        // Expected leader: P2.
         var (repo, pub, id) = await ArmutCardExchangeGame();
         var useCase = new ExchangeArmutCardsHandler(repo, pub);
 
@@ -177,7 +179,7 @@ public class ExchangeArmutCardsHandlerTests
         );
 
         var state = await repo.GetAsync(id);
-        state!.CurrentTurn.Should().Be(AppB.P0);
+        state!.CurrentTurn.Should().Be(AppB.P2);
     }
 
     [Fact]

@@ -217,6 +217,7 @@ export default function App() {
         viewError={viewError}
         allowPlayerSwitching={isHotSeat}
         onPlayerSwitch={isHotSeat ? hotSeat.setActivePlayer : () => {}}
+        lobbyId={isGame ? view.lobbySession?.lobbyId : undefined}
         onNewGame={isHotSeat ? hotSeat.restart : () => setView({ kind: 'home' })}
         multiplayerNewGame={
           isGame && view.lobbySession
