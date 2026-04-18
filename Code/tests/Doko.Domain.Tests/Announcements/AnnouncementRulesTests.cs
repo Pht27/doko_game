@@ -357,6 +357,67 @@ public class AnnouncementRulesTests
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
     }
 
+    // ── CanAnnounce: Absage mutex ─────────────────────────────────────────────
+
+    [Fact]
+    public void CanAnnounce_Keine90_BlockedWhenOtherPartyAlreadyHasKeine90()
+    {
+        // Kontra (P1) already has Keine90. Re (P0) cannot make any Absage.
+        var state = B.BasicState(
+            announcements:
+            [
+                B.Ann(B.P0, AnnouncementType.Win),
+                B.Ann(B.P1, AnnouncementType.Win),
+                B.Ann(B.P1, AnnouncementType.Keine90),
+            ]
+        );
+        AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Keine90, state).Should().BeFalse();
+    }
+
+    [Fact]
+    public void CanAnnounce_Keine90_AllowedWhenOtherPartyHasNoAbsage()
+    {
+        // Kontra (P1) only has Win, no Absage → Re can still announce Keine90.
+        var state = B.BasicState(
+            announcements:
+            [
+                B.Ann(B.P0, AnnouncementType.Win),
+                B.Ann(B.P1, AnnouncementType.Win),
+            ]
+        );
+        AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Keine90, state).Should().BeTrue();
+    }
+
+    [Fact]
+    public void CanAnnounce_Keine60_BlockedWhenOtherPartyHasAbsage()
+    {
+        // Re (P0) has Keine90. Kontra (P1) cannot make Keine60 (or any Absage).
+        var state = B.BasicState(
+            announcements:
+            [
+                B.Ann(B.P0, AnnouncementType.Win),
+                B.Ann(B.P0, AnnouncementType.Keine90),
+                B.Ann(B.P1, AnnouncementType.Win),
+                B.Ann(B.P1, AnnouncementType.Keine90), // this would also be blocked; assume it slipped through
+            ]
+        );
+        AnnouncementRules.CanAnnounce(B.P1, AnnouncementType.Keine60, state).Should().BeFalse();
+    }
+
+    [Fact]
+    public void CanAnnounce_SameParty_CanContinueAbsageLadder()
+    {
+        // Re already has Keine90. Re can continue to Keine60 (other party has no Absage).
+        var state = B.BasicState(
+            announcements:
+            [
+                B.Ann(B.P0, AnnouncementType.Win),
+                B.Ann(B.P0, AnnouncementType.Keine90),
+            ]
+        );
+        AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Keine60, state).Should().BeTrue();
+    }
+
     // ── CanAnnounce: Hochzeit timing ──────────────────────────────────────────
 
     [Fact]

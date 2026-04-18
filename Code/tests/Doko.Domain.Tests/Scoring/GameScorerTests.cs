@@ -177,6 +177,122 @@ public class GameScorerTests
         result.GameValue.Should().Be(3);
     }
 
+    // ── Absage: automatic loss when Absage unfulfilled ────────────────────────
+
+    [Fact]
+    public void Score_KontraWins_WhenReFailsKeine90Absage()
+    {
+        // Re=143, Kontra=97. Re announced keine 90, but Kontra has 97 ≥ 90 → Re loses automatically.
+        var state = SoloState(
+            rules: NoFeigheit,
+            announcements:
+            [
+                B.Ann(B.P0, AnnouncementType.Win),
+                B.Ann(B.P0, AnnouncementType.Keine90),
+                B.Ann(B.P1, AnnouncementType.Win),
+            ]
+        );
+        // Re: 3×44=132+11=143 (use 3 high tricks + partial), Kontra: 97
+        // Simplest: 3 Re tricks (132) + Kontra trick with 44 = Re 132, Kontra 44 → not 97
+        // Let's do Re=4×44=176-33=143 → too complex; use explicit Augen via trick split
+        // 3 Re tricks (3×44=132), 1 Kontra trick (44), 1 more Kontra trick (44) = Re 132, Kontra 88 < 90 → test wrong
+        // Instead: Re 2 tricks (88), Kontra 3 tricks (132) → Re<121 AND Re's keine90 means Kontra<90 but Kontra=132≥90 → Re loses
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P0, 0),
+            B.HighValueTrick(B.P0, 4),
+            B.HighValueTrick(B.P1, 8),
+            B.HighValueTrick(B.P1, 12),
+            B.HighValueTrick(B.P1, 16),
+        };
+        // Re=88, Kontra=132. Re's keine90 requires Kontra<90, but Kontra=132≥90 → Re loses.
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.Winner.Should().Be(Party.Kontra);
+        result.ReAugen.Should().Be(88);
+        result.KontraAugen.Should().Be(132);
+    }
+
+    [Fact]
+    public void Score_KontraWins_WhenReFailsKeine90_EvenIfReHas121Plus()
+    {
+        // Re=132, Kontra=108. Re announced keine90, but Kontra has 108 ≥ 90.
+        // Even though Re would normally win (132≥121), the Absage failure makes Re lose.
+        var state = SoloState(
+            rules: NoFeigheit,
+            announcements:
+            [
+                B.Ann(B.P0, AnnouncementType.Win),
+                B.Ann(B.P0, AnnouncementType.Keine90),
+            ]
+        );
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P0, 0),
+            B.HighValueTrick(B.P0, 4),
+            B.HighValueTrick(B.P0, 8),
+            B.HighValueTrick(B.P1, 12),
+            B.HighValueTrick(B.P1, 16),
+            B.HighValueTrick(B.P1, 20),
+        };
+        // Re=132, Kontra=132 → Kontra≥90 → Re's keine90 fails → Kontra wins
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.Winner.Should().Be(Party.Kontra);
+    }
+
+    [Fact]
+    public void Score_ReWins_WhenKontraFailsKeine90Absage()
+    {
+        // Kontra announced keine90, but Re has ≥90 → Kontra loses automatically.
+        var state = SoloState(
+            rules: NoFeigheit,
+            announcements:
+            [
+                B.Ann(B.P1, AnnouncementType.Win),
+                B.Ann(B.P1, AnnouncementType.Keine90),
+            ]
+        );
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P0, 0),
+            B.HighValueTrick(B.P0, 4),
+            B.HighValueTrick(B.P0, 8),
+            B.HighValueTrick(B.P1, 12),
+            B.HighValueTrick(B.P1, 16),
+        };
+        // Re=132, Kontra=88. Kontra's keine90 requires Re<90, but Re=132≥90 → Kontra loses.
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.Winner.Should().Be(Party.Re);
+    }
+
+    [Fact]
+    public void Score_Keine90AbsageFulfilled_UsesNormalAugenLogic()
+    {
+        // Re announced keine90, Kontra has 44 < 90 → Absage fulfilled → normal Augen logic applies.
+        var state = SoloState(
+            rules: NoFeigheit,
+            announcements:
+            [
+                B.Ann(B.P0, AnnouncementType.Win),
+                B.Ann(B.P0, AnnouncementType.Keine90),
+            ]
+        );
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P0, 0),
+            B.HighValueTrick(B.P0, 4),
+            B.HighValueTrick(B.P0, 8),
+            B.HighValueTrick(B.P0, 12),
+            B.HighValueTrick(B.P1, 16),
+        };
+        // Re=176, Kontra=44 < 90 → fulfilled → Re wins with normal logic
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.Winner.Should().Be(Party.Re);
+    }
+
     // ── Feigheit ──────────────────────────────────────────────────────────────
 
     [Fact]

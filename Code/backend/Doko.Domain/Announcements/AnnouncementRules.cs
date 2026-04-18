@@ -30,23 +30,43 @@ public static class AnnouncementRules
         if (party is null)
             return false;
 
+        var otherParty = party == Party.Re ? Party.Kontra : Party.Re;
+
         var partyAnnouncements = state
             .Announcements.Where(a => state.PartyResolver.ResolveParty(a.Player, state) == party)
             .Select(a => a.Type)
             .ToHashSet();
+
+        var otherPartyAnnouncements = state
+            .Announcements.Where(a =>
+                state.PartyResolver.ResolveParty(a.Player, state) == otherParty
+            )
+            .Select(a => a.Type)
+            .ToHashSet();
+
+        // Once one party has made an Absage (Keine90+), the other party may no longer make Absagen.
+        bool otherPartyHasAbsage =
+            otherPartyAnnouncements.Contains(AnnouncementType.Keine90)
+            || otherPartyAnnouncements.Contains(AnnouncementType.Keine60)
+            || otherPartyAnnouncements.Contains(AnnouncementType.Keine30)
+            || otherPartyAnnouncements.Contains(AnnouncementType.Schwarz);
 
         // Consecutive ordering: Win must come before Keine90, etc.
         // The player's party must have already made the preceding announcement.
         return type switch
         {
             AnnouncementType.Win => !partyAnnouncements.Contains(AnnouncementType.Win),
-            AnnouncementType.Keine90 => partyAnnouncements.Contains(AnnouncementType.Win)
+            AnnouncementType.Keine90 => !otherPartyHasAbsage
+                && partyAnnouncements.Contains(AnnouncementType.Win)
                 && !partyAnnouncements.Contains(AnnouncementType.Keine90),
-            AnnouncementType.Keine60 => partyAnnouncements.Contains(AnnouncementType.Keine90)
+            AnnouncementType.Keine60 => !otherPartyHasAbsage
+                && partyAnnouncements.Contains(AnnouncementType.Keine90)
                 && !partyAnnouncements.Contains(AnnouncementType.Keine60),
-            AnnouncementType.Keine30 => partyAnnouncements.Contains(AnnouncementType.Keine60)
+            AnnouncementType.Keine30 => !otherPartyHasAbsage
+                && partyAnnouncements.Contains(AnnouncementType.Keine60)
                 && !partyAnnouncements.Contains(AnnouncementType.Keine30),
-            AnnouncementType.Schwarz => partyAnnouncements.Contains(AnnouncementType.Keine30)
+            AnnouncementType.Schwarz => !otherPartyHasAbsage
+                && partyAnnouncements.Contains(AnnouncementType.Keine30)
                 && !partyAnnouncements.Contains(AnnouncementType.Schwarz),
             _ => false,
         };

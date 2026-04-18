@@ -42,8 +42,9 @@ public sealed class GameScorer : IGameScorer
         }
 
         // ── 2. Determine winner ───────────────────────────────────────────────────
-        // Re needs 121+; Kontra wins if Re does not reach 121.
-        Party winner = reAugen >= 121 ? Party.Re : Party.Kontra;
+        // If a party made Absagen (Keine90+) that were not fulfilled, they lose automatically.
+        // Otherwise Re needs 121+; Kontra wins if Re does not reach 121.
+        Party winner = DetermineWinner(state, reAugen, kontraAugen);
         int loserAugen = winner == Party.Re ? kontraAugen : reAugen;
 
         // ── 3. Collect all Extrapunkte awards ─────────────────────────────────────
@@ -163,6 +164,38 @@ public sealed class GameScorer : IGameScorer
             totalScore,
             announcementRecords
         );
+    }
+
+    private static Party DetermineWinner(GameFlow.GameState state, int reAugen, int kontraAugen)
+    {
+        bool reFailedAbsagen = HasUnfulfilledAbsagen(Party.Re, kontraAugen, state);
+        bool kontraFailedAbsagen = HasUnfulfilledAbsagen(Party.Kontra, reAugen, state);
+
+        if (reFailedAbsagen && !kontraFailedAbsagen)
+            return Party.Kontra;
+        if (kontraFailedAbsagen && !reFailedAbsagen)
+            return Party.Re;
+
+        return reAugen >= 121 ? Party.Re : Party.Kontra;
+    }
+
+    private static bool HasUnfulfilledAbsagen(Party party, int opponentAugen, GameFlow.GameState state)
+    {
+        var absagen = state
+            .Announcements.Where(a => state.PartyResolver.ResolveParty(a.Player, state) == party)
+            .Select(a => a.Type)
+            .ToHashSet();
+
+        if (absagen.Contains(AnnouncementType.Keine90) && opponentAugen >= 90)
+            return true;
+        if (absagen.Contains(AnnouncementType.Keine60) && opponentAugen >= 60)
+            return true;
+        if (absagen.Contains(AnnouncementType.Keine30) && opponentAugen >= 30)
+            return true;
+        if (absagen.Contains(AnnouncementType.Schwarz) && opponentAugen != 0)
+            return true;
+
+        return false;
     }
 
     private static int ComputeEffectiveAugen(
