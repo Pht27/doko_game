@@ -22,7 +22,7 @@ public static class AnnouncementRules
             state.CompletedTricks.Count * 4 + (state.CurrentTrick?.Cards.Count ?? 0);
         int totalAnnouncements = state.Announcements.Count;
         int deadline = baseDeadline.Value + 4 * totalAnnouncements;
-        if (totalCardsPlayed >= deadline)
+        if (totalCardsPlayed > deadline)
             return false;
 
         // Party membership check
