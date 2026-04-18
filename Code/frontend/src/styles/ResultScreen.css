@@ -2,127 +2,253 @@
 @reference "./index.css";
 
 .result-overlay {
-  @apply fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4;
+  @apply fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-3;
 }
 
-.result-screen {
-  @apply bg-gray-800 rounded-2xl p-6 w-full max-w-sm shadow-2xl flex flex-col gap-4 text-white max-h-[90vh] overflow-y-auto;
+/* ── Wide screen container ──────────────────────────────────────────────────── */
+
+.result-screen-wide {
+  @apply bg-gray-800 rounded-2xl p-4 w-full max-w-3xl shadow-2xl text-white max-h-[95vh] overflow-y-auto;
 }
 
-.result-title {
-  @apply text-2xl font-bold text-center;
+.result-main-columns {
+  @apply flex gap-4;
 }
 
-.result-grid {
-  @apply grid grid-cols-2 gap-x-4 gap-y-1 text-sm;
+.result-left-col {
+  @apply flex-none w-[44%] min-w-0;
 }
 
-.result-label {
-  @apply text-white/60;
+.result-right-col {
+  @apply flex-1 min-w-0 flex flex-col gap-3;
 }
 
-.result-value {
-  @apply font-semibold;
+.result-detail-area {
+  @apply flex-1;
 }
 
-.result-section-header {
-  @apply text-white/50 text-xs uppercase tracking-wide mb-2;
-}
-
-.result-breakdown {
-  @apply flex flex-col gap-1 text-sm;
-}
-
-.result-breakdown-row {
-  @apply flex justify-between;
-}
-
-.result-breakdown-value {
-  @apply font-semibold tabular-nums;
-}
-
-.result-breakdown-total {
-  @apply flex justify-between font-bold border-t border-white/20 mt-1 pt-1;
-}
-
-.result-feigheit-banner {
-  @apply text-center text-yellow-400 font-semibold bg-yellow-400/10 rounded-lg py-2 text-sm;
-}
-
-.result-awards-list {
-  @apply flex flex-col gap-1;
-}
-
-.result-award-item {
-  @apply flex justify-between text-sm;
-}
-
-.result-award-delta {
-  @apply font-semibold tabular-nums;
-}
+/* ── Ready / new-game button ────────────────────────────────────────────────── */
 
 .result-new-game-btn {
-  @apply mt-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg py-3 font-bold transition-colors;
-}
-
-.result-standings-row {
-  @apply flex justify-between text-sm;
-}
-
-.result-standings-row-me {
-  @apply flex justify-between text-sm font-semibold text-indigo-300;
-}
-
-.result-points-positive {
-  @apply font-semibold tabular-nums text-green-400;
-}
-
-.result-points-negative {
-  @apply font-semibold tabular-nums text-red-400;
-}
-
-.result-points-neutral {
-  @apply font-semibold tabular-nums;
-}
-
-.result-vote-area {
-  @apply flex flex-col items-center gap-2 mt-2;
+  @apply mt-auto bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg py-3 font-bold transition-colors w-full;
 }
 
 .result-bereit-btn {
-  @apply w-full bg-green-600 hover:bg-green-500 active:bg-green-700 text-white rounded-lg py-3 font-bold transition-colors disabled:opacity-50;
+  @apply mt-auto w-full bg-green-600 hover:bg-green-500 active:bg-green-700 text-white rounded-lg py-3 font-bold transition-colors disabled:opacity-50 flex items-center justify-between px-4;
 }
 
 .result-bereit-active-btn {
-  @apply w-full bg-gray-600 hover:bg-gray-500 active:bg-gray-700 text-white rounded-lg py-3 font-bold transition-colors disabled:opacity-50;
+  @apply mt-auto w-full bg-gray-600 hover:bg-gray-500 active:bg-gray-700 text-white rounded-lg py-3 font-bold transition-colors disabled:opacity-50 flex items-center justify-center px-4;
 }
 
-.result-vote-count {
+.result-bereit-label {
+  @apply flex-1 text-center;
+}
+
+.result-bereit-indicator {
+  @apply text-sm font-normal text-white/80 whitespace-nowrap;
+}
+
+/* ── LobbyHistory ──────────────────────────────────────────────────────────── */
+
+.rh-container {
+  @apply flex flex-col text-xs;
+}
+
+.rh-row {
+  @apply grid;
+  /* game-cell + 4 seat columns, all equal */
+  grid-template-columns: 1.5rem repeat(4, 1fr);
+}
+
+.rh-cell {
+  @apply flex items-center justify-center px-0.5 py-1 tabular-nums;
+}
+
+.rh-game-cell {
+  @apply justify-start pl-0;
+}
+
+.rh-header-row {
+  @apply border-b border-white/10 pb-1 mb-1;
+}
+
+.rh-seat-header {
+  @apply text-white/50 font-medium uppercase tracking-wide;
+}
+
+.rh-seat-me {
+  @apply text-indigo-400 font-semibold;
+}
+
+.rh-rows {
+  @apply flex flex-col gap-0.5 overflow-y-auto max-h-[40vh];
+}
+
+.rh-game-row {
+  @apply rounded transition-colors;
+}
+
+.rh-row-clickable {
+  @apply cursor-pointer hover:bg-white/5;
+}
+
+.rh-row-selected {
+  @apply bg-white/10 cursor-default;
+}
+
+.rh-game-number {
+  @apply text-white/30 text-[10px] justify-start;
+}
+
+.rh-points {
+  @apply font-medium;
+}
+
+.rh-points-pos {
+  @apply text-green-400;
+}
+
+.rh-points-neg {
+  @apply text-red-400;
+}
+
+.rh-points-zero {
+  @apply text-white/30;
+}
+
+.rh-standings-row {
+  @apply border-t border-white/20 mt-1 pt-1;
+}
+
+.rh-standing {
+  @apply font-bold;
+}
+
+.rh-standing-pos {
+  @apply text-green-300;
+}
+
+.rh-standing-neg {
+  @apply text-red-300;
+}
+
+/* ── ResultDisplay (3-column) ──────────────────────────────────────────────── */
+
+.rd-columns {
+  @apply grid grid-cols-3 gap-3 text-sm;
+}
+
+.rd-col {
+  @apply flex flex-col gap-2;
+}
+
+/* Column 1: winner banner + augen */
+
+.rd-winner-banner {
+  @apply text-xs font-bold text-center rounded-lg py-1.5 px-2;
+}
+
+.rd-winner-re {
+  @apply bg-blue-600/25 text-blue-300;
+}
+
+.rd-winner-kontra {
+  @apply bg-red-600/25 text-red-300;
+}
+
+.rd-augen-block {
+  @apply flex flex-col gap-1;
+}
+
+.rd-augen-row {
+  @apply flex justify-between text-xs text-white/60;
+}
+
+.rd-augen-winner {
+  @apply text-white/90 font-semibold;
+}
+
+.rd-augen-label {
+  /* intentionally plain */
+}
+
+.rd-augen-value {
+  @apply tabular-nums;
+}
+
+/* Column 2: extrapunkte */
+
+.rd-awards-list {
+  @apply flex flex-col gap-1;
+}
+
+.rd-award-item {
+  @apply flex items-baseline gap-1 text-xs;
+}
+
+.rd-award-player {
+  @apply font-semibold shrink-0 text-[10px];
+}
+
+.rd-award-re {
+  @apply text-blue-400;
+}
+
+.rd-award-kontra {
+  @apply text-red-400;
+}
+
+.rd-award-type {
+  @apply text-white/60 flex-1 leading-tight;
+}
+
+.rd-award-delta {
+  @apply tabular-nums font-semibold shrink-0;
+}
+
+.rd-empty {
+  @apply text-white/30 text-xs;
+}
+
+/* Column 3: spielwert breakdown */
+
+.rd-breakdown {
+  @apply flex flex-col gap-1 text-xs;
+}
+
+.rd-breakdown-row {
+  @apply flex justify-between gap-1;
+}
+
+.rd-breakdown-label {
+  @apply text-white/60;
+}
+
+.rd-breakdown-value {
+  @apply tabular-nums font-semibold shrink-0;
+}
+
+.rd-breakdown-total {
+  @apply flex justify-between font-bold border-t border-white/20 mt-1 pt-1;
+}
+
+/* GeschmissenDisplay */
+
+.rd-geschmissen {
+  @apply flex flex-col items-center justify-center gap-2 py-4 text-center;
+}
+
+.rd-geschmissen-title {
+  @apply text-2xl font-bold;
+}
+
+.rd-geschmissen-subtitle {
   @apply text-white/60 text-sm;
 }
 
-/* ── Two-column result layout ─────────────────────────────────────────────── */
+/* Feigheit banner (shared) */
 
-.result-columns {
-  @apply grid grid-cols-2 gap-x-4 gap-y-4;
-}
-
-.result-col-standings {
-  @apply flex flex-col gap-2;
-}
-
-.result-col-details {
-  @apply flex flex-col gap-2;
-}
-
-.result-col-standings-values {
-  @apply flex gap-2 items-center tabular-nums;
-}
-
-.result-grid-compact {
-  @apply mt-1;
-}
-
-.result-section-header-sm {
-  @apply text-white/50 text-xs uppercase tracking-wide mt-1 mb-1;
+.result-feigheit-banner {
+  @apply text-center text-yellow-400 font-semibold bg-yellow-400/10 rounded-lg py-2 text-xs;
 }

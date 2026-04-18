@@ -79,7 +79,8 @@ public static class DtoMapper
         GameResult r,
         int[]? netPointsPerSeat = null,
         int[]? lobbyStandings = null,
-        bool isGeschmissen = false
+        bool isGeschmissen = false,
+        IReadOnlyList<GameResultDto>? matchHistory = null
     ) =>
         new(
             r.Winner.ToString(),
@@ -93,10 +94,14 @@ public static class DtoMapper
             r.TotalScore,
             (IReadOnlyList<int>?)netPointsPerSeat ?? [],
             (IReadOnlyList<int>?)lobbyStandings ?? [],
-            isGeschmissen
+            isGeschmissen,
+            matchHistory
         );
 
-    public static GameResultDto ToGeschmissenDto(int[]? lobbyStandings = null) =>
+    public static GameResultDto ToGeschmissenDto(
+        int[]? lobbyStandings = null,
+        IReadOnlyList<GameResultDto>? matchHistory = null
+    ) =>
         new(
             Winner: string.Empty,
             ReAugen: 0,
@@ -109,7 +114,8 @@ public static class DtoMapper
             TotalScore: 0,
             NetPointsPerSeat: new int[4],
             LobbyStandings: (IReadOnlyList<int>?)lobbyStandings ?? [],
-            IsGeschmissen: true
+            IsGeschmissen: true,
+            MatchHistory: matchHistory
         );
 
     public static ExtrapunktAwardDto ToDto(ExtrapunktAward a) =>

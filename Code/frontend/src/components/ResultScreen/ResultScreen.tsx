@@ -4,6 +4,7 @@ import type { GameResultDto } from '../../types/api';
 import { t } from '../../translations';
 import { GeschmissenDisplay } from './GeschmissenDisplay';
 import { ResultDisplay } from './ResultDisplay';
+import { LobbyHistory } from './LobbyHistory';
 import '../../styles/ResultScreen.css';
 
 export interface MultiplayerNewGameProps {
@@ -22,6 +23,19 @@ interface ResultScreenProps {
 export function ResultScreen({ result, onNewGame, multiplayerNewGame }: ResultScreenProps) {
   const [hasVoted, setHasVoted] = useState(false);
   const [voting, setVoting] = useState(false);
+
+  const history = result.matchHistory ?? [];
+  const currentGameIndex = result.isGeschmissen ? Math.max(0, history.length - 1) : history.length;
+  const [selectedGame, setSelectedGame] = useState(currentGameIndex);
+
+  const mySeat = multiplayerNewGame?.mySeatIndex;
+  const hasHistory = history.length > 0 || !result.isGeschmissen;
+
+  /** The result to show in the detail column — current or a historic one. */
+  function getDisplayResult(): GameResultDto {
+    if (selectedGame < history.length) return history[selectedGame];
+    return result;
+  }
 
   async function handleVote() {
     if (!multiplayerNewGame || voting) return;
@@ -45,36 +59,57 @@ export function ResultScreen({ result, onNewGame, multiplayerNewGame }: ResultSc
     }
   }
 
-  const mySeat = multiplayerNewGame?.mySeatIndex;
+  const voteCount = multiplayerNewGame?.voteCount ?? 0;
 
   return createPortal(
     <div className="result-overlay">
-      <div className="result-screen">
-        {result.isGeschmissen ? (
-          <GeschmissenDisplay result={result} mySeat={mySeat} />
-        ) : (
-          <ResultDisplay result={result} mySeat={mySeat} />
-        )}
+      <div className="result-screen-wide">
+        <div className="result-main-columns">
+          {/* ── Left column: match history table ── */}
+          {hasHistory && (
+            <div className="result-left-col">
+              <LobbyHistory
+                result={result}
+                mySeat={mySeat}
+                selectedGame={selectedGame}
+                onSelectGame={setSelectedGame}
+              />
+            </div>
+          )}
 
-        {/* New game action */}
-        {multiplayerNewGame ? (
-          <div className="result-vote-area">
-            <button
-              onClick={hasVoted ? handleWithdraw : handleVote}
-              className={hasVoted ? 'result-bereit-active-btn' : 'result-bereit-btn'}
-              disabled={voting}
-            >
-              {hasVoted ? t.zurueckziehen : t.bereit}
-            </button>
-            <span className="result-vote-count">
-              {t.bereitCount(multiplayerNewGame.voteCount)}
-            </span>
+          {/* ── Right column: detail + action ── */}
+          <div className="result-right-col">
+            <div className="result-detail-area">
+              {getDisplayResult().isGeschmissen ? (
+                <GeschmissenDisplay />
+              ) : (
+                <ResultDisplay result={getDisplayResult()} mySeat={mySeat} />
+              )}
+            </div>
+
+            {/* Action button */}
+            {multiplayerNewGame ? (
+              <button
+                onClick={hasVoted ? handleWithdraw : handleVote}
+                className={hasVoted ? 'result-bereit-active-btn' : 'result-bereit-btn'}
+                disabled={voting}
+              >
+                <span className="result-bereit-label">
+                  {hasVoted ? t.zurueckziehen : t.bereit}
+                </span>
+                {!hasVoted && (
+                  <span className="result-bereit-indicator">
+                    {voteCount}/4 👤
+                  </span>
+                )}
+              </button>
+            ) : (
+              <button onClick={onNewGame} className="result-new-game-btn">
+                {t.neuesSpiel}
+              </button>
+            )}
           </div>
-        ) : (
-          <button onClick={onNewGame} className="result-new-game-btn">
-            {t.neuesSpiel}
-          </button>
-        )}
+        </div>
       </div>
     </div>,
     document.body,

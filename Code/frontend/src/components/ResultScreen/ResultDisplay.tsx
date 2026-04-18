@@ -6,132 +6,111 @@ interface ResultDisplayProps {
   mySeat?: number;
 }
 
+/** Derives a seat's party from the winner and net points. */
+function getSeatParty(seat: number, result: GameResultDto): 'Re' | 'Kontra' | null {
+  const pts = result.netPointsPerSeat[seat];
+  if (pts === undefined || pts === 0) return null;
+  return pts > 0 ? (result.winner as 'Re' | 'Kontra') : result.winner === 'Re' ? 'Kontra' : 'Re';
+}
+
 export function ResultDisplay({ result, mySeat }: ResultDisplayProps) {
-  const hasNetPoints = result.netPointsPerSeat?.length > 0;
-  const hasStandings = result.lobbyStandings?.length > 0;
+  const isReWinner = result.winner === 'Re';
+  const isKontraWinner = result.winner === 'Kontra';
+
+  // Sum of all extrapunkte for the "Extrapoints" row in column 3
+  const extraSum = result.allAwards.reduce((acc, a) => acc + a.delta, 0);
+  const myNetPoints = mySeat !== undefined ? (result.netPointsPerSeat[mySeat] ?? 0) : null;
 
   return (
-    <div className="result-columns">
-      {/* ── Left column: lobby standings + this-game delta ── */}
-      <div className="result-col-standings">
-        <div className="result-section-header">{t.gesamtstand}</div>
-        {hasStandings && hasNetPoints && (
-          <div className="result-breakdown">
-            {result.lobbyStandings.map((pts, seat) => {
-              const delta = result.netPointsPerSeat[seat] ?? 0;
-              const isMe = seat === mySeat;
-              const deltaCls =
-                delta > 0
-                  ? 'result-points-positive'
-                  : delta < 0
-                    ? 'result-points-negative'
-                    : 'result-points-neutral';
-              return (
-                <div
-                  key={seat}
-                  className={isMe ? 'result-standings-row-me' : 'result-standings-row'}
-                >
-                  <span>{t.playerLabel(seat)}</span>
-                  <span className="result-col-standings-values">
-                    <span className={deltaCls}>
-                      {delta > 0 ? '+' : ''}
-                      {delta}
-                    </span>
-                    <span className="result-breakdown-value">{pts}</span>
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* ── Right column: game details ── */}
-      <div className="result-col-details">
-        <div className="result-section-header">{t.winnerLabel(result.winner)}</div>
-
-        {/* Augen */}
-        <div className="result-grid result-grid-compact">
-          <div className="result-label">{t.reAugen}</div>
-          <div className="result-value">{result.reAugen}</div>
-          <div className="result-label">{t.kontraAugen}</div>
-          <div className="result-value">{result.kontraAugen}</div>
+    <div className="rd-columns">
+      {/* ── Column 1: Stiche & Augen ── */}
+      <div className="rd-col">
+        <div className={isReWinner ? 'rd-winner-banner rd-winner-re' : 'rd-winner-banner rd-winner-kontra'}>
+          {t.winnerLabel(result.winner)}
         </div>
 
-        {/* Spielwert breakdown */}
-        <div>
-          <div className="result-section-header result-section-header-sm">{t.spielwertBerechnung}</div>
-          <div className="result-breakdown">
-            {result.valueComponents.map((c, i) => (
-              <div key={i} className="result-breakdown-row">
-                <span className="result-label">{c.label}</span>
-                <span className="result-breakdown-value">
-                  {c.value > 0 ? `+${c.value}` : c.value}
-                </span>
-              </div>
-            ))}
-            <div className="result-breakdown-total">
-              <span>{t.spielwert}</span>
-              <span>{result.gameValue}</span>
-            </div>
+        <div className="rd-augen-block">
+          <div className={isReWinner ? 'rd-augen-row rd-augen-winner' : 'rd-augen-row'}>
+            <span className="rd-augen-label">{t.reLabel}</span>
+            <span className="rd-augen-value">{result.reAugen}</span>
+          </div>
+          <div className={isKontraWinner ? 'rd-augen-row rd-augen-winner' : 'rd-augen-row'}>
+            <span className="rd-augen-label">{t.kontraLabel}</span>
+            <span className="rd-augen-value">{result.kontraAugen}</span>
           </div>
         </div>
 
         {result.feigheit && (
           <div className="result-feigheit-banner">{t.feigheit}</div>
         )}
+      </div>
 
-        {/* Gesamtergebnis — only when it differs from GameValue */}
-        {result.totalScore !== result.gameValue && (
-          <div>
-            <div className="result-section-header result-section-header-sm">{t.gesamtergebnis}</div>
-            <div className="result-breakdown">
-              <div className="result-breakdown-row">
-                <span className="result-label">{t.spielwert}</span>
-                <span className="result-breakdown-value">{result.gameValue}</span>
-              </div>
-              {result.soloFactor > 1 && (
-                <div className="result-breakdown-row">
-                  <span className="result-label">{t.soloFaktor(result.soloFactor)}</span>
-                  <span className="result-breakdown-value">
-                    {result.gameValue * result.soloFactor}
-                  </span>
-                </div>
-              )}
-              {result.totalScore !== result.gameValue * result.soloFactor && (
-                <div className="result-breakdown-row">
-                  <span className="result-label">{t.extrapunkteNetto}</span>
-                  <span className="result-breakdown-value">
-                    {result.totalScore - result.gameValue * result.soloFactor > 0 ? '+' : ''}
-                    {result.totalScore - result.gameValue * result.soloFactor}
-                  </span>
-                </div>
-              )}
-              <div className="result-breakdown-total">
-                <span>{t.gesamtergebnis}</span>
-                <span>{result.totalScore}</span>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Zusatzpunkte */}
-        {result.allAwards.length > 0 && (
-          <div>
-            <div className="result-section-header result-section-header-sm">{t.zusatzpunkte}</div>
-            <ul className="result-awards-list">
-              {result.allAwards.map((award, i) => (
-                <li key={i} className="result-award-item">
-                  <span>{t.awardLabel(award.type, award.benefittingPlayer)}</span>
-                  <span className="result-award-delta">
+      {/* ── Column 2: Extrapunkte ── */}
+      <div className="rd-col">
+        {result.allAwards.length > 0 ? (
+          <ul className="rd-awards-list">
+            {result.allAwards.map((award, i) => {
+              const party = getSeatParty(award.benefittingPlayer, result);
+              const nameCls =
+                party === 'Re'
+                  ? 'rd-award-player rd-award-re'
+                  : party === 'Kontra'
+                    ? 'rd-award-player rd-award-kontra'
+                    : 'rd-award-player';
+              return (
+                <li key={i} className="rd-award-item">
+                  <span className={nameCls}>{t.seatShort(award.benefittingPlayer)}</span>
+                  <span className="rd-award-type">{award.type}</span>
+                  <span className="rd-award-delta">
                     {award.delta > 0 ? '+' : ''}
                     {award.delta}
                   </span>
                 </li>
-              ))}
-            </ul>
-          </div>
+              );
+            })}
+          </ul>
+        ) : (
+          <span className="rd-empty">{t.keineExtrapunkte}</span>
         )}
+      </div>
+
+      {/* ── Column 3: Spielwert ── */}
+      <div className="rd-col">
+        <div className="rd-breakdown">
+          {result.valueComponents.map((c, i) => (
+            <div key={i} className="rd-breakdown-row">
+              <span className="rd-breakdown-label">{c.label}</span>
+              <span className="rd-breakdown-value">
+                {c.value > 0 ? `+${c.value}` : c.value}
+              </span>
+            </div>
+          ))}
+
+          {result.allAwards.length > 0 && (
+            <div className="rd-breakdown-row">
+              <span className="rd-breakdown-label">{t.extrapunkteNetto}</span>
+              <span className="rd-breakdown-value">
+                {extraSum > 0 ? `+${extraSum}` : extraSum}
+              </span>
+            </div>
+          )}
+
+          {result.soloFactor > 1 && (
+            <div className="rd-breakdown-row">
+              <span className="rd-breakdown-label">{t.soloFaktor(result.soloFactor)}</span>
+              <span className="rd-breakdown-value" />
+            </div>
+          )}
+
+          <div className="rd-breakdown-total">
+            <span>{t.spielwert}</span>
+            <span>
+              {myNetPoints !== null
+                ? (myNetPoints > 0 ? `+${myNetPoints}` : `${myNetPoints}`)
+                : result.totalScore}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );

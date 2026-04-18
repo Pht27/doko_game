@@ -16,5 +16,6 @@ public record GameResultDto(
     int TotalScore,
     IReadOnlyList<int> NetPointsPerSeat,
     IReadOnlyList<int> LobbyStandings,
-    bool IsGeschmissen = false
+    bool IsGeschmissen = false,
+    IReadOnlyList<GameResultDto>? MatchHistory = null
 );

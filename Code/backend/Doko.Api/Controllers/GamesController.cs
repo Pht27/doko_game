@@ -12,6 +12,7 @@ using Doko.Domain.Announcements;
 using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
 using Doko.Domain.Players;
+using Doko.Domain.Scoring;
 using Doko.Domain.Sonderkarten;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -219,16 +220,18 @@ public class GamesController(
     {
         var lobby = await lobbyRepository.GetByGameIdAsync(gameId, ct);
         int[]? standings = null;
+        IReadOnlyList<GameResultDto>? matchHistory = null;
         if (lobby != null)
         {
             lobby.SetAdvanceRauskommer(false);
             standings = lobby.Standings.ToArray();
+            matchHistory = BuildMatchHistory(lobby.GameHistory);
             await lobbyRepository.SaveAsync(lobby, ct);
         }
 
         await hub
             .Clients.Group(gameIdString)
-            .SendAsync("gameFinished", new { result = DtoMapper.ToGeschmissenDto(standings) }, ct);
+            .SendAsync("gameFinished", new { result = DtoMapper.ToGeschmissenDto(standings, matchHistory) }, ct);
     }
 
     private async Task HandleGameFinishedAsync(
@@ -240,13 +243,16 @@ public class GamesController(
     {
         var netPoints = finished.NetPointsPerSeat.ToArray();
         int[]? standings = null;
+        IReadOnlyList<GameResultDto>? matchHistory = null;
 
         var lobby = await lobbyRepository.GetByGameIdAsync(gameId, ct);
         if (lobby != null)
         {
             lobby.UpdateStandings(netPoints);
+            lobby.AddGameRecord(finished.Result, netPoints);
             lobby.SetAdvanceRauskommer(finished.ShouldAdvanceRauskommer);
             standings = lobby.Standings.ToArray();
+            matchHistory = BuildMatchHistory(lobby.GameHistory.SkipLast(1).ToList());
             await lobbyRepository.SaveAsync(lobby, ct);
         }
 
@@ -254,10 +260,15 @@ public class GamesController(
             .Clients.Group(gameIdString)
             .SendAsync(
                 "gameFinished",
-                new { result = DtoMapper.ToDto(finished.Result, netPoints, standings) },
+                new { result = DtoMapper.ToDto(finished.Result, netPoints, standings, matchHistory: matchHistory) },
                 ct
             );
     }
+
+    private static IReadOnlyList<GameResultDto> BuildMatchHistory(
+        IEnumerable<(GameResult Result, int[] NetPoints)> history
+    ) =>
+        history.Select(e => DtoMapper.ToDto(e.Result, e.NetPoints)).ToList();
 
     private PlayerId GetPlayerId()
     {
