@@ -390,7 +390,7 @@ public class GameScorerTests
 
         result.SoloFactor.Should().Be(3);
         result.GameValue.Should().Be(1);
-        result.TotalScore.Should().Be(4); // 1 × 3 + 1 (extrapunkt, NOT multiplied by soloFactor)
+        result.TotalScore.Should().Be(6); // (GameValue 1 + winnerExtra 1) × soloFactor 3
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────

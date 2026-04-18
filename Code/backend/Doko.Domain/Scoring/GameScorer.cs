@@ -129,11 +129,11 @@ public sealed class GameScorer : IGameScorer
         }
 
         // ── 7. TotalScore ─────────────────────────────────────────────────────────
-        // Gesamtergebnis = Spielwert × SoloFaktor + winnerExtra - loserExtra
-        // (Extrapunkte are NOT multiplied by the solo factor)
+        // Gesamtergebnis = (Spielwert + winnerExtra - loserExtra) × SoloFaktor
+        // Extrapunkte are multiplied by the solo factor (solo player earns/pays 3×)
         int finalWinnerExtra = winner == Party.Re ? reExtra : kontraExtra;
         int finalLoserExtra = winner == Party.Re ? kontraExtra : reExtra;
-        int totalScore = gameValue * soloFactor + (finalWinnerExtra - finalLoserExtra);
+        int totalScore = (gameValue + finalWinnerExtra - finalLoserExtra) * soloFactor;
 
         return new GameResult(
             winner,
