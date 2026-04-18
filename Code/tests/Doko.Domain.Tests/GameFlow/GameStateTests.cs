@@ -90,7 +90,6 @@ public class GameStateTests
         state.Announcements.Should().ContainSingle().Which.Should().Be(kontra);
     }
 
-
     // ── Apply: ActivateSonderkarteModification ────────────────────────────────
 
     [Fact]
