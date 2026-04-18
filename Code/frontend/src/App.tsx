@@ -4,7 +4,7 @@ import { useGameState } from './hooks/useGameState';
 import { useTrickAnimation } from './hooks/useTrickAnimation';
 import { useGameActions } from './hooks/useGameActions';
 import { saveLobbySession, loadLobbySession } from './hooks/useLobby';
-import { joinSeat, getLobby, voteNewGame, withdrawNewGame, voteNewGameGeschmissen } from './api/lobby';
+import { joinSeat, getLobby, voteNewGame, withdrawNewGame } from './api/lobby';
 import { GameBoard } from './components/GameBoard/GameBoard';
 import { GameLoader } from './components/GameLoader/GameLoader';
 import { LandingPage } from './components/LandingPage/LandingPage';
@@ -225,16 +225,6 @@ export default function App() {
                 voteCount: newGameVoteCount,
                 mySeatIndex: view.lobbySession.seatIndex,
                 onVote: () => voteNewGame(view.lobbySession!.token, view.lobbySession!.lobbyId),
-                onWithdraw: () => withdrawNewGame(view.lobbySession!.token, view.lobbySession!.lobbyId),
-              }
-            : undefined
-        }
-        multiplayerGeschmissenNewGame={
-          isGame && view.lobbySession
-            ? {
-                voteCount: newGameVoteCount,
-                mySeatIndex: view.lobbySession.seatIndex,
-                onVote: () => voteNewGameGeschmissen(view.lobbySession!.token, view.lobbySession!.lobbyId),
                 onWithdraw: () => withdrawNewGame(view.lobbySession!.token, view.lobbySession!.lobbyId),
               }
             : undefined

@@ -52,6 +52,3 @@ export function withdrawNewGame(token: string, lobbyId: string): Promise<{ voteC
   return apiFetch(`/lobbies/${lobbyId}/new-game/withdraw`, token, { method: 'POST' });
 }
 
-export function voteNewGameGeschmissen(token: string, lobbyId: string): Promise<{ voteCount: number }> {
-  return apiFetch(`/lobbies/${lobbyId}/new-game/ready-geschmissen`, token, { method: 'POST' });
-}

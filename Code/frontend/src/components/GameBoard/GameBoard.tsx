@@ -5,7 +5,6 @@ import type { GameActions } from '../../hooks/useGameActions';
 import type { MultiplayerNewGameProps } from '../ResultScreen/ResultScreen';
 import { GameInfo } from '../shared/GameInfo';
 import { GameInfoOverlay } from '../shared/GameInfoOverlay';
-import { GeschmissenResultScreen } from '../GeschmissenResultScreen/GeschmissenResultScreen';
 import { PlayerLabel } from '../shared/PlayerLabel';
 import { HandDisplay } from '../HandDisplay/HandDisplay';
 import { AnnouncementButton } from '../AnnouncementButton/AnnouncementButton';
@@ -34,7 +33,6 @@ interface GameBoardProps {
   lobbyId?: string;
   onNewGame: () => void;
   multiplayerNewGame?: MultiplayerNewGameProps;
-  multiplayerGeschmissenNewGame?: MultiplayerNewGameProps;
 }
 
 /** Returns which compass direction a player sits relative to the active player. */
@@ -58,7 +56,6 @@ export function GameBoard({
   lobbyId,
   onNewGame,
   multiplayerNewGame,
-  multiplayerGeschmissenNewGame,
 }: GameBoardProps) {
   const [showInfoOverlay, setShowInfoOverlay] = useState(false);
   const seatOfPlayer = (player: number) => seatOf(player, activePlayer);
@@ -210,16 +207,6 @@ export function GameBoard({
             onConfirm={() => actions.handleArmutExchange(Array.from(actions.armutReturnSelected))}
           />
         </div>
-      )}
-
-      {/* Schmeißen result screen */}
-      {view?.phase === 'Geschmissen' && (
-        <GeschmissenResultScreen
-          lobbyId={lobbyId}
-          activePlayer={activePlayer}
-          onNewGame={onNewGame}
-          multiplayerNewGame={multiplayerGeschmissenNewGame}
-        />
       )}
 
       {/* Game info overlay: game details + lobby standings */}

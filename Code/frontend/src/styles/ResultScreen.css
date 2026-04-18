@@ -100,3 +100,29 @@
 .result-vote-count {
   @apply text-white/60 text-sm;
 }
+
+/* ── Two-column result layout ─────────────────────────────────────────────── */
+
+.result-columns {
+  @apply grid grid-cols-2 gap-x-4 gap-y-4;
+}
+
+.result-col-standings {
+  @apply flex flex-col gap-2;
+}
+
+.result-col-details {
+  @apply flex flex-col gap-2;
+}
+
+.result-col-standings-values {
+  @apply flex gap-2 items-center tabular-nums;
+}
+
+.result-grid-compact {
+  @apply mt-1;
+}
+
+.result-section-header-sm {
+  @apply text-white/50 text-xs uppercase tracking-wide mt-1 mb-1;
+}
