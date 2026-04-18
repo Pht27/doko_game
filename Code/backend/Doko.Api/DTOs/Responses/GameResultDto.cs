@@ -15,5 +15,6 @@ public record GameResultDto(
     int SoloFactor,
     int TotalScore,
     IReadOnlyList<int> NetPointsPerSeat,
-    IReadOnlyList<int> LobbyStandings
+    IReadOnlyList<int> LobbyStandings,
+    bool IsGeschmissen = false
 );

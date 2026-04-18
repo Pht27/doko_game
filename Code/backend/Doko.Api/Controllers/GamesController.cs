@@ -94,7 +94,12 @@ public class GamesController(
         var reservation = DtoMapper.BuildReservation(req, player);
         var command = new MakeReservationCommand(new GameId(guid), player, reservation);
         var result = await makeReservation.ExecuteAsync(command, ct);
-        return result.ToActionResult(r => Ok(DtoMapper.ToResponse(r)));
+        return await result.ToActionResult(async r =>
+        {
+            if (r.Geschmissen)
+                await HandleGeschmissenAsync(gameId, new GameId(guid), ct);
+            return Ok(DtoMapper.ToResponse(r));
+        });
     }
 
     [HttpPost("{gameId}/armut-response")]
@@ -204,6 +209,26 @@ public class GamesController(
             return NotFound(new ErrorResponse("game_not_found"));
 
         return Ok(DtoMapper.ToResponse(view));
+    }
+
+    private async Task HandleGeschmissenAsync(
+        string gameIdString,
+        GameId gameId,
+        CancellationToken ct
+    )
+    {
+        var lobby = await lobbyRepository.GetByGameIdAsync(gameId, ct);
+        int[]? standings = null;
+        if (lobby != null)
+        {
+            lobby.SetAdvanceRauskommer(false);
+            standings = lobby.Standings.ToArray();
+            await lobbyRepository.SaveAsync(lobby, ct);
+        }
+
+        await hub
+            .Clients.Group(gameIdString)
+            .SendAsync("gameFinished", new { result = DtoMapper.ToGeschmissenDto(standings) }, ct);
     }
 
     private async Task HandleGameFinishedAsync(

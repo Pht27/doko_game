@@ -78,7 +78,8 @@ public static class DtoMapper
     public static GameResultDto ToDto(
         GameResult r,
         int[]? netPointsPerSeat = null,
-        int[]? lobbyStandings = null
+        int[]? lobbyStandings = null,
+        bool isGeschmissen = false
     ) =>
         new(
             r.Winner.ToString(),
@@ -91,7 +92,24 @@ public static class DtoMapper
             r.SoloFactor,
             r.TotalScore,
             (IReadOnlyList<int>?)netPointsPerSeat ?? [],
-            (IReadOnlyList<int>?)lobbyStandings ?? []
+            (IReadOnlyList<int>?)lobbyStandings ?? [],
+            isGeschmissen
+        );
+
+    public static GameResultDto ToGeschmissenDto(int[]? lobbyStandings = null) =>
+        new(
+            Winner: string.Empty,
+            ReAugen: 0,
+            KontraAugen: 0,
+            GameValue: 0,
+            AllAwards: [],
+            Feigheit: false,
+            ValueComponents: [],
+            SoloFactor: 1,
+            TotalScore: 0,
+            NetPointsPerSeat: new int[4],
+            LobbyStandings: (IReadOnlyList<int>?)lobbyStandings ?? [],
+            IsGeschmissen: true
         );
 
     public static ExtrapunktAwardDto ToDto(ExtrapunktAward a) =>
