@@ -10,5 +10,7 @@ public record GameFinishedResult(
     /// False for Soli, Armut, and SchlankerMartin — the same seat leads again.
     /// Schmeißen is handled separately (dedicated endpoint skips advancement).
     /// </summary>
-    bool ShouldAdvanceRauskommer
+    bool ShouldAdvanceRauskommer,
+    /// <summary>Null for Normalspiel; the reservation priority name otherwise (e.g. "Damensolo").</summary>
+    string? GameMode = null
 );

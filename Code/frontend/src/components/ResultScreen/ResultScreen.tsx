@@ -31,7 +31,6 @@ export function ResultScreen({ result, onNewGame, multiplayerNewGame }: ResultSc
   const mySeat = multiplayerNewGame?.mySeatIndex;
   const hasHistory = history.length > 0 || !result.isGeschmissen;
 
-  /** The result to show in the detail column — current or a historic one. */
   function getDisplayResult(): GameResultDto {
     if (selectedGame < history.length) return history[selectedGame];
     return result;
@@ -77,6 +76,9 @@ export function ResultScreen({ result, onNewGame, multiplayerNewGame }: ResultSc
             </div>
           )}
 
+          {/* Vertical divider */}
+          {hasHistory && <div className="result-divider" />}
+
           {/* ── Right column: detail + action ── */}
           <div className="result-right-col">
             <div className="result-detail-area">
@@ -94,14 +96,11 @@ export function ResultScreen({ result, onNewGame, multiplayerNewGame }: ResultSc
                 className={hasVoted ? 'result-bereit-active-btn' : 'result-bereit-btn'}
                 disabled={voting}
               >
+                <span className="result-bereit-indicator">{voteCount}/4 👤</span>
                 <span className="result-bereit-label">
                   {hasVoted ? t.zurueckziehen : t.bereit}
                 </span>
-                {!hasVoted && (
-                  <span className="result-bereit-indicator">
-                    {voteCount}/4 👤
-                  </span>
-                )}
+                <span className="result-bereit-spacer" />
               </button>
             ) : (
               <button onClick={onNewGame} className="result-new-game-btn">

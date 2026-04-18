@@ -9,6 +9,8 @@ public record GameResult(
     Party Winner,
     int ReAugen,
     int KontraAugen,
+    int ReStiche,
+    int KontraStiche,
     int GameValue,
     IReadOnlyList<ExtrapunktAward> AllAwards,
     bool Feigheit,

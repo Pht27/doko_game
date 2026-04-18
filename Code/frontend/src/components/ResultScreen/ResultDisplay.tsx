@@ -6,111 +6,125 @@ interface ResultDisplayProps {
   mySeat?: number;
 }
 
-/** Derives a seat's party from the winner and net points. */
-function getSeatParty(seat: number, result: GameResultDto): 'Re' | 'Kontra' | null {
+type Party = 'Re' | 'Kontra';
+
+function getSeatParty(seat: number, result: GameResultDto): Party | null {
   const pts = result.netPointsPerSeat[seat];
   if (pts === undefined || pts === 0) return null;
-  return pts > 0 ? (result.winner as 'Re' | 'Kontra') : result.winner === 'Re' ? 'Kontra' : 'Re';
+  return pts > 0 ? (result.winner as Party) : result.winner === 'Re' ? 'Kontra' : 'Re';
+}
+
+function fmt(n: number): string {
+  return n > 0 ? `+${n}` : `${n}`;
 }
 
 export function ResultDisplay({ result, mySeat }: ResultDisplayProps) {
-  const isReWinner = result.winner === 'Re';
-  const isKontraWinner = result.winner === 'Kontra';
+  const winner = result.winner as Party;
+  const isReWinner = winner === 'Re';
 
-  // Sum of all extrapunkte for the "Extrapoints" row in column 3
-  const extraSum = result.allAwards.reduce((acc, a) => acc + a.delta, 0);
+  // Determine viewing player's party and sign multiplier
   const myNetPoints = mySeat !== undefined ? (result.netPointsPerSeat[mySeat] ?? 0) : null;
+  const myParty: Party | null =
+    myNetPoints === null
+      ? null
+      : myNetPoints > 0
+        ? winner
+        : winner === 'Re'
+          ? 'Kontra'
+          : 'Re';
+  const sign = myParty === null ? 1 : myParty === winner ? 1 : -1;
+
+  // Header line: "<GameMode>: <Winner> gewinnt" or just "<Winner> gewinnt"
+  const gameModeLabel = result.gameMode ? t.gameModeLabel(result.gameMode) : null;
+  const headerLabel = gameModeLabel
+    ? `${gameModeLabel}: ${winner} gewinnt`
+    : `${winner} gewinnt`;
 
   return (
-    <div className="rd-columns">
-      {/* ── Column 1: Stiche & Augen ── */}
-      <div className="rd-col">
-        <div className={isReWinner ? 'rd-winner-banner rd-winner-re' : 'rd-winner-banner rd-winner-kontra'}>
-          {t.winnerLabel(result.winner)}
-        </div>
-
-        <div className="rd-augen-block">
-          <div className={isReWinner ? 'rd-augen-row rd-augen-winner' : 'rd-augen-row'}>
-            <span className="rd-augen-label">{t.reLabel}</span>
-            <span className="rd-augen-value">{result.reAugen}</span>
-          </div>
-          <div className={isKontraWinner ? 'rd-augen-row rd-augen-winner' : 'rd-augen-row'}>
-            <span className="rd-augen-label">{t.kontraLabel}</span>
-            <span className="rd-augen-value">{result.kontraAugen}</span>
-          </div>
-        </div>
-
-        {result.feigheit && (
-          <div className="result-feigheit-banner">{t.feigheit}</div>
-        )}
+    <div className="rd-container">
+      {/* Winner header */}
+      <div className={isReWinner ? 'rd-winner-banner rd-winner-re' : 'rd-winner-banner rd-winner-kontra'}>
+        {headerLabel}
       </div>
 
-      {/* ── Column 2: Extrapunkte ── */}
-      <div className="rd-col">
-        {result.allAwards.length > 0 ? (
-          <ul className="rd-awards-list">
-            {result.allAwards.map((award, i) => {
-              const party = getSeatParty(award.benefittingPlayer, result);
-              const nameCls =
-                party === 'Re'
-                  ? 'rd-award-player rd-award-re'
-                  : party === 'Kontra'
-                    ? 'rd-award-player rd-award-kontra'
-                    : 'rd-award-player';
-              return (
-                <li key={i} className="rd-award-item">
-                  <span className={nameCls}>{t.seatShort(award.benefittingPlayer)}</span>
-                  <span className="rd-award-type">{award.type}</span>
-                  <span className="rd-award-delta">
-                    {award.delta > 0 ? '+' : ''}
-                    {award.delta}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        ) : (
-          <span className="rd-empty">{t.keineExtrapunkte}</span>
-        )}
+      {/* Augen + stiche row */}
+      <div className="rd-augen-row">
+        <span className={isReWinner ? 'rd-augen-party rd-augen-winner' : 'rd-augen-party'}>
+          Re
+        </span>
+        <span className={isReWinner ? 'rd-augen-score rd-augen-winner' : 'rd-augen-score'}>
+          {result.reAugen}
+          {result.reStiche != null && (
+            <span className="rd-augen-stiche"> ({result.reStiche})</span>
+          )}
+        </span>
+        <span className="rd-augen-divider">|</span>
+        <span className={!isReWinner ? 'rd-augen-score rd-augen-winner' : 'rd-augen-score'}>
+          {result.kontraAugen}
+          {result.kontraStiche != null && (
+            <span className="rd-augen-stiche"> ({result.kontraStiche})</span>
+          )}
+        </span>
+        <span className={!isReWinner ? 'rd-augen-party rd-augen-winner' : 'rd-augen-party'}>
+          Kontra
+        </span>
       </div>
 
-      {/* ── Column 3: Spielwert ── */}
-      <div className="rd-col">
-        <div className="rd-breakdown">
-          {result.valueComponents.map((c, i) => (
-            <div key={i} className="rd-breakdown-row">
-              <span className="rd-breakdown-label">{c.label}</span>
-              <span className="rd-breakdown-value">
-                {c.value > 0 ? `+${c.value}` : c.value}
-              </span>
-            </div>
-          ))}
+      {result.feigheit && (
+        <div className="result-feigheit-banner">{t.feigheit}</div>
+      )}
 
-          {result.allAwards.length > 0 && (
-            <div className="rd-breakdown-row">
-              <span className="rd-breakdown-label">{t.extrapunkteNetto}</span>
-              <span className="rd-breakdown-value">
-                {extraSum > 0 ? `+${extraSum}` : extraSum}
-              </span>
-            </div>
-          )}
+      {/* Component table */}
+      <div className="rd-separator" />
 
-          {result.soloFactor > 1 && (
-            <div className="rd-breakdown-row">
-              <span className="rd-breakdown-label">{t.soloFaktor(result.soloFactor)}</span>
-              <span className="rd-breakdown-value" />
-            </div>
-          )}
-
-          <div className="rd-breakdown-total">
-            <span>{t.spielwert}</span>
-            <span>
-              {myNetPoints !== null
-                ? (myNetPoints > 0 ? `+${myNetPoints}` : `${myNetPoints}`)
-                : result.totalScore}
+      <div className="rd-table">
+        {result.valueComponents.map((c, i) => (
+          <div key={i} className="rd-row">
+            <span className="rd-row-label">{c.label}</span>
+            <span className={sign * c.value >= 0 ? 'rd-row-value rd-value-pos' : 'rd-row-value rd-value-neg'}>
+              {fmt(sign * c.value)}
             </span>
           </div>
-        </div>
+        ))}
+      </div>
+
+      {/* Extrapunkte */}
+      {result.allAwards.length > 0 && (
+        <>
+          <div className="rd-separator" />
+          <div className="rd-table">
+            {result.allAwards.map((award, i) => {
+              const awardParty = getSeatParty(award.benefittingPlayer, result);
+              const awardSign =
+                myParty === null ? 1 : awardParty === myParty ? 1 : -1;
+              const value = awardSign * award.delta;
+              return (
+                <div key={i} className="rd-row">
+                  <span className="rd-row-label">
+                    {award.type}
+                    <span className="rd-award-player"> ({t.seatShort(award.benefittingPlayer)})</span>
+                  </span>
+                  <span className={value >= 0 ? 'rd-row-value rd-value-pos' : 'rd-row-value rd-value-neg'}>
+                    {fmt(value)}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
+
+      {/* Total */}
+      <div className="rd-separator" />
+      <div className="rd-total">
+        <span>{t.insgesamt}</span>
+        <span className={
+          (myNetPoints ?? result.totalScore) >= 0
+            ? 'rd-total-value rd-value-pos'
+            : 'rd-total-value rd-value-neg'
+        }>
+          {myNetPoints !== null ? fmt(myNetPoints) : fmt(result.totalScore)}
+        </span>
       </div>
     </div>
   );

@@ -80,12 +80,16 @@ public static class DtoMapper
         int[]? netPointsPerSeat = null,
         int[]? lobbyStandings = null,
         bool isGeschmissen = false,
-        IReadOnlyList<GameResultDto>? matchHistory = null
+        IReadOnlyList<GameResultDto>? matchHistory = null,
+        string? gameMode = null
     ) =>
         new(
             r.Winner.ToString(),
             r.ReAugen,
             r.KontraAugen,
+            r.ReStiche,
+            r.KontraStiche,
+            gameMode,
             r.GameValue,
             r.AllAwards.Select(ToDto).ToList(),
             r.Feigheit,
@@ -106,6 +110,9 @@ public static class DtoMapper
             Winner: string.Empty,
             ReAugen: 0,
             KontraAugen: 0,
+            ReStiche: 0,
+            KontraStiche: 0,
+            GameMode: null,
             GameValue: 0,
             AllAwards: [],
             Feigheit: false,

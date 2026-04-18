@@ -19,18 +19,26 @@ public sealed class GameScorer : IGameScorer
     {
         var state = game.FinalState;
 
-        // ── 1. Sum Augen per party ────────────────────────────────────────────────
+        // ── 1. Sum Augen and tricks per party ────────────────────────────────────
         int reAugen = 0;
         int kontraAugen = 0;
+        int reStiche = 0;
+        int kontraStiche = 0;
 
         foreach (var trickResult in game.Tricks)
         {
             int trickAugen = ComputeEffectiveAugen(trickResult.Trick, state.CardPointTransfers);
             var winnerParty = state.PartyResolver.ResolveParty(trickResult.Winner, state);
             if (winnerParty == Party.Re)
+            {
                 reAugen += trickAugen;
+                reStiche++;
+            }
             else
+            {
                 kontraAugen += trickAugen;
+                kontraStiche++;
+            }
         }
 
         // ── 2. Determine winner ───────────────────────────────────────────────────
@@ -106,6 +114,8 @@ public sealed class GameScorer : IGameScorer
             winner,
             reAugen,
             kontraAugen,
+            reStiche,
+            kontraStiche,
             gameValue,
             allAwards,
             Feigheit: false,
@@ -139,6 +149,8 @@ public sealed class GameScorer : IGameScorer
             winner,
             reAugen,
             kontraAugen,
+            reStiche,
+            kontraStiche,
             gameValue,
             allAwards,
             feigheit,

@@ -26,6 +26,7 @@ internal sealed class FinishGameHandler(IGameScorer scorer)
             state.ActiveReservation is null
             || state.ActiveReservation.Priority == ReservationPriority.Hochzeit;
 
-        return new GameFinishedResult(result, netPoints, advanceRauskommer);
+        string? gameMode = state.ActiveReservation?.Priority.ToString();
+        return new GameFinishedResult(result, netPoints, advanceRauskommer, gameMode);
     }
 }

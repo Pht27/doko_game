@@ -78,6 +78,9 @@ export interface GameResultDto {
   winner: string;
   reAugen: number;
   kontraAugen: number;
+  reStiche: number;
+  kontraStiche: number;
+  gameMode: string | null;
   gameValue: number;
   allAwards: ExtrapunktAwardDto[];
   feigheit: boolean;

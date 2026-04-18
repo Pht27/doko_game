@@ -10,7 +10,6 @@ interface LobbyHistoryProps {
 
 export function LobbyHistory({ result, mySeat, selectedGame, onSelectGame }: LobbyHistoryProps) {
   const history = result.matchHistory ?? [];
-  // Schmeißen doesn't add a new row; regular games add one final row
   const totalGames = history.length + (result.isGeschmissen ? 0 : 1);
   const standings = result.lobbyStandings;
   const seatCount = 4;
@@ -29,7 +28,10 @@ export function LobbyHistory({ result, mySeat, selectedGame, onSelectGame }: Lob
 
   return (
     <div className="rh-container">
-      {/* Header: seat labels */}
+      {/* Title */}
+      <div className="rh-title">{t.matchHistory}</div>
+
+      {/* Header: seat labels — fixed at top */}
       <div className="rh-row rh-header-row">
         <div className="rh-cell rh-game-cell" />
         {Array.from({ length: seatCount }, (_, seat) => (
@@ -42,7 +44,7 @@ export function LobbyHistory({ result, mySeat, selectedGame, onSelectGame }: Lob
         ))}
       </div>
 
-      {/* Game rows */}
+      {/* Game rows — scrollable, fills available space */}
       <div className="rh-rows">
         {Array.from({ length: totalGames }, (_, i) => {
           const isSelected = i === selectedGame;
@@ -72,7 +74,7 @@ export function LobbyHistory({ result, mySeat, selectedGame, onSelectGame }: Lob
         })}
       </div>
 
-      {/* Standings footer */}
+      {/* Standings — fixed at bottom */}
       {standings.length > 0 && (
         <div className="rh-row rh-standings-row">
           <div className="rh-cell rh-game-cell" />

@@ -11,7 +11,7 @@ public class LobbyState
     private readonly LobbyPlayer?[] _seats = new LobbyPlayer?[4];
     private readonly int[] _standings = new int[4];
     private readonly HashSet<byte> _newGameVoters = [];
-    private readonly List<(GameResult Result, int[] NetPoints)> _gameHistory = [];
+    private readonly List<(GameResult Result, string? GameMode, int[] NetPoints)> _gameHistory = [];
     private bool _advanceRauskommer = true;
 
     public LobbyId Id { get; }
@@ -40,7 +40,7 @@ public class LobbyState
     public IReadOnlyList<int> Standings => Array.AsReadOnly(_standings);
 
     /// <summary>Ordered list of completed game results with their net points per seat.</summary>
-    public IReadOnlyList<(GameResult Result, int[] NetPoints)> GameHistory => _gameHistory.AsReadOnly();
+    public IReadOnlyList<(GameResult Result, string? GameMode, int[] NetPoints)> GameHistory => _gameHistory.AsReadOnly();
 
     /// <summary>Number of players who have voted to start a new game.</summary>
     public int NewGameVoteCount => _newGameVoters.Count;
@@ -143,6 +143,6 @@ public class LobbyState
     }
 
     /// <summary>Records a completed game result in the match history.</summary>
-    public void AddGameRecord(GameResult result, int[] netPointsPerSeat) =>
-        _gameHistory.Add((result, netPointsPerSeat));
+    public void AddGameRecord(GameResult result, string? gameMode, int[] netPointsPerSeat) =>
+        _gameHistory.Add((result, gameMode, netPointsPerSeat));
 }

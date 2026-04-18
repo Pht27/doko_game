@@ -99,6 +99,8 @@ export const t = {
   bereit: 'Bereit',
   zurueckziehen: 'Zurückziehen',
   bereitCount: (count: number) => `${count} / 4 bereit`,
+  matchHistory: 'Match History',
+  insgesamt: 'Insgesamt',
 
   // ── GeschmissenResultScreen ────────────────────────────────────────────────
   geschmissenTitle: 'Schmeißen!',
