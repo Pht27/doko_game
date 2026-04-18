@@ -18,6 +18,7 @@ internal sealed class FinishGameHandler(IGameScorer scorer)
 
         state.Apply(new AdvancePhaseModification(GamePhase.Finished));
 
-        return new GameFinishedResult(result);
+        var netPoints = NetPointsCalculator.Calculate(result, state);
+        return new GameFinishedResult(result, netPoints);
     }
 }
