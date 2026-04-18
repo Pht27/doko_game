@@ -96,6 +96,10 @@ export const t = {
   zurueckziehen: 'Zurückziehen',
   bereitCount: (count: number) => `${count} / 4 bereit`,
 
+  // ── GeschmissenResultScreen ────────────────────────────────────────────────
+  geschmissenTitle: 'Schmeißen!',
+  geschmissenSubtitle: 'Das Spiel wurde zurückgegeben. Gleicher Rauskommer.',
+
   // ── GameInfo ───────────────────────────────────────────────────────────────
   stichInfo: (trickNumber: number, completed: number) =>
     `Stich ${trickNumber} · ${completed} gespielt`,

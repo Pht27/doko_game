@@ -198,6 +198,71 @@ public class LobbiesController(
         return Ok(new { voteCount = lobby.NewGameVoteCount });
     }
 
+    /// <summary>
+    /// Same as VoteNewGame but does NOT advance the VorbehaltRauskommer —
+    /// used after Schmeißen, where the same player leads the next round.
+    /// </summary>
+    [HttpPost("{lobbyId}/new-game/ready-geschmissen")]
+    [Authorize]
+    public async Task<IActionResult> VoteNewGameGeschmissen(string lobbyId, CancellationToken ct)
+    {
+        if (!Guid.TryParse(lobbyId, out var guid))
+            return NotFound(new ErrorResponse("lobby_not_found"));
+
+        var lobby = await lobbyRepository.GetAsync(new LobbyId(guid), ct);
+        if (lobby is null)
+            return NotFound(new ErrorResponse("lobby_not_found"));
+
+        var callerIdClaim = User.FindFirst("player_id")?.Value ?? "255";
+        var callerId = new PlayerId((byte)int.Parse(callerIdClaim));
+        if (!lobby.HasPlayer(callerId))
+            return Forbid();
+
+        bool allReady = lobby.AddNewGameVote(callerId);
+
+        if (allReady)
+        {
+            var oldGameId = lobby.ActiveGameId?.ToString();
+            lobby.MarkGameFinished();
+            lobby.ResetNewGameVotes();
+            // Rauskommer intentionally NOT advanced after Schmeißen
+
+            var players = lobby.Players.Select(p => p.Id).ToList();
+            var startResult = await startGame.ExecuteAsync(
+                new StartGameCommand(players, Rules: null),
+                ct
+            );
+            if (
+                startResult
+                is not Application.Common.GameActionResult<Application.Games.Results.StartGameResult>.Ok startOk
+            )
+                return StatusCode(500, new ErrorResponse("game_start_failed"));
+
+            var newGameId = startOk.Value.GameId;
+            var vorbehaltRauskommer = new PlayerId((byte)lobby.VorbehaltRauskommer);
+            await dealCards.ExecuteAsync(new DealCardsCommand(newGameId, vorbehaltRauskommer), ct);
+
+            lobby.MarkStarted(newGameId);
+            await lobbyRepository.SaveAsync(lobby, ct);
+
+            if (oldGameId != null)
+                await hub
+                    .Clients.Group(oldGameId)
+                    .SendAsync("newGameStarted", new { gameId = newGameId.ToString() }, ct);
+        }
+        else
+        {
+            await lobbyRepository.SaveAsync(lobby, ct);
+            var gameGroupName = lobby.ActiveGameId?.ToString();
+            if (gameGroupName != null)
+                await hub
+                    .Clients.Group(gameGroupName)
+                    .SendAsync("newGameVoteChanged", new { count = lobby.NewGameVoteCount }, ct);
+        }
+
+        return Ok(new { voteCount = lobby.NewGameVoteCount });
+    }
+
     [HttpPost("{lobbyId}/new-game/withdraw")]
     [Authorize]
     public async Task<IActionResult> WithdrawNewGame(string lobbyId, CancellationToken ct)
