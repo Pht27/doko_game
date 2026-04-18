@@ -109,10 +109,6 @@ public sealed class GameState
     /// </summary>
     public IReadOnlyList<TrickResult> ScoredTricks { get; private set; } = [];
 
-    /// <summary>Card-point transfers recorded by Sonderkarten (e.g. Schatz). Used during scoring.</summary>
-    public IReadOnlyList<TransferCardPointsModification> CardPointTransfers => _cardPointTransfers;
-    private readonly List<TransferCardPointsModification> _cardPointTransfers = new();
-
     /// <summary>
     /// The player who leads the reservation-check ordering for this round.
     /// Rotates counter-clockwise each game. Always rotates; SpieleRauskommer

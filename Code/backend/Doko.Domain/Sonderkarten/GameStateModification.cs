@@ -22,9 +22,6 @@ public sealed record ScheduleDirectionFlipModification : GameStateModification;
 public sealed record WithdrawAnnouncementModification(PlayerId Player, AnnouncementType Type)
     : GameStateModification;
 
-public sealed record TransferCardPointsModification(CardType From, CardType To)
-    : GameStateModification;
-
 public sealed record ActivateSonderkarteModification(SonderkarteType Type) : GameStateModification;
 
 /// <summary>

@@ -371,45 +371,6 @@ public class GameScorerTests
         result.Winner.Should().Be(Party.Re);
     }
 
-    // ── CardPointTransfers (Schatz) ───────────────────────────────────────────
-
-    [Fact]
-    public void Score_SchatzTransfer_ShiftsAugenBetweenCards()
-    {
-        // Transfer ♦A (11 pts) to ♣A: ♦A worth 0, ♣A worth 11+11=22.
-        // Re wins the ♣A trick; Kontra wins the ♦A trick.
-        // Without transfer: Re=11, Kontra=11. With transfer: Re=22, Kontra=0.
-        var state = SoloState(rules: NoFeigheit);
-        state.Apply(
-            new TransferCardPointsModification(
-                new CardType(Suit.Karo, Rank.Ass), // from ♦A
-                new CardType(Suit.Kreuz, Rank.Ass)
-            )
-        ); // to ♣A
-
-        var reTrick = new Trick();
-        reTrick.Add(new TrickCard(B.Card(0, Suit.Kreuz, Rank.Ass), B.P0));
-        reTrick.Add(new TrickCard(B.Card(1, Suit.Kreuz, Rank.Neun), B.P1));
-        reTrick.Add(new TrickCard(B.Card(2, Suit.Kreuz, Rank.Neun), B.P2));
-        reTrick.Add(new TrickCard(B.Card(3, Suit.Kreuz, Rank.Neun), B.P3));
-
-        var kontraTrick = new Trick();
-        kontraTrick.Add(new TrickCard(B.Card(4, Suit.Karo, Rank.Ass), B.P1));
-        kontraTrick.Add(new TrickCard(B.Card(5, Suit.Kreuz, Rank.Neun), B.P0));
-        kontraTrick.Add(new TrickCard(B.Card(6, Suit.Kreuz, Rank.Neun), B.P2));
-        kontraTrick.Add(new TrickCard(B.Card(7, Suit.Kreuz, Rank.Neun), B.P3));
-
-        var tricks = new List<TrickResult>
-        {
-            new(reTrick, B.P0, []), // Re wins ♣A trick
-            new(kontraTrick, B.P1, []), // Kontra wins ♦A trick
-        };
-        var result = Sut.Score(new CompletedGame(state, tricks));
-
-        result.ReAugen.Should().Be(22); // ♣A = 11 + 11 (absorbed ♦A points)
-        result.KontraAugen.Should().Be(0); // ♦A = 0 (transferred away)
-    }
-
     // ── SoloFactor + TotalScore ───────────────────────────────────────────────
 
     [Fact]

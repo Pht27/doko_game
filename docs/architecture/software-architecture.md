@@ -208,7 +208,7 @@ Sonderkarten are triggered by a player holding **both copies** of a specific car
 
 | Type | Kind | Description |
 |---|---|---|
-| `SonderkarteType` | enum | `Schweinchen \| Superschweinchen \| Hyperschweinchen \| LinksGehangter \| RechtsGehangter \| Genscherdamen \| Gegengenscherdamen \| Heidmann \| Heidfrau \| Kemmerich \| Schatz` |
+| `SonderkarteType` | enum | `Schweinchen \| Superschweinchen \| Hyperschweinchen \| LinksGehangter \| RechtsGehangter \| Genscherdamen \| Gegengenscherdamen \| Heidmann \| Heidfrau \| Kemmerich ` |
 
 #### Sealed `GameStateModification` Hierarchy
 
@@ -242,7 +242,6 @@ ISonderkarte
 |---|---|
 | `GehangterSonderkarte(bool leftward)` | Returns `ReverseDirectionModification` |
 | `KemmerichSonderkarte` | Returns `WithdrawAnnouncementModification` for an announcement of the holder's choice |
-| `SchatzSonderkarte` | Returns `TransferCardPointsModification` for ♥9 *(WIP)* |
 
 #### Registry
 
@@ -421,7 +420,6 @@ RuleSet   // immutable record
   bool EnableHeidmann
   bool EnableHeidfrau
   bool EnableKemmerich
-  bool EnableSchatz
 
   // Announcement mechanics
   bool AllowAnnouncements

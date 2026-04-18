@@ -30,8 +30,6 @@ public static class SonderkarteRegistry
             list.Add(new HeidfrauSonderkarte());
         if (rules.EnableKemmerich)
             list.Add(new KemmerichSonderkarte());
-        if (rules.EnableSchatz)
-            list.Add(new SchatzSonderkarte());
         return list;
     }
 

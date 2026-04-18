@@ -61,17 +61,6 @@ public static class Scenarios
             },
         };
 
-    /// <summary>P0 holds both ♥ Nines → eligible for Schatz. Requires PlayWithNines = true.</summary>
-    public static ScenarioConfig Schatz(int player = 0) =>
-        new()
-        {
-            Name = $"Schatz (P{player} holds both ♥ Nines — needs PlayWithNines)",
-            PlayerRequiredCards =
-            {
-                [player] = [CT(Suit.Herz, Rank.Neun), CT(Suit.Herz, Rank.Neun)],
-            },
-        };
-
     /// <summary>P0 holds both ♦ Aces AND both ♠ Jacks → eligible for Schweinchen + Heidmann.</summary>
     public static ScenarioConfig SchweinchenUndHeidmann(int player = 0) =>
         new()
@@ -166,7 +155,6 @@ public static class Scenarios
             Gehangter(),
             Genscherdamen(),
             Kemmerich(),
-            Schatz(),
             SchweinchenUndHeidmann(),
             Hochzeit(),
             Armut(),

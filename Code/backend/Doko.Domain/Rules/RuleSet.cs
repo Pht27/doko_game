@@ -32,7 +32,6 @@ public record RuleSet
     public bool EnableHeidmann { get; init; }
     public bool EnableHeidfrau { get; init; }
     public bool EnableKemmerich { get; init; }
-    public bool EnableSchatz { get; init; }
 
     // Announcements
     public bool AllowAnnouncements { get; init; }
@@ -77,7 +76,6 @@ public record RuleSet
             EnableHeidmann = true,
             EnableHeidfrau = true,
             EnableKemmerich = true,
-            EnableSchatz = true,
             AllowAnnouncements = true,
             EnforcePflichtansage = true,
             EnforceFeigheit = true,

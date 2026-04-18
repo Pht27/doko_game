@@ -210,5 +210,4 @@ const sonderkarteNames: Record<string, string> = {
   Heidmann: 'Heidmann',
   Heidfrau: 'Heidfrau',
   Kemmerich: 'Kemmerich',
-  Schatz: 'Schatz',
 };

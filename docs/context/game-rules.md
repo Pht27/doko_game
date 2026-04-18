@@ -369,12 +369,6 @@ All Sonderkarten are **deactivated in Soli and Armut** — **except in Stille So
 - Can only withdraw announcements made by **own party** — but cannot withdraw a partner's announcement unless **both** party members have already announced.
 - Only **one announcement total** can be withdrawn (not one per Jack).
 - Pflichtansagen can also be withdrawn.
-
-### Schatz — ♥ 9s [CONFIGURABLE — WORK IN PROGRESS]
-- Condition: a player holds **both ♥ Nines**.
-- When playing a ♥ Nine, the player may announce **"Schatz"** — the **Augen value of the ♥ 10s (Dullen) is transferred to the ♥ 9s** for scoring purposes (i.e. the ♥ 10 scores 0 and the ♥ 9 scores 10).
-- *Status: design is not finalised. Timing rules, interaction with the Dulle trump order, and further details are pending.*
-
 ---
 
 ## Extrapunkte (Bonus Points) [CONFIGURABLE — all off in Soli]
