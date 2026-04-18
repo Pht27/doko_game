@@ -103,6 +103,8 @@ export const t = {
     mode ? ((gameModeLabels[mode] as string | undefined) ?? mode) : 'Normalspiel',
   phaseLabel: (phase: string) =>
     (phaseLabels[phase] as string | undefined) ?? phase,
+  spielInfo: 'Spielinfo',
+  schliessen: 'Schließen',
 
   // ── TrickArea ──────────────────────────────────────────────────────────────
   keinStich: 'Kein Stich',

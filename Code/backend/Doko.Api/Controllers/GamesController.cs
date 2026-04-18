@@ -222,7 +222,12 @@ public class GamesController(
         if (view is null)
             return NotFound(new ErrorResponse("game_not_found"));
 
-        return Ok(DtoMapper.ToResponse(view));
+        var lobby = await lobbyRepository.GetByGameIdAsync(new GameId(guid), ct);
+        var response = DtoMapper.ToResponse(view);
+        if (lobby != null)
+            response = response with { LobbyStandings = lobby.Standings };
+
+        return Ok(response);
     }
 
     private PlayerId GetPlayerId()

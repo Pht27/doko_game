@@ -44,4 +44,7 @@ public record PlayerGameViewResponse(
 
     /// <summary>The active game mode (e.g. "KaroSolo", "Hochzeit", "Armut"). Null = Normalspiel.</summary>
     public string? ActiveGameMode { get; init; } = null;
+
+    /// <summary>Cumulative lobby standings per seat (index 0–3). Empty for hot-seat / standalone games.</summary>
+    public IReadOnlyList<int> LobbyStandings { get; init; } = [];
 }

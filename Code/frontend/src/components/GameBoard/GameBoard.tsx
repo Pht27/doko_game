@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import type { PlayerGameViewResponse, GameResultDto, TrickSummaryDto, SonderkarteNotification } from '../../types/api';
 import type { AnimPhase } from '../TrickArea/TrickArea';
 import type { GameActions } from '../../hooks/useGameActions';
 import type { MultiplayerNewGameProps } from '../ResultScreen/ResultScreen';
 import { GameInfo } from '../shared/GameInfo';
+import { GameInfoOverlay } from '../shared/GameInfoOverlay';
 import { PlayerLabel } from '../shared/PlayerLabel';
 import { HandDisplay } from '../HandDisplay/HandDisplay';
 import { AnnouncementButton } from '../AnnouncementButton/AnnouncementButton';
@@ -53,6 +55,7 @@ export function GameBoard({
   onNewGame,
   multiplayerNewGame,
 }: GameBoardProps) {
+  const [showInfoOverlay, setShowInfoOverlay] = useState(false);
   const seatOfPlayer = (player: number) => seatOf(player, activePlayer);
 
   const displayTrick = animTrick ?? (view?.currentTrick ?? null);
@@ -67,7 +70,7 @@ export function GameBoard({
 
   return (
     <div className="w-full h-full relative flex flex-col bg-[#1a1a2e] select-none overflow-hidden">
-      {/* Floating top-right: game info */}
+      {/* Floating top-right: game info (clickable when lobby standings available) */}
       {view && (
         <div className="absolute top-2 right-2 z-10">
           <GameInfo
@@ -75,6 +78,7 @@ export function GameBoard({
             gameMode={view.activeGameMode}
             trickNumber={(view.currentTrick?.trickNumber ?? 0) + 1}
             completedTricks={view.completedTricks.length}
+            onClick={() => setShowInfoOverlay(true)}
           />
         </div>
       )}
@@ -201,6 +205,19 @@ export function GameBoard({
             onConfirm={() => actions.handleArmutExchange(Array.from(actions.armutReturnSelected))}
           />
         </div>
+      )}
+
+      {/* Game info overlay: game details + lobby standings */}
+      {showInfoOverlay && view && (
+        <GameInfoOverlay
+          phase={view.phase}
+          gameMode={view.activeGameMode}
+          trickNumber={(view.currentTrick?.trickNumber ?? 0) + 1}
+          completedTricks={view.completedTricks.length}
+          lobbyStandings={view.lobbyStandings}
+          activePlayer={activePlayer}
+          onClose={() => setShowInfoOverlay(false)}
+        />
       )}
 
       {/* Full-screen overlays: Sonderkarte confirmation + result screen */}
