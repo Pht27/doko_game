@@ -64,3 +64,39 @@
 .result-new-game-btn {
   @apply mt-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg py-3 font-bold transition-colors;
 }
+
+.result-standings-row {
+  @apply flex justify-between text-sm;
+}
+
+.result-standings-row-me {
+  @apply flex justify-between text-sm font-semibold text-indigo-300;
+}
+
+.result-points-positive {
+  @apply font-semibold tabular-nums text-green-400;
+}
+
+.result-points-negative {
+  @apply font-semibold tabular-nums text-red-400;
+}
+
+.result-points-neutral {
+  @apply font-semibold tabular-nums;
+}
+
+.result-vote-area {
+  @apply flex flex-col items-center gap-2 mt-2;
+}
+
+.result-bereit-btn {
+  @apply w-full bg-green-600 hover:bg-green-500 active:bg-green-700 text-white rounded-lg py-3 font-bold transition-colors disabled:opacity-50;
+}
+
+.result-bereit-active-btn {
+  @apply w-full bg-gray-600 hover:bg-gray-500 active:bg-gray-700 text-white rounded-lg py-3 font-bold transition-colors disabled:opacity-50;
+}
+
+.result-vote-count {
+  @apply text-white/60 text-sm;
+}

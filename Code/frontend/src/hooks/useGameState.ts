@@ -12,6 +12,10 @@ export interface GameStateResult {
   finishedResult: GameResultDto | null;
   /** Brief notification when a sonderkarte was just triggered; auto-clears after 3 s */
   sonderkarteNotification: SonderkarteNotification | null;
+  /** How many players have voted to start a new game */
+  newGameVoteCount: number;
+  /** Set to the new game's ID when a new-game auto-start fires */
+  newGameId: string | null;
   refetch: () => void;
 }
 
@@ -26,6 +30,8 @@ export function useGameState(
   const [finishedResult, setFinishedResult] = useState<GameResultDto | null>(null);
   const [sonderkarteNotification, setSonderkarteNotification] =
     useState<SonderkarteNotification | null>(null);
+  const [newGameVoteCount, setNewGameVoteCount] = useState(0);
+  const [newGameId, setNewGameId] = useState<string | null>(null);
   const notifTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const connectionRef = useRef<signalR.HubConnection | null>(null);
   const refetchRef = useRef<(() => void) | null>(null);
@@ -46,9 +52,11 @@ export function useGameState(
     }
   }, [token, gameId]);
 
-  // Reset finished result when the game changes
+  // Reset per-game state when the game changes
   useEffect(() => {
     setFinishedResult(null);
+    setNewGameVoteCount(0);
+    setNewGameId(null);
   }, [gameId]);
 
   // Keep ref in sync so SignalR handlers always call the latest refetch
@@ -93,6 +101,12 @@ export function useGameState(
     connection.on('PartyRevealed', handleEvent);
     connection.on('SonderkarteTriggered', handleSonderkarteTriggered);
     connection.on('GameFinished', handleGameFinished);
+    connection.on('NewGameVoteChanged', (payload: { count: number }) => {
+      setNewGameVoteCount(payload.count);
+    });
+    connection.on('NewGameStarted', (payload: { gameId: string }) => {
+      setNewGameId(payload.gameId);
+    });
 
     connection
       .start()
@@ -104,5 +118,5 @@ export function useGameState(
     };
   }, [gameId, tokens]);
 
-  return { view, loading, error, finishedResult, sonderkarteNotification, refetch };
+  return { view, loading, error, finishedResult, sonderkarteNotification, newGameVoteCount, newGameId, refetch };
 }

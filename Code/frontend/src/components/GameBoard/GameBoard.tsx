@@ -1,6 +1,7 @@
 import type { PlayerGameViewResponse, GameResultDto, TrickSummaryDto, SonderkarteNotification } from '../../types/api';
 import type { AnimPhase } from '../TrickArea/TrickArea';
 import type { GameActions } from '../../hooks/useGameActions';
+import type { MultiplayerNewGameProps } from '../ResultScreen/ResultScreen';
 import { GameInfo } from '../shared/GameInfo';
 import { PlayerLabel } from '../shared/PlayerLabel';
 import { HandDisplay } from '../HandDisplay/HandDisplay';
@@ -28,6 +29,7 @@ interface GameBoardProps {
   allowPlayerSwitching: boolean;
   onPlayerSwitch: (player: number) => void;
   onNewGame: () => void;
+  multiplayerNewGame?: MultiplayerNewGameProps;
 }
 
 /** Returns which compass direction a player sits relative to the active player. */
@@ -49,6 +51,7 @@ export function GameBoard({
   allowPlayerSwitching,
   onPlayerSwitch,
   onNewGame,
+  multiplayerNewGame,
 }: GameBoardProps) {
   const seatOfPlayer = (player: number) => seatOf(player, activePlayer);
 
@@ -208,6 +211,7 @@ export function GameBoard({
         onSubmitPlayCard={actions.submitPlayCard}
         onCancelPendingCard={() => actions.setPendingCard(null)}
         onNewGame={onNewGame}
+        multiplayerNewGame={multiplayerNewGame}
       />
     </div>
   );

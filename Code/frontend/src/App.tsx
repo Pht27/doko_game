@@ -4,7 +4,7 @@ import { useGameState } from './hooks/useGameState';
 import { useTrickAnimation } from './hooks/useTrickAnimation';
 import { useGameActions } from './hooks/useGameActions';
 import { saveLobbySession, loadLobbySession } from './hooks/useLobby';
-import { joinSeat, getLobby } from './api/lobby';
+import { joinSeat, getLobby, voteNewGame, withdrawNewGame } from './api/lobby';
 import { GameBoard } from './components/GameBoard/GameBoard';
 import { GameLoader } from './components/GameLoader/GameLoader';
 import { LandingPage } from './components/LandingPage/LandingPage';
@@ -132,8 +132,16 @@ export default function App() {
     error: viewError,
     finishedResult,
     sonderkarteNotification,
+    newGameVoteCount,
+    newGameId,
     refetch,
   } = useGameState(gameSession?.tokens ?? [], gameSession?.gameId ?? null, activePlayer);
+
+  // When the backend auto-starts a new game, update the active game ID
+  useEffect(() => {
+    if (!newGameId) return;
+    setView(prev => prev.kind === 'game' ? { ...prev, gameId: newGameId } : prev);
+  }, [newGameId]);
 
   const { animTrick, animPhase } = useTrickAnimation(gameView);
 
@@ -209,15 +217,16 @@ export default function App() {
         viewError={viewError}
         allowPlayerSwitching={isHotSeat}
         onPlayerSwitch={isHotSeat ? hotSeat.setActivePlayer : () => {}}
-        onNewGame={
-          isHotSeat
-            ? hotSeat.restart
-            : isGame && view.lobbySession
-              ? () => {
-                  saveLobbySession(view.lobbySession!);
-                  setView({ kind: 'multiplayer-browser', selectedLobbyId: view.lobbySession!.lobbyId });
-                }
-              : () => setView({ kind: 'home' })
+        onNewGame={isHotSeat ? hotSeat.restart : () => setView({ kind: 'home' })}
+        multiplayerNewGame={
+          isGame && view.lobbySession
+            ? {
+                voteCount: newGameVoteCount,
+                mySeatIndex: view.lobbySession.seatIndex,
+                onVote: () => voteNewGame(view.lobbySession!.token, view.lobbySession!.lobbyId),
+                onWithdraw: () => withdrawNewGame(view.lobbySession!.token, view.lobbySession!.lobbyId),
+              }
+            : undefined
         }
       />
     </>

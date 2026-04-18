@@ -1,14 +1,52 @@
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { GameResultDto } from '../../types/api';
 import { t } from '../../translations';
 import '../../styles/ResultScreen.css';
 
+export interface MultiplayerNewGameProps {
+  voteCount: number;
+  mySeatIndex: number;
+  onVote: () => Promise<void>;
+  onWithdraw: () => Promise<void>;
+}
+
 interface ResultScreenProps {
   result: GameResultDto;
   onNewGame: () => void;
+  multiplayerNewGame?: MultiplayerNewGameProps;
 }
 
-export function ResultScreen({ result, onNewGame }: ResultScreenProps) {
+export function ResultScreen({ result, onNewGame, multiplayerNewGame }: ResultScreenProps) {
+  const [hasVoted, setHasVoted] = useState(false);
+  const [voting, setVoting] = useState(false);
+
+  async function handleVote() {
+    if (!multiplayerNewGame || voting) return;
+    setVoting(true);
+    try {
+      await multiplayerNewGame.onVote();
+      setHasVoted(true);
+    } finally {
+      setVoting(false);
+    }
+  }
+
+  async function handleWithdraw() {
+    if (!multiplayerNewGame || voting) return;
+    setVoting(true);
+    try {
+      await multiplayerNewGame.onWithdraw();
+      setHasVoted(false);
+    } finally {
+      setVoting(false);
+    }
+  }
+
+  const mySeat = multiplayerNewGame?.mySeatIndex;
+  const hasNetPoints = result.netPointsPerSeat?.length > 0;
+  const hasStandings = result.lobbyStandings?.length > 0;
+
   return createPortal(
     <div className="result-overlay">
       <div className="result-screen">
@@ -92,12 +130,66 @@ export function ResultScreen({ result, onNewGame }: ResultScreenProps) {
           </div>
         )}
 
-        <button
-          onClick={onNewGame}
-          className="result-new-game-btn"
-        >
-          {t.neuesSpiel}
-        </button>
+        {/* Punkteänderung (net points this game) */}
+        {hasNetPoints && (
+          <div>
+            <div className="result-section-header">{t.punkteAenderung}</div>
+            <div className="result-breakdown">
+              {result.netPointsPerSeat.map((pts, seat) => {
+                const isMe = seat === mySeat;
+                const ptsCls = pts > 0
+                  ? 'result-points-positive'
+                  : pts < 0
+                    ? 'result-points-negative'
+                    : 'result-points-neutral';
+                return (
+                  <div key={seat} className={isMe ? 'result-standings-row-me' : 'result-standings-row'}>
+                    <span>{t.playerLabel(seat)}</span>
+                    <span className={ptsCls}>{pts > 0 ? '+' : ''}{pts}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Gesamtstand (lobby standings) */}
+        {hasStandings && (
+          <div>
+            <div className="result-section-header">{t.gesamtstand}</div>
+            <div className="result-breakdown">
+              {result.lobbyStandings.map((pts, seat) => {
+                const isMe = seat === mySeat;
+                return (
+                  <div key={seat} className={isMe ? 'result-standings-row-me' : 'result-standings-row'}>
+                    <span>{t.playerLabel(seat)}</span>
+                    <span className="result-breakdown-value">{pts}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* New game action */}
+        {multiplayerNewGame ? (
+          <div className="result-vote-area">
+            <button
+              onClick={hasVoted ? handleWithdraw : handleVote}
+              className={hasVoted ? 'result-bereit-active-btn' : 'result-bereit-btn'}
+              disabled={voting}
+            >
+              {hasVoted ? t.zurueckziehen : t.bereit}
+            </button>
+            <span className="result-vote-count">
+              {t.bereitCount(multiplayerNewGame.voteCount)}
+            </span>
+          </div>
+        ) : (
+          <button onClick={onNewGame} className="result-new-game-btn">
+            {t.neuesSpiel}
+          </button>
+        )}
       </div>
     </div>,
     document.body,

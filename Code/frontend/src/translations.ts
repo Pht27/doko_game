@@ -89,6 +89,12 @@ export const t = {
   extrapunkteNetto: 'Extrapunkte',
   neuesSpiel: 'Neues Spiel',
   awardLabel: (type: string, player: number) => `${type} (S${player})`,
+  playerLabel: (seat: number) => `Spieler ${seat + 1}`,
+  punkteAenderung: 'Punkteänderung',
+  gesamtstand: 'Gesamtstand',
+  bereit: 'Bereit',
+  zurueckziehen: 'Zurückziehen',
+  bereitCount: (count: number) => `${count} / 4 bereit`,
 
   // ── GameInfo ───────────────────────────────────────────────────────────────
   stichInfo: (trickNumber: number, completed: number) =>

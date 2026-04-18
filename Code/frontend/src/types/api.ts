@@ -84,6 +84,8 @@ export interface GameResultDto {
   valueComponents: GameValueComponentDto[];
   soloFactor: number;
   totalScore: number;
+  netPointsPerSeat: number[];
+  lobbyStandings: number[];
 }
 
 // ── Responses ─────────────────────────────────────────────────────────────────
@@ -164,7 +166,9 @@ export type SignalREvent =
   | 'ArmutCardsExchanged'
   | 'PartyRevealed'
   | 'GameFinished'
-  | 'SonderkarteTriggered';
+  | 'SonderkarteTriggered'
+  | 'NewGameVoteChanged'
+  | 'NewGameStarted';
 
 export interface SonderkarteNotification {
   player: number;

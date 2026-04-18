@@ -42,3 +42,11 @@ export function getLobby(lobbyId: string): Promise<LobbyViewResponse> {
 export function startLobbyGame(token: string, lobbyId: string): Promise<{ gameId: string }> {
   return apiFetch(`/lobbies/${lobbyId}/start`, token, { method: 'POST' });
 }
+
+export function voteNewGame(token: string, lobbyId: string): Promise<{ voteCount: number }> {
+  return apiFetch(`/lobbies/${lobbyId}/new-game/ready`, token, { method: 'POST' });
+}
+
+export function withdrawNewGame(token: string, lobbyId: string): Promise<{ voteCount: number }> {
+  return apiFetch(`/lobbies/${lobbyId}/new-game/withdraw`, token, { method: 'POST' });
+}
