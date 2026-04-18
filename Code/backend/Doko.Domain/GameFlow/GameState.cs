@@ -191,10 +191,6 @@ public sealed class GameState
                     .ToList();
                 break;
 
-            case TransferCardPointsModification m:
-                _cardPointTransfers.Add(m);
-                break;
-
             case ActivateSonderkarteModification m:
                 ActiveSonderkarten = ActiveSonderkarten.Append(m.Type).ToList();
                 break;

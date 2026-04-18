@@ -27,7 +27,7 @@ public sealed class GameScorer : IGameScorer
 
         foreach (var trickResult in game.Tricks)
         {
-            int trickAugen = ComputeEffectiveAugen(trickResult.Trick, state.CardPointTransfers);
+            int trickAugen = ComputeEffectiveAugen(trickResult.Trick);
             var winnerParty = state.PartyResolver.ResolveParty(trickResult.Winner, state);
             if (winnerParty == Party.Re)
             {
@@ -202,28 +202,9 @@ public sealed class GameScorer : IGameScorer
         return false;
     }
 
-    private static int ComputeEffectiveAugen(
-        Tricks.Trick trick,
-        IReadOnlyList<Sonderkarten.TransferCardPointsModification> transfers
-    )
+    private static int ComputeEffectiveAugen(Tricks.Trick trick)
     {
-        return trick.Cards.Sum(tc => EffectiveCardPoints(tc.Card.Type, transfers));
-    }
-
-    private static int EffectiveCardPoints(
-        CardType type,
-        IReadOnlyList<Sonderkarten.TransferCardPointsModification> transfers
-    )
-    {
-        int points = CardPoints.Of(type.Rank);
-        foreach (var t in transfers)
-        {
-            if (type == t.From)
-                return 0;
-            if (type == t.To)
-                points += CardPoints.Of(t.From.Rank);
-        }
-        return points;
+        return trick.Cards.Sum(tc => CardPoints.Of(tc.Card.Type.Rank));
     }
 
     private static int ComputeFeigheitPenalty(

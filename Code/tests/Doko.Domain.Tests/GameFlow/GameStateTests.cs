@@ -90,40 +90,6 @@ public class GameStateTests
         state.Announcements.Should().ContainSingle().Which.Should().Be(kontra);
     }
 
-    // ── Apply: TransferCardPointsModification ─────────────────────────────────
-
-    [Fact]
-    public void Apply_TransferCardPoints_RecordsTransfer()
-    {
-        var transfer = new TransferCardPointsModification(
-            new CardType(Suit.Herz, Rank.Zehn),
-            new CardType(Suit.Herz, Rank.Neun)
-        );
-        var state = GameState.Create();
-
-        state.Apply(transfer);
-
-        state.CardPointTransfers.Should().ContainSingle().Which.Should().Be(transfer);
-    }
-
-    [Fact]
-    public void Apply_TransferCardPoints_AccumulatesMultiple()
-    {
-        var t1 = new TransferCardPointsModification(
-            new CardType(Suit.Herz, Rank.Zehn),
-            new CardType(Suit.Herz, Rank.Neun)
-        );
-        var t2 = new TransferCardPointsModification(
-            new CardType(Suit.Karo, Rank.Ass),
-            new CardType(Suit.Karo, Rank.Neun)
-        );
-        var state = GameState.Create();
-
-        state.Apply(t1);
-        state.Apply(t2);
-
-        state.CardPointTransfers.Should().HaveCount(2);
-    }
 
     // ── Apply: ActivateSonderkarteModification ────────────────────────────────
 
