@@ -211,7 +211,12 @@ public class LobbiesController(
             .Clients.Group($"lobby_{lobbyId}")
             .SendAsync(
                 "playerJoined",
-                new { seatIndex, playerCount = 0, isOpa = true },
+                new
+                {
+                    seatIndex,
+                    playerCount = 0,
+                    isOpa = true,
+                },
                 ct
             );
 
