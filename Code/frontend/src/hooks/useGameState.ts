@@ -44,6 +44,10 @@ export function useGameState(
     try {
       const data = await getGameView(token, gameId);
       setView(data);
+      if (data.phase === 'Finished' && data.finishedResult) {
+        setFinishedResult(prev => prev ?? data.finishedResult!);
+        setNewGameVoteCount(prev => prev === 0 ? (data.newGameVoteCount ?? 0) : prev);
+      }
       setError(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));

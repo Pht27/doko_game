@@ -209,7 +209,25 @@ public class GamesController(
         if (view is null)
             return NotFound(new ErrorResponse("game_not_found"));
 
-        return Ok(DtoMapper.ToResponse(view));
+        var response = DtoMapper.ToResponse(view);
+
+        if (view.Phase == GamePhase.Finished)
+        {
+            var lobby = await lobbyRepository.GetByGameIdAsync(new GameId(guid), ct);
+            if (lobby?.GameHistory.Count > 0)
+            {
+                var (lastResult, gameMode, netPoints) = lobby.GameHistory[^1];
+                var standings = lobby.Standings.ToArray();
+                var matchHistory = BuildMatchHistory(lobby.GameHistory.SkipLast(1).ToList());
+                response = response with
+                {
+                    FinishedResult = DtoMapper.ToDto(lastResult, netPoints, standings, matchHistory: matchHistory, gameMode: gameMode),
+                    NewGameVoteCount = lobby.NewGameVoteCount,
+                };
+            }
+        }
+
+        return Ok(response);
     }
 
     private async Task HandleGeschmissenAsync(

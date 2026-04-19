@@ -5,7 +5,7 @@ namespace Doko.Application.Lobbies.Handlers;
 
 public record LeaveLobbyCommand(LobbyId LobbyId, PlayerSeat PlayerSeat);
 
-public record LeaveLobbyResult(bool LobbyDeleted);
+public record LeaveLobbyResult(bool LobbyDeleted, int NewGameVoteCount, string? ActiveGameId);
 
 public interface ILeaveLobbyHandler
 {
@@ -29,6 +29,9 @@ public sealed class LeaveLobbyHandler(ILobbyRepository repository) : ILeaveLobby
         if (!lobby.HasPlayer(command.PlayerSeat))
             return new LobbyActionResult<LeaveLobbyResult>.Failure(LobbyError.PlayerNotInLobby);
 
+        lobby.RemoveNewGameVote(command.PlayerSeat);
+        var activeGameId = lobby.ActiveGameId?.ToString();
+        var voteCount = lobby.NewGameVoteCount;
         var isNowEmpty = lobby.TryRemovePlayer(command.PlayerSeat);
 
         if (isNowEmpty)
@@ -36,6 +39,6 @@ public sealed class LeaveLobbyHandler(ILobbyRepository repository) : ILeaveLobby
         else
             await repository.SaveAsync(lobby, ct);
 
-        return new LobbyActionResult<LeaveLobbyResult>.Ok(new LeaveLobbyResult(isNowEmpty));
+        return new LobbyActionResult<LeaveLobbyResult>.Ok(new LeaveLobbyResult(isNowEmpty, voteCount, activeGameId));
     }
 }

@@ -59,6 +59,8 @@ export interface PlayerGameViewResponse {
   armutExchangeCardCount: number | null;
   armutReturnedTrump: boolean | null;
   activeGameMode: string | null;
+  finishedResult?: GameResultDto | null;
+  newGameVoteCount?: number;
 }
 
 // ── Results ───────────────────────────────────────────────────────────────────

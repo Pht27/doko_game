@@ -121,11 +121,20 @@ public class LobbiesController(
         var ok = ((LobbyActionResult<LeaveLobbyResult>.Ok)result).Value;
 
         if (ok.LobbyDeleted)
+        {
             await hub.Clients.Group($"lobby_{lobbyId}").SendAsync("lobbyClosed", ct);
+        }
         else
+        {
             await hub
                 .Clients.Group($"lobby_{lobbyId}")
                 .SendAsync("playerLeft", new { seatIndex = (int)callerId }, ct);
+
+            if (ok.ActiveGameId != null)
+                await hub
+                    .Clients.Group(ok.ActiveGameId)
+                    .SendAsync("newGameVoteChanged", new { count = ok.NewGameVoteCount }, ct);
+        }
 
         return NoContent();
     }

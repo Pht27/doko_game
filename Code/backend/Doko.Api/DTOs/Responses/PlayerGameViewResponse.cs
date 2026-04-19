@@ -44,4 +44,10 @@ public record PlayerGameViewResponse(
 
     /// <summary>The active game mode (e.g. "KaroSolo", "Hochzeit", "Armut"). Null = Normalspiel.</summary>
     public string? ActiveGameMode { get; init; } = null;
+
+    /// <summary>Populated when phase is Finished so rejoining players see the result screen immediately.</summary>
+    public GameResultDto? FinishedResult { get; init; } = null;
+
+    /// <summary>Current new-game vote count. Populated together with FinishedResult.</summary>
+    public int NewGameVoteCount { get; init; } = 0;
 }
