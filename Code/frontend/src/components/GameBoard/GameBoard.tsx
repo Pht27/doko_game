@@ -250,7 +250,7 @@ export function GameBoard({
 
       {/* Leave confirmation dialog */}
       {showLeaveConfirm && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-60 p-4">
           <div className="bg-gray-800 rounded-2xl p-6 w-full max-w-xs shadow-2xl flex flex-col gap-4 text-white text-center">
             <p className="font-semibold text-base">Willst du die Lobby wirklich verlassen?</p>
             <p className="text-white/50 text-sm">Dein Platz wird frei und kann von anderen besetzt werden.</p>
