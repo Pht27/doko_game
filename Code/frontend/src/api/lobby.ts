@@ -20,6 +20,7 @@ export interface LobbyViewResponse {
   standings: number[];
   startVoteCount: number;
   activeGameId?: string | null;
+  opaSeats?: number[] | null;
 }
 
 export function createLobby(): Promise<LobbyJoinResponse> {
@@ -64,5 +65,13 @@ export function voteNewGame(token: string, lobbyId: string): Promise<{ voteCount
 
 export function withdrawNewGame(token: string, lobbyId: string): Promise<{ voteCount: number }> {
   return apiFetch(`/lobbies/${lobbyId}/new-game/withdraw`, token, { method: 'POST' });
+}
+
+export function addOpa(token: string, lobbyId: string, seatIndex: number): Promise<{ seatIndex: number }> {
+  return apiFetch(`/lobbies/${lobbyId}/seats/${seatIndex}/opa`, token, { method: 'POST' });
+}
+
+export function removeOpa(token: string, lobbyId: string, seatIndex: number): Promise<void> {
+  return apiFetch(`/lobbies/${lobbyId}/seats/${seatIndex}/opa`, token, { method: 'DELETE' });
 }
 

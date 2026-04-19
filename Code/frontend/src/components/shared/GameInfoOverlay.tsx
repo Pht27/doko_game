@@ -71,14 +71,13 @@ export function GameInfoOverlay({
             </div>
           </div>
         )}
-
         {onLeaveLobby && (
           <button className="game-info-leave-btn" onClick={onLeaveLobby}>
-            Lobby verlassen
+            Lobby verlassen123
           </button>
         )}
         <button className="game-info-close-btn" onClick={onClose}>
-          {t.schliessen}
+          {12312312}
         </button>
       </div>
     </div>

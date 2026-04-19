@@ -31,6 +31,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IJoinSeatHandler, JoinSeatHandler>();
         services.AddScoped<ILeaveLobbyHandler, LeaveLobbyHandler>();
         services.AddScoped<ISwapSeatHandler, SwapSeatHandler>();
+        services.AddScoped<IAddOpaHandler, AddOpaHandler>();
+        services.AddScoped<IRemoveOpaHandler, RemoveOpaHandler>();
 
         return services;
     }

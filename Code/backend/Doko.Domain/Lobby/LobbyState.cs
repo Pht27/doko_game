@@ -13,6 +13,7 @@ public class LobbyState
     private readonly HashSet<PlayerSeat> _newGameVoters = [];
     private readonly HashSet<PlayerSeat> _lobbyStartVoters = [];
     private readonly List<(GameResult Result, string? GameMode, int[] NetPoints)> _gameHistory = [];
+    private readonly HashSet<int> _opaSeats = [];
     private bool _advanceRauskommer = true;
 
     public LobbyId Id { get; }
@@ -64,6 +65,12 @@ public class LobbyState
         return lobby;
     }
 
+    /// <summary>Set of seat indices (0–3) currently occupied by Opa (the computer player).</summary>
+    public IReadOnlySet<int> OpaSeats => _opaSeats;
+
+    /// <summary>Returns true if the given seat index is occupied by Opa.</summary>
+    public bool IsOpaSeat(int seatIndex) => _opaSeats.Contains(seatIndex);
+
     /// <summary>
     /// Tries to occupy a specific seat. Returns false if the index is out of range
     /// or the seat is already taken.
@@ -82,10 +89,36 @@ public class LobbyState
     }
 
     /// <summary>
+    /// Occupies a seat as Opa (the computer player). Returns false if out of range or taken.
+    /// </summary>
+    public bool TryOccupySeatAsOpa(int seatIndex, out PlayerSeat seat)
+    {
+        if (!TryOccupySeat(seatIndex, out seat))
+            return false;
+        _opaSeats.Add(seatIndex);
+        return true;
+    }
+
+    /// <summary>
+    /// Removes Opa from the given seat. Returns false if the seat is not an Opa seat.
+    /// </summary>
+    public bool TryRemoveOpa(int seatIndex, out PlayerSeat seat)
+    {
+        seat = default;
+        if (!_opaSeats.Contains(seatIndex))
+            return false;
+        seat = (PlayerSeat)seatIndex;
+        _opaSeats.Remove(seatIndex);
+        _seats[seatIndex] = null;
+        return true;
+    }
+
+    /// <summary>
     /// Removes the player from their seat. Returns true if the lobby is now completely empty.
     /// </summary>
     public bool TryRemovePlayer(PlayerSeat seat)
     {
+        _opaSeats.Remove((int)seat);
         _seats[(int)seat] = null;
         return _seats.All(s => s == null);
     }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { t } from '../../translations';
-import { leaveLobby, joinSeat, swapSeat, getLobby, voteReady, withdrawReady } from '../../api/lobby';
+import { leaveLobby, joinSeat, swapSeat, getLobby, voteReady, withdrawReady, addOpa, removeOpa } from '../../api/lobby';
 import {
   useLobby,
   loadLobbySession,
@@ -23,7 +23,7 @@ interface LobbyDetailViewProps {
 export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFinishedResult }: LobbyDetailViewProps) {
   const [session, setSession] = useState<LobbySession | null>(() => loadLobbySession(lobbyId));
 
-  const { seats, gameId, isStarted, lobbyClosed, startVoteCount, error } = useLobby(session, lobbyId);
+  const { seats, opaSeats, gameId, isStarted, lobbyClosed, startVoteCount, error } = useLobby(session, lobbyId);
 
   const [copied, setCopied] = useState(false);
   const [hasVoted, setHasVoted] = useState(false);
@@ -134,6 +134,26 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
     }
   }
 
+  async function doAddOpa(targetSeat: number) {
+    if (!session) return;
+    setActionError(null);
+    try {
+      await addOpa(session.token, lobbyId, targetSeat);
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : String(e));
+    }
+  }
+
+  async function doRemoveOpa(opaSeatIndex: number) {
+    if (!session) return;
+    setActionError(null);
+    try {
+      await removeOpa(session.token, lobbyId, opaSeatIndex);
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : String(e));
+    }
+  }
+
   async function handleLeaveSeat() {
     if (!session) return;
     setLeaving(true);
@@ -162,10 +182,12 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
       <div className="grid grid-cols-2 gap-2 shrink-0">
         {([0, 3, 1, 2] as const).map((i) => {
           const occupied = seats[i];
+          const isOpa = opaSeats.includes(i);
           const isMe = isMyLobby && session!.seatIndex === i;
           const isBusy = busySeat === i;
-          // Can click if: seat is empty AND not blocked by a session elsewhere AND not own current seat
           const canInteract = !occupied && !isInAnotherLobby && !isMe;
+          const canAddOpa = isMyLobby && !occupied && !isStarted;
+          const canRemoveOpa = isMyLobby && isOpa && !isStarted;
 
           function handleClick() {
             if (!canInteract || isBusy) return;
@@ -174,28 +196,35 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
           }
 
           return (
-            <button
+            <div
               key={i}
-              onClick={handleClick}
-              disabled={!canInteract || isBusy}
-              className={`flex items-center gap-2 px-3 py-3 rounded-xl transition-colors text-left w-full ${
+              className={`flex items-center gap-2 px-3 py-3 rounded-xl transition-colors ${
                 isMe
                   ? 'bg-indigo-600/50 text-white ring-1 ring-indigo-400'
-                  : occupied
-                    ? 'bg-white/15 text-white cursor-default'
-                    : canInteract
-                      ? 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white/80 cursor-pointer'
-                      : 'bg-white/5 text-white/20 cursor-default'
+                  : isOpa
+                    ? 'bg-white/15 text-white'
+                    : occupied
+                      ? 'bg-white/15 text-white'
+                      : canInteract
+                        ? 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white/80 cursor-pointer'
+                        : 'bg-white/5 text-white/20'
               }`}
+              onClick={!isOpa ? handleClick : undefined}
+              role={!isOpa && canInteract ? 'button' : undefined}
             >
               <div
                 className={`w-2.5 h-2.5 rounded-full shrink-0 ${
                   occupied ? 'bg-green-400' : 'bg-white/20'
                 }`}
               />
-              <span className="text-sm font-medium truncate">
+              <span className="text-sm font-medium truncate flex-1">
                 {isBusy ? (
                   t.joiningLobby
+                ) : isOpa ? (
+                  <>
+                    Opa
+                    <span className="text-white/40 text-xs ml-1">🤖</span>
+                  </>
                 ) : occupied ? (
                   <>
                     {t.playerSlot(i)}
@@ -205,7 +234,25 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
                   t.seatLabel(i)
                 )}
               </span>
-            </button>
+              {canRemoveOpa && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); doRemoveOpa(i); }}
+                  className="ml-auto text-red-400 hover:text-red-300 text-xs px-1 shrink-0"
+                  title="Opa entfernen"
+                >
+                  ✕
+                </button>
+              )}
+              {canAddOpa && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); doAddOpa(i); }}
+                  className="ml-auto text-white/30 hover:text-white/60 text-xs px-1 shrink-0"
+                  title="Opa hinzufügen"
+                >
+                  🤖
+                </button>
+              )}
+            </div>
           );
         })}
       </div>

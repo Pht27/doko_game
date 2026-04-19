@@ -11,6 +11,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddSingleton<IGameEventPublisher, SignalRGameEventPublisher>();
         services.AddSingleton<ITokenService, JwtTokenService>();
+        services.AddScoped<IOpaService, OpaService>();
         services.AddControllers();
         return services;
     }

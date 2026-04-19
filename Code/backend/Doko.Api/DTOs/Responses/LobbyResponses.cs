@@ -1,6 +1,11 @@
 namespace Doko.Api.DTOs.Responses;
 
-public record LobbyJoinResponse(string LobbyId, string Token, int SeatIndex, string? ActiveGameId = null);
+public record LobbyJoinResponse(
+    string LobbyId,
+    string Token,
+    int SeatIndex,
+    string? ActiveGameId = null
+);
 
 public record LobbyListItemResponse(string LobbyId, bool[] Seats, bool IsStarted);
 
@@ -10,7 +15,8 @@ public record LobbyViewResponse(
     bool IsStarted,
     int[] Standings,
     int StartVoteCount = 0,
-    string? ActiveGameId = null
+    string? ActiveGameId = null,
+    int[]? OpaSeats = null
 );
 
 public record StartLobbyGameResponse(string GameId);

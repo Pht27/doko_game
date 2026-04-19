@@ -20,10 +20,13 @@ public class LobbiesController(
     IJoinSeatHandler joinSeat,
     ILeaveLobbyHandler leaveLobby,
     ISwapSeatHandler swapSeat,
+    IAddOpaHandler addOpa,
+    IRemoveOpaHandler removeOpa,
     ILobbyRepository lobbyRepository,
     IStartGameHandler startGame,
     IDealCardsHandler dealCards,
     ITokenService tokenService,
+    IOpaService opaService,
     IHubContext<GameHub> hub
 ) : ControllerBase
 {
@@ -36,13 +39,7 @@ public class LobbiesController(
             return StatusCode(500, new ErrorResponse("lobby_creation_failed"));
 
         var token = tokenService.GenerateToken(ok.Value.Seat);
-        return Ok(
-            new LobbyJoinResponse(
-                ok.Value.LobbyId.ToString(),
-                token,
-                SeatIndex: 0
-            )
-        );
+        return Ok(new LobbyJoinResponse(ok.Value.LobbyId.ToString(), token, SeatIndex: 0));
     }
 
     [HttpGet]
@@ -122,10 +119,20 @@ public class LobbiesController(
         var ok = ((LobbyActionResult<SwapSeatResult>.Ok)result).Value;
         var oldSeatIndex = (int)callerSeat;
 
-        await hub.Clients.Group($"lobby_{lobbyId}").SendAsync("playerLeft", new { seatIndex = oldSeatIndex }, ct);
-        await hub.Clients.Group($"lobby_{lobbyId}").SendAsync("playerJoined", new { seatIndex, playerCount = 0 }, ct);
+        await hub
+            .Clients.Group($"lobby_{lobbyId}")
+            .SendAsync("playerLeft", new { seatIndex = oldSeatIndex }, ct);
+        await hub
+            .Clients.Group($"lobby_{lobbyId}")
+            .SendAsync("playerJoined", new { seatIndex, playerCount = 0 }, ct);
 
-        return Ok(new LobbyJoinResponse(lobbyId, tokenService.GenerateToken(ok.NewSeat), SeatIndex: seatIndex));
+        return Ok(
+            new LobbyJoinResponse(
+                lobbyId,
+                tokenService.GenerateToken(ok.NewSeat),
+                SeatIndex: seatIndex
+            )
+        );
     }
 
     [HttpPost("{lobbyId}/leave")]
@@ -169,6 +176,100 @@ public class LobbiesController(
         return NoContent();
     }
 
+    [HttpPost("{lobbyId}/seats/{seatIndex:int}/opa")]
+    [Authorize]
+    public async Task<IActionResult> AddOpa(string lobbyId, int seatIndex, CancellationToken ct)
+    {
+        if (!Guid.TryParse(lobbyId, out var guid))
+            return NotFound(new ErrorResponse("lobby_not_found"));
+
+        var lobby = await lobbyRepository.GetAsync(new LobbyId(guid), ct);
+        if (lobby is null)
+            return NotFound(new ErrorResponse("lobby_not_found"));
+
+        var callerId = GetCallerSeat();
+        if (!lobby.HasPlayer(callerId))
+            return Forbid();
+
+        if (lobby.IsStarted)
+            return Conflict(new ErrorResponse("lobby_already_started"));
+
+        var command = new AddOpaCommand(new LobbyId(guid), seatIndex);
+        var result = await addOpa.ExecuteAsync(command, ct);
+
+        if (result is LobbyActionResult<AddOpaResult>.Failure failure)
+            return failure.Error switch
+            {
+                LobbyError.LobbyNotFound => NotFound(new ErrorResponse("lobby_not_found")),
+                LobbyError.SeatOccupied => Conflict(new ErrorResponse("lobby_full")),
+                _ => StatusCode(500, new ErrorResponse("unknown_error")),
+            };
+
+        var updatedLobby = await lobbyRepository.GetAsync(new LobbyId(guid), ct);
+
+        await hub
+            .Clients.Group($"lobby_{lobbyId}")
+            .SendAsync(
+                "playerJoined",
+                new { seatIndex, playerCount = 0, isOpa = true },
+                ct
+            );
+
+        await hub
+            .Clients.Group($"lobby_{lobbyId}")
+            .SendAsync(
+                "lobbyReadyVoteChanged",
+                new { count = updatedLobby?.LobbyStartVoteCount ?? 0 },
+                ct
+            );
+
+        return Ok(new { seatIndex });
+    }
+
+    [HttpDelete("{lobbyId}/seats/{seatIndex:int}/opa")]
+    [Authorize]
+    public async Task<IActionResult> RemoveOpa(string lobbyId, int seatIndex, CancellationToken ct)
+    {
+        if (!Guid.TryParse(lobbyId, out var guid))
+            return NotFound(new ErrorResponse("lobby_not_found"));
+
+        var lobby = await lobbyRepository.GetAsync(new LobbyId(guid), ct);
+        if (lobby is null)
+            return NotFound(new ErrorResponse("lobby_not_found"));
+
+        var callerId = GetCallerSeat();
+        if (!lobby.HasPlayer(callerId))
+            return Forbid();
+
+        if (lobby.IsStarted)
+            return Conflict(new ErrorResponse("lobby_already_started"));
+
+        var command = new RemoveOpaCommand(new LobbyId(guid), seatIndex);
+        var result = await removeOpa.ExecuteAsync(command, ct);
+
+        if (result is LobbyActionResult<RemoveOpaResult>.Failure failure)
+            return failure.Error switch
+            {
+                LobbyError.LobbyNotFound => NotFound(new ErrorResponse("lobby_not_found")),
+                LobbyError.PlayerNotInLobby => NotFound(new ErrorResponse("opa_not_found")),
+                _ => StatusCode(500, new ErrorResponse("unknown_error")),
+            };
+
+        var updatedLobby = await lobbyRepository.GetAsync(new LobbyId(guid), ct);
+
+        await hub.Clients.Group($"lobby_{lobbyId}").SendAsync("playerLeft", new { seatIndex }, ct);
+
+        await hub
+            .Clients.Group($"lobby_{lobbyId}")
+            .SendAsync(
+                "lobbyReadyVoteChanged",
+                new { count = updatedLobby?.LobbyStartVoteCount ?? 0 },
+                ct
+            );
+
+        return NoContent();
+    }
+
     [HttpGet("{lobbyId}")]
     [AllowAnonymous]
     public async Task<IActionResult> GetLobby(string lobbyId, CancellationToken ct)
@@ -188,7 +289,8 @@ public class LobbiesController(
                 lobby.IsStarted,
                 lobby.Standings.ToArray(),
                 lobby.LobbyStartVoteCount,
-                lobby.ActiveGameId?.ToString()
+                lobby.ActiveGameId?.ToString(),
+                lobby.OpaSeats.ToArray()
             )
         );
     }
@@ -240,6 +342,9 @@ public class LobbiesController(
             await hub
                 .Clients.Group($"lobby_{lobbyId}")
                 .SendAsync("gameStarted", new { gameId = gameId.ToString() }, ct);
+
+            // Trigger Opa if it needs to act first (e.g. Opa is VorbehaltRauskommer)
+            await opaService.ExecuteOpaActionsAsync(gameId, ct);
         }
         else
         {
@@ -294,6 +399,10 @@ public class LobbiesController(
 
         bool allReady = lobby.AddNewGameVote(callerId);
 
+        // Opa automatically votes for every new game
+        foreach (var opaSeatIndex in lobby.OpaSeats)
+            allReady = lobby.AddNewGameVote((PlayerSeat)opaSeatIndex) || allReady;
+
         if (allReady)
         {
             var oldGameId = lobby.ActiveGameId?.ToString();
@@ -323,6 +432,9 @@ public class LobbiesController(
                 await hub
                     .Clients.Group(oldGameId)
                     .SendAsync("newGameStarted", new { gameId = newGameId.ToString() }, ct);
+
+            // Trigger Opa if it needs to act first in the new game
+            await opaService.ExecuteOpaActionsAsync(newGameId, ct);
         }
         else
         {

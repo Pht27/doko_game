@@ -3,6 +3,7 @@ using Doko.Api.DTOs.Responses;
 using Doko.Api.Extensions;
 using Doko.Api.Hubs;
 using Doko.Api.Mapping;
+using Doko.Api.Services;
 using Doko.Application.Abstractions;
 using Doko.Application.Games.Commands;
 using Doko.Application.Games.Handlers;
@@ -36,6 +37,7 @@ public class GamesController(
     IMakeAnnouncementHandler makeAnnouncement,
     IGameQueryService gameQuery,
     ILobbyRepository lobbyRepository,
+    IOpaService opaService,
     IHubContext<GameHub> hub
 ) : ControllerBase
 {
@@ -78,6 +80,7 @@ public class GamesController(
         var player = GetPlayerSeat();
         var command = new DeclareHealthStatusCommand(new GameId(guid), player, req.HasVorbehalt);
         var result = await declareHealth.ExecuteAsync(command, ct);
+        await opaService.ExecuteOpaActionsAsync(new GameId(guid), ct);
         return result.ToActionResult(r => Ok(new DeclareHealthResponse(r.AllDeclared)));
     }
 
@@ -95,6 +98,7 @@ public class GamesController(
         var reservation = DtoMapper.BuildReservation(req, player);
         var command = new MakeReservationCommand(new GameId(guid), player, reservation);
         var result = await makeReservation.ExecuteAsync(command, ct);
+        await opaService.ExecuteOpaActionsAsync(new GameId(guid), ct);
         return await result.ToActionResult(async r =>
         {
             if (r.Geschmissen)
@@ -116,6 +120,7 @@ public class GamesController(
         var player = GetPlayerSeat();
         var command = new AcceptArmutCommand(new GameId(guid), player, req.Accepts);
         var result = await acceptArmut.ExecuteAsync(command, ct);
+        await opaService.ExecuteOpaActionsAsync(new GameId(guid), ct);
         return result.ToActionResult(r => Ok(new AcceptArmutResponse(r.Accepted, r.SchwarzesSau)));
     }
 
@@ -168,8 +173,16 @@ public class GamesController(
         var result = await playCard.ExecuteAsync(command, ct);
         return await result.ToActionResult(async r =>
         {
-            if (r.GameFinished && r.FinishedResult is { } finished)
-                await HandleGameFinishedAsync(gameId, new GameId(guid), finished, ct);
+            if (r.GameFinished && r.FinishedResult is { } humanFinished)
+            {
+                await HandleGameFinishedAsync(gameId, new GameId(guid), humanFinished, ct);
+            }
+            else
+            {
+                var opaFinished = await opaService.ExecuteOpaActionsAsync(new GameId(guid), ct);
+                if (opaFinished is not null)
+                    await HandleGameFinishedAsync(gameId, new GameId(guid), opaFinished, ct);
+            }
 
             return Ok(DtoMapper.ToResponse(r));
         });
@@ -221,7 +234,13 @@ public class GamesController(
                 var matchHistory = BuildMatchHistory(lobby.GameHistory.SkipLast(1).ToList());
                 response = response with
                 {
-                    FinishedResult = DtoMapper.ToDto(lastResult, netPoints, standings, matchHistory: matchHistory, gameMode: gameMode),
+                    FinishedResult = DtoMapper.ToDto(
+                        lastResult,
+                        netPoints,
+                        standings,
+                        matchHistory: matchHistory,
+                        gameMode: gameMode
+                    ),
                     NewGameVoteCount = lobby.NewGameVoteCount,
                 };
             }

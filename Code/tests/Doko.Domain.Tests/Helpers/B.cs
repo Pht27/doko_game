@@ -60,7 +60,9 @@ internal static class B
         trick.Add(new TrickCard(Card(startId, Suit.Kreuz, Rank.Neun), winner));
         trick.Add(new TrickCard(Card((byte)(startId + 1), Suit.Pik, Rank.Neun), PlayerSeat.Second));
         trick.Add(new TrickCard(Card((byte)(startId + 2), Suit.Herz, Rank.Neun), PlayerSeat.Third));
-        trick.Add(new TrickCard(Card((byte)(startId + 3), Suit.Karo, Rank.Neun), PlayerSeat.Fourth));
+        trick.Add(
+            new TrickCard(Card((byte)(startId + 3), Suit.Karo, Rank.Neun), PlayerSeat.Fourth)
+        );
         return new TrickResult(trick, winner, []);
     }
 

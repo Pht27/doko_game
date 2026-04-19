@@ -12,6 +12,7 @@ export interface LobbySession {
 
 export interface LobbyHookState {
   seats: boolean[];
+  opaSeats: number[];
   gameId: string | null;
   isStarted: boolean;
   lobbyClosed: boolean;
@@ -52,6 +53,7 @@ export function clearLobbySession(): void {
 
 export function useLobby(session: LobbySession | null, lobbyId: string): LobbyHookState {
   const [seats, setSeats] = useState<boolean[]>(Array(4).fill(false));
+  const [opaSeats, setOpaSeats] = useState<number[]>([]);
   const [gameId, setGameId] = useState<string | null>(null);
   const [isStarted, setIsStarted] = useState(false);
   const [lobbyClosed, setLobbyClosed] = useState(false);
@@ -68,6 +70,7 @@ export function useLobby(session: LobbySession | null, lobbyId: string): LobbyHo
       .then((view) => {
         if (!cancelled) {
           setSeats(view.seats);
+          setOpaSeats(view.opaSeats ?? []);
           setStartVoteCount(view.startVoteCount ?? 0);
           setIsStarted(view.isStarted);
           if (view.activeGameId) setGameId(view.activeGameId);
@@ -87,13 +90,16 @@ export function useLobby(session: LobbySession | null, lobbyId: string): LobbyHo
       const hub = createHubConnection(session!.token);
       hubRef.current = hub;
 
-      hub.on('playerJoined', (data: { seatIndex: number }) => {
+      hub.on('playerJoined', (data: { seatIndex: number; isOpa?: boolean }) => {
         if (cancelled) return;
         setSeats((prev) => {
           const next = [...prev];
           next[data.seatIndex] = true;
           return next;
         });
+        if (data.isOpa) {
+          setOpaSeats((prev) => prev.includes(data.seatIndex) ? prev : [...prev, data.seatIndex]);
+        }
       });
 
       hub.on('playerLeft', (data: { seatIndex: number }) => {
@@ -103,6 +109,7 @@ export function useLobby(session: LobbySession | null, lobbyId: string): LobbyHo
           next[data.seatIndex] = false;
           return next;
         });
+        setOpaSeats((prev) => prev.filter((s) => s !== data.seatIndex));
       });
 
       hub.on('gameStarted', (data: { gameId: string }) => {
@@ -135,5 +142,5 @@ export function useLobby(session: LobbySession | null, lobbyId: string): LobbyHo
     };
   }, [session?.lobbyId, session?.token]);
 
-  return { seats, gameId, isStarted, lobbyClosed, startVoteCount, error };
+  return { seats, opaSeats, gameId, isStarted, lobbyClosed, startVoteCount, error };
 }

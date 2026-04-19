@@ -39,6 +39,8 @@ public sealed class LeaveLobbyHandler(ILobbyRepository repository) : ILeaveLobby
         else
             await repository.SaveAsync(lobby, ct);
 
-        return new LobbyActionResult<LeaveLobbyResult>.Ok(new LeaveLobbyResult(isNowEmpty, voteCount, activeGameId));
+        return new LobbyActionResult<LeaveLobbyResult>.Ok(
+            new LeaveLobbyResult(isNowEmpty, voteCount, activeGameId)
+        );
     }
 }
