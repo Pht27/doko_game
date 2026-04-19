@@ -3,6 +3,7 @@ using Doko.Domain.Announcements;
 using Doko.Domain.GameFlow.Events;
 using Doko.Domain.Parties;
 using Doko.Domain.Scoring;
+using Doko.Domain.Tricks;
 using Doko.Domain.Trump;
 
 namespace Doko.Application.Tests.Games.Handlers;
@@ -255,5 +256,58 @@ public class PlayCardHandlerTests
 
         var saved = await repo.GetAsync(id);
         saved!.Phase.Should().Be(GamePhase.Finished);
+    }
+
+    [Fact]
+    public async Task PlayCard_LastTrick_FirstDulleBeatsSecond()
+    {
+        // In the last trick (trick 12), the first Dulle beats the second — opposite of normal
+        var dulle0 = AppB.Card(0, Suit.Herz, Rank.Zehn); // P0 leads with Dulle
+        var dulle1 = AppB.Card(1, Suit.Herz, Rank.Zehn); // P1 plays second Dulle
+        var plain0 = AppB.Card(2, Suit.Karo, Rank.Neun);
+        var plain1 = AppB.Card(3, Suit.Karo, Rank.Neun);
+
+        // Build 11 dummy completed tricks so this is trick 12
+        static Trick DummyTrick(byte startId)
+        {
+            var t = new Trick();
+            t.Add(new TrickCard(AppB.Card(startId, Suit.Kreuz, Rank.Neun), AppB.P0));
+            t.Add(new TrickCard(AppB.Card((byte)(startId + 1), Suit.Pik, Rank.Neun), AppB.P1));
+            t.Add(new TrickCard(AppB.Card((byte)(startId + 2), Suit.Herz, Rank.Neun), AppB.P2));
+            t.Add(new TrickCard(AppB.Card((byte)(startId + 3), Suit.Karo, Rank.Neun), AppB.P3));
+            return t;
+        }
+
+        var completedTricks = Enumerable.Range(0, 11)
+            .Select(i => DummyTrick((byte)(i * 4 + 4)))
+            .ToList();
+
+        var players = new[]
+        {
+            new PlayerState(AppB.P0, PlayerSeat.First, AppB.HandOf(dulle0), null),
+            new PlayerState(AppB.P1, PlayerSeat.Second, AppB.HandOf(dulle1), null),
+            new PlayerState(AppB.P2, PlayerSeat.Third, AppB.HandOf(plain0), null),
+            new PlayerState(AppB.P3, PlayerSeat.Fourth, AppB.HandOf(plain1), null),
+        };
+
+        var (repo, pub, _) = AppB.Infrastructure();
+        var state = GameState.Create(
+            phase: GamePhase.Playing,
+            players: players,
+            currentTurn: AppB.P0,
+            trumpEvaluator: NormalTrumpEvaluator.Instance,
+            rules: new RuleSet { DulleRule = DulleRule.SecondBeatsFirst },
+            completedTricks: completedTricks
+        );
+        await repo.SaveAsync(state);
+        var uc = Handler(repo, pub);
+
+        await uc.ExecuteAsync(new PlayCardCommand(state.Id, AppB.P0, dulle0.Id, []));
+        await uc.ExecuteAsync(new PlayCardCommand(state.Id, AppB.P1, dulle1.Id, []));
+        await uc.ExecuteAsync(new PlayCardCommand(state.Id, AppB.P2, plain0.Id, []));
+        var result = await uc.ExecuteAsync(new PlayCardCommand(state.Id, AppB.P3, plain1.Id, []));
+
+        var ok = result.Should().BeOfType<GameActionResult<PlayCardResult>.Ok>().Which.Value;
+        ok.TrickWinner.Should().Be(AppB.P0); // first Dulle wins on last trick
     }
 }
