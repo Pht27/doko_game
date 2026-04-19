@@ -174,6 +174,14 @@ export default function App() {
     refetch,
   } = useGameState(gameSession?.tokens ?? [], gameSession?.gameId ?? null, activePlayer);
 
+  // If the game is gone (backend restart), clear stale session and go home
+  useEffect(() => {
+    if (!viewError || view.kind !== 'game') return;
+    if (!viewError.startsWith('HTTP 404')) return;
+    clearLobbySession();
+    setView({ kind: 'home' });
+  }, [viewError, view.kind]);
+
   // When the backend auto-starts a new game, update the active game ID
   useEffect(() => {
     if (!newGameId) return;
