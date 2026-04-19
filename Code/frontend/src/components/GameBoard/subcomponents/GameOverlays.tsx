@@ -11,9 +11,10 @@ interface GameOverlaysProps {
   onCancelPendingCard: () => void;
   onNewGame: () => void;
   multiplayerNewGame?: MultiplayerNewGameProps;
+  onLeaveLobby?: () => void;
 }
 
-export function GameOverlays({ pendingCard, activePlayer, finishedResult, onSubmitPlayCard, onCancelPendingCard, onNewGame, multiplayerNewGame }: GameOverlaysProps) {
+export function GameOverlays({ pendingCard, activePlayer, finishedResult, onSubmitPlayCard, onCancelPendingCard, onNewGame, multiplayerNewGame, onLeaveLobby }: GameOverlaysProps) {
   return (
     <>
       {pendingCard && (
@@ -31,6 +32,7 @@ export function GameOverlays({ pendingCard, activePlayer, finishedResult, onSubm
           result={finishedResult}
           onNewGame={onNewGame}
           multiplayerNewGame={multiplayerNewGame}
+          onLeaveLobby={onLeaveLobby}
         />
       )}
     </>

@@ -73,8 +73,6 @@ public class LobbyState
         playerId = default;
         if (seatIndex < 0 || seatIndex >= 4)
             return false;
-        if (IsStarted)
-            return false;
         if (_seats[seatIndex] != null)
             return false;
 

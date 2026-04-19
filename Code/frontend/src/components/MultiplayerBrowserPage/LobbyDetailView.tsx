@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { t } from '../../translations';
-import { leaveLobby, joinSeat, voteReady, withdrawReady } from '../../api/lobby';
+import { leaveLobby, joinSeat, getLobby, voteReady, withdrawReady } from '../../api/lobby';
 import {
   useLobby,
   loadLobbySession,
@@ -22,7 +22,7 @@ interface LobbyDetailViewProps {
 export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFinishedResult }: LobbyDetailViewProps) {
   const [session, setSession] = useState<LobbySession | null>(() => loadLobbySession(lobbyId));
 
-  const { seats, gameId, lobbyClosed, startVoteCount, error } = useLobby(session, lobbyId);
+  const { seats, gameId, isStarted, lobbyClosed, startVoteCount, error } = useLobby(session, lobbyId);
 
   const [copied, setCopied] = useState(false);
   const [hasVoted, setHasVoted] = useState(false);
@@ -71,6 +71,13 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
       };
       saveLobbySession(newSession);
       setSession(newSession);
+
+      // If a game is already running, navigate straight to it
+      const lobby = await getLobby(lobbyId);
+      if (lobby.isStarted && lobby.activeGameId) {
+        clearLobbySession();
+        onGameStarted(lobby.activeGameId, newSession);
+      }
     } catch (e) {
       setActionError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -156,6 +163,8 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
   const isMyLobby = session !== null;
   // True if user has a session stored for a *different* lobby — blocks joining seats here
   const isInAnotherLobby = !isMyLobby && loadAnySession() !== null;
+  // When a game is running, seat swapping is not allowed — only joining empty seats
+  const canSwapSeats = isMyLobby && !isStarted;
 
   return (
     <div className="flex flex-col h-full gap-3 p-4 overflow-y-auto">
@@ -170,7 +179,7 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
 
           function handleClick() {
             if (!canInteract || isBusy) return;
-            if (isMyLobby) doSwap(i);
+            if (canSwapSeats) doSwap(i);
             else doJoin(i);
           }
 
@@ -213,7 +222,9 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
 
       <p className="text-white/40 text-xs shrink-0">
         {t.playerCount(filledCount, 4)}
-        {filledCount < 4 && ` · ${t.waitingForPlayers}`}
+        {isStarted
+          ? <span className="text-orange-400"> · Spiel läuft</span>
+          : filledCount < 4 && ` · ${t.waitingForPlayers}`}
       </p>
 
       {/* Invite link */}
@@ -235,19 +246,21 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
       {/* Actions — only shown when user has a seat in this lobby */}
       {isMyLobby && (
         <div className="flex flex-col gap-2 shrink-0">
-          <button
-            onClick={hasVoted ? handleWithdraw : handleVote}
-            disabled={filledCount < 4 || voting}
-            className={`w-full py-3 text-base font-semibold rounded-2xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-between px-4 ${
-              hasVoted
-                ? 'bg-green-600 hover:bg-green-500 active:bg-green-700 text-white'
-                : 'bg-white/15 hover:bg-white/25 active:bg-white/10 text-white'
-            }`}
-          >
-            <span className="text-sm opacity-70">{startVoteCount}/4 👤</span>
-            <span>{hasVoted ? t.zurueckziehen : t.bereit}</span>
-            <span className="w-12" />
-          </button>
+          {!isStarted && (
+            <button
+              onClick={hasVoted ? handleWithdraw : handleVote}
+              disabled={filledCount < 4 || voting}
+              className={`w-full py-3 text-base font-semibold rounded-2xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-between px-4 ${
+                hasVoted
+                  ? 'bg-green-600 hover:bg-green-500 active:bg-green-700 text-white'
+                  : 'bg-white/15 hover:bg-white/25 active:bg-white/10 text-white'
+              }`}
+            >
+              <span className="text-sm opacity-70">{startVoteCount}/4 👤</span>
+              <span>{hasVoted ? t.zurueckziehen : t.bereit}</span>
+              <span className="w-12" />
+            </button>
+          )}
           <button
             onClick={handleLeaveSeat}
             disabled={leaving}

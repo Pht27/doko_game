@@ -53,3 +53,7 @@
 .game-info-close-btn {
   @apply mt-2 w-full bg-gray-600 hover:bg-gray-500 text-white rounded-lg py-2 font-semibold transition-colors text-sm;
 }
+
+.game-info-leave-btn {
+  @apply mt-2 w-full bg-red-900/60 hover:bg-red-800/80 text-red-300 rounded-lg py-2 font-semibold transition-colors text-sm;
+}

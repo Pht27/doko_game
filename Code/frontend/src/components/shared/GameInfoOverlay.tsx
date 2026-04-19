@@ -11,6 +11,7 @@ interface GameInfoOverlayProps {
   lobbyId?: string;
   activePlayer: number;
   onClose: () => void;
+  onLeaveLobby?: () => void;
 }
 
 export function GameInfoOverlay({
@@ -21,6 +22,7 @@ export function GameInfoOverlay({
   lobbyId,
   activePlayer,
   onClose,
+  onLeaveLobby,
 }: GameInfoOverlayProps) {
   const [standings, setStandings] = useState<number[] | null>(null);
 
@@ -70,6 +72,11 @@ export function GameInfoOverlay({
           </div>
         )}
 
+        {onLeaveLobby && (
+          <button className="game-info-leave-btn" onClick={onLeaveLobby}>
+            Lobby verlassen
+          </button>
+        )}
         <button className="game-info-close-btn" onClick={onClose}>
           {t.schliessen}
         </button>

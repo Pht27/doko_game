@@ -148,7 +148,8 @@ public class LobbiesController(
                 seats,
                 lobby.IsStarted,
                 lobby.Standings.ToArray(),
-                lobby.LobbyStartVoteCount
+                lobby.LobbyStartVoteCount,
+                lobby.ActiveGameId?.ToString()
             )
         );
     }

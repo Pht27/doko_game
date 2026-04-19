@@ -19,9 +19,10 @@ interface ResultScreenProps {
   onNewGame: () => void;
   multiplayerNewGame?: MultiplayerNewGameProps;
   viewOnly?: boolean;
+  onLeaveLobby?: () => void;
 }
 
-export function ResultScreen({ result, onNewGame, multiplayerNewGame, viewOnly }: ResultScreenProps) {
+export function ResultScreen({ result, onNewGame, multiplayerNewGame, viewOnly, onLeaveLobby }: ResultScreenProps) {
   const [hasVoted, setHasVoted] = useState(false);
   const [voting, setVoting] = useState(false);
 
@@ -90,7 +91,7 @@ export function ResultScreen({ result, onNewGame, multiplayerNewGame, viewOnly }
               )}
             </div>
 
-            {/* Action button */}
+            {/* Action button(s) */}
             {multiplayerNewGame ? (
               <button
                 onClick={hasVoted ? handleWithdraw : handleVote}
@@ -110,6 +111,11 @@ export function ResultScreen({ result, onNewGame, multiplayerNewGame, viewOnly }
             ) : (
               <button onClick={onNewGame} className="result-new-game-btn">
                 {t.neuesSpiel}
+              </button>
+            )}
+            {onLeaveLobby && (
+              <button onClick={onLeaveLobby} className="result-leave-btn">
+                Lobby verlassen
               </button>
             )}
           </div>

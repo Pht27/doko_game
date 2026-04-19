@@ -5,6 +5,7 @@ import type { GameActions } from '../../hooks/useGameActions';
 import type { MultiplayerNewGameProps } from '../ResultScreen/ResultScreen';
 import { ResultScreen } from '../ResultScreen/ResultScreen';
 import { GameInfo } from '../shared/GameInfo';
+import { GameInfoOverlay } from '../shared/GameInfoOverlay';
 import { PlayerLabel } from '../shared/PlayerLabel';
 import { HandDisplay } from '../HandDisplay/HandDisplay';
 import { AnnouncementButton } from '../AnnouncementButton/AnnouncementButton';
@@ -33,6 +34,8 @@ interface GameBoardProps {
   onNewGame: () => void;
   multiplayerNewGame?: MultiplayerNewGameProps;
   lastFinishedResult?: GameResultDto | null;
+  onLeaveLobby?: () => Promise<void>;
+  lobbyId?: string;
 }
 
 /** Returns which compass direction a player sits relative to the active player. */
@@ -56,9 +59,22 @@ export function GameBoard({
   onNewGame,
   multiplayerNewGame,
   lastFinishedResult,
+  onLeaveLobby,
+  lobbyId,
 }: GameBoardProps) {
   const [showInfoOverlay, setShowInfoOverlay] = useState(false);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const seatOfPlayer = (player: number) => seatOf(player, activePlayer);
+
+  function triggerLeave() {
+    setShowInfoOverlay(false);
+    setShowLeaveConfirm(true);
+  }
+
+  async function confirmLeave() {
+    setShowLeaveConfirm(false);
+    await onLeaveLobby?.();
+  }
 
   const displayTrick = animTrick ?? (view?.currentTrick ?? null);
   const winnerSeat = animTrick?.winner != null ? seatOfPlayer(animTrick.winner) : undefined;
@@ -209,13 +225,51 @@ export function GameBoard({
         </div>
       )}
 
-      {/* Game info overlay: show match history when available */}
-      {showInfoOverlay && lastFinishedResult && (
-        <ResultScreen
-          result={lastFinishedResult}
-          onNewGame={() => setShowInfoOverlay(false)}
-          viewOnly
-        />
+      {/* Game info overlay: match history if available, otherwise basic game info */}
+      {showInfoOverlay && (
+        lastFinishedResult ? (
+          <ResultScreen
+            result={lastFinishedResult}
+            onNewGame={() => setShowInfoOverlay(false)}
+            viewOnly
+            onLeaveLobby={onLeaveLobby ? triggerLeave : undefined}
+          />
+        ) : view ? (
+          <GameInfoOverlay
+            phase={view.phase}
+            gameMode={view.activeGameMode}
+            trickNumber={(view.currentTrick?.trickNumber ?? 0) + 1}
+            completedTricks={view.completedTricks.length}
+            lobbyId={lobbyId}
+            activePlayer={activePlayer}
+            onClose={() => setShowInfoOverlay(false)}
+            onLeaveLobby={onLeaveLobby ? triggerLeave : undefined}
+          />
+        ) : null
+      )}
+
+      {/* Leave confirmation dialog */}
+      {showLeaveConfirm && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-2xl p-6 w-full max-w-xs shadow-2xl flex flex-col gap-4 text-white text-center">
+            <p className="font-semibold text-base">Willst du die Lobby wirklich verlassen?</p>
+            <p className="text-white/50 text-sm">Dein Platz wird frei und kann von anderen besetzt werden.</p>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={confirmLeave}
+                className="w-full py-2.5 rounded-xl bg-red-700 hover:bg-red-600 active:bg-red-800 text-white font-semibold transition-colors"
+              >
+                Ja, verlassen
+              </button>
+              <button
+                onClick={() => setShowLeaveConfirm(false)}
+                className="w-full py-2.5 rounded-xl bg-gray-600 hover:bg-gray-500 active:bg-gray-700 text-white font-semibold transition-colors"
+              >
+                Nein, weiterspielen
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Full-screen overlays: Sonderkarte confirmation + result screen */}
@@ -227,6 +281,7 @@ export function GameBoard({
         onCancelPendingCard={() => actions.setPendingCard(null)}
         onNewGame={onNewGame}
         multiplayerNewGame={multiplayerNewGame}
+        onLeaveLobby={onLeaveLobby ? triggerLeave : undefined}
       />
     </div>
   );

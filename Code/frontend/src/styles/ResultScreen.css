@@ -60,6 +60,10 @@
   @apply w-12;
 }
 
+.result-leave-btn {
+  @apply w-full bg-red-900/50 hover:bg-red-800/70 text-red-300 rounded-lg py-2.5 font-semibold transition-colors text-sm;
+}
+
 /* ── LobbyHistory ──────────────────────────────────────────────────────────── */
 
 .rh-container {

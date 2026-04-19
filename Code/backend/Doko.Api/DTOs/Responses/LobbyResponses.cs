@@ -9,7 +9,8 @@ public record LobbyViewResponse(
     bool[] Seats,
     bool IsStarted,
     int[] Standings,
-    int StartVoteCount = 0
+    int StartVoteCount = 0,
+    string? ActiveGameId = null
 );
 
 public record StartLobbyGameResponse(string GameId);

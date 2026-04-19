@@ -19,6 +19,7 @@ export interface LobbyViewResponse {
   isStarted: boolean;
   standings: number[];
   startVoteCount: number;
+  activeGameId?: string | null;
 }
 
 export function createLobby(): Promise<LobbyJoinResponse> {

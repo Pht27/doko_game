@@ -4,7 +4,7 @@ import { useGameState } from './hooks/useGameState';
 import { useTrickAnimation } from './hooks/useTrickAnimation';
 import { useGameActions } from './hooks/useGameActions';
 import { saveLobbySession, loadLobbySession } from './hooks/useLobby';
-import { joinSeat, getLobby, voteNewGame, withdrawNewGame } from './api/lobby';
+import { joinSeat, getLobby, leaveLobby, voteNewGame, withdrawNewGame } from './api/lobby';
 import { GameBoard } from './components/GameBoard/GameBoard';
 import { GameLoader } from './components/GameLoader/GameLoader';
 import { LandingPage } from './components/LandingPage/LandingPage';
@@ -110,6 +110,17 @@ export default function App() {
     const tokens = Array<string>(4).fill(token);
     window.history.replaceState({}, '', window.location.pathname);
     setView({ kind: 'game', tokens, gameId, myPlayerId: playerId, lobbySession: session });
+  }
+
+  async function handleLeaveLobby() {
+    if (view.kind !== 'game' || !view.lobbySession) return;
+    const { token, lobbyId } = view.lobbySession;
+    try {
+      await leaveLobby(token, lobbyId);
+    } catch {
+      // best-effort: lobby may already be gone
+    }
+    setView({ kind: 'multiplayer-browser', selectedLobbyId: lobbyId });
   }
 
   // ── Game wiring (hot-seat and multiplayer share the same hooks) ─────────────
@@ -236,6 +247,8 @@ export default function App() {
               }
             : undefined
         }
+        onLeaveLobby={isGame && view.lobbySession ? handleLeaveLobby : undefined}
+        lobbyId={isGame ? view.lobbySession?.lobbyId : undefined}
       />
     </>
   );

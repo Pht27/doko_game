@@ -13,6 +13,7 @@ export interface LobbySession {
 export interface LobbyHookState {
   seats: boolean[];
   gameId: string | null;
+  isStarted: boolean;
   lobbyClosed: boolean;
   startVoteCount: number;
   error: string | null;
@@ -52,6 +53,7 @@ export function clearLobbySession(): void {
 export function useLobby(session: LobbySession | null, lobbyId: string): LobbyHookState {
   const [seats, setSeats] = useState<boolean[]>(Array(4).fill(false));
   const [gameId, setGameId] = useState<string | null>(null);
+  const [isStarted, setIsStarted] = useState(false);
   const [lobbyClosed, setLobbyClosed] = useState(false);
   const [startVoteCount, setStartVoteCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -67,6 +69,7 @@ export function useLobby(session: LobbySession | null, lobbyId: string): LobbyHo
         if (!cancelled) {
           setSeats(view.seats);
           setStartVoteCount(view.startVoteCount ?? 0);
+          setIsStarted(view.isStarted);
         }
       })
       .catch(() => {});
@@ -131,5 +134,5 @@ export function useLobby(session: LobbySession | null, lobbyId: string): LobbyHo
     };
   }, [session?.lobbyId, session?.token]);
 
-  return { seats, gameId, lobbyClosed, startVoteCount, error };
+  return { seats, gameId, isStarted, lobbyClosed, startVoteCount, error };
 }
