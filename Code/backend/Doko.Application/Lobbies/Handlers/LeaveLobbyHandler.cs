@@ -3,7 +3,7 @@ using Doko.Domain.Players;
 
 namespace Doko.Application.Lobbies.Handlers;
 
-public record LeaveLobbyCommand(LobbyId LobbyId, PlayerId PlayerId);
+public record LeaveLobbyCommand(LobbyId LobbyId, PlayerSeat PlayerSeat);
 
 public record LeaveLobbyResult(bool LobbyDeleted);
 
@@ -26,10 +26,10 @@ public sealed class LeaveLobbyHandler(ILobbyRepository repository) : ILeaveLobby
         if (lobby is null)
             return new LobbyActionResult<LeaveLobbyResult>.Failure(LobbyError.LobbyNotFound);
 
-        if (!lobby.HasPlayer(command.PlayerId))
+        if (!lobby.HasPlayer(command.PlayerSeat))
             return new LobbyActionResult<LeaveLobbyResult>.Failure(LobbyError.PlayerNotInLobby);
 
-        var isNowEmpty = lobby.TryRemovePlayer(command.PlayerId);
+        var isNowEmpty = lobby.TryRemovePlayer(command.PlayerSeat);
 
         if (isNowEmpty)
             await repository.DeleteAsync(command.LobbyId, ct);

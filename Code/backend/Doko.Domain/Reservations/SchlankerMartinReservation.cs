@@ -13,9 +13,9 @@ namespace Doko.Domain.Reservations;
 /// </summary>
 public sealed class SchlankerMartinReservation : IReservation
 {
-    private readonly PlayerId _soloPlayer;
+    private readonly PlayerSeat _soloPlayer;
 
-    public SchlankerMartinReservation(PlayerId soloPlayer) => _soloPlayer = soloPlayer;
+    public SchlankerMartinReservation(PlayerSeat soloPlayer) => _soloPlayer = soloPlayer;
 
     public ReservationPriority Priority => ReservationPriority.SchlankerMartin;
 

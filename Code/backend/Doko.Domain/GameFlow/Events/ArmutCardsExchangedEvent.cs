@@ -4,7 +4,7 @@ namespace Doko.Domain.GameFlow.Events;
 
 public sealed record ArmutCardsExchangedEvent(
     GameId GameId,
-    PlayerId RichPlayer,
+    PlayerSeat RichPlayer,
     int CardCount,
     bool IncludedTrump
 ) : IDomainEvent;

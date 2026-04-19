@@ -19,7 +19,7 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
 {
     public async Task<PlayerGameView?> GetPlayerViewAsync(
         GameId gameId,
-        PlayerId requestingPlayer,
+        PlayerSeat requestingPlayer,
         CancellationToken ct = default
     )
     {
@@ -27,7 +27,7 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
         if (state is null)
             return null;
 
-        var playerState = state.Players.FirstOrDefault(p => p.Id == requestingPlayer);
+        var playerState = state.Players.FirstOrDefault(p => p.Seat == requestingPlayer);
         if (playerState is null)
             return null;
 
@@ -87,19 +87,19 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
 
         // Other players' public state
         var others = state
-            .Players.Where(p => p.Id != requestingPlayer)
+            .Players.Where(p => p.Seat != requestingPlayer)
             .Select(p =>
             {
                 // Reveal party when mode dictates it, or when the player has announced
-                var hasAnnounced = state.Announcements.Any(a => a.Player == p.Id);
+                var hasAnnounced = state.Announcements.Any(a => a.Player == p.Seat);
                 var knownParty = revealParties
-                    ? state.PartyResolver.ResolveParty(p.Id, state)
+                    ? state.PartyResolver.ResolveParty(p.Seat, state)
                     : p.KnownParty
-                        ?? (hasAnnounced ? state.PartyResolver.ResolveParty(p.Id, state) : null);
+                        ?? (hasAnnounced ? state.PartyResolver.ResolveParty(p.Seat, state) : null);
 
                 // Most specific announcement: highest enum value wins
                 var highestAnn = state
-                    .Announcements.Where(a => a.Player == p.Id)
+                    .Announcements.Where(a => a.Player == p.Seat)
                     .MaxBy(a => a.Type);
                 string? announcementLabel = null;
                 if (highestAnn is not null)
@@ -115,7 +115,6 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
                 }
 
                 return new PlayerPublicState(
-                    p.Id,
                     p.Seat,
                     knownParty,
                     p.Hand.Cards.Count,

@@ -20,7 +20,7 @@ public sealed class GameState
     public RuleSet Rules { get; private set; }
 
     public IReadOnlyList<PlayerState> Players { get; private set; }
-    public PlayerId CurrentTurn { get; private set; }
+    public PlayerSeat CurrentTurn { get; private set; }
     public PlayDirection Direction { get; private set; }
 
     public IReservation? ActiveReservation { get; private set; }
@@ -53,42 +53,42 @@ public sealed class GameState
     /// (e.g. Superschweinchen: player originally held both ♦10, but may have already played the first).
     /// Null before dealing phase completes.
     /// </summary>
-    public IReadOnlyDictionary<PlayerId, Hand>? InitialHands { get; private set; }
+    public IReadOnlyDictionary<PlayerSeat, Hand>? InitialHands { get; private set; }
 
     /// <summary>
     /// Round 1 of reservation discovery: each player's health declaration.
     /// True = Vorbehalt (has a reservation), false = Gesund (none).
     /// Null means the player has not yet been asked.
     /// </summary>
-    public IReadOnlyDictionary<PlayerId, bool> HealthDeclarations { get; private set; } =
-        new Dictionary<PlayerId, bool>();
+    public IReadOnlyDictionary<PlayerSeat, bool> HealthDeclarations { get; private set; } =
+        new Dictionary<PlayerSeat, bool>();
 
     /// <summary>
     /// Players still awaiting a declaration in the current reservation check phase
     /// (SoloCheck, ArmutCheck, …). <see cref="CurrentTurn"/> equals the first entry.
     /// Empty outside reservation check phases.
     /// </summary>
-    public IReadOnlyList<PlayerId> PendingReservationResponders { get; private set; } = [];
+    public IReadOnlyList<PlayerSeat> PendingReservationResponders { get; private set; } = [];
 
     /// <summary>
     /// Tracks each player's reservation declaration during a check phase.
     /// Populated by <see cref="RecordDeclarationModification"/>; null means the player passed.
     /// Cleared between check phases by <see cref="ClearReservationDeclarationsModification"/>.
     /// </summary>
-    public IReadOnlyDictionary<PlayerId, IReservation?> ReservationDeclarations
+    public IReadOnlyDictionary<PlayerSeat, IReservation?> ReservationDeclarations
     {
         get;
         private set;
-    } = new Dictionary<PlayerId, IReservation?>();
+    } = new Dictionary<PlayerSeat, IReservation?>();
 
     /// <summary>The player who declared Armut. Set when Armut wins the reservation check.</summary>
-    public PlayerId? ArmutPlayer { get; private set; }
+    public PlayerSeat? ArmutPlayer { get; private set; }
 
     /// <summary>
     /// The rich player who accepted the Armut. Set during <see cref="GamePhase.ArmutPartnerFinding"/>.
     /// Null if nobody has accepted yet.
     /// </summary>
-    public PlayerId? ArmutRichPlayer { get; private set; }
+    public PlayerSeat? ArmutRichPlayer { get; private set; }
 
     /// <summary>
     /// How many cards the poor player gave to the rich player in the Armut exchange.
@@ -121,7 +121,7 @@ public sealed class GameState
     /// Used by Gegengenscherdamen to detect whether the original teams are restored.
     /// Null until a team-changing Genscher fires; cleared on full restoration.
     /// </summary>
-    public (PlayerId First, PlayerId Second)? PreGenscherRePlayers { get; private set; }
+    public (PlayerSeat First, PlayerSeat Second)? PreGenscherRePlayers { get; private set; }
 
     /// <summary>
     /// Announcements saved when a team-changing Genscherdamen fired and cleared <see cref="Announcements"/>.
@@ -135,7 +135,7 @@ public sealed class GameState
     /// Rotates counter-clockwise each game. Always rotates; SpieleRauskommer
     /// (who actually plays first) may differ for Solo/Armut.
     /// </summary>
-    public PlayerId VorbehaltRauskommer { get; private set; }
+    public PlayerSeat VorbehaltRauskommer { get; private set; }
 
 #pragma warning disable CS8618 // Non-nullable fields initialized via factory/Apply
     private GameState() { }
@@ -148,7 +148,7 @@ public sealed class GameState
     public static GameState Create(
         RuleSet? rules = null,
         IReadOnlyList<PlayerState>? players = null,
-        PlayerId currentTurn = default,
+        PlayerSeat currentTurn = default,
         ITrumpEvaluator? trumpEvaluator = null,
         IPartyResolver? partyResolver = null,
         PlayDirection direction = PlayDirection.Counterclockwise,
@@ -157,7 +157,7 @@ public sealed class GameState
         Trick? currentTrick = null,
         IReadOnlyList<Announcement>? announcements = null,
         IReadOnlyList<SonderkarteType>? activeSonderkarten = null,
-        IReadOnlyDictionary<PlayerId, Hand>? initialHands = null,
+        IReadOnlyDictionary<PlayerSeat, Hand>? initialHands = null,
         GamePhase phase = GamePhase.Dealing,
         GameId id = default
     ) =>
@@ -180,13 +180,12 @@ public sealed class GameState
         };
 
     /// <summary>Determines the next player in the given play direction.</summary>
-    public PlayerId NextPlayer(PlayerId current, PlayDirection direction)
+    public PlayerSeat NextPlayer(PlayerSeat current, PlayDirection direction)
     {
-        var currentPlayer = Players.First(p => p.Id == current);
-        int seatIndex = (int)currentPlayer.Seat;
+        int seatIndex = (int)current;
         int nextIndex =
             direction == PlayDirection.Counterclockwise ? (seatIndex + 1) % 4 : (seatIndex + 3) % 4;
-        return Players.First(p => (int)p.Seat == nextIndex).Id;
+        return (PlayerSeat)nextIndex;
     }
 
     /// <summary>Applies a state modification. The only place mutations occur.</summary>
@@ -240,12 +239,12 @@ public sealed class GameState
                 break;
 
             case DealHandsModification m:
-                Players = [.. Players.Select(p => p with { Hand = m.Hands[p.Id] })];
+                Players = [.. Players.Select(p => p with { Hand = m.Hands[p.Seat] })];
                 InitialHands = m.Hands;
                 break;
 
             case RecordHealthDeclarationModification m:
-                HealthDeclarations = new Dictionary<PlayerId, bool>(HealthDeclarations)
+                HealthDeclarations = new Dictionary<PlayerSeat, bool>(HealthDeclarations)
                 {
                     [m.Player] = m.HasVorbehalt,
                 };
@@ -256,7 +255,7 @@ public sealed class GameState
                 break;
 
             case ClearReservationDeclarationsModification:
-                ReservationDeclarations = new Dictionary<PlayerId, IReservation?>();
+                ReservationDeclarations = new Dictionary<PlayerSeat, IReservation?>();
                 break;
 
             case SetArmutPlayerModification m:
@@ -269,8 +268,8 @@ public sealed class GameState
 
             case ArmutGiveTrumpsModification m:
             {
-                var poorState = Players.First(p => p.Id == m.PoorPlayer);
-                var richState = Players.First(p => p.Id == m.RichPlayer);
+                var poorState = Players.First(p => p.Seat == m.PoorPlayer);
+                var richState = Players.First(p => p.Seat == m.RichPlayer);
                 var trumps = poorState
                     .Hand.Cards.Where(c => TrumpEvaluator.IsTrump(c.Type))
                     .ToList();
@@ -280,8 +279,8 @@ public sealed class GameState
                 Players =
                 [
                     .. Players.Select(p =>
-                        p.Id == m.PoorPlayer ? p with { Hand = poorNewHand }
-                        : p.Id == m.RichPlayer ? p with { Hand = richNewHand }
+                        p.Seat == m.PoorPlayer ? p with { Hand = poorNewHand }
+                        : p.Seat == m.RichPlayer ? p with { Hand = richNewHand }
                         : p
                     ),
                 ];
@@ -293,7 +292,7 @@ public sealed class GameState
                 break;
 
             case RecordDeclarationModification m:
-                var updated = new Dictionary<PlayerId, IReservation?>(ReservationDeclarations)
+                var updated = new Dictionary<PlayerSeat, IReservation?>(ReservationDeclarations)
                 {
                     [m.Player] = m.Declaration,
                 };
@@ -303,7 +302,7 @@ public sealed class GameState
             case UpdatePlayerHandModification m:
                 Players =
                 [
-                    .. Players.Select(p => p.Id == m.Player ? p with { Hand = m.NewHand } : p),
+                    .. Players.Select(p => p.Seat == m.Player ? p with { Hand = m.NewHand } : p),
                 ];
                 break;
 
@@ -333,8 +332,8 @@ public sealed class GameState
                     {
                         // First team-changing Genscher: save original Re pair and announcements.
                         var rePlayers = Players
-                            .Where(p => PartyResolver.ResolveParty(p.Id, this) == Party.Re)
-                            .Select(p => p.Id)
+                            .Where(p => PartyResolver.ResolveParty(p.Seat, this) == Party.Re)
+                            .Select(p => p.Seat)
                             .ToArray();
                         PreGenscherRePlayers = (rePlayers[0], rePlayers[1]);
                         SavedGenscherAnnouncements = Announcements;

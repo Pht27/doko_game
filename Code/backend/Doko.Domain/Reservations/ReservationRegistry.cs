@@ -18,12 +18,12 @@ public static class ReservationRegistry
     /// and is not included in the result.
     /// </summary>
     public static IReadOnlyList<ReservationPriority> GetEligible(
-        PlayerId player,
+        PlayerSeat player,
         Hand hand,
         RuleSet rules
     )
     {
-        var dummyPartner = new PlayerId((byte)((player.Value + 1) % 4));
+        var dummyPartner = (PlayerSeat)(((int)player + 1) % 4);
 
         IReservation[] all =
         [
@@ -46,7 +46,7 @@ public static class ReservationRegistry
 
     /// <summary>Returns eligible Solo reservation priorities (excludes Armut, Hochzeit, Schmeißen, Schlanker Martin).</summary>
     public static IReadOnlyList<ReservationPriority> GetEligibleSolos(
-        PlayerId player,
+        PlayerSeat player,
         Hand hand,
         RuleSet rules
     )
@@ -68,19 +68,19 @@ public static class ReservationRegistry
 
     /// <summary>Returns Armut if eligible, otherwise empty.</summary>
     public static IReadOnlyList<ReservationPriority> GetEligibleArmut(
-        PlayerId player,
+        PlayerSeat player,
         Hand hand,
         RuleSet rules
     )
     {
-        var dummyPartner = new PlayerId((byte)((player.Value + 1) % 4));
+        var dummyPartner = (PlayerSeat)(((int)player + 1) % 4);
         var armut = new ArmutReservation(player, dummyPartner);
         return armut.IsEligible(hand, rules) ? [ReservationPriority.Armut] : [];
     }
 
     /// <summary>Returns Schmeißen if eligible, otherwise empty.</summary>
     public static IReadOnlyList<ReservationPriority> GetEligibleSchmeissen(
-        PlayerId player,
+        PlayerSeat player,
         Hand hand,
         RuleSet rules
     )
@@ -91,7 +91,7 @@ public static class ReservationRegistry
 
     /// <summary>Returns Hochzeit if eligible, otherwise empty.</summary>
     public static IReadOnlyList<ReservationPriority> GetEligibleHochzeit(
-        PlayerId player,
+        PlayerSeat player,
         Hand hand,
         RuleSet rules
     )

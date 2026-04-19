@@ -44,7 +44,7 @@ public sealed class PlayCardHandler(
         if (state.CurrentTurn != command.Player)
             return Fail(GameError.NotYourTurn);
 
-        var playerState = state.Players.First(p => p.Id == command.Player);
+        var playerState = state.Players.First(p => p.Seat == command.Player);
         var card = playerState.Hand.Cards.FirstOrDefault(c => c.Id == command.Card);
         if (card is null)
             return Fail(GameError.IllegalCard);
@@ -158,7 +158,7 @@ public sealed class PlayCardHandler(
             return GameError.GenscherPartnerRequired;
         if (command.GenscherPartner == command.Player)
             return GameError.GenscherPartnerInvalid;
-        if (state.Players.All(p => p.Id != command.GenscherPartner))
+        if (state.Players.All(p => p.Seat != command.GenscherPartner))
             return GameError.GenscherPartnerInvalid;
 
         return null;
@@ -166,12 +166,12 @@ public sealed class PlayCardHandler(
 
     private sealed class CommandInputProvider(PlayCardCommand command) : ISonderkarteInputProvider
     {
-        public PlayerId GetGenscherPartner() => command.GenscherPartner!.Value;
+        public PlayerSeat GetGenscherPartner() => command.GenscherPartner!.Value;
     }
 
     private static void PlayCardIntoTrick(
         GameState state,
-        PlayerId player,
+        PlayerSeat player,
         PlayerState playerState,
         Card card
     )
@@ -182,7 +182,7 @@ public sealed class PlayCardHandler(
 
     private static List<IDomainEvent> BuildEvents(
         GameState state,
-        PlayerId player,
+        PlayerSeat player,
         Card card,
         List<IDomainEvent> sonderkarteEvents
     ) =>
@@ -193,7 +193,7 @@ public sealed class PlayCardHandler(
 
     private async Task<GameActionResult<PlayCardResult>> AdvanceTurnAsync(
         GameState state,
-        PlayerId player,
+        PlayerSeat player,
         List<IDomainEvent> events,
         CancellationToken ct
     )

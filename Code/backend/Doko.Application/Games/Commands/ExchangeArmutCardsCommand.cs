@@ -9,6 +9,6 @@ namespace Doko.Application.Games.Commands;
 /// </summary>
 public record ExchangeArmutCardsCommand(
     GameId GameId,
-    PlayerId RichPlayer,
+    PlayerSeat RichPlayer,
     IReadOnlyList<CardId> CardIdsToReturn
 );

@@ -70,7 +70,7 @@ export function MultiplayerBrowserPage({
       const session: LobbySession = {
         lobbyId: res.lobbyId,
         token: res.token,
-        playerId: res.playerId,
+        
         seatIndex: res.seatIndex,
       };
       saveLobbySession(session);

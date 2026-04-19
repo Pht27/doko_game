@@ -39,22 +39,22 @@ public sealed class DealCardsHandler(
         var shuffled = shuffler.Shuffle(deck);
         var cardsPerPlayer = shuffled.Count / 4;
 
-        var hands = new Dictionary<PlayerId, Hand>();
+        var hands = new Dictionary<PlayerSeat, Hand>();
         for (int i = 0; i < state.Players.Count; i++)
         {
             var playerCards = shuffled.Skip(i * cardsPerPlayer).Take(cardsPerPlayer).ToList();
-            hands[state.Players[i].Id] = new Hand(playerCards);
+            hands[state.Players[i].Seat] = new Hand(playerCards);
         }
 
         state.Apply(new DealHandsModification(hands));
         state.Apply(new AdvancePhaseModification(GamePhase.ReservationHealthCheck));
 
-        var rauskommer = command.VorbehaltRauskommer ?? state.Players[0].Id;
+        var rauskommer = command.VorbehaltRauskommer ?? state.Players[0].Seat;
         state.Apply(new SetVorbehaltRauskommerModification(rauskommer));
-        var rauskommerSeat = (int)state.Players.First(p => p.Id == rauskommer).Seat;
+        var rauskommerSeat = (int)rauskommer;
         var allPlayers = state
             .Players.OrderBy(p => ((int)p.Seat - rauskommerSeat + 4) % 4)
-            .Select(p => p.Id)
+            .Select(p => p.Seat)
             .ToList();
         state.Apply(new SetPendingRespondersModification(allPlayers));
         state.Apply(new SetCurrentTurnModification(rauskommer));

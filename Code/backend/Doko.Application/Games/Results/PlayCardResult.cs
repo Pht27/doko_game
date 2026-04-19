@@ -4,7 +4,7 @@ namespace Doko.Application.Games.Results;
 
 public record PlayCardResult(
     bool TrickCompleted,
-    PlayerId? TrickWinner,
+    PlayerSeat? TrickWinner,
     bool GameFinished,
     GameFinishedResult? FinishedResult
 );

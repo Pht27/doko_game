@@ -4,4 +4,4 @@ using Doko.Domain.Tricks;
 
 namespace Doko.Domain.Scoring;
 
-public record TrickResult(Trick Trick, PlayerId Winner, IReadOnlyList<ExtrapunktAward> Awards);
+public record TrickResult(Trick Trick, PlayerSeat Winner, IReadOnlyList<ExtrapunktAward> Awards);

@@ -9,10 +9,10 @@ namespace Doko.Domain.Parties;
 /// This applies regardless of whether the teams actually changed — the Genscher's
 /// team is always Re after the call.
 /// </summary>
-public sealed class GenscherPartyResolver(PlayerId genscher, PlayerId chosenPartner)
+public sealed class GenscherPartyResolver(PlayerSeat genscher, PlayerSeat chosenPartner)
     : IPartyResolver
 {
-    public Party? ResolveParty(PlayerId player, GameState state) =>
+    public Party? ResolveParty(PlayerSeat player, GameState state) =>
         player == genscher || player == chosenPartner ? Party.Re : Party.Kontra;
 
     public bool IsFullyResolved(GameState state) => true;

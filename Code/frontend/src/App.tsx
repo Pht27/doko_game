@@ -90,7 +90,7 @@ export default function App() {
         const session: LobbySession = {
           lobbyId: res.lobbyId,
           token: res.token,
-          playerId: res.playerId,
+          
           seatIndex: res.seatIndex,
         };
         saveLobbySession(session);
@@ -106,10 +106,10 @@ export default function App() {
   }, [joiningLobbyId]);
 
   function handleGameStarted(gameId: string, session: LobbySession) {
-    const { token, playerId } = session;
+    const { token, seatIndex } = session;
     const tokens = Array<string>(4).fill(token);
     window.history.replaceState({}, '', window.location.pathname);
-    setView({ kind: 'game', tokens, gameId, myPlayerId: playerId, lobbySession: session });
+    setView({ kind: 'game', tokens, gameId, myPlayerId: seatIndex, lobbySession: session });
   }
 
   async function handleLeaveLobby() {

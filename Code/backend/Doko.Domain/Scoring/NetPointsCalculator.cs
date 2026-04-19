@@ -16,7 +16,7 @@ public static class NetPointsCalculator
         foreach (var player in state.Players)
         {
             int seat = (int)player.Seat;
-            var party = state.PartyResolver.ResolveParty(player.Id, state);
+            var party = state.PartyResolver.ResolveParty(player.Seat, state);
             if (party is null)
                 continue; // Party unresolvable (e.g. undecided Hochzeit)
             bool isWinner = party == result.Winner;

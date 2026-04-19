@@ -10,7 +10,7 @@ public class DealCardsHandlerTests
     )
     {
         var startResult = await new StartGameHandler(repo, pub).ExecuteAsync(
-            new StartGameCommand(AppB.FourPlayerIds, RuleSet.Minimal())
+            new StartGameCommand(AppB.FourPlayerSeats, RuleSet.Minimal())
         );
         return ((GameActionResult<StartGameResult>.Ok)startResult).Value.GameId;
     }

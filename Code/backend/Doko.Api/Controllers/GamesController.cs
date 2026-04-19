@@ -48,7 +48,7 @@ public class GamesController(
         if (req.PlayerIds.Count != 4)
             return BadRequest(new ErrorResponse("exactly_four_players_required"));
 
-        var players = req.PlayerIds.Select(id => new PlayerId((byte)id)).ToList();
+        var players = req.PlayerIds.Select(id => (PlayerSeat)id).ToList();
         var command = new StartGameCommand(players, Rules: null);
         var result = await startGame.ExecuteAsync(command, ct);
         return result.ToActionResult(r => Ok(new StartGameResponse(r.GameId.ToString())));
@@ -75,7 +75,7 @@ public class GamesController(
         if (!Guid.TryParse(gameId, out var guid))
             return NotFound(new ErrorResponse("game_not_found"));
 
-        var player = GetPlayerId();
+        var player = GetPlayerSeat();
         var command = new DeclareHealthStatusCommand(new GameId(guid), player, req.HasVorbehalt);
         var result = await declareHealth.ExecuteAsync(command, ct);
         return result.ToActionResult(r => Ok(new DeclareHealthResponse(r.AllDeclared)));
@@ -91,7 +91,7 @@ public class GamesController(
         if (!Guid.TryParse(gameId, out var guid))
             return NotFound(new ErrorResponse("game_not_found"));
 
-        var player = GetPlayerId();
+        var player = GetPlayerSeat();
         var reservation = DtoMapper.BuildReservation(req, player);
         var command = new MakeReservationCommand(new GameId(guid), player, reservation);
         var result = await makeReservation.ExecuteAsync(command, ct);
@@ -113,7 +113,7 @@ public class GamesController(
         if (!Guid.TryParse(gameId, out var guid))
             return NotFound(new ErrorResponse("game_not_found"));
 
-        var player = GetPlayerId();
+        var player = GetPlayerSeat();
         var command = new AcceptArmutCommand(new GameId(guid), player, req.Accepts);
         var result = await acceptArmut.ExecuteAsync(command, ct);
         return result.ToActionResult(r => Ok(new AcceptArmutResponse(r.Accepted, r.SchwarzesSau)));
@@ -129,7 +129,7 @@ public class GamesController(
         if (!Guid.TryParse(gameId, out var guid))
             return NotFound(new ErrorResponse("game_not_found"));
 
-        var player = GetPlayerId();
+        var player = GetPlayerSeat();
         var cardIds = req.CardIds.Select(id => new CardId((byte)id)).ToList();
         var command = new ExchangeArmutCardsCommand(new GameId(guid), player, cardIds);
         var result = await exchangeArmutCards.ExecuteAsync(command, ct);
@@ -146,7 +146,7 @@ public class GamesController(
         if (!Guid.TryParse(gameId, out var guid))
             return NotFound(new ErrorResponse("game_not_found"));
 
-        var player = GetPlayerId();
+        var player = GetPlayerSeat();
         var sonderkarten = req
             .ActivateSonderkarten.Where(s =>
                 Enum.TryParse<SonderkarteType>(s, ignoreCase: true, out _)
@@ -154,8 +154,8 @@ public class GamesController(
             .Select(s => Enum.Parse<SonderkarteType>(s, ignoreCase: true))
             .ToList();
         var genscherPartner = req.GenscherPartnerId.HasValue
-            ? new PlayerId((byte)req.GenscherPartnerId.Value)
-            : (PlayerId?)null;
+            ? (PlayerSeat?)req.GenscherPartnerId.Value
+            : null;
 
         var command = new PlayCardCommand(
             new GameId(guid),
@@ -192,7 +192,7 @@ public class GamesController(
         )
             return BadRequest(new ErrorResponse("invalid_announcement_type"));
 
-        var player = GetPlayerId();
+        var player = GetPlayerSeat();
         var command = new MakeAnnouncementCommand(new GameId(guid), player, announcementType);
         var result = await makeAnnouncement.ExecuteAsync(command, ct);
         return result.ToActionResult(_ => Ok());
@@ -204,7 +204,7 @@ public class GamesController(
         if (!Guid.TryParse(gameId, out var guid))
             return NotFound(new ErrorResponse("game_not_found"));
 
-        var player = GetPlayerId();
+        var player = GetPlayerSeat();
         var view = await gameQuery.GetPlayerViewAsync(new GameId(guid), player, ct);
         if (view is null)
             return NotFound(new ErrorResponse("game_not_found"));
@@ -282,9 +282,9 @@ public class GamesController(
         IEnumerable<(GameResult Result, string? GameMode, int[] NetPoints)> history
     ) => history.Select(e => DtoMapper.ToDto(e.Result, e.NetPoints, gameMode: e.GameMode)).ToList();
 
-    private PlayerId GetPlayerId()
+    private PlayerSeat GetPlayerSeat()
     {
-        var claim = User.FindFirst("player_id")?.Value ?? "0";
-        return new PlayerId((byte)int.Parse(claim));
+        var claim = User.FindFirst("seat_index")?.Value ?? "0";
+        return (PlayerSeat)int.Parse(claim);
     }
 }

@@ -14,5 +14,5 @@ public interface ISonderkarteInputProvider
     /// Genscherdamen or Gegengenscherdamen sonderkarte is being activated —
     /// the handler validates this before calling Apply.
     /// </summary>
-    PlayerId GetGenscherPartner();
+    PlayerSeat GetGenscherPartner();
 }

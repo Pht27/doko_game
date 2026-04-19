@@ -9,9 +9,9 @@ namespace Doko.Domain.Reservations;
 /// <summary>Bubensolo: only Jacks are trump.</summary>
 public sealed class BubensoloReservation : IReservation
 {
-    private readonly PlayerId _soloPlayer;
+    private readonly PlayerSeat _soloPlayer;
 
-    public BubensoloReservation(PlayerId soloPlayer) => _soloPlayer = soloPlayer;
+    public BubensoloReservation(PlayerSeat soloPlayer) => _soloPlayer = soloPlayer;
 
     public ReservationPriority Priority => ReservationPriority.Bubensolo;
 

@@ -84,7 +84,7 @@ public sealed class MakeReservationHandler(
         if (!IsAllowedInPhase(command.Reservation, state.Phase, state))
             return GameError.ReservationNotEligible;
 
-        var playerState = state.Players.First(p => p.Id == command.Player);
+        var playerState = state.Players.First(p => p.Seat == command.Player);
         if (
             command.Reservation is not null
             && !command.Reservation.IsEligible(playerState.Hand, state.Rules)
@@ -212,11 +212,11 @@ public sealed class MakeReservationHandler(
         if (winner is ArmutReservation)
         {
             // Find which player declared Armut (first in order = lowest seat)
-            var armutPlayerId = FirstDeclarantId(state, winner);
-            state.Apply(new SetArmutPlayerModification(armutPlayerId));
+            var armutPlayerSeat = FirstDeclarantId(state, winner);
+            state.Apply(new SetArmutPlayerModification(armutPlayerSeat));
 
             // Determine partner-finding queue: players after poor player in seat order
-            var partnerCandidates = PlayersAfter(state, armutPlayerId);
+            var partnerCandidates = PlayersAfter(state, armutPlayerSeat);
             state.Apply(new SetPendingRespondersModification(partnerCandidates));
             state.Apply(new AdvancePhaseModification(GamePhase.ArmutPartnerFinding));
             state.Apply(new SetCurrentTurnModification(partnerCandidates[0]));
@@ -327,10 +327,10 @@ public sealed class MakeReservationHandler(
     /// </summary>
     private static void ApplyFallbackGameMode(
         Domain.GameFlow.GameState state,
-        PlayerId martinPlayer
+        PlayerSeat martinPlayer
     )
     {
-        var playerState = state.Players.First(p => p.Id == martinPlayer);
+        var playerState = state.Players.First(p => p.Seat == martinPlayer);
         var schlankerMartin = new SchlankerMartinReservation(martinPlayer);
         var gameMode = schlankerMartin.IsEligible(playerState.Hand, state.Rules)
             ? (IReservation?)schlankerMartin
@@ -348,46 +348,46 @@ public sealed class MakeReservationHandler(
         state
             .ReservationDeclarations.Where(kv => kv.Value is not null)
             .OrderBy(kv => kv.Value!.Priority)
-            .ThenBy(kv => (int)state.Players.First(p => p.Id == kv.Key).Seat)
+            .ThenBy(kv => (int)kv.Key)
             .Select(kv => kv.Value)
             .FirstOrDefault();
 
     /// <summary>Returns the player ID of the first declarant of the given reservation (by seat order).</summary>
-    private static PlayerId FirstDeclarantId(
+    private static PlayerSeat FirstDeclarantId(
         Domain.GameFlow.GameState state,
         IReservation target
     ) =>
         state
             .ReservationDeclarations.Where(kv => kv.Value?.Priority == target.Priority)
-            .OrderBy(kv => (int)state.Players.First(p => p.Id == kv.Key).Seat)
+            .OrderBy(kv => (int)kv.Key)
             .First()
             .Key;
 
     /// <summary>Returns Vorbehalt players in seat order.</summary>
-    private static IReadOnlyList<PlayerId> VorbehaltPlayers(Domain.GameFlow.GameState state) =>
+    private static IReadOnlyList<PlayerSeat> VorbehaltPlayers(Domain.GameFlow.GameState state) =>
         state
-            .Players.Where(p => state.HealthDeclarations.TryGetValue(p.Id, out var hasV) && hasV)
-            .Select(p => p.Id)
+            .Players.Where(p => state.HealthDeclarations.TryGetValue(p.Seat, out var hasV) && hasV)
+            .Select(p => p.Seat)
             .ToList();
 
     /// <summary>Returns players seated after <paramref name="player"/> (wrapping around), in seat order.</summary>
-    private static IReadOnlyList<PlayerId> PlayersAfter(
+    private static IReadOnlyList<PlayerSeat> PlayersAfter(
         Domain.GameFlow.GameState state,
-        PlayerId player
+        PlayerSeat player
     )
     {
-        int seat = (int)state.Players.First(p => p.Id == player).Seat;
+        int seat = (int)player;
         return state
             .Players.OrderBy(p => ((int)p.Seat - seat + 4) % 4)
             .Skip(1) // exclude the player themselves
-            .Select(p => p.Id)
+            .Select(p => p.Seat)
             .ToList();
     }
 
     private static void AdvanceToNextCheckPhase(
         Domain.GameFlow.GameState state,
         GamePhase next,
-        IReadOnlyList<PlayerId> players
+        IReadOnlyList<PlayerSeat> players
     )
     {
         state.Apply(new ClearReservationDeclarationsModification());

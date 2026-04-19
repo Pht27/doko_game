@@ -6,6 +6,6 @@ namespace Doko.Domain.GameFlow.Events;
 public sealed record TrickCompletedEvent(
     GameId GameId,
     int TrickNumber,
-    PlayerId Winner,
+    PlayerSeat Winner,
     TrickResult Result
 ) : IDomainEvent;

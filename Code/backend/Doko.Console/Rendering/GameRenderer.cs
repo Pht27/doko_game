@@ -137,9 +137,9 @@ public sealed class GameRenderer
         var names = new string[4];
         for (byte i = 0; i < 4; i++)
         {
-            bool isMe = i == view.RequestingPlayer.Value;
-            bool isCurrent = i == view.CurrentTurn.Value;
-            var other = view.OtherPlayers.FirstOrDefault(p => p.Id.Value == i);
+            bool isMe = i == (int)view.RequestingPlayer;
+            bool isCurrent = i == (int)view.CurrentTurn;
+            var other = view.OtherPlayers.FirstOrDefault(p => (int)p.Seat == i);
             int cardCount = isMe ? (view.Hand.Count) : (other?.HandCardCount ?? 0);
             var party = isMe ? null : other?.KnownParty?.ToString();
 

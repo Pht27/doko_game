@@ -18,11 +18,11 @@ public sealed class Trick
     public void Add(TrickCard trickCard) => _cards.Add(trickCard);
 
     /// <summary>Returns the winner of this trick. Only valid when IsComplete is true.</summary>
-    public PlayerId Winner(ITrumpEvaluator trumpEvaluator, Rules.DulleRule dulleRule)
+    public PlayerSeat Winner(ITrumpEvaluator trumpEvaluator, Rules.DulleRule dulleRule)
     {
         var led = _cards[0];
         bool winnerIsTrump = trumpEvaluator.IsTrump(led.Card.Type);
-        PlayerId winner = led.Player;
+        PlayerSeat winner = led.Player;
         CardType winnerType = led.Card.Type;
         int winnerRank = winnerIsTrump
             ? trumpEvaluator.GetTrumpRank(led.Card.Type)

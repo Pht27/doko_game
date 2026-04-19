@@ -26,15 +26,10 @@ public class AcceptArmutHandlerTests
 
         var players = new[]
         {
-            new PlayerState(
-                AppB.P0,
-                PlayerSeat.First,
-                AppB.HandOf(Trump1, Trump2, NonTrump0),
-                null
-            ),
-            new PlayerState(AppB.P1, PlayerSeat.Second, AppB.HandOf(NonTrump1), null),
-            new PlayerState(AppB.P2, PlayerSeat.Third, AppB.HandOf(NonTrump2), null),
-            new PlayerState(AppB.P3, PlayerSeat.Fourth, AppB.HandOf(NonTrump3), null),
+            new PlayerState(PlayerSeat.First, AppB.HandOf(Trump1, Trump2, NonTrump0), null),
+            new PlayerState(PlayerSeat.Second, AppB.HandOf(NonTrump1), null),
+            new PlayerState(PlayerSeat.Third, AppB.HandOf(NonTrump2), null),
+            new PlayerState(PlayerSeat.Fourth, AppB.HandOf(NonTrump3), null),
         };
 
         var state = GameState.Create(
@@ -105,8 +100,8 @@ public class AcceptArmutHandlerTests
         await useCase.ExecuteAsync(new AcceptArmutCommand(id, AppB.P1, true));
 
         var state = await repo.GetAsync(id);
-        var poorHand = state!.Players.First(p => p.Id == AppB.P0).Hand;
-        var richHand = state.Players.First(p => p.Id == AppB.P1).Hand;
+        var poorHand = state!.Players.First(p => p.Seat == AppB.P0).Hand;
+        var richHand = state.Players.First(p => p.Seat == AppB.P1).Hand;
 
         // Poor player's trumps moved to rich player
         poorHand.Cards.Should().NotContain(Trump1).And.NotContain(Trump2);

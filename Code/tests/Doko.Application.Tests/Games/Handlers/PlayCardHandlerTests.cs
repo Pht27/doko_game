@@ -39,10 +39,10 @@ public class PlayCardHandlerTests
 
         var players = new[]
         {
-            new PlayerState(AppB.P0, PlayerSeat.First, AppB.HandOf([.. p0Hand]), null),
-            new PlayerState(AppB.P1, PlayerSeat.Second, AppB.HandOf([.. p1Hand]), null),
-            new PlayerState(AppB.P2, PlayerSeat.Third, AppB.HandOf([.. p2Hand]), null),
-            new PlayerState(AppB.P3, PlayerSeat.Fourth, AppB.HandOf([.. p3Hand]), null),
+            new PlayerState(PlayerSeat.First, AppB.HandOf([.. p0Hand]), null),
+            new PlayerState(PlayerSeat.Second, AppB.HandOf([.. p1Hand]), null),
+            new PlayerState(PlayerSeat.Third, AppB.HandOf([.. p2Hand]), null),
+            new PlayerState(PlayerSeat.Fourth, AppB.HandOf([.. p3Hand]), null),
         };
 
         var state = GameState.Create(
@@ -73,7 +73,7 @@ public class PlayCardHandlerTests
         await uc.ExecuteAsync(new PlayCardCommand(id, AppB.P0, card.Id, []));
 
         var state = await repo.GetAsync(id);
-        state!.Players.First(p => p.Id == AppB.P0).Hand.Cards.Should().NotContain(card);
+        state!.Players.First(p => p.Seat == AppB.P0).Hand.Cards.Should().NotContain(card);
     }
 
     [Fact]
@@ -149,10 +149,10 @@ public class PlayCardHandlerTests
         // Use NoTrump so plain-suit rules apply cleanly
         var players = new[]
         {
-            new PlayerState(AppB.P0, PlayerSeat.First, AppB.HandOf(c0), null),
-            new PlayerState(AppB.P1, PlayerSeat.Second, AppB.HandOf(c1), null),
-            new PlayerState(AppB.P2, PlayerSeat.Third, AppB.HandOf(c2), null),
-            new PlayerState(AppB.P3, PlayerSeat.Fourth, AppB.HandOf(c3), null),
+            new PlayerState(PlayerSeat.First, AppB.HandOf(c0), null),
+            new PlayerState(PlayerSeat.Second, AppB.HandOf(c1), null),
+            new PlayerState(PlayerSeat.Third, AppB.HandOf(c2), null),
+            new PlayerState(PlayerSeat.Fourth, AppB.HandOf(c3), null),
         };
         var (repo, pub, _) = AppB.Infrastructure();
         var state = GameState.Create(
@@ -192,10 +192,10 @@ public class PlayCardHandlerTests
 
         var players = new[]
         {
-            new PlayerState(AppB.P0, PlayerSeat.First, AppB.HandOf(c0), null),
-            new PlayerState(AppB.P1, PlayerSeat.Second, AppB.HandOf(c1), null),
-            new PlayerState(AppB.P2, PlayerSeat.Third, AppB.HandOf(c2), null),
-            new PlayerState(AppB.P3, PlayerSeat.Fourth, AppB.HandOf(c3), null),
+            new PlayerState(PlayerSeat.First, AppB.HandOf(c0), null),
+            new PlayerState(PlayerSeat.Second, AppB.HandOf(c1), null),
+            new PlayerState(PlayerSeat.Third, AppB.HandOf(c2), null),
+            new PlayerState(PlayerSeat.Fourth, AppB.HandOf(c3), null),
         };
 
         var (repo, pub, _) = AppB.Infrastructure();
@@ -285,10 +285,10 @@ public class PlayCardHandlerTests
 
         var players = new[]
         {
-            new PlayerState(AppB.P0, PlayerSeat.First, AppB.HandOf(dulle0), null),
-            new PlayerState(AppB.P1, PlayerSeat.Second, AppB.HandOf(dulle1), null),
-            new PlayerState(AppB.P2, PlayerSeat.Third, AppB.HandOf(plain0), null),
-            new PlayerState(AppB.P3, PlayerSeat.Fourth, AppB.HandOf(plain1), null),
+            new PlayerState(PlayerSeat.First, AppB.HandOf(dulle0), null),
+            new PlayerState(PlayerSeat.Second, AppB.HandOf(dulle1), null),
+            new PlayerState(PlayerSeat.Third, AppB.HandOf(plain0), null),
+            new PlayerState(PlayerSeat.Fourth, AppB.HandOf(plain1), null),
         };
 
         var (repo, pub, _) = AppB.Infrastructure();

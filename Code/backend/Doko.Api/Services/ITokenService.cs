@@ -4,5 +4,5 @@ namespace Doko.Api.Services;
 
 public interface ITokenService
 {
-    string GenerateToken(PlayerId playerId);
+    string GenerateToken(PlayerSeat seat);
 }

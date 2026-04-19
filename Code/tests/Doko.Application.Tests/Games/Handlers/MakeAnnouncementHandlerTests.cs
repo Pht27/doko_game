@@ -17,10 +17,10 @@ public class MakeAnnouncementHandlerTests
         // Solo resolver: P0 = Re, others = Kontra
         var players = new[]
         {
-            new PlayerState(AppB.P0, PlayerSeat.First, Hand.Empty, null),
-            new PlayerState(AppB.P1, PlayerSeat.Second, Hand.Empty, null),
-            new PlayerState(AppB.P2, PlayerSeat.Third, Hand.Empty, null),
-            new PlayerState(AppB.P3, PlayerSeat.Fourth, Hand.Empty, null),
+            new PlayerState(PlayerSeat.First, Hand.Empty, null),
+            new PlayerState(PlayerSeat.Second, Hand.Empty, null),
+            new PlayerState(PlayerSeat.Third, Hand.Empty, null),
+            new PlayerState(PlayerSeat.Fourth, Hand.Empty, null),
         };
 
         var state = GameState.Create(
@@ -93,7 +93,7 @@ public class MakeAnnouncementHandlerTests
         var (repo, pub, _) = AppB.Infrastructure();
         var state = GameState.Create(
             phase: GamePhase.Dealing,
-            players: [new PlayerState(AppB.P0, PlayerSeat.First, Hand.Empty, null)]
+            players: [new PlayerState(PlayerSeat.First, Hand.Empty, null)]
         );
         await repo.SaveAsync(state);
         var useCase = new MakeAnnouncementHandler(repo, pub);

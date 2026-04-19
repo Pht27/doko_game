@@ -24,7 +24,7 @@ public sealed class ConsoleInputReader
     public (
         CardId CardId,
         IReadOnlyList<SonderkarteType> Sonderkarten,
-        PlayerId? GenscherPartner
+        PlayerSeat? GenscherPartner
     ) PromptCard(PlayerGameView view)
     {
         while (true)
@@ -47,7 +47,7 @@ public sealed class ConsoleInputReader
 
     private (
         IReadOnlyList<SonderkarteType> Activated,
-        PlayerId? GenscherPartner
+        PlayerSeat? GenscherPartner
     ) PromptSonderkarten(Card card, PlayerGameView view)
     {
         if (
@@ -57,7 +57,7 @@ public sealed class ConsoleInputReader
             return ([], null);
 
         var activated = new List<SonderkarteType>();
-        PlayerId? genscherPartner = null;
+        PlayerSeat? genscherPartner = null;
 
         foreach (var info in eligible)
         {
@@ -74,25 +74,25 @@ public sealed class ConsoleInputReader
         return (activated, genscherPartner);
     }
 
-    private static PlayerId PromptGenscherPartner(
-        PlayerId genscher,
+    private static PlayerSeat PromptGenscherPartner(
+        PlayerSeat genscher,
         IReadOnlyList<PlayerPublicState> others
     )
     {
         System.Console.WriteLine("  Choose your new partner:");
         foreach (var p in others)
-            System.Console.WriteLine($"    [{p.Id.Value}] Player {p.Id.Value}");
+            System.Console.WriteLine($"    [{(int)p.Seat}] Player {(int)p.Seat}");
 
         while (true)
         {
-            System.Console.Write($"  Partner (not {genscher.Value}): ");
+            System.Console.Write($"  Partner (not {(int)genscher}): ");
             var input = System.Console.ReadLine()?.Trim();
             if (
                 byte.TryParse(input, out byte id)
-                && id != genscher.Value
-                && others.Any(p => p.Id.Value == id)
+                && id != (int)genscher
+                && others.Any(p => (int)p.Seat == id)
             )
-                return new PlayerId(id);
+                return (PlayerSeat)id;
             System.Console.WriteLine("  Invalid choice. Enter a player number from the list.");
         }
     }
@@ -116,7 +116,7 @@ public sealed class ConsoleInputReader
     /// <summary>
     /// Prompts the player to declare a reservation, showing only eligible options.
     /// </summary>
-    public IReservation? PromptReservation(PlayerId playerId, PlayerGameView view)
+    public IReservation? PromptReservation(PlayerSeat playerId, PlayerGameView view)
     {
         var eligible = view.EligibleReservations;
 
@@ -141,7 +141,7 @@ public sealed class ConsoleInputReader
         }
     }
 
-    private static IReservation BuildReservation(ReservationPriority kind, PlayerId playerId) =>
+    private static IReservation BuildReservation(ReservationPriority kind, PlayerSeat playerId) =>
         kind switch
         {
             ReservationPriority.Hochzeit => BuildHochzeit(playerId),
@@ -159,7 +159,7 @@ public sealed class ConsoleInputReader
             _ => null!,
         };
 
-    private static HochzeitReservation BuildHochzeit(PlayerId playerId)
+    private static HochzeitReservation BuildHochzeit(PlayerSeat playerId)
     {
         System.Console.WriteLine("  Hochzeit condition:");
         System.Console.WriteLine("    [1] First trick");
@@ -183,15 +183,15 @@ public sealed class ConsoleInputReader
         }
     }
 
-    private static ArmutReservation BuildArmut(PlayerId poorPlayer)
+    private static ArmutReservation BuildArmut(PlayerSeat poorPlayer)
     {
         System.Console.WriteLine("  Which player accepts your Armut? (0–3, not yourself)");
         while (true)
         {
             System.Console.Write($"  Rich player (not {poorPlayer}): ");
             var input = System.Console.ReadLine()?.Trim();
-            if (byte.TryParse(input, out byte id) && id <= 3 && id != poorPlayer.Value)
-                return new ArmutReservation(poorPlayer, new PlayerId(id));
+            if (byte.TryParse(input, out byte id) && id <= 3 && id != (int)poorPlayer)
+                return new ArmutReservation(poorPlayer, (PlayerSeat)id);
             System.Console.WriteLine($"  Enter 0–3 (not {poorPlayer}).");
         }
     }

@@ -3,7 +3,7 @@ using Doko.Domain.Players;
 namespace Doko.Domain.Announcements;
 
 public record Announcement(
-    PlayerId Player,
+    PlayerSeat Player,
     AnnouncementType Type,
     int TrickNumber,
     int CardIndexInTrick

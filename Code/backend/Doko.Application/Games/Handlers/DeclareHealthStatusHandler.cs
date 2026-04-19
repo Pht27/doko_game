@@ -64,7 +64,7 @@ public sealed class DeclareHealthStatusHandler(
 
     // ── Private helpers ───────────────────────────────────────────────────────
 
-    private static IReadOnlyList<PlayerId> AdvancePendingQueue(GameState state)
+    private static IReadOnlyList<PlayerSeat> AdvancePendingQueue(GameState state)
     {
         var remaining = state.PendingReservationResponders.Skip(1).ToList();
         state.Apply(new SetPendingRespondersModification(remaining));
@@ -75,11 +75,11 @@ public sealed class DeclareHealthStatusHandler(
 
     private static void ResolveNextPhaseAfterAllDeclared(GameState state)
     {
-        var rauskommerSeat = (int)state.Players.First(p => p.Id == state.VorbehaltRauskommer).Seat;
+        var rauskommerSeat = (int)state.VorbehaltRauskommer;
         var vorbehaltPlayers = state
-            .Players.Where(p => state.HealthDeclarations.TryGetValue(p.Id, out var hasV) && hasV)
+            .Players.Where(p => state.HealthDeclarations.TryGetValue(p.Seat, out var hasV) && hasV)
             .OrderBy(p => ((int)p.Seat - rauskommerSeat + 4) % 4)
-            .Select(p => p.Id)
+            .Select(p => p.Seat)
             .ToList();
 
         if (vorbehaltPlayers.Count == 0)

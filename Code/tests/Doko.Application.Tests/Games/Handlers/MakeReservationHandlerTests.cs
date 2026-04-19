@@ -16,7 +16,7 @@ public class MakeReservationHandlerTests
         var id = (
             (GameActionResult<StartGameResult>.Ok)
                 await new StartGameHandler(repo, pub).ExecuteAsync(
-                    new StartGameCommand(AppB.FourPlayerIds, RuleSet.Minimal())
+                    new StartGameCommand(AppB.FourPlayerSeats, RuleSet.Minimal())
                 )
         )
             .Value
@@ -26,7 +26,7 @@ public class MakeReservationHandlerTests
         );
         // All players say Gesund to skip health check
         var healthHandler = new DeclareHealthStatusHandler(repo, pub);
-        foreach (var player in AppB.FourPlayerIds)
+        foreach (var player in AppB.FourPlayerSeats)
             await healthHandler.ExecuteAsync(new DeclareHealthStatusCommand(id, player, false));
         return id;
     }
@@ -42,7 +42,7 @@ public class MakeReservationHandlerTests
         var id = (
             (GameActionResult<StartGameResult>.Ok)
                 await new StartGameHandler(repo, pub).ExecuteAsync(
-                    new StartGameCommand(AppB.FourPlayerIds, RuleSet.Minimal())
+                    new StartGameCommand(AppB.FourPlayerSeats, RuleSet.Minimal())
                 )
         )
             .Value
@@ -51,7 +51,7 @@ public class MakeReservationHandlerTests
             new DealCardsCommand(id)
         );
         var healthHandler = new DeclareHealthStatusHandler(repo, pub);
-        foreach (var player in AppB.FourPlayerIds)
+        foreach (var player in AppB.FourPlayerSeats)
             await healthHandler.ExecuteAsync(new DeclareHealthStatusCommand(id, player, true));
         return id;
     }
@@ -121,7 +121,7 @@ public class MakeReservationHandlerTests
         var id = (
             (GameActionResult<StartGameResult>.Ok)
                 await new StartGameHandler(repo, pub).ExecuteAsync(
-                    new StartGameCommand(AppB.FourPlayerIds)
+                    new StartGameCommand(AppB.FourPlayerSeats)
                 )
         )
             .Value
@@ -146,19 +146,19 @@ public class MakeReservationHandlerTests
 
         // Pass all four check phases (minimal rules: no solos, no armut, no schmeissen, no hochzeit)
         // SoloCheck
-        foreach (var player in AppB.FourPlayerIds)
+        foreach (var player in AppB.FourPlayerSeats)
             await useCase.ExecuteAsync(new MakeReservationCommand(gameId, player, null));
 
         // ArmutCheck
-        foreach (var player in AppB.FourPlayerIds)
+        foreach (var player in AppB.FourPlayerSeats)
             await useCase.ExecuteAsync(new MakeReservationCommand(gameId, player, null));
 
         // SchmeissenCheck
-        foreach (var player in AppB.FourPlayerIds)
+        foreach (var player in AppB.FourPlayerSeats)
             await useCase.ExecuteAsync(new MakeReservationCommand(gameId, player, null));
 
         // HochzeitCheck — last player in Hochzeit check will result in forced Schlanker Martin or normal game
-        foreach (var player in AppB.FourPlayerIds)
+        foreach (var player in AppB.FourPlayerSeats)
             await useCase.ExecuteAsync(new MakeReservationCommand(gameId, player, null));
 
         var state = await repo.GetAsync(gameId);
@@ -173,7 +173,7 @@ public class MakeReservationHandlerTests
         var gameId = (
             (GameActionResult<StartGameResult>.Ok)
                 await new StartGameHandler(repo, pub).ExecuteAsync(
-                    new StartGameCommand(AppB.FourPlayerIds, RuleSet.Minimal())
+                    new StartGameCommand(AppB.FourPlayerSeats, RuleSet.Minimal())
                 )
         )
             .Value
@@ -183,7 +183,7 @@ public class MakeReservationHandlerTests
         );
 
         var healthHandler = new DeclareHealthStatusHandler(repo, pub);
-        foreach (var player in AppB.FourPlayerIds)
+        foreach (var player in AppB.FourPlayerSeats)
             await healthHandler.ExecuteAsync(new DeclareHealthStatusCommand(gameId, player, false));
 
         var state = await repo.GetAsync(gameId);

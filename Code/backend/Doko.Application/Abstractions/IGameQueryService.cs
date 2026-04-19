@@ -8,7 +8,7 @@ public interface IGameQueryService
 {
     Task<PlayerGameView?> GetPlayerViewAsync(
         GameId gameId,
-        PlayerId requestingPlayer,
+        PlayerSeat requestingPlayer,
         CancellationToken ct = default
     );
 }

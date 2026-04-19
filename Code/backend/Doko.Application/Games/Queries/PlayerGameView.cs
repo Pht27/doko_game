@@ -10,7 +10,7 @@ namespace Doko.Application.Games.Queries;
 public record PlayerGameView(
     GameId GameId,
     GamePhase Phase,
-    PlayerId RequestingPlayer,
+    PlayerSeat RequestingPlayer,
     Party? OwnParty,
     IReadOnlyList<Card> Hand,
     IReadOnlyList<Card> LegalCards,
@@ -20,7 +20,7 @@ public record PlayerGameView(
     IReadOnlyList<PlayerPublicState> OtherPlayers,
     TrickSummary? CurrentTrick,
     IReadOnlyList<TrickSummary> CompletedTricks,
-    PlayerId CurrentTurn,
+    PlayerSeat CurrentTurn,
     bool IsMyTurn
 )
 {

@@ -11,16 +11,16 @@ namespace Doko.Domain.Parties;
 /// </summary>
 public sealed class HochzeitPartyResolver : IPartyResolver
 {
-    private readonly PlayerId _hochzeitPlayer;
+    private readonly PlayerSeat _hochzeitPlayer;
     private readonly HochzeitCondition _condition;
 
-    public HochzeitPartyResolver(PlayerId hochzeitPlayer, HochzeitCondition condition)
+    public HochzeitPartyResolver(PlayerSeat hochzeitPlayer, HochzeitCondition condition)
     {
         _hochzeitPlayer = hochzeitPlayer;
         _condition = condition;
     }
 
-    public Party? ResolveParty(PlayerId player, GameState state)
+    public Party? ResolveParty(PlayerSeat player, GameState state)
     {
         if (player == _hochzeitPlayer)
             return Party.Re;

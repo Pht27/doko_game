@@ -8,7 +8,7 @@ namespace Doko.Domain.Announcements;
 public static class AnnouncementRules
 {
     /// <summary>Returns true if the player is allowed to make the given announcement in the current game state.</summary>
-    public static bool CanAnnounce(PlayerId player, AnnouncementType type, GameState state)
+    public static bool CanAnnounce(PlayerSeat player, AnnouncementType type, GameState state)
     {
         if (!state.Rules.AllowAnnouncements)
             return false;
@@ -77,7 +77,7 @@ public static class AnnouncementRules
     /// <see cref="Announcement"/> the trick winner is required to make (Pflichtansage),
     /// or null if none applies. Only the first two tricks can trigger a Pflichtansage.
     /// </summary>
-    public static Announcement? GetMandatoryAnnouncement(PlayerId winner, GameState state)
+    public static Announcement? GetMandatoryAnnouncement(PlayerSeat winner, GameState state)
     {
         if (!state.Rules.EnforcePflichtansage)
             return null;

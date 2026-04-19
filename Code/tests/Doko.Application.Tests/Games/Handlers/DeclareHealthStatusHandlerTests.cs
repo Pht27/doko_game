@@ -10,7 +10,7 @@ public class DeclareHealthStatusHandlerTests
     )
     {
         var startResult = await new StartGameHandler(repo, pub).ExecuteAsync(
-            new StartGameCommand(AppB.FourPlayerIds, RuleSet.Minimal())
+            new StartGameCommand(AppB.FourPlayerSeats, RuleSet.Minimal())
         );
         var id = ((GameActionResult<StartGameResult>.Ok)startResult).Value.GameId;
         await new DealCardsHandler(repo, pub, new Fakes.FakeDeckShuffler()).ExecuteAsync(
@@ -24,7 +24,7 @@ public class DeclareHealthStatusHandlerTests
     {
         var (repo, pub, _) = AppB.Infrastructure();
         var startResult = await new StartGameHandler(repo, pub).ExecuteAsync(
-            new StartGameCommand(AppB.FourPlayerIds, RuleSet.Minimal())
+            new StartGameCommand(AppB.FourPlayerSeats, RuleSet.Minimal())
         );
         var id = ((GameActionResult<StartGameResult>.Ok)startResult).Value.GameId;
         // Game is in Dealing phase, not ReservationHealthCheck
@@ -83,12 +83,12 @@ public class DeclareHealthStatusHandlerTests
         var gameId = await GameInHealthCheck(repo, pub);
         var useCase = new DeclareHealthStatusHandler(repo, pub);
 
-        foreach (var player in AppB.FourPlayerIds)
+        foreach (var player in AppB.FourPlayerSeats)
             await useCase.ExecuteAsync(new DeclareHealthStatusCommand(gameId, player, true));
 
         var state = await repo.GetAsync(gameId);
         state!.Phase.Should().Be(GamePhase.ReservationSoloCheck);
-        state.PendingReservationResponders.Should().BeEquivalentTo(AppB.FourPlayerIds);
+        state.PendingReservationResponders.Should().BeEquivalentTo(AppB.FourPlayerSeats);
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class DeclareHealthStatusHandlerTests
         var useCase = new DeclareHealthStatusHandler(repo, pub);
 
         GameActionResult<DeclareHealthStatusResult> lastResult = null!;
-        foreach (var player in AppB.FourPlayerIds)
+        foreach (var player in AppB.FourPlayerSeats)
             lastResult = await useCase.ExecuteAsync(
                 new DeclareHealthStatusCommand(gameId, player, false)
             );
@@ -134,7 +134,7 @@ public class DeclareHealthStatusHandlerTests
     {
         var (repo, pub, _) = AppB.Infrastructure();
         var startResult = await new StartGameHandler(repo, pub).ExecuteAsync(
-            new StartGameCommand(AppB.FourPlayerIds, RuleSet.Minimal())
+            new StartGameCommand(AppB.FourPlayerSeats, RuleSet.Minimal())
         );
         var gameId = ((GameActionResult<StartGameResult>.Ok)startResult).Value.GameId;
         // P2 is the VorbehaltRauskommer — health check starts from P2, P3, P0, P1
@@ -158,7 +158,7 @@ public class DeclareHealthStatusHandlerTests
     {
         var (repo, pub, _) = AppB.Infrastructure();
         var startResult = await new StartGameHandler(repo, pub).ExecuteAsync(
-            new StartGameCommand(AppB.FourPlayerIds, RuleSet.Minimal())
+            new StartGameCommand(AppB.FourPlayerSeats, RuleSet.Minimal())
         );
         var gameId = ((GameActionResult<StartGameResult>.Ok)startResult).Value.GameId;
         // VorbehaltRauskommer = P2, health check order: P2, P3, P0, P1

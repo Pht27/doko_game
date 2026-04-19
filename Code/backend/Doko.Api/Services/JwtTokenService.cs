@@ -8,7 +8,7 @@ namespace Doko.Api.Services;
 
 public sealed class JwtTokenService(IConfiguration configuration) : ITokenService
 {
-    public string GenerateToken(PlayerId playerId)
+    public string GenerateToken(PlayerSeat seat)
     {
         var key =
             configuration["Jwt:Key"]
@@ -17,7 +17,7 @@ public sealed class JwtTokenService(IConfiguration configuration) : ITokenServic
 
         var descriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity([new Claim("player_id", playerId.Value.ToString())]),
+            Subject = new ClaimsIdentity([new Claim("seat_index", ((int)seat).ToString())]),
             Expires = DateTime.UtcNow.AddDays(1),
             SigningCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256),
         };

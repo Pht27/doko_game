@@ -4,14 +4,14 @@ using Doko.Domain.Scoring;
 
 namespace Doko.Domain.Lobby;
 
-public record LobbyPlayer(PlayerId Id, DateTimeOffset JoinedAt);
+public record LobbyPlayer(PlayerSeat Seat, DateTimeOffset JoinedAt);
 
 public class LobbyState
 {
     private readonly LobbyPlayer?[] _seats = new LobbyPlayer?[4];
     private readonly int[] _standings = new int[4];
-    private readonly HashSet<byte> _newGameVoters = [];
-    private readonly HashSet<byte> _lobbyStartVoters = [];
+    private readonly HashSet<PlayerSeat> _newGameVoters = [];
+    private readonly HashSet<PlayerSeat> _lobbyStartVoters = [];
     private readonly List<(GameResult Result, string? GameMode, int[] NetPoints)> _gameHistory = [];
     private bool _advanceRauskommer = true;
 
@@ -60,39 +60,38 @@ public class LobbyState
     public static LobbyState Create()
     {
         var lobby = new LobbyState(LobbyId.New(), DateTimeOffset.UtcNow);
-        lobby._seats[0] = new LobbyPlayer(new PlayerId(0), DateTimeOffset.UtcNow);
+        lobby._seats[0] = new LobbyPlayer(PlayerSeat.First, DateTimeOffset.UtcNow);
         return lobby;
     }
 
     /// <summary>
-    /// Tries to occupy a specific seat. Returns false if the index is out of range,
-    /// the seat is already taken, or the lobby is full/started.
+    /// Tries to occupy a specific seat. Returns false if the index is out of range
+    /// or the seat is already taken.
     /// </summary>
-    public bool TryOccupySeat(int seatIndex, out PlayerId playerId)
+    public bool TryOccupySeat(int seatIndex, out PlayerSeat seat)
     {
-        playerId = default;
+        seat = default;
         if (seatIndex < 0 || seatIndex >= 4)
             return false;
         if (_seats[seatIndex] != null)
             return false;
 
-        playerId = new PlayerId((byte)seatIndex);
-        _seats[seatIndex] = new LobbyPlayer(playerId, DateTimeOffset.UtcNow);
+        seat = (PlayerSeat)seatIndex;
+        _seats[seatIndex] = new LobbyPlayer(seat, DateTimeOffset.UtcNow);
         return true;
     }
 
     /// <summary>
     /// Removes the player from their seat. Returns true if the lobby is now completely empty.
     /// </summary>
-    public bool TryRemovePlayer(PlayerId playerId)
+    public bool TryRemovePlayer(PlayerSeat seat)
     {
-        _seats[playerId.Value] = null;
+        _seats[(int)seat] = null;
         return _seats.All(s => s == null);
     }
 
-    /// <summary>Returns true if the given player currently holds a seat.</summary>
-    public bool HasPlayer(PlayerId playerId) =>
-        playerId.Value < 4 && _seats[playerId.Value] != null;
+    /// <summary>Returns true if the given seat is currently occupied.</summary>
+    public bool HasPlayer(PlayerSeat seat) => (int)seat < 4 && _seats[(int)seat] != null;
 
     public void MarkStarted(GameId gameId)
     {
@@ -110,27 +109,27 @@ public class LobbyState
     /// <summary>
     /// Adds a vote to start a new game. Returns true when all 4 seated players have voted.
     /// </summary>
-    public bool AddNewGameVote(PlayerId playerId)
+    public bool AddNewGameVote(PlayerSeat seat)
     {
-        _newGameVoters.Add(playerId.Value);
+        _newGameVoters.Add(seat);
         return _newGameVoters.Count >= 4;
     }
 
     /// <summary>Withdraws a player's vote to start a new game.</summary>
-    public void RemoveNewGameVote(PlayerId playerId) => _newGameVoters.Remove(playerId.Value);
+    public void RemoveNewGameVote(PlayerSeat seat) => _newGameVoters.Remove(seat);
 
     /// <summary>Clears all new-game votes (called when the new game actually starts).</summary>
     public void ResetNewGameVotes() => _newGameVoters.Clear();
 
     /// <summary>Adds a vote to start the initial lobby game. Returns true when all 4 have voted.</summary>
-    public bool AddLobbyStartVote(PlayerId playerId)
+    public bool AddLobbyStartVote(PlayerSeat seat)
     {
-        _lobbyStartVoters.Add(playerId.Value);
+        _lobbyStartVoters.Add(seat);
         return _lobbyStartVoters.Count >= 4;
     }
 
     /// <summary>Withdraws a player's lobby-start vote.</summary>
-    public void RemoveLobbyStartVote(PlayerId playerId) => _lobbyStartVoters.Remove(playerId.Value);
+    public void RemoveLobbyStartVote(PlayerSeat seat) => _lobbyStartVoters.Remove(seat);
 
     /// <summary>Clears all lobby-start votes (called when the game actually starts).</summary>
     public void ResetLobbyStartVotes() => _lobbyStartVoters.Clear();

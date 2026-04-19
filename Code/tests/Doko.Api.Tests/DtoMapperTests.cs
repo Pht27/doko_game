@@ -9,7 +9,7 @@ namespace Doko.Api.Tests;
 
 public class DtoMapperTests
 {
-    private static readonly PlayerId Player0 = new(0);
+    private static readonly PlayerSeat Player0 = PlayerSeat.First;
 
     [Fact]
     public void BuildReservation_NullInput_ReturnsNull()

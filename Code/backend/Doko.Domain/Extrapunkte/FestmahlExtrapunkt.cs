@@ -31,7 +31,7 @@ public sealed class FestmahlExtrapunkt : IExtrapunkt
         if (byKind[0].Count() < 2)
             return [];
 
-        Players.PlayerId festmahlWinner;
+        Players.PlayerSeat festmahlWinner;
         int majorityCount = byKind[0].Count();
 
         bool twoPairs =

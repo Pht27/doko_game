@@ -14,12 +14,12 @@ namespace Doko.Domain.Reservations;
 /// </summary>
 public sealed class HochzeitReservation : IReservation
 {
-    private readonly PlayerId _hochzeitPlayer;
+    private readonly PlayerSeat _hochzeitPlayer;
     private readonly HochzeitCondition _condition;
 
     private static readonly CardType KreuzDame = new(Suit.Kreuz, Rank.Dame);
 
-    public HochzeitReservation(PlayerId hochzeitPlayer, HochzeitCondition condition)
+    public HochzeitReservation(PlayerSeat hochzeitPlayer, HochzeitCondition condition)
     {
         _hochzeitPlayer = hochzeitPlayer;
         _condition = condition;

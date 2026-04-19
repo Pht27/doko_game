@@ -2,9 +2,9 @@ import { apiFetch } from './client';
 
 export interface LobbyJoinResponse {
   lobbyId: string;
-  playerId: number;
   token: string;
   seatIndex: number;
+  activeGameId?: string | null;
 }
 
 export interface LobbyListItemResponse {

@@ -66,7 +66,7 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
       const newSession: LobbySession = {
         lobbyId: res.lobbyId,
         token: res.token,
-        playerId: res.playerId,
+        
         seatIndex: res.seatIndex,
       };
       saveLobbySession(newSession);
@@ -104,7 +104,7 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
       const newSession: LobbySession = {
         lobbyId: res.lobbyId,
         token: res.token,
-        playerId: res.playerId,
+        
         seatIndex: res.seatIndex,
       };
       saveLobbySession(newSession);

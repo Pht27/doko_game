@@ -6,7 +6,6 @@ import type { HubConnection } from '@microsoft/signalr';
 export interface LobbySession {
   lobbyId: string;
   token: string;
-  playerId: number;
   seatIndex: number;
 }
 

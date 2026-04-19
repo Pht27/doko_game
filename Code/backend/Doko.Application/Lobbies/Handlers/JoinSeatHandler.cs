@@ -5,7 +5,7 @@ namespace Doko.Application.Lobbies.Handlers;
 
 public record JoinSeatCommand(LobbyId LobbyId, int SeatIndex);
 
-public record JoinSeatResult(PlayerId PlayerId, bool IsNowFull);
+public record JoinSeatResult(PlayerSeat Seat, bool IsNowFull);
 
 public interface IJoinSeatHandler
 {

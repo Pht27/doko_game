@@ -536,7 +536,7 @@ public class AnnouncementRulesTests
     /// A trick where <paramref name="winner"/> wins ~43 Augen: ♣A, ♣10, ♠A, ♥A.
     /// Card IDs start at <paramref name="startId"/> to avoid conflicts in multi-trick states.
     /// </summary>
-    private static Trick HighValueTrick(PlayerId winner, byte startId = 10)
+    private static Trick HighValueTrick(PlayerSeat winner, byte startId = 10)
     {
         var trick = new Trick();
         trick.Add(new TrickCard(B.Card(startId, Suit.Kreuz, Rank.Ass), winner));
@@ -547,7 +547,7 @@ public class AnnouncementRulesTests
     }
 
     /// <summary>A low-value 4-card trick.</summary>
-    private static Trick CompleteTrick(PlayerId winner)
+    private static Trick CompleteTrick(PlayerSeat winner)
     {
         var trick = new Trick();
         trick.Add(new TrickCard(B.Card(20, Suit.Kreuz, Rank.Ass), winner));

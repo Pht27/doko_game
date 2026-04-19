@@ -23,7 +23,7 @@ public sealed class BlutbadExtrapunkt : IExtrapunkt
         if (distinctKinds < 3)
             return [];
 
-        Players.PlayerId blutbadWinner;
+        Players.PlayerSeat blutbadWinner;
         var animalCards = animals.Select(a => a.Card).ToHashSet();
         var nonAnimals = completedTrick.Cards.Where(tc => !animalCards.Contains(tc)).ToList();
 

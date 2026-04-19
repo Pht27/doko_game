@@ -34,11 +34,10 @@ public class LobbiesController(
         if (result is not LobbyActionResult<CreateLobbyResult>.Ok ok)
             return StatusCode(500, new ErrorResponse("lobby_creation_failed"));
 
-        var token = tokenService.GenerateToken(ok.Value.PlayerId);
+        var token = tokenService.GenerateToken(ok.Value.Seat);
         return Ok(
             new LobbyJoinResponse(
                 ok.Value.LobbyId.ToString(),
-                ok.Value.PlayerId.Value,
                 token,
                 SeatIndex: 0
             )
@@ -74,9 +73,6 @@ public class LobbiesController(
             return failure.Error switch
             {
                 LobbyError.LobbyNotFound => NotFound(new ErrorResponse("lobby_not_found")),
-                LobbyError.LobbyAlreadyStarted => Conflict(
-                    new ErrorResponse("lobby_already_started")
-                ),
                 LobbyError.SeatOccupied => Conflict(new ErrorResponse("seat_occupied")),
                 _ => StatusCode(500, new ErrorResponse("unknown_error")),
             };
@@ -87,12 +83,17 @@ public class LobbiesController(
             .Clients.Group($"lobby_{lobbyId}")
             .SendAsync("playerJoined", new { seatIndex, playerCount = ok.IsNowFull ? 4 : 0 }, ct);
 
+        // If a game is already running, include its id in the response so the client
+        // can navigate straight to it without a second round-trip.
+        var lobby = await lobbyRepository.GetAsync(new LobbyId(guid), ct);
+        string? activeGameId = (lobby?.IsStarted == true) ? lobby.ActiveGameId?.ToString() : null;
+
         return Ok(
             new LobbyJoinResponse(
                 lobbyId,
-                ok.PlayerId.Value,
-                tokenService.GenerateToken(ok.PlayerId),
-                SeatIndex: seatIndex
+                tokenService.GenerateToken(ok.Seat),
+                SeatIndex: seatIndex,
+                ActiveGameId: activeGameId
             )
         );
     }
@@ -104,8 +105,7 @@ public class LobbiesController(
         if (!Guid.TryParse(lobbyId, out var guid))
             return NotFound(new ErrorResponse("lobby_not_found"));
 
-        var callerIdClaim = User.FindFirst("player_id")?.Value ?? "255";
-        var callerId = new PlayerId((byte)int.Parse(callerIdClaim));
+        var callerId = GetCallerSeat();
 
         var command = new LeaveLobbyCommand(new LobbyId(guid), callerId);
         var result = await leaveLobby.ExecuteAsync(command, ct);
@@ -125,7 +125,7 @@ public class LobbiesController(
         else
             await hub
                 .Clients.Group($"lobby_{lobbyId}")
-                .SendAsync("playerLeft", new { seatIndex = callerId.Value }, ct);
+                .SendAsync("playerLeft", new { seatIndex = (int)callerId }, ct);
 
         return NoContent();
     }
@@ -171,8 +171,7 @@ public class LobbiesController(
         if (!lobby.IsFull)
             return BadRequest(new ErrorResponse("lobby_not_full"));
 
-        var callerIdClaim = User.FindFirst("player_id")?.Value ?? "255";
-        var callerId = new PlayerId((byte)int.Parse(callerIdClaim));
+        var callerId = GetCallerSeat();
         if (!lobby.HasPlayer(callerId))
             return Forbid();
 
@@ -182,7 +181,7 @@ public class LobbiesController(
         {
             lobby.ResetLobbyStartVotes();
 
-            var players = lobby.Players.Select(p => p.Id).ToList();
+            var players = lobby.Players.Select(p => p.Seat).ToList();
             var startResult = await startGame.ExecuteAsync(
                 new StartGameCommand(players, Rules: null),
                 ct
@@ -225,8 +224,7 @@ public class LobbiesController(
         if (lobby is null)
             return NotFound(new ErrorResponse("lobby_not_found"));
 
-        var callerIdClaim = User.FindFirst("player_id")?.Value ?? "255";
-        var callerId = new PlayerId((byte)int.Parse(callerIdClaim));
+        var callerId = GetCallerSeat();
         if (!lobby.HasPlayer(callerId))
             return Forbid();
 
@@ -251,8 +249,7 @@ public class LobbiesController(
         if (lobby is null)
             return NotFound(new ErrorResponse("lobby_not_found"));
 
-        var callerIdClaim = User.FindFirst("player_id")?.Value ?? "255";
-        var callerId = new PlayerId((byte)int.Parse(callerIdClaim));
+        var callerId = GetCallerSeat();
         if (!lobby.HasPlayer(callerId))
             return Forbid();
 
@@ -265,7 +262,7 @@ public class LobbiesController(
             lobby.ResetNewGameVotes();
             lobby.AdvanceRauskommerIfRequired();
 
-            var players = lobby.Players.Select(p => p.Id).ToList();
+            var players = lobby.Players.Select(p => p.Seat).ToList();
             var startResult = await startGame.ExecuteAsync(
                 new StartGameCommand(players, Rules: null),
                 ct
@@ -277,7 +274,7 @@ public class LobbiesController(
                 return StatusCode(500, new ErrorResponse("game_start_failed"));
 
             var newGameId = startOk.Value.GameId;
-            var vorbehaltRauskommer = new PlayerId((byte)lobby.VorbehaltRauskommer);
+            var vorbehaltRauskommer = (PlayerSeat)lobby.VorbehaltRauskommer;
             await dealCards.ExecuteAsync(new DealCardsCommand(newGameId, vorbehaltRauskommer), ct);
 
             lobby.MarkStarted(newGameId);
@@ -312,8 +309,7 @@ public class LobbiesController(
         if (lobby is null)
             return NotFound(new ErrorResponse("lobby_not_found"));
 
-        var callerIdClaim = User.FindFirst("player_id")?.Value ?? "255";
-        var callerId = new PlayerId((byte)int.Parse(callerIdClaim));
+        var callerId = GetCallerSeat();
         if (!lobby.HasPlayer(callerId))
             return Forbid();
 
@@ -347,12 +343,11 @@ public class LobbiesController(
         if (!lobby.IsFull)
             return BadRequest(new ErrorResponse("lobby_not_full"));
 
-        var callerIdClaim = User.FindFirst("player_id")?.Value ?? "255";
-        var callerId = new PlayerId((byte)int.Parse(callerIdClaim));
+        var callerId = GetCallerSeat();
         if (!lobby.HasPlayer(callerId))
             return Forbid();
 
-        var players = lobby.Players.Select(p => p.Id).ToList();
+        var players = lobby.Players.Select(p => p.Seat).ToList();
         var startResult = await startGame.ExecuteAsync(
             new StartGameCommand(players, Rules: null),
             ct
@@ -375,5 +370,11 @@ public class LobbiesController(
             .SendAsync("gameStarted", new { gameId = gameId.ToString() }, ct);
 
         return Ok(new StartLobbyGameResponse(gameId.ToString()));
+    }
+
+    private PlayerSeat GetCallerSeat()
+    {
+        var claim = User.FindFirst("seat_index")?.Value ?? "0";
+        return (PlayerSeat)int.Parse(claim);
     }
 }

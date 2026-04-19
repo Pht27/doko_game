@@ -16,10 +16,10 @@ import type {
   MakeAnnouncementRequest,
 } from '../types/api';
 
-export function fetchToken(playerId: number): Promise<AuthTokenResponse> {
+export function fetchToken(seatIndex: number): Promise<AuthTokenResponse> {
   return apiFetch('/auth/token', null, {
     method: 'POST',
-    body: JSON.stringify({ playerId }),
+    body: JSON.stringify({ seatIndex }),
   });
 }
 

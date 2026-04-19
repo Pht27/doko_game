@@ -28,7 +28,7 @@ public sealed class StartGameHandler(IGameRepository repository, IGameEventPubli
 
         var players = command
             .Players.Select(
-                (id, i) => new PlayerState(id, (PlayerSeat)i, Domain.Hands.Hand.Empty, null)
+                seat => new PlayerState(seat, Domain.Hands.Hand.Empty, null)
             )
             .ToList();
 

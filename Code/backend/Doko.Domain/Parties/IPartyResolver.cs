@@ -5,7 +5,7 @@ namespace Doko.Domain.Parties;
 
 public interface IPartyResolver
 {
-    Party? ResolveParty(PlayerId player, GameState state);
+    Party? ResolveParty(PlayerSeat player, GameState state);
     bool IsFullyResolved(GameState state);
 
     /// <summary>

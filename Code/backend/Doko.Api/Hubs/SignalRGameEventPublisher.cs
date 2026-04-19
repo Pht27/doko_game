@@ -24,7 +24,7 @@ public sealed class SignalRGameEventPublisher(IHubContext<GameHub> hubContext) :
                     "cardPlayed",
                     new
                     {
-                        player = e.Player.Value,
+                        player = (int)e.Player,
                         card = DtoMapper.ToDto(e.Card),
                         trickNumber = e.TrickNumber,
                     },
@@ -36,7 +36,7 @@ public sealed class SignalRGameEventPublisher(IHubContext<GameHub> hubContext) :
                     new
                     {
                         trickNumber = e.TrickNumber,
-                        winner = e.Winner.Value,
+                        winner = (int)e.Winner,
                         awards = e.Result.Awards.Select(DtoMapper.ToDto).ToArray(),
                     },
                     ct
@@ -46,7 +46,7 @@ public sealed class SignalRGameEventPublisher(IHubContext<GameHub> hubContext) :
                     "announcementMade",
                     new
                     {
-                        player = e.Player.Value,
+                        player = (int)e.Player,
                         type = e.Type.ToString(),
                         trickNumber = e.TrickNumber,
                     },
@@ -55,7 +55,7 @@ public sealed class SignalRGameEventPublisher(IHubContext<GameHub> hubContext) :
 
                 HealthDeclaredEvent e => group.SendAsync(
                     "healthDeclared",
-                    new { player = e.Player.Value },
+                    new { player = (int)e.Player },
                     ct
                 ),
 
@@ -63,7 +63,7 @@ public sealed class SignalRGameEventPublisher(IHubContext<GameHub> hubContext) :
                     "reservationMade",
                     new
                     {
-                        player = e.Player.Value,
+                        player = (int)e.Player,
                         reservation = e.Reservation?.Priority.ToString(),
                     },
                     ct
@@ -71,19 +71,19 @@ public sealed class SignalRGameEventPublisher(IHubContext<GameHub> hubContext) :
 
                 SonderkarteTriggeredEvent e => group.SendAsync(
                     "sonderkarteTriggered",
-                    new { player = e.Player.Value, type = e.Type.ToString() },
+                    new { player = (int)e.Player, type = e.Type.ToString() },
                     ct
                 ),
 
                 PartyRevealedEvent e => group.SendAsync(
                     "partyRevealed",
-                    new { player = e.Player.Value, party = e.Party.ToString() },
+                    new { player = (int)e.Player, party = e.Party.ToString() },
                     ct
                 ),
 
                 ArmutResponseEvent e => group.SendAsync(
                     "armutResponse",
-                    new { player = e.Player.Value, accepted = e.Accepted },
+                    new { player = (int)e.Player, accepted = e.Accepted },
                     ct
                 ),
 
@@ -91,7 +91,7 @@ public sealed class SignalRGameEventPublisher(IHubContext<GameHub> hubContext) :
                     "armutCardsExchanged",
                     new
                     {
-                        richPlayer = e.RichPlayer.Value,
+                        richPlayer = (int)e.RichPlayer,
                         cardCount = e.CardCount,
                         includedTrump = e.IncludedTrump,
                     },

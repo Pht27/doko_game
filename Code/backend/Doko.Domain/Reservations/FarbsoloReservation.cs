@@ -13,9 +13,9 @@ namespace Doko.Domain.Reservations;
 public sealed class FarbsoloReservation : IReservation
 {
     private readonly Suit _suit;
-    private readonly PlayerId _soloPlayer;
+    private readonly PlayerSeat _soloPlayer;
 
-    public FarbsoloReservation(Suit suit, PlayerId soloPlayer)
+    public FarbsoloReservation(Suit suit, PlayerSeat soloPlayer)
     {
         _suit = suit;
         _soloPlayer = soloPlayer;

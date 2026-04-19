@@ -99,7 +99,7 @@ public sealed class ExchangeArmutCardsHandler(
         ExchangeArmutCardsCommand command
     )
     {
-        var richHand = state.Players.First(p => p.Id == command.RichPlayer).Hand;
+        var richHand = state.Players.First(p => p.Seat == command.RichPlayer).Hand;
         var cards = command
             .CardIdsToReturn.Select(id => richHand.Cards.FirstOrDefault(c => c.Id == id))
             .ToList();
@@ -116,12 +116,12 @@ public sealed class ExchangeArmutCardsHandler(
     private static (Hand newRichHand, Hand newPoorHand, int returnedTrumpCount) ComputeNewHands(
         GameState state,
         ExchangeArmutCardsCommand command,
-        PlayerId poorPlayer,
+        PlayerSeat poorPlayer,
         List<Card> validCards
     )
     {
-        var richHand = state.Players.First(p => p.Id == command.RichPlayer).Hand;
-        var poorHand = state.Players.First(p => p.Id == poorPlayer).Hand;
+        var richHand = state.Players.First(p => p.Seat == command.RichPlayer).Hand;
+        var poorHand = state.Players.First(p => p.Seat == poorPlayer).Hand;
 
         int returnedTrumpCount = validCards.Count(c => state.TrumpEvaluator.IsTrump(c.Type));
         var newRichHand = new Hand(richHand.Cards.Where(c => !validCards.Contains(c)).ToList());
@@ -132,8 +132,8 @@ public sealed class ExchangeArmutCardsHandler(
 
     private static void ApplyHandUpdates(
         GameState state,
-        PlayerId richPlayer,
-        PlayerId poorPlayer,
+        PlayerSeat richPlayer,
+        PlayerSeat poorPlayer,
         Hand newRichHand,
         Hand newPoorHand,
         int returnedTrumpCount
@@ -148,16 +148,16 @@ public sealed class ExchangeArmutCardsHandler(
     /// Finds the first player to the left of the rich player who is not in the Re party
     /// (neither rich nor poor). This player leads the first trick after the Armut exchange.
     /// </summary>
-    private static PlayerId FindStartingPlayer(
+    private static PlayerSeat FindStartingPlayer(
         GameState state,
-        PlayerId richPlayer,
-        PlayerId poorPlayer
+        PlayerSeat richPlayer,
+        PlayerSeat poorPlayer
     )
     {
-        var richSeat = (int)state.Players.First(p => p.Id == richPlayer).Seat;
+        var richSeat = (int)richPlayer;
         return state
             .Players.OrderBy(p => ((int)p.Seat - richSeat - 1 + 4) % 4)
-            .First(p => p.Id != richPlayer && p.Id != poorPlayer)
-            .Id;
+            .First(p => p.Seat != richPlayer && p.Seat != poorPlayer)
+            .Seat;
     }
 }

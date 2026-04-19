@@ -25,7 +25,7 @@ public sealed class ConsoleGame(
     public async Task RunAsync(CancellationToken ct = default)
     {
         // ── 1. Start ─────────────────��─────────────────────────��──────────────
-        var players = Enumerable.Range(0, 4).Select(i => new PlayerId((byte)i)).ToList();
+        var players = Enumerable.Range(0, 4).Select(i => (PlayerSeat)i).ToList();
         var startResult = await startGame.ExecuteAsync(new StartGameCommand(players), ct);
         if (startResult is not GameActionResult<StartGameResult>.Ok { Value: var started })
             throw new InvalidOperationException("Failed to start game.");
@@ -44,7 +44,7 @@ public sealed class ConsoleGame(
         System.Console.WriteLine("=== RESERVATION PHASE ===\n");
         for (byte i = 0; i < 4; i++)
         {
-            var playerId = new PlayerId(i);
+            var playerId = (PlayerSeat)i;
             var view =
                 await queryService.GetPlayerViewAsync(gameId, playerId, ct)
                 ?? throw new InvalidOperationException($"No view for player {i}");
@@ -67,7 +67,7 @@ public sealed class ConsoleGame(
                     if (ok.Value.Geschmissen)
                     {
                         System.Console.Clear();
-                        renderer.RenderGeschmissen(playerId.Value);
+                        renderer.RenderGeschmissen((byte)(int)playerId);
                         Pause();
                         return;
                     }
@@ -94,7 +94,7 @@ public sealed class ConsoleGame(
         {
             // Determine current player by peeking at any view
             var peek =
-                await queryService.GetPlayerViewAsync(gameId, new PlayerId(0), ct)
+                await queryService.GetPlayerViewAsync(gameId, PlayerSeat.First, ct)
                 ?? throw new InvalidOperationException("Game disappeared.");
 
             var currentPlayer = peek.CurrentTurn;

@@ -18,7 +18,7 @@ public static class DtoMapper
         new(
             GameId: view.GameId.ToString(),
             Phase: view.Phase.ToString(),
-            RequestingPlayer: view.RequestingPlayer.Value,
+            RequestingPlayer: (int)view.RequestingPlayer,
             OwnParty: view.OwnParty?.ToString(),
             Hand: view.Hand.Select(ToDto).ToList(),
             HandSorted: view.HandSorted.Select(ToDto).ToList(),
@@ -36,7 +36,7 @@ public static class DtoMapper
             OtherPlayers: view.OtherPlayers.Select(ToDto).ToList(),
             CurrentTrick: view.CurrentTrick is { } ct ? ToDto(ct) : null,
             CompletedTricks: view.CompletedTricks.Select(ToDto).ToList(),
-            CurrentTurn: view.CurrentTurn.Value,
+            CurrentTurn: (int)view.CurrentTurn,
             IsMyTurn: view.IsMyTurn,
             EligibleReservations: view.EligibleReservations.Select(r => r.ToString()).ToList()
         )
@@ -60,7 +60,7 @@ public static class DtoMapper
 
     public static PlayerPublicStateDto ToDto(PlayerPublicState p) =>
         new(
-            p.Id.Value,
+            (int)p.Seat,
             p.Seat.ToString(),
             p.KnownParty?.ToString(),
             p.HandCardCount,
@@ -70,9 +70,9 @@ public static class DtoMapper
     public static TrickSummaryDto ToDto(TrickSummary t) =>
         new(
             t.TrickNumber,
-            t.Cards.Select(c => new TrickCardDto(c.Player.Value, ToDto(c.Card), c.FaceDown))
+            t.Cards.Select(c => new TrickCardDto((int)c.Player, ToDto(c.Card), c.FaceDown))
                 .ToList(),
-            t.Winner?.Value
+            (int?)t.Winner
         );
 
     public static GameResultDto ToDto(
@@ -132,7 +132,7 @@ public static class DtoMapper
         );
 
     public static ExtrapunktAwardDto ToDto(ExtrapunktAward a) =>
-        new(a.Type.ToString(), a.BenefittingPlayer.Value, a.Delta);
+        new(a.Type.ToString(), (int)a.BenefittingPlayer, a.Delta);
 
     public static MakeReservationResponse ToResponse(MakeReservationResult r) =>
         new(r.AllDeclared, r.WinningReservation?.Priority.ToString(), r.Geschmissen);
@@ -140,7 +140,7 @@ public static class DtoMapper
     public static PlayCardResponse ToResponse(PlayCardResult r) =>
         new(
             r.TrickCompleted,
-            r.TrickWinner?.Value,
+            (int?)r.TrickWinner,
             r.GameFinished,
             r.FinishedResult is { } fr ? ToDto(fr.Result) : null
         );
@@ -150,7 +150,7 @@ public static class DtoMapper
     /// <c>ConsoleInputReader.BuildReservation</c>.
     /// Returns null for keine Vorbehalt (Reservation is null or unrecognized).
     /// </summary>
-    public static IReservation? BuildReservation(MakeReservationRequest req, PlayerId player)
+    public static IReservation? BuildReservation(MakeReservationRequest req, PlayerSeat player)
     {
         if (req.Reservation is null)
             return null;
@@ -178,7 +178,7 @@ public static class DtoMapper
         };
     }
 
-    private static HochzeitReservation BuildHochzeit(MakeReservationRequest req, PlayerId player)
+    private static HochzeitReservation BuildHochzeit(MakeReservationRequest req, PlayerSeat player)
     {
         var condition = Enum.TryParse<HochzeitCondition>(
             req.HochzeitCondition,
@@ -190,7 +190,7 @@ public static class DtoMapper
         return new HochzeitReservation(player, condition);
     }
 
-    private static ArmutReservation BuildArmut(MakeReservationRequest req, PlayerId player)
+    private static ArmutReservation BuildArmut(MakeReservationRequest req, PlayerSeat player)
     {
         // Rich player is not known at declaration time — it is determined during ArmutPartnerFinding.
         // Use the declaring player as a placeholder; the real reservation is constructed in AcceptArmutHandler.

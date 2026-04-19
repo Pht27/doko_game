@@ -11,7 +11,7 @@ public sealed class NormalPartyResolver : IPartyResolver
 
     private static readonly CardType KreuzDame = new(Suit.Kreuz, Rank.Dame);
 
-    public Party? ResolveParty(PlayerId player, GameState state)
+    public Party? ResolveParty(PlayerSeat player, GameState state)
     {
         if (state.InitialHands is null)
             return null;
