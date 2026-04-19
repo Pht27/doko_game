@@ -71,6 +71,9 @@ public class LobbyState
     /// <summary>Returns true if the given seat index is occupied by Opa.</summary>
     public bool IsOpaSeat(int seatIndex) => _opaSeats.Contains(seatIndex);
 
+    /// <summary>Returns true if at least one non-Opa player is in the lobby.</summary>
+    public bool HasHumanPlayers => Players.Any(p => !_opaSeats.Contains((int)p.Seat));
+
     /// <summary>
     /// Tries to occupy a specific seat. Returns false if the index is out of range
     /// or the seat is already taken.

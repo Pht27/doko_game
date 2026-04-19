@@ -32,15 +32,17 @@ public sealed class LeaveLobbyHandler(ILobbyRepository repository) : ILeaveLobby
         lobby.RemoveNewGameVote(command.PlayerSeat);
         var activeGameId = lobby.ActiveGameId?.ToString();
         var voteCount = lobby.NewGameVoteCount;
-        var isNowEmpty = lobby.TryRemovePlayer(command.PlayerSeat);
+        lobby.TryRemovePlayer(command.PlayerSeat);
 
-        if (isNowEmpty)
+        var shouldDelete = !lobby.HasHumanPlayers;
+
+        if (shouldDelete)
             await repository.DeleteAsync(command.LobbyId, ct);
         else
             await repository.SaveAsync(lobby, ct);
 
         return new LobbyActionResult<LeaveLobbyResult>.Ok(
-            new LeaveLobbyResult(isNowEmpty, voteCount, activeGameId)
+            new LeaveLobbyResult(shouldDelete, voteCount, activeGameId)
         );
     }
 }
