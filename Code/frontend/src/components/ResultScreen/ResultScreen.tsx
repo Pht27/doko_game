@@ -26,7 +26,7 @@ export function ResultScreen({ result, onNewGame, multiplayerNewGame, viewOnly }
   const [voting, setVoting] = useState(false);
 
   const history = result.matchHistory ?? [];
-  const currentGameIndex = result.isGeschmissen ? Math.max(0, history.length - 1) : history.length;
+  const currentGameIndex = history.length;
   const [selectedGame, setSelectedGame] = useState(currentGameIndex);
 
   const mySeat = multiplayerNewGame?.mySeatIndex;
