@@ -28,11 +28,11 @@
 }
 
 .player-party-re {
-  @apply bg-blue-500;
+  @apply bg-re-500;
 }
 
 .player-party-kontra {
-  @apply bg-red-500;
+  @apply bg-kontra-500;
 }
 
 .player-party-unknown {
@@ -49,11 +49,11 @@
 }
 
 .player-ann-re {
-  @apply bg-blue-600/80 text-white;
+  @apply bg-re-600/80 text-white;
 }
 
 .player-ann-kontra {
-  @apply bg-red-600/80 text-white;
+  @apply bg-kontra-600/80 text-white;
 }
 
 .player-ann-other {

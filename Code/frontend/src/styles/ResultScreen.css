@@ -175,11 +175,11 @@
 }
 
 .rd-winner-re {
-  @apply bg-blue-600/25 text-blue-300;
+  @apply bg-re-500/20 text-re-300;
 }
 
 .rd-winner-kontra {
-  @apply bg-red-600/25 text-red-300;
+  @apply bg-kontra-500/20 text-kontra-300;
 }
 
 /* Augen + stiche row */
