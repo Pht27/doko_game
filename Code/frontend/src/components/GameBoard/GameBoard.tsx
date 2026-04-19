@@ -9,6 +9,8 @@ import { GameInfoOverlay } from '../shared/GameInfoOverlay';
 import { PlayerLabel } from '../shared/PlayerLabel';
 import { HandDisplay } from '../HandDisplay/HandDisplay';
 import { AnnouncementButton } from '../AnnouncementButton/AnnouncementButton';
+import { LastTrickOverlay } from '../LastTrickOverlay/LastTrickOverlay';
+import { cardBackSvgPath } from '../../api/cards';
 import { ArmutBanner } from './subcomponents/ArmutBanner';
 import { CenterArea } from './subcomponents/CenterArea';
 import { PlayerGrid } from './subcomponents/PlayerGrid';
@@ -64,6 +66,7 @@ export function GameBoard({
 }: GameBoardProps) {
   const [showInfoOverlay, setShowInfoOverlay] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [showLastTrick, setShowLastTrick] = useState(false);
   const seatOfPlayer = (player: number) => seatOf(player, activePlayer);
 
   function triggerLeave() {
@@ -154,8 +157,21 @@ export function GameBoard({
         )}
       />
 
-      {/* Floating announcement button — bottom-left at ~20% from bottom */}
-      <div className="absolute bottom-[20%] left-4 z-10">
+      {/* Last trick button — bottom-left, shifted toward center to avoid player label */}
+      {view && view.completedTricks.length > 0 && (
+        <div className="absolute bottom-[20%] left-[10%] z-10">
+          <button
+            onClick={() => setShowLastTrick(true)}
+            className="rounded-xl bg-gray-700/80 hover:bg-gray-600/90 active:bg-gray-800 shadow-lg transition-colors p-1.5"
+            title="Letzter Stich"
+          >
+            <img src={cardBackSvgPath} alt="" className="w-7 h-auto block" />
+          </button>
+        </div>
+      )}
+
+      {/* Floating announcement button — bottom-right at ~20% from bottom */}
+      <div className="absolute bottom-[20%] right-4 z-10">
         <AnnouncementButton
           legalAnnouncements={view?.legalAnnouncements ?? []}
           ownParty={view?.ownParty ?? null}
@@ -270,6 +286,15 @@ export function GameBoard({
             </div>
           </div>
         </div>
+      )}
+
+      {/* Last trick overlay */}
+      {showLastTrick && view && view.completedTricks.length > 0 && (
+        <LastTrickOverlay
+          trick={view.completedTricks[view.completedTricks.length - 1]}
+          seatOf={seatOfPlayer}
+          onClose={() => setShowLastTrick(false)}
+        />
       )}
 
       {/* Full-screen overlays: Sonderkarte confirmation + result screen */}

@@ -1,0 +1,44 @@
+/* LastTrickOverlay — floating viewer for the last completed trick */
+@reference "./index.css";
+
+.last-trick-panel {
+  --lt-card-w:      clamp(3.2rem, 14vw, 5rem);
+  --lt-card-aspect: 1.57;
+  --lt-card-h:      calc(var(--lt-card-w) * var(--lt-card-aspect));
+  --lt-offset-f:    0.33;
+  --lt-spread:      calc(1 + 2 * var(--lt-offset-f));
+
+  @apply bg-[#0f172a] rounded-2xl shadow-2xl flex flex-col items-center gap-4 p-6;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.last-trick-title {
+  @apply text-white/70 text-sm font-semibold tracking-wide uppercase;
+}
+
+.last-trick-pile {
+  width:    calc(var(--lt-card-w) * var(--lt-spread) + 1rem);
+  height:   calc(var(--lt-card-h) * var(--lt-spread) + 1rem);
+  position: relative;
+}
+
+.last-trick-card-positioner {
+  position: absolute;
+  top:  50%;
+  left: 50%;
+  display: block;
+}
+
+.last-trick-card {
+  display:          block;
+  width:            var(--lt-card-w);
+  height:           auto;
+  border-radius:    0.3rem;
+  box-shadow:       0 4px 16px rgba(0, 0, 0, 0.6);
+  transform-origin: center;
+}
+
+.last-trick-card-winner {
+  @apply ring-2 ring-yellow-400;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.7), 0 0 12px rgba(250, 204, 21, 0.4);
+}
