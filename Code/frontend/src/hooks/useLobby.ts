@@ -7,6 +7,7 @@ export interface LobbySession {
   lobbyId: string;
   token: string;
   seatIndex: number;
+  activeGameId?: string;
 }
 
 export interface LobbyHookState {

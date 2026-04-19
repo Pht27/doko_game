@@ -3,7 +3,7 @@ import { useHotSeat } from './hooks/useHotSeat';
 import { useGameState } from './hooks/useGameState';
 import { useTrickAnimation } from './hooks/useTrickAnimation';
 import { useGameActions } from './hooks/useGameActions';
-import { saveLobbySession, loadLobbySession } from './hooks/useLobby';
+import { saveLobbySession, loadLobbySession, loadAnySession, clearLobbySession } from './hooks/useLobby';
 import { joinSeat, getLobby, leaveLobby, voteNewGame, withdrawNewGame } from './api/lobby';
 import { GameBoard } from './components/GameBoard/GameBoard';
 import { GameLoader } from './components/GameLoader/GameLoader';
@@ -27,8 +27,30 @@ function detectInitialView(): AppView {
   const lobbyId = params.get('lobby');
   if (lobbyId) {
     const stored = loadLobbySession(lobbyId);
-    if (stored) return { kind: 'multiplayer-browser', selectedLobbyId: lobbyId };
+    if (stored) {
+      if (stored.activeGameId) {
+        return {
+          kind: 'game',
+          tokens: Array<string>(4).fill(stored.token),
+          gameId: stored.activeGameId,
+          myPlayerId: stored.seatIndex,
+          lobbySession: stored,
+        };
+      }
+      return { kind: 'multiplayer-browser', selectedLobbyId: lobbyId };
+    }
     return { kind: 'joining', lobbyId };
+  }
+  // No URL param — check for a stored game session (e.g. after reload while in-game)
+  const anySession = loadAnySession();
+  if (anySession?.activeGameId) {
+    return {
+      kind: 'game',
+      tokens: Array<string>(4).fill(anySession.token),
+      gameId: anySession.activeGameId,
+      myPlayerId: anySession.seatIndex,
+      lobbySession: anySession,
+    };
   }
   return { kind: 'home' };
 }
@@ -108,8 +130,10 @@ export default function App() {
   function handleGameStarted(gameId: string, session: LobbySession) {
     const { token, seatIndex } = session;
     const tokens = Array<string>(4).fill(token);
+    const gameSession: LobbySession = { ...session, activeGameId: gameId };
+    saveLobbySession(gameSession);
     window.history.replaceState({}, '', window.location.pathname);
-    setView({ kind: 'game', tokens, gameId, myPlayerId: seatIndex, lobbySession: session });
+    setView({ kind: 'game', tokens, gameId, myPlayerId: seatIndex, lobbySession: gameSession });
   }
 
   async function handleLeaveLobby() {
@@ -120,6 +144,7 @@ export default function App() {
     } catch {
       // best-effort: lobby may already be gone
     }
+    clearLobbySession();
     setView({ kind: 'multiplayer-browser', selectedLobbyId: lobbyId });
   }
 
@@ -152,7 +177,14 @@ export default function App() {
   // When the backend auto-starts a new game, update the active game ID
   useEffect(() => {
     if (!newGameId) return;
-    setView(prev => prev.kind === 'game' ? { ...prev, gameId: newGameId } : prev);
+    setView(prev => {
+      if (prev.kind !== 'game') return prev;
+      const updatedSession = prev.lobbySession
+        ? { ...prev.lobbySession, activeGameId: newGameId }
+        : undefined;
+      if (updatedSession) saveLobbySession(updatedSession);
+      return { ...prev, gameId: newGameId, lobbySession: updatedSession };
+    });
   }, [newGameId]);
 
   const [lastFinishedResult, setLastFinishedResult] = useState<GameResultDto | null>(null);

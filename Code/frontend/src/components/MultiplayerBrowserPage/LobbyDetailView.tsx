@@ -37,7 +37,6 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
 
   useEffect(() => {
     if (gameId && session) {
-      clearLobbySession();
       onGameStarted(gameId, session);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
