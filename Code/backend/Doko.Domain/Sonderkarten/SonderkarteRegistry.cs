@@ -1,5 +1,6 @@
 using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
+using Doko.Domain.Reservations;
 using Doko.Domain.Rules;
 
 namespace Doko.Domain.Sonderkarten;
@@ -41,8 +42,31 @@ public static class SonderkarteRegistry
         Card playedCard,
         GameState state,
         RuleSet rules
-    ) =>
-        GetEnabled(rules)
-            .Where(s => s.TriggeringCard == playedCard.Type && s.AreConditionsMet(state))
+    )
+    {
+        var reservation = state.ActiveReservation;
+
+        bool isSoloExceptSchlankerMartin =
+            reservation?.IsSolo == true
+            && reservation.Priority != ReservationPriority.SchlankerMartin;
+        bool isArmut = reservation?.Priority == ReservationPriority.Armut;
+
+        if (isSoloExceptSchlankerMartin || isArmut)
+            return [];
+
+        bool isSchlankerMartin = reservation?.Priority == ReservationPriority.SchlankerMartin;
+
+        return GetEnabled(rules)
+            .Where(s =>
+                s.TriggeringCard == playedCard.Type
+                && s.AreConditionsMet(state)
+                && !(
+                    isSchlankerMartin
+                    && s.Type
+                        is SonderkarteType.Genscherdamen
+                            or SonderkarteType.Gegengenscherdamen
+                )
+            )
             .ToList();
+    }
 }

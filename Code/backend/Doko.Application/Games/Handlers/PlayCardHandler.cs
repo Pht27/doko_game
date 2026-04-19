@@ -212,7 +212,7 @@ public sealed class PlayCardHandler(
         var trick = state.CurrentTrick!;
         var winner = trick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
         var awards = ExtrapunktRegistry
-            .GetActive(state.Rules)
+            .GetActive(state.Rules, state.ActiveReservation)
             .SelectMany(e => e.Evaluate(trick, state))
             .ToList();
         var result = new TrickResult(trick, winner, awards);
