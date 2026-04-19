@@ -26,9 +26,6 @@ public sealed class JoinSeatHandler(ILobbyRepository repository) : IJoinSeatHand
         if (lobby is null)
             return new LobbyActionResult<JoinSeatResult>.Failure(LobbyError.LobbyNotFound);
 
-        if (lobby.IsStarted)
-            return new LobbyActionResult<JoinSeatResult>.Failure(LobbyError.LobbyAlreadyStarted);
-
         if (!lobby.TryOccupySeat(command.SeatIndex, out var playerId))
             return new LobbyActionResult<JoinSeatResult>.Failure(LobbyError.SeatOccupied);
 

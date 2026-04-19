@@ -70,6 +70,7 @@ export function useLobby(session: LobbySession | null, lobbyId: string): LobbyHo
           setSeats(view.seats);
           setStartVoteCount(view.startVoteCount ?? 0);
           setIsStarted(view.isStarted);
+          if (view.activeGameId) setGameId(view.activeGameId);
         }
       })
       .catch(() => {});
