@@ -61,7 +61,14 @@
 }
 
 .result-leave-btn {
-  @apply w-full bg-red-900/50 hover:bg-red-800/70 text-red-300 rounded-lg py-2.5 font-semibold transition-colors text-sm;
+  @apply w-full py-2 text-base bg-red-900/50 hover:bg-red-800/70 text-red-300 rounded-lg font-semibold transition-colors;
+}
+/* Buttons row */
+
+.result-action-area {
+  display: flex;
+  gap: 6px;          /* Abstand zwischen den Buttons */
+  align-items: center; /* optional: vertikal schön ausrichten */
 }
 
 /* ── LobbyHistory ──────────────────────────────────────────────────────────── */

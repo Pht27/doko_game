@@ -9,6 +9,7 @@ import {
   clearLobbySession,
 } from '../../hooks/useLobby';
 import { ResultScreen } from '../ResultScreen/ResultScreen';
+import { ReadyVoteButton } from '../shared/ReadyVoteButton';
 import type { LobbySession } from '../../hooks/useLobby';
 import type { GameResultDto } from '../../types/api';
 
@@ -247,19 +248,12 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
       {isMyLobby && (
         <div className="flex flex-col gap-2 shrink-0">
           {!isStarted && (
-            <button
-              onClick={hasVoted ? handleWithdraw : handleVote}
+            <ReadyVoteButton
+              hasVoted={hasVoted}
+              voteCount={startVoteCount}
               disabled={filledCount < 4 || voting}
-              className={`w-full py-3 text-base font-semibold rounded-2xl transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-between px-4 ${
-                hasVoted
-                  ? 'bg-green-600 hover:bg-green-500 active:bg-green-700 text-white'
-                  : 'bg-white/15 hover:bg-white/25 active:bg-white/10 text-white'
-              }`}
-            >
-              <span className="text-sm opacity-70">{startVoteCount}/4 👤</span>
-              <span>{hasVoted ? t.zurueckziehen : t.bereit}</span>
-              <span className="w-12" />
-            </button>
+              onClick={hasVoted ? handleWithdraw : handleVote}
+            />
           )}
           <button
             onClick={handleLeaveSeat}

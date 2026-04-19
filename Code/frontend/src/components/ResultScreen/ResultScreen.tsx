@@ -5,6 +5,7 @@ import { t } from '../../translations';
 import { GeschmissenDisplay } from './GeschmissenDisplay';
 import { ResultDisplay } from './ResultDisplay';
 import { LobbyHistory } from './LobbyHistory';
+import { ReadyVoteButton } from '../shared/ReadyVoteButton';
 import '../../styles/ResultScreen.css';
 
 export interface MultiplayerNewGameProps {
@@ -92,32 +93,29 @@ export function ResultScreen({ result, onNewGame, multiplayerNewGame, viewOnly, 
             </div>
 
             {/* Action button(s) */}
-            {multiplayerNewGame ? (
-              <button
-                onClick={hasVoted ? handleWithdraw : handleVote}
-                className={hasVoted ? 'result-bereit-active-btn' : 'result-bereit-btn'}
-                disabled={voting}
-              >
-                <span className="result-bereit-indicator">{voteCount}/4 👤</span>
-                <span className="result-bereit-label">
-                  {hasVoted ? t.zurueckziehen : t.bereit}
-                </span>
-                <span className="result-bereit-spacer" />
-              </button>
-            ) : viewOnly ? (
-              <button onClick={onNewGame} className="result-new-game-btn">
-                {t.schliessen}
-              </button>
-            ) : (
-              <button onClick={onNewGame} className="result-new-game-btn">
-                {t.neuesSpiel}
-              </button>
-            )}
-            {onLeaveLobby && (
-              <button onClick={onLeaveLobby} className="result-leave-btn">
-                Lobby verlassen
-              </button>
-            )}
+            <div className="result-action-area">
+              {onLeaveLobby && (
+                <button onClick={onLeaveLobby} className="result-leave-btn">
+                  Lobby verlassen
+                </button>
+              )}
+              {multiplayerNewGame ? (
+                <ReadyVoteButton
+                  hasVoted={hasVoted}
+                  voteCount={voteCount}
+                  disabled={voting}
+                  onClick={hasVoted ? handleWithdraw : handleVote}
+                />
+              ) : viewOnly ? (
+                <button onClick={onNewGame} className="result-new-game-btn">
+                  {t.schliessen}
+                </button>
+              ) : (
+                <button onClick={onNewGame} className="result-new-game-btn">
+                  {t.neuesSpiel}
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>
