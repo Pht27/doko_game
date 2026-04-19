@@ -110,6 +110,27 @@ public sealed class GameState
     public IReadOnlyList<TrickResult> ScoredTricks { get; private set; } = [];
 
     /// <summary>
+    /// True once a Genscher (or Gegengenscher) changed the actual team composition.
+    /// Set to false again only if Gegengenscherdamen restores the exact original Re pair.
+    /// When true, Feigheit does not apply at scoring time.
+    /// </summary>
+    public bool GenscherTeamsChanged { get; private set; }
+
+    /// <summary>
+    /// The two Re players before the first team-changing Genscher fired.
+    /// Used by Gegengenscherdamen to detect whether the original teams are restored.
+    /// Null until a team-changing Genscher fires; cleared on full restoration.
+    /// </summary>
+    public (PlayerId First, PlayerId Second)? PreGenscherRePlayers { get; private set; }
+
+    /// <summary>
+    /// Announcements saved when a team-changing Genscherdamen fired and cleared <see cref="Announcements"/>.
+    /// Restored if Gegengenscherdamen subsequently recreates the original teams.
+    /// Null when no saved announcements exist.
+    /// </summary>
+    public IReadOnlyList<Announcement>? SavedGenscherAnnouncements { get; private set; }
+
+    /// <summary>
     /// The player who leads the reservation-check ordering for this round.
     /// Rotates counter-clockwise each game. Always rotates; SpieleRauskommer
     /// (who actually plays first) may differ for Solo/Armut.
@@ -301,8 +322,51 @@ public sealed class GameState
                 break;
 
             case SetGenscherPartnerModification m:
+            {
+                bool teamsChanged =
+                    PartyResolver.ResolveParty(m.Genscher, this)
+                    != PartyResolver.ResolveParty(m.Partner, this);
+
+                if (teamsChanged)
+                {
+                    if (PreGenscherRePlayers is null)
+                    {
+                        // First team-changing Genscher: save original Re pair and announcements.
+                        var rePlayers = Players
+                            .Where(p => PartyResolver.ResolveParty(p.Id, this) == Party.Re)
+                            .Select(p => p.Id)
+                            .ToArray();
+                        PreGenscherRePlayers = (rePlayers[0], rePlayers[1]);
+                        SavedGenscherAnnouncements = Announcements;
+                        Announcements = [];
+                        GenscherTeamsChanged = true;
+                    }
+                    else
+                    {
+                        // Subsequent Genscher (Gegengenscher): check for original team restoration.
+                        var (orig1, orig2) = PreGenscherRePlayers.Value;
+                        bool restored =
+                            (m.Genscher == orig1 || m.Genscher == orig2)
+                            && (m.Partner == orig1 || m.Partner == orig2);
+                        if (restored && SavedGenscherAnnouncements is not null)
+                        {
+                            Announcements = SavedGenscherAnnouncements;
+                            SavedGenscherAnnouncements = null;
+                            PreGenscherRePlayers = null;
+                            GenscherTeamsChanged = false;
+                        }
+                        else
+                        {
+                            // Different Gegengenscher outcome — saved announcements are lost.
+                            SavedGenscherAnnouncements = null;
+                        }
+                    }
+                }
+                // If !teamsChanged (Nicht tauschen): announcements stay as-is.
+
                 PartyResolver = new Parties.GenscherPartyResolver(m.Genscher, m.Partner);
                 break;
+            }
 
             case AddAnnouncementModification m:
                 Announcements = [.. Announcements, m.Announcement];

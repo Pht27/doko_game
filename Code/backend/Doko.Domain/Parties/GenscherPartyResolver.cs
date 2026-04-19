@@ -17,5 +17,5 @@ public sealed class GenscherPartyResolver(PlayerId genscher, PlayerId chosenPart
 
     public bool IsFullyResolved(GameState state) => true;
 
-    public int? AnnouncementBaseDeadline(GameState state) => 5;
+    public int? AnnouncementBaseDeadline(GameState state) => null;
 }

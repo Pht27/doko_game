@@ -127,6 +127,10 @@ public static class AnnouncementRules
         if (state.ActiveReservation is not null)
             return false;
 
+        // Feigheit does not apply when a Genscher changed the teams
+        if (state.GenscherTeamsChanged)
+            return false;
+
         var winner = result.Winner;
         var loserAugen = winner == Party.Re ? result.KontraAugen : result.ReAugen;
 
