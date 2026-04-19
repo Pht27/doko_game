@@ -5,7 +5,6 @@ import type { GameActions } from '../../hooks/useGameActions';
 import type { MultiplayerNewGameProps } from '../ResultScreen/ResultScreen';
 import { ResultScreen } from '../ResultScreen/ResultScreen';
 import { GameInfo } from '../shared/GameInfo';
-import { GameInfoOverlay } from '../shared/GameInfoOverlay';
 import { PlayerLabel } from '../shared/PlayerLabel';
 import { HandDisplay } from '../HandDisplay/HandDisplay';
 import { AnnouncementButton } from '../AnnouncementButton/AnnouncementButton';
@@ -37,7 +36,6 @@ interface GameBoardProps {
   multiplayerNewGame?: MultiplayerNewGameProps;
   lastFinishedResult?: GameResultDto | null;
   onLeaveLobby?: () => Promise<void>;
-  lobbyId?: string;
 }
 
 /** Returns which compass direction a player sits relative to the active player. */
@@ -62,7 +60,6 @@ export function GameBoard({
   multiplayerNewGame,
   lastFinishedResult,
   onLeaveLobby,
-  lobbyId,
 }: GameBoardProps) {
   const [showInfoOverlay, setShowInfoOverlay] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
@@ -241,27 +238,14 @@ export function GameBoard({
         </div>
       )}
 
-      {/* Game info overlay: match history if available, otherwise basic game info */}
+      {/* Game info overlay: match history if available, otherwise empty state */}
       {showInfoOverlay && (
-        lastFinishedResult ? (
-          <ResultScreen
-            result={lastFinishedResult}
-            onNewGame={() => setShowInfoOverlay(false)}
-            viewOnly
-            onLeaveLobby={onLeaveLobby ? triggerLeave : undefined}
-          />
-        ) : view ? (
-          <GameInfoOverlay
-            phase={view.phase}
-            gameMode={view.activeGameMode}
-            trickNumber={(view.currentTrick?.trickNumber ?? 0) + 1}
-            completedTricks={view.completedTricks.length}
-            lobbyId={lobbyId}
-            activePlayer={activePlayer}
-            onClose={() => setShowInfoOverlay(false)}
-            onLeaveLobby={onLeaveLobby ? triggerLeave : undefined}
-          />
-        ) : null
+        <ResultScreen
+          result={lastFinishedResult ?? undefined}
+          onNewGame={() => setShowInfoOverlay(false)}
+          viewOnly
+          onLeaveLobby={onLeaveLobby ? triggerLeave : undefined}
+        />
       )}
 
       {/* Leave confirmation dialog */}

@@ -196,8 +196,15 @@ export default function App() {
   }, [newGameId]);
 
   const [lastFinishedResult, setLastFinishedResult] = useState<GameResultDto | null>(null);
+  const [lastFinishedResultLobbyId, setLastFinishedResultLobbyId] = useState<string | null>(null);
   useEffect(() => {
-    if (finishedResult) setLastFinishedResult(finishedResult);
+    if (finishedResult) {
+      setLastFinishedResult(finishedResult);
+      if (view.kind === 'game' && view.lobbySession) {
+        setLastFinishedResultLobbyId(view.lobbySession.lobbyId);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finishedResult]);
 
   const { animTrick, animPhase } = useTrickAnimation(gameView);
@@ -240,7 +247,7 @@ export default function App() {
           onBack={() => setView({ kind: 'home' })}
           onSelectLobby={(lobbyId) => setView({ kind: 'multiplayer-browser', selectedLobbyId: lobbyId })}
           onGameStarted={handleGameStarted}
-          lastFinishedResult={lastFinishedResult}
+          lastFinishedResult={lastFinishedResultLobbyId === view.selectedLobbyId ? lastFinishedResult : null}
         />
       </>
     );
@@ -288,7 +295,6 @@ export default function App() {
             : undefined
         }
         onLeaveLobby={isGame && view.lobbySession ? handleLeaveLobby : undefined}
-        lobbyId={isGame ? view.lobbySession?.lobbyId : undefined}
       />
     </>
   );

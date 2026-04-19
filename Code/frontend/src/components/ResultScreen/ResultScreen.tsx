@@ -16,7 +16,7 @@ export interface MultiplayerNewGameProps {
 }
 
 interface ResultScreenProps {
-  result: GameResultDto;
+  result?: GameResultDto;
   onNewGame: () => void;
   multiplayerNewGame?: MultiplayerNewGameProps;
   viewOnly?: boolean;
@@ -27,14 +27,15 @@ export function ResultScreen({ result, onNewGame, multiplayerNewGame, viewOnly, 
   const [hasVoted, setHasVoted] = useState(false);
   const [voting, setVoting] = useState(false);
 
-  const history = result.matchHistory ?? [];
+  const history = result?.matchHistory ?? [];
   const currentGameIndex = history.length;
   const [selectedGame, setSelectedGame] = useState(currentGameIndex);
 
   const mySeat = multiplayerNewGame?.mySeatIndex;
-  const hasHistory = history.length > 0 || !result.isGeschmissen;
+  const hasHistory = result != null && (history.length > 0 || !result.isGeschmissen);
 
-  function getDisplayResult(): GameResultDto {
+  function getDisplayResult(): GameResultDto | null {
+    if (!result) return null;
     if (selectedGame < history.length) return history[selectedGame];
     return result;
   }
@@ -62,13 +63,14 @@ export function ResultScreen({ result, onNewGame, multiplayerNewGame, viewOnly, 
   }
 
   const voteCount = multiplayerNewGame?.voteCount ?? 0;
+  const displayResult = getDisplayResult();
 
   return createPortal(
     <div className="result-overlay">
       <div className="result-screen-wide">
         <div className="result-main-columns">
           {/* ── Left column: match history table ── */}
-          {hasHistory && (
+          {hasHistory && result && (
             <div className="result-left-col">
               <LobbyHistory
                 result={result}
@@ -85,10 +87,14 @@ export function ResultScreen({ result, onNewGame, multiplayerNewGame, viewOnly, 
           {/* ── Right column: detail + action ── */}
           <div className="result-right-col">
             <div className="result-detail-area">
-              {getDisplayResult().isGeschmissen ? (
+              {displayResult == null ? (
+                <div className="result-no-games">
+                  <span>{t.nochKeineErgebnisse}</span>
+                </div>
+              ) : displayResult.isGeschmissen ? (
                 <GeschmissenDisplay />
               ) : (
-                <ResultDisplay result={getDisplayResult()} mySeat={mySeat} />
+                <ResultDisplay result={displayResult} mySeat={mySeat} />
               )}
             </div>
 

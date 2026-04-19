@@ -283,32 +283,45 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
       {/* Actions — only shown when user has a seat in this lobby */}
       {isMyLobby && (
         <div className="flex flex-col gap-2 shrink-0">
-          {!isStarted && (
-            <ReadyVoteButton
-              hasVoted={hasVoted}
-              voteCount={startVoteCount}
-              disabled={filledCount < 4 || voting}
-              onClick={hasVoted ? handleWithdraw : handleVote}
-            />
+          {/* Match history button */}
+          {lastFinishedResult && (
+            <button
+              onClick={() => setShowHistory(true)}
+              className="w-full py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/5 text-white/70 transition-colors"
+            >
+              {t.spielverlauf}
+            </button>
           )}
-          <button
-            onClick={handleLeaveSeat}
-            disabled={leaving}
-            className="w-full py-2.5 text-sm font-semibold rounded-2xl bg-white/10 hover:bg-white/20 active:bg-white/5 text-white/70 transition-colors disabled:opacity-40"
-          >
-            {leaving ? t.loading : t.leaveSeat}
-          </button>
+          {/* Leave + Ready row */}
+          {!isStarted && (
+            <div className="flex gap-2">
+              <button
+                onClick={handleLeaveSeat}
+                disabled={leaving}
+                className="flex-1 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg bg-red-900/50 hover:bg-red-800/70 active:bg-red-900/80 text-red-300 transition-colors disabled:opacity-40"
+              >
+                {leaving ? t.loading : t.leaveSeat}
+              </button>
+              <ReadyVoteButton
+                hasVoted={hasVoted}
+                voteCount={startVoteCount}
+                disabled={filledCount < 4 || voting}
+                onClick={hasVoted ? handleWithdraw : handleVote}
+                className="flex-1"
+              />
+            </div>
+          )}
+          {/* Game running: only show leave button */}
+          {isStarted && (
+            <button
+              onClick={handleLeaveSeat}
+              disabled={leaving}
+              className="w-full py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg bg-red-900/50 hover:bg-red-800/70 active:bg-red-900/80 text-red-300 transition-colors disabled:opacity-40"
+            >
+              {leaving ? t.loading : t.leaveSeat}
+            </button>
+          )}
         </div>
-      )}
-
-      {/* Match history button — only when previous game data is available */}
-      {lastFinishedResult && (
-        <button
-          onClick={() => setShowHistory(true)}
-          className="w-full py-2.5 text-sm font-semibold rounded-2xl bg-white/10 hover:bg-white/20 active:bg-white/5 text-white/70 transition-colors shrink-0"
-        >
-          {t.spielverlauf}
-        </button>
       )}
 
       {(error || actionError) && (

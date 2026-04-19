@@ -115,6 +115,7 @@ export const t = {
     (phaseLabels[phase] as string | undefined) ?? phase,
   spielInfo: 'Spielinfo',
   schliessen: 'Schließen',
+  nochKeineErgebnisse: 'Noch keine Ergebnisse',
   spielverlauf: 'Spielverlauf',
 
   // ── TrickArea ──────────────────────────────────────────────────────────────
