@@ -7,7 +7,9 @@ using Doko.Domain.Cards;
 using Doko.Domain.Extrapunkte;
 using Doko.Domain.GameFlow;
 using Doko.Domain.GameFlow.Events;
+using Doko.Domain.Parties;
 using Doko.Domain.Players;
+using Doko.Domain.Reservations;
 using Doko.Domain.Rules;
 using Doko.Domain.Scoring;
 using Doko.Domain.Sonderkarten;
@@ -223,6 +225,17 @@ public sealed class PlayCardHandler(
         events.Add(
             new TrickCompletedEvent(state.Id, state.CompletedTricks.Count - 1, winner, result)
         );
+
+        // Detect Hochzeit forced solo: partner not found after 3 qualifying tricks
+        if (
+            !state.HochzeitBecameForcedSolo
+            && state.ActiveReservation is HochzeitReservation
+            && state.PartyResolver.IsFullyResolved(state)
+            && state.Players.Count(p =>
+                state.PartyResolver.ResolveParty(p.Seat, state) == Party.Re
+            ) == 1
+        )
+            state.Apply(new SetHochzeitForcedSoloModification());
 
         // Auto-make Pflichtansage if the completed trick triggers one
         var pflichtAnnouncement = AnnouncementRules.GetMandatoryAnnouncement(winner, state);

@@ -357,6 +357,67 @@ public class AnnouncementRulesTests
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
     }
 
+    [Fact]
+    public void ViolatesFeigheit_ReturnsFalse_WhenHochzeitBecameForcedSolo()
+    {
+        // Same conditions as ViolatesFeigheit_ReturnsTrue_WhenThreeMissing, but
+        // HochzeitBecameForcedSolo=true exempts the game from Feigheit.
+        var state = GameState.Create(
+            rules: RuleSet.Default(),
+            players: B.FourPlayers(),
+            partyResolver: B.SoloResolver()
+        );
+        state.Apply(new SetHochzeitForcedSoloModification());
+
+        var result = new GameResult(
+            Winner: Party.Re,
+            ReAugen: 196,
+            KontraAugen: 44,
+            ReStiche: 1,
+            KontraStiche: 0,
+            GameValue: 1,
+            AllAwards: [],
+            Feigheit: false,
+            ValueComponents: [],
+            SoloFactor: 1,
+            TotalScore: 1,
+            AnnouncementRecords: []
+        );
+        AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
+    }
+
+    [Fact]
+    public void ViolatesFeigheit_ReturnsFalse_WhenSilentModeActive()
+    {
+        // Silent modes (Kontrasolo, Stille Hochzeit) also exempt from Feigheit.
+        var state = GameState.Create(
+            rules: RuleSet.Default(),
+            players: B.FourPlayers(),
+            partyResolver: B.SoloResolver()
+        );
+        state.Apply(
+            new SetSilentGameModeModification(
+                new SilentGameMode(SilentGameModeType.KontraSolo, B.P0)
+            )
+        );
+
+        var result = new GameResult(
+            Winner: Party.Re,
+            ReAugen: 196,
+            KontraAugen: 44,
+            ReStiche: 1,
+            KontraStiche: 0,
+            GameValue: 1,
+            AllAwards: [],
+            Feigheit: false,
+            ValueComponents: [],
+            SoloFactor: 1,
+            TotalScore: 1,
+            AnnouncementRecords: []
+        );
+        AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
+    }
+
     // ── CanAnnounce: Absage mutex ─────────────────────────────────────────────
 
     [Fact]

@@ -143,6 +143,12 @@ public sealed class GameState
     /// </summary>
     public SilentGameMode? SilentMode { get; private set; }
 
+    /// <summary>
+    /// True once a Hochzeit failed to find a partner in 3 qualifying tricks and became a
+    /// forced solo. Affects scoring (soloFactor=3), Feigheit exemption, and Rauskommer advance.
+    /// </summary>
+    public bool HochzeitBecameForcedSolo { get; private set; }
+
 #pragma warning disable CS8618 // Non-nullable fields initialized via factory/Apply
     private GameState() { }
 #pragma warning restore CS8618
@@ -400,6 +406,10 @@ public sealed class GameState
 
             case SetVorbehaltRauskommerModification m:
                 VorbehaltRauskommer = m.Player;
+                break;
+
+            case SetHochzeitForcedSoloModification:
+                HochzeitBecameForcedSolo = true;
                 break;
 
             default:

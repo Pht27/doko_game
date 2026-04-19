@@ -258,6 +258,110 @@ public class PlayCardHandlerTests
         saved!.Phase.Should().Be(GamePhase.Finished);
     }
 
+    // ── Hochzeit forced solo detection ────────────────────────────────────────
+
+    [Fact]
+    public async Task PlayCard_HochzeitNoPartnerIn3Tricks_SetsForcedSoloFlag()
+    {
+        // P0 is the Hochzeit player. P0 wins all 3 qualifying tricks (FirstTrick condition).
+        // After trick 3, HochzeitBecameForcedSolo should be true.
+        var kd0 = AppB.Card(0, Suit.Kreuz, Rank.Dame);
+        var kd1 = AppB.Card(1, Suit.Kreuz, Rank.Dame);
+        var kd2 = AppB.Card(2, Suit.Kreuz, Rank.Dame);
+        Card P1Card(byte id) => AppB.Card(id, Suit.Pik, Rank.Ass);
+        Card P2Card(byte id) => AppB.Card(id, Suit.Herz, Rank.Neun);
+        Card P3Card(byte id) => AppB.Card(id, Suit.Karo, Rank.Neun);
+
+        var players = new[]
+        {
+            new PlayerState(AppB.P0, AppB.HandOf(kd0, kd1, kd2), null),
+            new PlayerState(AppB.P1, AppB.HandOf(P1Card(10), P1Card(11), P1Card(12)), null),
+            new PlayerState(AppB.P2, AppB.HandOf(P2Card(20), P2Card(21), P2Card(22)), null),
+            new PlayerState(AppB.P3, AppB.HandOf(P3Card(30), P3Card(31), P3Card(32)), null),
+        };
+
+        var (repo, pub, _) = AppB.Infrastructure();
+        var gameState = GameState.Create(
+            phase: GamePhase.Playing,
+            players: players,
+            currentTurn: AppB.P0,
+            rules: RuleSet.Minimal(),
+            activeReservation: new HochzeitReservation(AppB.P0, HochzeitCondition.FirstTrick),
+            partyResolver: new HochzeitPartyResolver(AppB.P0, HochzeitCondition.FirstTrick)
+        );
+        await repo.SaveAsync(gameState);
+        var uc = Handler(repo, pub);
+
+        // Play 3 full tricks — P0 leads ♣Q each time, P1/P2/P3 play non-trump → P0 wins each
+        foreach (var (p0card, p1id, p2id, p3id) in new[] {
+            (kd0, (byte)10, (byte)20, (byte)30),
+            (kd1, (byte)11, (byte)21, (byte)31),
+            (kd2, (byte)12, (byte)22, (byte)32),
+        })
+        {
+            await uc.ExecuteAsync(new PlayCardCommand(gameState.Id, AppB.P0, p0card.Id, []));
+            await uc.ExecuteAsync(new PlayCardCommand(gameState.Id, AppB.P1, P1Card(p1id).Id, []));
+            await uc.ExecuteAsync(new PlayCardCommand(gameState.Id, AppB.P2, P2Card(p2id).Id, []));
+            await uc.ExecuteAsync(new PlayCardCommand(gameState.Id, AppB.P3, P3Card(p3id).Id, []));
+        }
+
+        var saved = await repo.GetAsync(gameState.Id);
+        saved!.HochzeitBecameForcedSolo.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task PlayCard_HochzeitForcedSolo_FinishedResultHasAdvanceRauskommerFalse()
+    {
+        var kd0 = AppB.Card(0, Suit.Kreuz, Rank.Dame);
+        var kd1 = AppB.Card(1, Suit.Kreuz, Rank.Dame);
+        var kd2 = AppB.Card(2, Suit.Kreuz, Rank.Dame);
+        Card P1Card(byte id) => AppB.Card(id, Suit.Pik, Rank.Ass);
+        Card P2Card(byte id) => AppB.Card(id, Suit.Herz, Rank.Neun);
+        Card P3Card(byte id) => AppB.Card(id, Suit.Karo, Rank.Neun);
+
+        var players = new[]
+        {
+            new PlayerState(AppB.P0, AppB.HandOf(kd0, kd1, kd2), null),
+            new PlayerState(AppB.P1, AppB.HandOf(P1Card(10), P1Card(11), P1Card(12)), null),
+            new PlayerState(AppB.P2, AppB.HandOf(P2Card(20), P2Card(21), P2Card(22)), null),
+            new PlayerState(AppB.P3, AppB.HandOf(P3Card(30), P3Card(31), P3Card(32)), null),
+        };
+
+        var (repo, pub, _) = AppB.Infrastructure();
+        var gameState = GameState.Create(
+            phase: GamePhase.Playing,
+            players: players,
+            currentTurn: AppB.P0,
+            rules: RuleSet.Minimal(),
+            activeReservation: new HochzeitReservation(AppB.P0, HochzeitCondition.FirstTrick),
+            partyResolver: new HochzeitPartyResolver(AppB.P0, HochzeitCondition.FirstTrick)
+        );
+        await repo.SaveAsync(gameState);
+        var uc = Handler(repo, pub);
+
+        GameActionResult<PlayCardResult> lastResult = null!;
+        foreach (var (p0card, p1id, p2id, p3id) in new[] {
+            (kd0, (byte)10, (byte)20, (byte)30),
+            (kd1, (byte)11, (byte)21, (byte)31),
+            (kd2, (byte)12, (byte)22, (byte)32),
+        })
+        {
+            await uc.ExecuteAsync(new PlayCardCommand(gameState.Id, AppB.P0, p0card.Id, []));
+            await uc.ExecuteAsync(new PlayCardCommand(gameState.Id, AppB.P1, P1Card(p1id).Id, []));
+            await uc.ExecuteAsync(new PlayCardCommand(gameState.Id, AppB.P2, P2Card(p2id).Id, []));
+            lastResult = await uc.ExecuteAsync(
+                new PlayCardCommand(gameState.Id, AppB.P3, P3Card(p3id).Id, [])
+            );
+        }
+
+        var finished = lastResult
+            .Should()
+            .BeOfType<GameActionResult<PlayCardResult>.Ok>()
+            .Which.Value.FinishedResult;
+        finished.Should().NotBeNull();
+        finished!.ShouldAdvanceRauskommer.Should().BeFalse();
+    }
+
     [Fact]
     public async Task PlayCard_LastTrick_FirstDulleBeatsSecond()
     {

@@ -123,8 +123,12 @@ public static class AnnouncementRules
         if (!state.Rules.EnforceFeigheit)
             return false;
 
-        // Feigheit does not apply in Soli
-        if (state.ActiveReservation?.IsSolo == true)
+        // Feigheit does not apply in Soli (declared or silent) or forced Hochzeit solo
+        if (
+            state.ActiveReservation?.IsSolo == true
+            || state.SilentMode is not null
+            || state.HochzeitBecameForcedSolo
+        )
             return false;
 
         // Feigheit does not apply when a Genscher changed the teams
