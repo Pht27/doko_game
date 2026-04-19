@@ -5,7 +5,10 @@ namespace Doko.Domain.Extrapunkte;
 
 public static class ExtrapunktRegistry
 {
-    public static IReadOnlyList<IExtrapunkt> GetActive(RuleSet rules, IReservation? activeReservation)
+    public static IReadOnlyList<IExtrapunkt> GetActive(
+        RuleSet rules,
+        IReservation? activeReservation
+    )
     {
         if (activeReservation?.IsSolo == true)
             return [];

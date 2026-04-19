@@ -62,9 +62,7 @@ public static class SonderkarteRegistry
                 && s.AreConditionsMet(state)
                 && !(
                     isSchlankerMartin
-                    && s.Type
-                        is SonderkarteType.Genscherdamen
-                            or SonderkarteType.Gegengenscherdamen
+                    && s.Type is SonderkarteType.Genscherdamen or SonderkarteType.Gegengenscherdamen
                 )
             )
             .ToList();

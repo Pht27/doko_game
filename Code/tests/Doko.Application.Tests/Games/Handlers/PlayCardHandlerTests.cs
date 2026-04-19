@@ -278,7 +278,8 @@ public class PlayCardHandlerTests
             return t;
         }
 
-        var completedTricks = Enumerable.Range(0, 11)
+        var completedTricks = Enumerable
+            .Range(0, 11)
             .Select(i => DummyTrick((byte)(i * 4 + 4)))
             .ToList();
 
