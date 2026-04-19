@@ -1,1 +1,0 @@
-normalerweise sticht die zweite dull die erste. wenn wir uns aber im letzten stich befinden, wird das umgedreht, dann sticht die erste die zweite
