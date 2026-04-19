@@ -30,6 +30,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICreateLobbyHandler, CreateLobbyHandler>();
         services.AddScoped<IJoinSeatHandler, JoinSeatHandler>();
         services.AddScoped<ILeaveLobbyHandler, LeaveLobbyHandler>();
+        services.AddScoped<ISwapSeatHandler, SwapSeatHandler>();
 
         return services;
     }

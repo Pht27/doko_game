@@ -38,6 +38,10 @@ export function leaveLobby(token: string, lobbyId: string): Promise<void> {
   return apiFetch(`/lobbies/${lobbyId}/leave`, token, { method: 'POST' });
 }
 
+export function swapSeat(token: string, lobbyId: string, targetSeatIndex: number): Promise<LobbyJoinResponse> {
+  return apiFetch(`/lobbies/${lobbyId}/seats/${targetSeatIndex}/swap`, token, { method: 'POST' });
+}
+
 export function getLobby(lobbyId: string): Promise<LobbyViewResponse> {
   return apiFetch(`/lobbies/${lobbyId}`, null);
 }

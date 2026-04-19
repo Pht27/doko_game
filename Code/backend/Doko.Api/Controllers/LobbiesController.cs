@@ -19,6 +19,7 @@ public class LobbiesController(
     ICreateLobbyHandler createLobby,
     IJoinSeatHandler joinSeat,
     ILeaveLobbyHandler leaveLobby,
+    ISwapSeatHandler swapSeat,
     ILobbyRepository lobbyRepository,
     IStartGameHandler startGame,
     IDealCardsHandler dealCards,
@@ -96,6 +97,35 @@ public class LobbiesController(
                 ActiveGameId: activeGameId
             )
         );
+    }
+
+    [HttpPost("{lobbyId}/seats/{seatIndex:int}/swap")]
+    [Authorize]
+    public async Task<IActionResult> SwapSeat(string lobbyId, int seatIndex, CancellationToken ct)
+    {
+        if (!Guid.TryParse(lobbyId, out var guid))
+            return NotFound(new ErrorResponse("lobby_not_found"));
+
+        var callerSeat = GetCallerSeat();
+        var command = new SwapSeatCommand(new LobbyId(guid), callerSeat, seatIndex);
+        var result = await swapSeat.ExecuteAsync(command, ct);
+
+        if (result is LobbyActionResult<SwapSeatResult>.Failure failure)
+            return failure.Error switch
+            {
+                LobbyError.LobbyNotFound => NotFound(new ErrorResponse("lobby_not_found")),
+                LobbyError.PlayerNotInLobby => Conflict(new ErrorResponse("player_not_in_lobby")),
+                LobbyError.SeatOccupied => Conflict(new ErrorResponse("seat_occupied")),
+                _ => StatusCode(500, new ErrorResponse("unknown_error")),
+            };
+
+        var ok = ((LobbyActionResult<SwapSeatResult>.Ok)result).Value;
+        var oldSeatIndex = (int)callerSeat;
+
+        await hub.Clients.Group($"lobby_{lobbyId}").SendAsync("playerLeft", new { seatIndex = oldSeatIndex }, ct);
+        await hub.Clients.Group($"lobby_{lobbyId}").SendAsync("playerJoined", new { seatIndex, playerCount = 0 }, ct);
+
+        return Ok(new LobbyJoinResponse(lobbyId, tokenService.GenerateToken(ok.NewSeat), SeatIndex: seatIndex));
     }
 
     [HttpPost("{lobbyId}/leave")]

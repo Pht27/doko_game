@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { t } from '../../translations';
-import { leaveLobby, joinSeat, getLobby, voteReady, withdrawReady } from '../../api/lobby';
+import { leaveLobby, joinSeat, swapSeat, getLobby, voteReady, withdrawReady } from '../../api/lobby';
 import {
   useLobby,
   loadLobbySession,
@@ -91,20 +91,10 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
     setBusySeat(targetSeat);
     setActionError(null);
     try {
-      // Leave first — ignore backend errors (e.g. lobby already gone) so we don't get stuck
-      try {
-        await leaveLobby(session.token, lobbyId);
-      } catch {
-        // best-effort
-      }
-      clearLobbySession();
-      setSession(null);
-
-      const res = await joinSeat(lobbyId, targetSeat);
+      const res = await swapSeat(session.token, lobbyId, targetSeat);
       const newSession: LobbySession = {
         lobbyId: res.lobbyId,
         token: res.token,
-        
         seatIndex: res.seatIndex,
       };
       saveLobbySession(newSession);
