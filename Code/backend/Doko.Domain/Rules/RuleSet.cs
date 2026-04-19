@@ -5,6 +5,8 @@ public record RuleSet
     // Deck
     public bool PlayWithNines { get; init; }
 
+    public int LastTrickIndex => PlayWithNines ? 11 : 9;
+
     // Game modes
     public bool AllowFarbsoli { get; init; }
     public bool AllowDamensolo { get; init; }

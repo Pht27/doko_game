@@ -1,5 +1,6 @@
 using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
+using Doko.Domain.Rules;
 using Doko.Domain.Sonderkarten;
 using Doko.Domain.Tricks;
 
@@ -22,11 +23,10 @@ public sealed class KarlchenExtrapunkt : IExtrapunkt
         if (heidmannActive && !heidfrauActive)
             return [];
 
-        // Only on the last trick (12 tricks total; CompletedTricks has 11 before this one is added)
-        if (state.CompletedTricks.Count != 11)
+        if (state.CompletedTricks.Count != state.Rules.LastTrickIndex)
             return [];
 
-        var winner = completedTrick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
+        var winner = completedTrick.Winner(state.TrumpEvaluator, DulleRule.FirstBeatsSecond);
         bool winnerPlayedKarlchen = completedTrick.Cards.Any(tc =>
             tc.Card.Type == KreuzBube && tc.Player == winner
         );

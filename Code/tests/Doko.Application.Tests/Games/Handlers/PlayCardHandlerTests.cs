@@ -296,7 +296,7 @@ public class PlayCardHandlerTests
             players: players,
             currentTurn: AppB.P0,
             trumpEvaluator: NormalTrumpEvaluator.Instance,
-            rules: new RuleSet { DulleRule = DulleRule.SecondBeatsFirst },
+            rules: new RuleSet { DulleRule = DulleRule.SecondBeatsFirst, PlayWithNines = true },
             completedTricks: completedTricks
         );
         await repo.SaveAsync(state);

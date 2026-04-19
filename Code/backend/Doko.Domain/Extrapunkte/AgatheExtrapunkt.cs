@@ -1,5 +1,6 @@
 using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
+using Doko.Domain.Rules;
 using Doko.Domain.Tricks;
 
 namespace Doko.Domain.Extrapunkte;
@@ -17,10 +18,10 @@ public sealed class AgatheExtrapunkt : IExtrapunkt
 
     public IReadOnlyList<ExtrapunktAward> Evaluate(Trick completedTrick, GameState state)
     {
-        if (state.CompletedTricks.Count != 11)
+        if (state.CompletedTricks.Count != state.Rules.LastTrickIndex)
             return [];
 
-        var winner = completedTrick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
+        var winner = completedTrick.Winner(state.TrumpEvaluator, DulleRule.FirstBeatsSecond);
         var winnerParty = state.PartyResolver.ResolveParty(winner, state);
 
         bool winnerPlayedAgathe = completedTrick.Cards.Any(tc =>

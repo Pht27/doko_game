@@ -210,7 +210,7 @@ public sealed class PlayCardHandler(
     )
     {
         var trick = state.CurrentTrick!;
-        var isLastTrick = state.CompletedTricks.Count == 11;
+        var isLastTrick = state.CompletedTricks.Count == state.Rules.LastTrickIndex;
         var dulleRule = isLastTrick ? DulleRule.FirstBeatsSecond : state.Rules.DulleRule;
         var winner = trick.Winner(state.TrumpEvaluator, dulleRule);
         var awards = ExtrapunktRegistry
