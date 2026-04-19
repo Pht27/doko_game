@@ -124,7 +124,7 @@ public static class AnnouncementRules
             return false;
 
         // Feigheit does not apply in Soli
-        if (state.ActiveReservation is not null)
+        if (state.ActiveReservation?.IsSolo == true)
             return false;
 
         // Feigheit does not apply when a Genscher changed the teams
