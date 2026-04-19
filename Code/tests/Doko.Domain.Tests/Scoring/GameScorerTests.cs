@@ -472,6 +472,30 @@ public class GameScorerTests
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
+    [Fact]
+    public void Score_SoloFactor_IsThree_WhenSilentModeActive()
+    {
+        // SilentMode = KontraSolo → soloFactor = 3 even without an ActiveReservation
+        var state = SoloState(rules: NoFeigheit);
+        state.Apply(
+            new SetSilentGameModeModification(
+                new SilentGameMode(SilentGameModeType.KontraSolo, B.P0)
+            )
+        );
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P0, 0),
+            B.HighValueTrick(B.P0, 4),
+            B.HighValueTrick(B.P0, 8),
+            B.HighValueTrick(B.P1, 12),
+            B.HighValueTrick(B.P1, 16),
+            B.HighValueTrick(B.P1, 20),
+        };
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.SoloFactor.Should().Be(3);
+    }
+
     private static GameState SoloState(
         RuleSet? rules = null,
         IReadOnlyList<Announcement>? announcements = null

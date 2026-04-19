@@ -127,3 +127,11 @@ public sealed record SetArmutReturnedTrumpModification(bool IncludedTrump) : Gam
 /// who plays the first card in Normal/Hochzeit/SchlankerMartin games.
 /// </summary>
 public sealed record SetVorbehaltRauskommerModification(PlayerSeat Player) : GameStateModification;
+
+/// <summary>
+/// Sets a silent (undeclared) game mode — Kontrasolo or Stille Hochzeit.
+/// Applied in the all-Gesund path when no reservation was declared.
+/// Null clears any active silent mode (fallback to normal game).
+/// </summary>
+public sealed record SetSilentGameModeModification(GameFlow.SilentGameMode? Mode)
+    : GameStateModification;

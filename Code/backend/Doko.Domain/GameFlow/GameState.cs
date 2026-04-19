@@ -137,6 +137,12 @@ public sealed class GameState
     /// </summary>
     public PlayerSeat VorbehaltRauskommer { get; private set; }
 
+    /// <summary>
+    /// Active silent (undeclared) game mode, set when all players declare Gesund and a player's
+    /// hand qualifies for Kontrasolo or Stille Hochzeit. Null in all other game modes.
+    /// </summary>
+    public SilentGameMode? SilentMode { get; private set; }
+
 #pragma warning disable CS8618 // Non-nullable fields initialized via factory/Apply
     private GameState() { }
 #pragma warning restore CS8618
@@ -232,6 +238,25 @@ public sealed class GameState
                 var ctx = m.Reservation?.Apply();
                 TrumpEvaluator = ctx?.TrumpEvaluator ?? NormalTrumpEvaluator.Instance;
                 PartyResolver = ctx?.PartyResolver ?? NormalPartyResolver.Instance;
+                break;
+
+            case SetSilentGameModeModification m:
+                SilentMode = m.Mode;
+                switch (m.Mode?.Type)
+                {
+                    case SilentGameModeType.KontraSolo:
+                        TrumpEvaluator = KontraSoloTrumpEvaluator.Instance;
+                        PartyResolver = new KontraSoloPartyResolver(m.Mode.Player);
+                        break;
+                    case SilentGameModeType.StilleHochzeit:
+                        TrumpEvaluator = NormalTrumpEvaluator.Instance;
+                        PartyResolver = new StilleHochzeitPartyResolver(m.Mode.Player);
+                        break;
+                    default:
+                        TrumpEvaluator = NormalTrumpEvaluator.Instance;
+                        PartyResolver = NormalPartyResolver.Instance;
+                        break;
+                }
                 break;
 
             case SetCurrentTurnModification m:
@@ -363,7 +388,9 @@ public sealed class GameState
                 }
                 // If !teamsChanged (Nicht tauschen): announcements stay as-is.
 
-                PartyResolver = new Parties.GenscherPartyResolver(m.Genscher, m.Partner);
+                // In Stille Hochzeit, Genscher can be announced but parties are fixed by the solo.
+                if (SilentMode?.Type != SilentGameModeType.StilleHochzeit)
+                    PartyResolver = new Parties.GenscherPartyResolver(m.Genscher, m.Partner);
                 break;
             }
 
@@ -386,7 +413,12 @@ public sealed class GameState
     private void RebuildTrumpEvaluator()
     {
         var baseEvaluator =
-            ActiveReservation?.Apply().TrumpEvaluator ?? NormalTrumpEvaluator.Instance;
+            ActiveReservation?.Apply().TrumpEvaluator
+            ?? (
+                SilentMode?.Type == SilentGameModeType.KontraSolo
+                    ? (ITrumpEvaluator)KontraSoloTrumpEvaluator.Instance
+                    : NormalTrumpEvaluator.Instance
+            );
 
         var activeSet = ActiveSonderkarten.ToHashSet();
         var suppressed = SonderkarteRegistry

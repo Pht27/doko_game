@@ -111,7 +111,8 @@ public sealed class GameScorer : IGameScorer
         }
 
         // ── 5. SoloFactor ─────────────────────────────────────────────────────────
-        int soloFactor = state.ActiveReservation?.IsSolo == true ? 3 : 1;
+        int soloFactor =
+            state.ActiveReservation?.IsSolo == true || state.SilentMode is not null ? 3 : 1;
 
         // ── 6. Feigheit ────────────────────────────────────────────────────────────
         var provisionalResult = new GameResult(

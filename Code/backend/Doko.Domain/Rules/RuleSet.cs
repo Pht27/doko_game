@@ -16,6 +16,8 @@ public record RuleSet
     public bool AllowKnochenloses { get; init; }
     public bool AllowSchlankerMartin { get; init; }
     public bool AllowStilleSolo { get; init; }
+    public bool AllowKontrasolo { get; init; }
+    public bool AllowStilleHochzeit { get; init; }
     public bool AllowArmut { get; init; }
     public bool AllowHochzeit { get; init; }
     public bool AllowSchmeissen { get; init; }
@@ -64,6 +66,8 @@ public record RuleSet
             AllowKnochenloses = true,
             AllowSchlankerMartin = true,
             AllowStilleSolo = true,
+            AllowKontrasolo = true,
+            AllowStilleHochzeit = true,
             AllowArmut = true,
             AllowHochzeit = true,
             AllowSchmeissen = true,

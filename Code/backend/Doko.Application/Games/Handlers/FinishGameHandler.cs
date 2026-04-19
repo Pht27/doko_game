@@ -23,10 +23,14 @@ internal sealed class FinishGameHandler(IGameScorer scorer)
 
         // Rauskommer advances only after Normal and Hochzeit games; Soli and Armut replay with same leader.
         bool advanceRauskommer =
-            state.ActiveReservation is null
-            || state.ActiveReservation.Priority == ReservationPriority.Hochzeit;
+            state.SilentMode is null
+            && (
+                state.ActiveReservation is null
+                || state.ActiveReservation.Priority == ReservationPriority.Hochzeit
+            );
 
-        string? gameMode = state.ActiveReservation?.Priority.ToString();
+        string? gameMode =
+            state.ActiveReservation?.Priority.ToString() ?? state.SilentMode?.Type.ToString();
         return new GameFinishedResult(result, netPoints, advanceRauskommer, gameMode);
     }
 }

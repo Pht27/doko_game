@@ -197,15 +197,19 @@ Silent solos are not declared as reservations but revealed through play.
 - A player with both ♣ Queens may play silently (not declare Hochzeit).
 - Plays like a normal game; only the Hochzeit party knows it is effectively a solo.
 - Revealed when the second ♣ Queen is played.
-- Announcements and all normal rules apply, **except** Genscherdamen and Gegengenscherdamen are fully inert (Genschern/Gegengenschern cannot be announced, and holding both ♥ Queens does not grant passive Re status).
+- Announcements and all normal rules apply, **except** Genscherdamen and Gegengenscherdamen have no effect on party determination — the stille solo party structure takes precedence at game end. However, Genschern/Gegengenschern **can still be announced** and the passive Re status from holding both ♥ Queens still applies; this prevents a Kontra player holding both ♥ Queens from inadvertently revealing the solo by failing to announce.
 - Scored as a **Solo** at the end.
 
 ### Kontrasolo [CONFIGURABLE]
 - Condition: player holds **both ♠ Queens AND both ♠ Kings**.
+- When the condition is met (without also holding both ♣ Queens), playing Kontrasolo is **mandatory** — the player has no choice.
 - Plays like a Stille Hochzeit; the allowed announcement is **"Kontra"** (regardless of ♣ Queens held).
 - The ♠ Kings become **Klabautermänner** — the **highest trumps** in the game (above all Sonderkarten). Announced by calling **"Klabautermann"** when playing one, which also reveals the solo.
 - Committing action (no changing one's mind after): playing/not-playing the ♠ Kings in a way that would reveal the solo, or announcing "Kontra"/"Re" while holding ♣ Queens.
-- If a player qualifies for both Stille Hochzeit and Kontrasolo, they may freely choose between announced Hochzeit, Stille Hochzeit, or Kontrasolo (Kontrasolo is strictly better than Stille Hochzeit in this case).
+- If a player qualifies for both Stille Hochzeit and Kontrasolo (holds both ♣ Queens, both ♠ Queens, and both ♠ Kings), three options apply:
+  1. Declare a **non-Hochzeit reservation** → that reservation is played.
+  2. Declare **Hochzeit** → normal Hochzeit with Findungsstich etc.; Kontrasolo rules do not apply.
+  3. **No declaration** → Kontrasolo by convention.
 
 ### Stille Armut [CONFIGURABLE — PRELIMINARY / WORK IN PROGRESS]
 - A player with an Armut hand may choose to play it silently.
