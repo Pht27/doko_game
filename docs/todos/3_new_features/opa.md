@@ -1,0 +1,1 @@
+I want to implement Computer player that automatically plays the first playable card when its its turn, in case I dont get the full 4 players. Lets call that player "Opa".

@@ -1,0 +1,1 @@
+wenn geschmissen wird kommt momentn der result screen aber mit dem letzten möglichen spiel selected. es kommt also nicht der geschmissen screen.
