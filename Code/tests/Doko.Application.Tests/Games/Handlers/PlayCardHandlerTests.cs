@@ -365,7 +365,7 @@ public class PlayCardHandlerTests
             .BeOfType<GameActionResult<PlayCardResult>.Ok>()
             .Which.Value.FinishedResult;
         finished.Should().NotBeNull();
-        finished!.ShouldAdvanceRauskommer.Should().BeFalse();
+        finished!.ShouldAdvanceRauskommer.Should().BeTrue();
     }
 
     [Fact]
