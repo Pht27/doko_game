@@ -233,7 +233,7 @@
 }
 
 .rd-row-label-factor {
-  @apply text-yellow-400/80 font-semibold;
+  @apply text-yellow-400/80 font-semibold text-right w-full;
 }
 
 .rd-row-value {
