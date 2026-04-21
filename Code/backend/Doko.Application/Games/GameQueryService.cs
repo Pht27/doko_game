@@ -35,7 +35,7 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
         bool isMyTurn = state.Phase == GamePhase.Playing && state.CurrentTurn == requestingPlayer;
 
         // Own party — null when not yet known (e.g. Hochzeit before Findungsstich)
-        var ownParty = state.PartyResolver.ResolveParty(requestingPlayer, state);
+        var ownParty = GetAnnouncementDisplayParty(requestingPlayer, state);
 
         // Legal cards: only relevant when it's this player's turn
         IReadOnlyList<Card> legalCards = [];
@@ -92,10 +92,11 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             {
                 // Reveal party when mode dictates it, or when the player has announced
                 var hasAnnounced = state.Announcements.Any(a => a.Player == p.Seat);
+                var displayParty = GetAnnouncementDisplayParty(p.Seat, state);
                 var knownParty = revealParties
-                    ? state.PartyResolver.ResolveParty(p.Seat, state)
+                    ? displayParty
                     : p.KnownParty
-                        ?? (hasAnnounced ? state.PartyResolver.ResolveParty(p.Seat, state) : null);
+                        ?? (hasAnnounced ? displayParty : null);
 
                 // Most specific announcement: highest enum value wins
                 var highestAnn = state
@@ -244,6 +245,18 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             ArmutReturnedTrump = armutReturnedTrump,
             ActiveGameMode = activeGameMode,
         };
+    }
+
+    /// In Kontrasolo, non-solo players see their Kreuz-Dame-based party for announcement labels.
+    /// They don't know they're "Re" in the Kontrasolo sense; the button should reflect normal rules.
+    private static Party? GetAnnouncementDisplayParty(PlayerSeat player, GameState state)
+    {
+        if (
+            state.SilentMode?.Type == SilentGameModeType.KontraSolo
+            && state.SilentMode.Player != player
+        )
+            return NormalPartyResolver.Instance.ResolveParty(player, state);
+        return state.PartyResolver.ResolveParty(player, state);
     }
 
     private static TrickSummary ToCompletedTrickSummary(int trickNumber, TrickResult result)
