@@ -38,6 +38,9 @@ public class LobbyState
     /// <summary>The game that is currently running in this lobby, if any.</summary>
     public GameId? ActiveGameId { get; private set; }
 
+    /// <summary>Name of the scenario to use when dealing cards, or null for random.</summary>
+    public string? SelectedScenario { get; private set; }
+
     /// <summary>Cumulative lobby standings per seat (index 0–3).</summary>
     public IReadOnlyList<int> Standings => Array.AsReadOnly(_standings);
 
@@ -128,6 +131,8 @@ public class LobbyState
 
     /// <summary>Returns true if the given seat is currently occupied.</summary>
     public bool HasPlayer(PlayerSeat seat) => (int)seat < 4 && _seats[(int)seat] != null;
+
+    public void SetScenario(string? scenarioName) => SelectedScenario = scenarioName;
 
     public void MarkStarted(GameId gameId)
     {

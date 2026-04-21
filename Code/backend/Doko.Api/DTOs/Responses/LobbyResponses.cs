@@ -16,7 +16,10 @@ public record LobbyViewResponse(
     int[] Standings,
     int StartVoteCount = 0,
     string? ActiveGameId = null,
-    int[]? OpaSeats = null
+    int[]? OpaSeats = null,
+    string? SelectedScenario = null
 );
 
 public record StartLobbyGameResponse(string GameId);
+
+public record ScenarioListResponse(string[] Scenarios);

@@ -3,4 +3,8 @@ using Doko.Domain.Players;
 
 namespace Doko.Application.Games.Commands;
 
-public record DealCardsCommand(GameId GameId, PlayerSeat? VorbehaltRauskommer = null);
+public record DealCardsCommand(
+    GameId GameId,
+    PlayerSeat? VorbehaltRauskommer = null,
+    string? ScenarioName = null
+);

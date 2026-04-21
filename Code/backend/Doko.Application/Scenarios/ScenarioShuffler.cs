@@ -1,12 +1,8 @@
 using Doko.Application.Abstractions;
 using Doko.Domain.Cards;
 
-namespace Doko.Console.Scenarios;
+namespace Doko.Application.Scenarios;
 
-/// <summary>
-/// An <see cref="IDeckShuffler"/> that arranges the deck so each player
-/// receives their required cards first, then fills the rest randomly from the leftover.
-/// </summary>
 public sealed class ScenarioShuffler(ScenarioConfig config) : IDeckShuffler
 {
     public IReadOnlyList<Card> Shuffle(IReadOnlyList<Card> deck)
@@ -29,7 +25,6 @@ public sealed class ScenarioShuffler(ScenarioConfig config) : IDeckShuffler
                 }
             }
 
-            // Fill the rest of this player's hand from whatever cards are left
             int toFill = slotSize - slot.Count;
             slot.AddRange(remaining.Take(toFill));
             remaining.RemoveRange(0, toFill);

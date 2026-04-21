@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { t } from '../../translations';
-import { leaveLobby, joinSeat, swapSeat, getLobby, voteReady, withdrawReady, addOpa, removeOpa } from '../../api/lobby';
+import { leaveLobby, joinSeat, swapSeat, getLobby, voteReady, withdrawReady, addOpa, removeOpa, getScenarios, setScenario } from '../../api/lobby';
 import {
   useLobby,
   loadLobbySession,
@@ -23,7 +23,7 @@ interface LobbyDetailViewProps {
 export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFinishedResult }: LobbyDetailViewProps) {
   const [session, setSession] = useState<LobbySession | null>(() => loadLobbySession(lobbyId));
 
-  const { seats, opaSeats, gameId, isStarted, lobbyClosed, startVoteCount, error } = useLobby(session, lobbyId);
+  const { seats, opaSeats, gameId, isStarted, lobbyClosed, startVoteCount, selectedScenario, error } = useLobby(session, lobbyId);
 
   const [copied, setCopied] = useState(false);
   const [hasVoted, setHasVoted] = useState(false);
@@ -32,6 +32,9 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
   const [showHistory, setShowHistory] = useState(false);
   const [busySeat, setBusySeat] = useState<number | null>(null); // index being joined/swapped
   const [actionError, setActionError] = useState<string | null>(null);
+  const [showScenarioPicker, setShowScenarioPicker] = useState(false);
+  const [availableScenarios, setAvailableScenarios] = useState<string[]>([]);
+  const [settingScenario, setSettingScenario] = useState(false);
 
   const inviteUrl = `${window.location.origin}${window.location.pathname}?lobby=${lobbyId}`;
 
@@ -151,6 +154,31 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
       await removeOpa(session.token, lobbyId, opaSeatIndex);
     } catch (e) {
       setActionError(e instanceof Error ? e.message : String(e));
+    }
+  }
+
+  async function openScenarioPicker() {
+    setActionError(null);
+    try {
+      const res = await getScenarios();
+      setAvailableScenarios(res.scenarios);
+      setShowScenarioPicker(true);
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : String(e));
+    }
+  }
+
+  async function handleSelectScenario(name: string | null) {
+    if (!session) return;
+    setSettingScenario(true);
+    setActionError(null);
+    try {
+      await setScenario(session.token, lobbyId, name);
+      setShowScenarioPicker(false);
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setSettingScenario(false);
     }
   }
 
@@ -281,6 +309,72 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
       </div>
 
       {/* Actions — only shown when user has a seat in this lobby */}
+      {isMyLobby && (
+        <div className="flex flex-col gap-2 shrink-0">
+          {/* Scenario picker */}
+          {!isStarted && (
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <span className="text-white/40 text-xs uppercase tracking-wider flex-1">Szenario</span>
+                <button
+                  onClick={openScenarioPicker}
+                  className="text-xs text-indigo-300 hover:text-indigo-200 transition-colors"
+                >
+                  {selectedScenario ? 'Ändern' : 'Laden'}
+                </button>
+                {selectedScenario && (
+                  <button
+                    onClick={() => handleSelectScenario(null)}
+                    className="text-xs text-red-400 hover:text-red-300 transition-colors"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+              {selectedScenario && (
+                <div className="bg-indigo-600/20 border border-indigo-500/30 rounded-lg px-3 py-2 text-indigo-200 text-xs font-medium">
+                  {selectedScenario}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Scenario modal */}
+          {showScenarioPicker && (
+            <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4" onClick={() => setShowScenarioPicker(false)}>
+              <div className="bg-gray-900 rounded-2xl w-full max-w-sm p-4 flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
+                <p className="text-white font-semibold text-sm mb-1">Szenario auswählen</p>
+                <button
+                  disabled={settingScenario}
+                  onClick={() => handleSelectScenario(null)}
+                  className={`w-full text-left px-3 py-2.5 rounded-xl text-sm transition-colors ${
+                    !selectedScenario
+                      ? 'bg-indigo-600/40 text-white'
+                      : 'text-white/50 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  Kein Szenario (Zufällig)
+                </button>
+                {availableScenarios.map((name) => (
+                  <button
+                    key={name}
+                    disabled={settingScenario}
+                    onClick={() => handleSelectScenario(name)}
+                    className={`w-full text-left px-3 py-2.5 rounded-xl text-sm transition-colors ${
+                      selectedScenario === name
+                        ? 'bg-indigo-600/40 text-white'
+                        : 'text-white/70 hover:bg-white/10 hover:text-white'
+                    }`}
+                  >
+                    {name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {isMyLobby && (
         <div className="flex flex-col gap-2 shrink-0">
           {/* Match history button */}

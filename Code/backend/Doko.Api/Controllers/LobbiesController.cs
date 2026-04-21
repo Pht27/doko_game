@@ -5,6 +5,7 @@ using Doko.Application.Games.Commands;
 using Doko.Application.Games.Handlers;
 using Doko.Application.Lobbies;
 using Doko.Application.Lobbies.Handlers;
+using Doko.Application.Scenarios;
 using Doko.Domain.Lobby;
 using Doko.Domain.Players;
 using Microsoft.AspNetCore.Authorization;
@@ -295,7 +296,8 @@ public class LobbiesController(
                 lobby.Standings.ToArray(),
                 lobby.LobbyStartVoteCount,
                 lobby.ActiveGameId?.ToString(),
-                lobby.OpaSeats.ToArray()
+                lobby.OpaSeats.ToArray(),
+                lobby.SelectedScenario
             )
         );
     }
@@ -339,7 +341,10 @@ public class LobbiesController(
                 return StatusCode(500, new ErrorResponse("game_start_failed"));
 
             var gameId = startOk.Value.GameId;
-            await dealCards.ExecuteAsync(new DealCardsCommand(gameId), ct);
+            await dealCards.ExecuteAsync(
+                new DealCardsCommand(gameId, ScenarioName: lobby.SelectedScenario),
+                ct
+            );
 
             lobby.MarkStarted(gameId);
             await lobbyRepository.SaveAsync(lobby, ct);
@@ -428,7 +433,10 @@ public class LobbiesController(
 
             var newGameId = startOk.Value.GameId;
             var vorbehaltRauskommer = (PlayerSeat)lobby.VorbehaltRauskommer;
-            await dealCards.ExecuteAsync(new DealCardsCommand(newGameId, vorbehaltRauskommer), ct);
+            await dealCards.ExecuteAsync(
+                new DealCardsCommand(newGameId, vorbehaltRauskommer, lobby.SelectedScenario),
+                ct
+            );
 
             lobby.MarkStarted(newGameId);
             await lobbyRepository.SaveAsync(lobby, ct);
@@ -528,9 +536,48 @@ public class LobbiesController(
         return Ok(new StartLobbyGameResponse(gameId.ToString()));
     }
 
+    [HttpGet("scenarios")]
+    [AllowAnonymous]
+    public IActionResult GetScenarios() =>
+        Ok(new ScenarioListResponse(Scenarios.All.Select(s => s.Name).ToArray()));
+
+    [HttpPost("{lobbyId}/scenario")]
+    [Authorize]
+    public async Task<IActionResult> SetScenario(
+        string lobbyId,
+        [FromBody] SetScenarioRequest body,
+        CancellationToken ct
+    )
+    {
+        if (!Guid.TryParse(lobbyId, out var guid))
+            return NotFound(new ErrorResponse("lobby_not_found"));
+
+        var lobby = await lobbyRepository.GetAsync(new LobbyId(guid), ct);
+        if (lobby is null)
+            return NotFound(new ErrorResponse("lobby_not_found"));
+
+        var callerId = GetCallerSeat();
+        if (!lobby.HasPlayer(callerId))
+            return Forbid();
+
+        if (body.Name is not null && !Scenarios.All.Any(s => s.Name == body.Name))
+            return BadRequest(new ErrorResponse("scenario_not_found"));
+
+        lobby.SetScenario(body.Name);
+        await lobbyRepository.SaveAsync(lobby, ct);
+
+        await hub
+            .Clients.Group($"lobby_{lobbyId}")
+            .SendAsync("scenarioChanged", new { name = body.Name }, ct);
+
+        return Ok(new { name = body.Name });
+    }
+
     private PlayerSeat GetCallerSeat()
     {
         var claim = User.FindFirst("seat_index")?.Value ?? "0";
         return (PlayerSeat)int.Parse(claim);
     }
 }
+
+public record SetScenarioRequest(string? Name);
