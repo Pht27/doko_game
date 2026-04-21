@@ -29,7 +29,9 @@ public class KontraSoloAnnouncementTests
             phase: GamePhase.Playing
         );
         state.Apply(
-            new SetSilentGameModeModification(new SilentGameMode(SilentGameModeType.KontraSolo, B.P0))
+            new SetSilentGameModeModification(
+                new SilentGameMode(SilentGameModeType.KontraSolo, B.P0)
+            )
         );
         return state;
     }

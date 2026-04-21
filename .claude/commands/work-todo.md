@@ -25,4 +25,6 @@ If no argument is given, use the file currently open in the IDE.
 
 7. **Mark as finished** — move the todo file into a `finished/` subfolder next to its current location (e.g. `docs/todos/99_finished/todo_fix_csharpier_problems.md`). Create the subfolder if it does not exist.
 
-8. **Commit** the changes along the way with fitting commit messages that summarizes what was done in sensible chunks. DO NOT MERGE TO MAIN.
+8. Run `dotnet csharpier format .` to format backend files.
+
+9. **Commit** the changes along the way with fitting commit messages that summarizes what was done in sensible chunks. DO NOT MERGE TO MAIN.
