@@ -8,6 +8,11 @@ public sealed class ScenarioShuffler(ScenarioConfig config) : IDeckShuffler
     public IReadOnlyList<Card> Shuffle(IReadOnlyList<Card> deck)
     {
         var remaining = deck.ToList();
+        for (int i = remaining.Count - 1; i > 0; i--)
+        {
+            int j = Random.Shared.Next(i + 1);
+            (remaining[i], remaining[j]) = (remaining[j], remaining[i]);
+        }
         var slotSize = deck.Count / 4;
         var result = new List<Card>(deck.Count);
 

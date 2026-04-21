@@ -21,7 +21,7 @@ export function ReadyVoteButton({ hasVoted, voteCount, disabled, onClick, classN
         {voteCount}/4 👤
       </span>
       <span className="flex-1 text-center">
-        {hasVoted ? '✓ Bereit' : 'Bereit'}
+        {hasVoted ? '✓' : 'Bereit'}
       </span>
       <span className="w-8" />
     </button>
