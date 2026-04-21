@@ -231,9 +231,8 @@ public sealed class PlayCardHandler(
             !state.HochzeitBecameForcedSolo
             && state.ActiveReservation is HochzeitReservation
             && state.PartyResolver.IsFullyResolved(state)
-            && state.Players.Count(p =>
-                state.PartyResolver.ResolveParty(p.Seat, state) == Party.Re
-            ) == 1
+            && state.Players.Count(p => state.PartyResolver.ResolveParty(p.Seat, state) == Party.Re)
+                == 1
         )
             state.Apply(new SetHochzeitForcedSoloModification());
 

@@ -293,11 +293,14 @@ public class PlayCardHandlerTests
         var uc = Handler(repo, pub);
 
         // Play 3 full tricks — P0 leads ♣Q each time, P1/P2/P3 play non-trump → P0 wins each
-        foreach (var (p0card, p1id, p2id, p3id) in new[] {
-            (kd0, (byte)10, (byte)20, (byte)30),
-            (kd1, (byte)11, (byte)21, (byte)31),
-            (kd2, (byte)12, (byte)22, (byte)32),
-        })
+        foreach (
+            var (p0card, p1id, p2id, p3id) in new[]
+            {
+                (kd0, (byte)10, (byte)20, (byte)30),
+                (kd1, (byte)11, (byte)21, (byte)31),
+                (kd2, (byte)12, (byte)22, (byte)32),
+            }
+        )
         {
             await uc.ExecuteAsync(new PlayCardCommand(gameState.Id, AppB.P0, p0card.Id, []));
             await uc.ExecuteAsync(new PlayCardCommand(gameState.Id, AppB.P1, P1Card(p1id).Id, []));
@@ -340,11 +343,14 @@ public class PlayCardHandlerTests
         var uc = Handler(repo, pub);
 
         GameActionResult<PlayCardResult> lastResult = null!;
-        foreach (var (p0card, p1id, p2id, p3id) in new[] {
-            (kd0, (byte)10, (byte)20, (byte)30),
-            (kd1, (byte)11, (byte)21, (byte)31),
-            (kd2, (byte)12, (byte)22, (byte)32),
-        })
+        foreach (
+            var (p0card, p1id, p2id, p3id) in new[]
+            {
+                (kd0, (byte)10, (byte)20, (byte)30),
+                (kd1, (byte)11, (byte)21, (byte)31),
+                (kd2, (byte)12, (byte)22, (byte)32),
+            }
+        )
         {
             await uc.ExecuteAsync(new PlayCardCommand(gameState.Id, AppB.P0, p0card.Id, []));
             await uc.ExecuteAsync(new PlayCardCommand(gameState.Id, AppB.P1, P1Card(p1id).Id, []));
