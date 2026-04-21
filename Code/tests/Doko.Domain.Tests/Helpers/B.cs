@@ -80,6 +80,28 @@ internal static class B
     public static IPartyResolver SoloResolver() => new SoloPartyResolver(P0);
 
     /// <summary>
+    /// KontraSoloPartyResolver where P0 is the Kontrasolo player (Kontra).
+    /// P1 and P2 hold ♣Q (effective Re); P3 does not (button-only Re).
+    /// Returns the resolver and the matching initial hands.
+    /// </summary>
+    public static (
+        KontraSoloPartyResolver resolver,
+        IReadOnlyDictionary<PlayerSeat, Hand> initialHands
+    ) KontraSoloResolver()
+    {
+        var kreuzDame1 = Card(0, Suit.Kreuz, Rank.Dame);
+        var kreuzDame2 = Card(1, Suit.Kreuz, Rank.Dame);
+        var hands = new Dictionary<PlayerSeat, Hand>
+        {
+            [P0] = HandOf(Card(2, Suit.Pik, Rank.Dame)), // Kontrasolo player, no ♣Q
+            [P1] = HandOf(kreuzDame1), // effective Re
+            [P2] = HandOf(kreuzDame2), // effective Re
+            [P3] = HandOf(Card(3, Suit.Herz, Rank.Ass)), // button-only Re
+        };
+        return (new KontraSoloPartyResolver(P0), hands);
+    }
+
+    /// <summary>
     /// NormalPartyResolver backed by initial hands where P0 and P2 hold ♣Q (Re),
     /// P1 and P3 do not (Kontra).
     /// </summary>

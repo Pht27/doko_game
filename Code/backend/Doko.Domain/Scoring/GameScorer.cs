@@ -99,9 +99,10 @@ public sealed class GameScorer : IGameScorer
             components.Add(new("Schwarz", 1));
         }
 
-        // One point per announcement (by any party)
+        // One point per effective announcement (by any party).
+        // Button-only announcements (IsEffective=false) are excluded — they have no scoring effect.
         var announcementRecords = new List<AnnouncementRecord>();
-        foreach (var announcement in state.Announcements)
+        foreach (var announcement in state.Announcements.Where(a => a.IsEffective))
         {
             var party = state.PartyResolver.ResolveParty(announcement.Player, state);
             if (party is null)
@@ -191,7 +192,9 @@ public sealed class GameScorer : IGameScorer
     )
     {
         var absagen = state
-            .Announcements.Where(a => state.PartyResolver.ResolveParty(a.Player, state) == party)
+            .Announcements.Where(a =>
+                a.IsEffective && state.PartyResolver.ResolveParty(a.Player, state) == party
+            )
             .Select(a => a.Type)
             .ToHashSet();
 
@@ -226,7 +229,8 @@ public sealed class GameScorer : IGameScorer
 
         var winnerAnnounced = state
             .Announcements.Where(a =>
-                state.PartyResolver.ResolveParty(a.Player, state) == provisionalWinner
+                a.IsEffective
+                && state.PartyResolver.ResolveParty(a.Player, state) == provisionalWinner
             )
             .Select(a => a.Type)
             .ToHashSet();

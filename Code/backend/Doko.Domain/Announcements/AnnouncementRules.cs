@@ -13,8 +13,16 @@ public static class AnnouncementRules
         if (!state.Rules.AllowAnnouncements)
             return false;
 
+        // Kontrasolo player cannot announce at all — they already know they play solo.
+        if (
+            state.SilentMode?.Type == SilentGameModeType.KontraSolo
+            && state.SilentMode.Player == player
+        )
+            return false;
+
         // Timing: base deadline depends on the game type (e.g. in Hochzeit it is relative to the
         // Findungsstich). Each announcement shifts the deadline forward by 4 (one full trick).
+        // All announcements — including button-only ones — extend the deadline to avoid info leaks.
         var baseDeadline = state.PartyResolver.AnnouncementBaseDeadline(state);
         if (baseDeadline is null)
             return false;
@@ -30,46 +38,89 @@ public static class AnnouncementRules
         if (party is null)
             return false;
 
-        var otherParty = party == Party.Re ? Party.Kontra : Party.Re;
+        bool isEffective = state.PartyResolver.IsAnnouncementEffective(player, state);
 
-        var partyAnnouncements = state
-            .Announcements.Where(a => state.PartyResolver.ResolveParty(a.Player, state) == party)
-            .Select(a => a.Type)
-            .ToHashSet();
-
-        var otherPartyAnnouncements = state
-            .Announcements.Where(a =>
-                state.PartyResolver.ResolveParty(a.Player, state) == otherParty
-            )
-            .Select(a => a.Type)
-            .ToHashSet();
-
-        // Once one party has made an Absage (Keine90+), the other party may no longer make Absagen.
-        bool otherPartyHasAbsage =
-            otherPartyAnnouncements.Contains(AnnouncementType.Keine90)
-            || otherPartyAnnouncements.Contains(AnnouncementType.Keine60)
-            || otherPartyAnnouncements.Contains(AnnouncementType.Keine30)
-            || otherPartyAnnouncements.Contains(AnnouncementType.Schwarz);
-
-        // Consecutive ordering: Win must come before Keine90, etc.
-        // The player's party must have already made the preceding announcement.
-        return type switch
+        if (isEffective)
         {
-            AnnouncementType.Win => !partyAnnouncements.Contains(AnnouncementType.Win),
-            AnnouncementType.Keine90 => !otherPartyHasAbsage
-                && partyAnnouncements.Contains(AnnouncementType.Win)
-                && !partyAnnouncements.Contains(AnnouncementType.Keine90),
-            AnnouncementType.Keine60 => !otherPartyHasAbsage
-                && partyAnnouncements.Contains(AnnouncementType.Keine90)
-                && !partyAnnouncements.Contains(AnnouncementType.Keine60),
-            AnnouncementType.Keine30 => !otherPartyHasAbsage
-                && partyAnnouncements.Contains(AnnouncementType.Keine60)
-                && !partyAnnouncements.Contains(AnnouncementType.Keine30),
-            AnnouncementType.Schwarz => !otherPartyHasAbsage
-                && partyAnnouncements.Contains(AnnouncementType.Keine30)
-                && !partyAnnouncements.Contains(AnnouncementType.Schwarz),
-            _ => false,
-        };
+            // Effective player: chain and Absage-mutex based on effective party announcements only.
+            var otherParty = party == Party.Re ? Party.Kontra : Party.Re;
+
+            var partyAnnouncements = state
+                .Announcements.Where(a =>
+                    a.IsEffective && state.PartyResolver.ResolveParty(a.Player, state) == party
+                )
+                .Select(a => a.Type)
+                .ToHashSet();
+
+            var otherPartyAnnouncements = state
+                .Announcements.Where(a =>
+                    a.IsEffective
+                    && state.PartyResolver.ResolveParty(a.Player, state) == otherParty
+                )
+                .Select(a => a.Type)
+                .ToHashSet();
+
+            bool otherPartyHasAbsage =
+                otherPartyAnnouncements.Contains(AnnouncementType.Keine90)
+                || otherPartyAnnouncements.Contains(AnnouncementType.Keine60)
+                || otherPartyAnnouncements.Contains(AnnouncementType.Keine30)
+                || otherPartyAnnouncements.Contains(AnnouncementType.Schwarz);
+
+            return type switch
+            {
+                AnnouncementType.Win => !partyAnnouncements.Contains(AnnouncementType.Win),
+                AnnouncementType.Keine90 => !otherPartyHasAbsage
+                    && partyAnnouncements.Contains(AnnouncementType.Win)
+                    && !partyAnnouncements.Contains(AnnouncementType.Keine90),
+                AnnouncementType.Keine60 => !otherPartyHasAbsage
+                    && partyAnnouncements.Contains(AnnouncementType.Keine90)
+                    && !partyAnnouncements.Contains(AnnouncementType.Keine60),
+                AnnouncementType.Keine30 => !otherPartyHasAbsage
+                    && partyAnnouncements.Contains(AnnouncementType.Keine60)
+                    && !partyAnnouncements.Contains(AnnouncementType.Keine30),
+                AnnouncementType.Schwarz => !otherPartyHasAbsage
+                    && partyAnnouncements.Contains(AnnouncementType.Keine30)
+                    && !partyAnnouncements.Contains(AnnouncementType.Schwarz),
+                _ => false,
+            };
+        }
+        else
+        {
+            // Button-only player (Kontrasolo Re without ♣ Queen): chain based on the shared pool of
+            // all non-effective party announcements. This prevents info leaks between button-only
+            // players — B1's Win allows B2 to announce Keine90 just as in a normal game.
+            // No Absage-mutex: effective other-party Absagen (Kontra solo can't announce) are N/A here.
+            var nonEffectivePartyAnnouncements = state
+                .Announcements.Where(a =>
+                    !a.IsEffective && state.PartyResolver.ResolveParty(a.Player, state) == party
+                )
+                .Select(a => a.Type)
+                .ToHashSet();
+
+            return type switch
+            {
+                AnnouncementType.Win => !nonEffectivePartyAnnouncements.Contains(
+                    AnnouncementType.Win
+                ),
+                AnnouncementType.Keine90 => nonEffectivePartyAnnouncements.Contains(
+                    AnnouncementType.Win
+                )
+                    && !nonEffectivePartyAnnouncements.Contains(AnnouncementType.Keine90),
+                AnnouncementType.Keine60 => nonEffectivePartyAnnouncements.Contains(
+                    AnnouncementType.Keine90
+                )
+                    && !nonEffectivePartyAnnouncements.Contains(AnnouncementType.Keine60),
+                AnnouncementType.Keine30 => nonEffectivePartyAnnouncements.Contains(
+                    AnnouncementType.Keine60
+                )
+                    && !nonEffectivePartyAnnouncements.Contains(AnnouncementType.Keine30),
+                AnnouncementType.Schwarz => nonEffectivePartyAnnouncements.Contains(
+                    AnnouncementType.Keine30
+                )
+                    && !nonEffectivePartyAnnouncements.Contains(AnnouncementType.Schwarz),
+                _ => false,
+            };
+        }
     }
 
     /// <summary>
@@ -99,7 +150,9 @@ public static class AnnouncementRules
             return null;
 
         var partyAnnouncements = state
-            .Announcements.Where(a => state.PartyResolver.ResolveParty(a.Player, state) == party)
+            .Announcements.Where(a =>
+                a.IsEffective && state.PartyResolver.ResolveParty(a.Player, state) == party
+            )
             .Select(a => a.Type)
             .ToHashSet();
 
@@ -139,7 +192,9 @@ public static class AnnouncementRules
         var loserAugen = winner == Party.Re ? result.KontraAugen : result.ReAugen;
 
         var winnerAnnounced = state
-            .Announcements.Where(a => state.PartyResolver.ResolveParty(a.Player, state) == winner)
+            .Announcements.Where(a =>
+                a.IsEffective && state.PartyResolver.ResolveParty(a.Player, state) == winner
+            )
             .Select(a => a.Type)
             .ToHashSet();
 

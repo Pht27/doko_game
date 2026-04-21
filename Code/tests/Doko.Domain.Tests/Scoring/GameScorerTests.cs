@@ -516,6 +516,103 @@ public class GameScorerTests
         result.SoloFactor.Should().Be(3);
     }
 
+    // ── Kontrasolo: button-only announcements have no scoring effect ──────────
+
+    [Fact]
+    public void Score_ButtonOnlyAnnouncement_DoesNotAddToGameValue()
+    {
+        // P3 makes a button-only Win (IsEffective=false) — game value must stay at 1 (Gewonnen only).
+        var (resolver, hands) = B.KontraSoloResolver();
+        var buttonOnlyWin = new Announcement(B.P3, AnnouncementType.Win, 0, 0)
+        {
+            IsEffective = false,
+        };
+        var state = GameState.Create(
+            rules: NoFeigheit,
+            players: B.FourPlayers(),
+            partyResolver: resolver,
+            initialHands: hands,
+            announcements: [buttonOnlyWin]
+        );
+        // P1+P2 (Re, effective) win enough tricks.
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P1, 0),
+            B.HighValueTrick(B.P1, 4),
+            B.HighValueTrick(B.P1, 8),
+            B.HighValueTrick(B.P0, 12), // Kontrasolo player (Kontra) wins one trick
+        };
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        // Gewonnen(1) + Keine90-threshold(1) + Keine60-threshold(1) = 3; no announcement point.
+        result.GameValue.Should().Be(3);
+        result.AnnouncementRecords.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Score_ButtonOnlyAbsage_DoesNotCauseUnfulfilledAbsageLoss()
+    {
+        // P3 makes a button-only Keine90. Re wins but Kontra still gets ≥ 90 Augen.
+        // Without IsEffective=false this would normally count as an unfulfilled Absage and Re would lose.
+        var (resolver, hands) = B.KontraSoloResolver();
+        var buttonOnlyWin = new Announcement(B.P3, AnnouncementType.Win, 0, 0)
+        {
+            IsEffective = false,
+        };
+        var buttonOnlyKeine90 = new Announcement(B.P3, AnnouncementType.Keine90, 0, 0)
+        {
+            IsEffective = false,
+        };
+        var state = GameState.Create(
+            rules: NoFeigheit,
+            players: B.FourPlayers(),
+            partyResolver: resolver,
+            initialHands: hands,
+            announcements: [buttonOnlyWin, buttonOnlyKeine90]
+        );
+        // Re wins (≥121 Augen) but Kontra gets 90+ Augen.
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P1, 0), // Re: 44
+            B.HighValueTrick(B.P1, 4), // Re: 44
+            B.HighValueTrick(B.P1, 8), // Re: 44
+            B.HighValueTrick(B.P0, 12), // Kontra: 44  (≥90 → would fail real Keine90)
+            B.HighValueTrick(B.P0, 16), // Kontra: 44
+            B.HighValueTrick(B.P0, 20), // Kontra: 44
+        };
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        // Re wins because no effective Keine90 was made — the button-only one doesn't count.
+        result.Winner.Should().Be(Party.Re);
+    }
+
+    [Fact]
+    public void Score_EffectiveAnnouncement_AddsToGameValue()
+    {
+        // Effective Win by P1 (has ♣Q) must add +1 to game value.
+        var (resolver, hands) = B.KontraSoloResolver();
+        var effectiveWin = B.Ann(B.P1, AnnouncementType.Win);
+        var state = GameState.Create(
+            rules: NoFeigheit,
+            players: B.FourPlayers(),
+            partyResolver: resolver,
+            initialHands: hands,
+            announcements: [effectiveWin]
+        );
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P1, 0),
+            B.HighValueTrick(B.P1, 4),
+            B.HighValueTrick(B.P1, 8),
+            B.HighValueTrick(B.P0, 12),
+        };
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        // Gewonnen(1) + Keine90-threshold(1) + Keine60-threshold(1) + Re-Win-announcement(1) = 4.
+        result.GameValue.Should().Be(4);
+        result.AnnouncementRecords.Should().HaveCount(1);
+    }
+
     private static GameState SoloState(
         RuleSet? rules = null,
         IReadOnlyList<Announcement>? announcements = null
