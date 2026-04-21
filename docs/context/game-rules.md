@@ -206,6 +206,7 @@ Silent solos are not declared as reservations but revealed through play.
 - Plays like a Stille Hochzeit; the allowed announcement is **"Kontra"** (regardless of ♣ Queens held).
 - The ♠ Kings become **Klabautermänner** — the **highest trumps** in the game (above all Sonderkarten). Announced by calling **"Klabautermann"** when playing one, which also reveals the solo.
 - Committing action (no changing one's mind after): playing/not-playing the ♠ Kings in a way that would reveal the solo, or announcing "Kontra"/"Re" while holding ♣ Queens.
+- Announcements and all normal rules apply, **except** Genscherdamen and Gegengenscherdamen have no effect on party determination — the solo party structure takes precedence at game end. Genschern/Gegengenschern **can still be announced** (same reasoning as Stille Hochzeit).
 - If a player qualifies for both Stille Hochzeit and Kontrasolo (holds both ♣ Queens, both ♠ Queens, and both ♠ Kings), three options apply:
   1. Declare a **non-Hochzeit reservation** → that reservation is played.
   2. Declare **Hochzeit** → normal Hochzeit with Findungsstich etc.; Kontrasolo rules do not apply.

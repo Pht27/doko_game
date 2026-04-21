@@ -353,6 +353,11 @@ public sealed class GameState
 
             case SetGenscherPartnerModification m:
             {
+                // In silent solos (StilleHochzeit, KontraSolo), Genscher can be announced but
+                // parties are fixed by the solo logic — all side effects are suppressed.
+                if (SilentMode is not null)
+                    break;
+
                 bool teamsChanged =
                     PartyResolver.ResolveParty(m.Genscher, this)
                     != PartyResolver.ResolveParty(m.Partner, this);
@@ -394,9 +399,7 @@ public sealed class GameState
                 }
                 // If !teamsChanged (Nicht tauschen): announcements stay as-is.
 
-                // In Stille Hochzeit, Genscher can be announced but parties are fixed by the solo.
-                if (SilentMode?.Type != SilentGameModeType.StilleHochzeit)
-                    PartyResolver = new Parties.GenscherPartyResolver(m.Genscher, m.Partner);
+                PartyResolver = new Parties.GenscherPartyResolver(m.Genscher, m.Partner);
                 break;
             }
 

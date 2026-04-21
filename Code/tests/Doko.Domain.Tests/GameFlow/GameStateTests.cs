@@ -147,4 +147,63 @@ public class GameStateTests
                 because: "Heidfrau reverts Heidmann; Queens should outrank Jacks again"
             );
     }
+
+    // ── Apply: SetGenscherPartnerModification in silent solos ─────────────────
+
+    [Fact]
+    public void Apply_Genscher_InKontraSolo_DoesNotReplacePartyResolver()
+    {
+        var state = B.BasicState();
+        state.Apply(
+            new SetSilentGameModeModification(
+                new SilentGameMode(SilentGameModeType.KontraSolo, B.P0)
+            )
+        );
+        var resolverBefore = state.PartyResolver;
+
+        // P0 is Kontra, P1 is Re — teams would change in a normal game
+        state.Apply(new SetGenscherPartnerModification(B.P0, B.P1));
+
+        state
+            .PartyResolver.Should()
+            .BeSameAs(resolverBefore, because: "KontraSolo party structure takes precedence");
+        state.PartyResolver.Should().BeOfType<KontraSoloPartyResolver>();
+    }
+
+    [Fact]
+    public void Apply_Genscher_InKontraSolo_DoesNotSetGenscherTeamsChanged()
+    {
+        var state = B.BasicState();
+        state.Apply(
+            new SetSilentGameModeModification(
+                new SilentGameMode(SilentGameModeType.KontraSolo, B.P0)
+            )
+        );
+
+        state.Apply(new SetGenscherPartnerModification(B.P0, B.P1));
+
+        state
+            .GenscherTeamsChanged.Should()
+            .BeFalse(because: "all Genscher side effects are suppressed in silent solos");
+    }
+
+    [Fact]
+    public void Apply_Genscher_InStilleHochzeit_DoesNotReplacePartyResolver()
+    {
+        var state = B.BasicState();
+        state.Apply(
+            new SetSilentGameModeModification(
+                new SilentGameMode(SilentGameModeType.StilleHochzeit, B.P0)
+            )
+        );
+        var resolverBefore = state.PartyResolver;
+
+        // P0 is Re (solo), P1 is Kontra — teams would change in a normal game
+        state.Apply(new SetGenscherPartnerModification(B.P1, B.P0));
+
+        state
+            .PartyResolver.Should()
+            .BeSameAs(resolverBefore, because: "StilleHochzeit party structure takes precedence");
+        state.PartyResolver.Should().BeOfType<StilleHochzeitPartyResolver>();
+    }
 }
