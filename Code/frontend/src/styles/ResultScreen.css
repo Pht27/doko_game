@@ -232,10 +232,6 @@
   @apply text-white/35;
 }
 
-.rd-row-factor {
-  @apply mt-0.5 border-t border-white/10 pt-0.5;
-}
-
 .rd-row-label-factor {
   @apply text-yellow-400/80 font-semibold;
 }

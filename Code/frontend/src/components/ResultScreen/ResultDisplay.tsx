@@ -142,11 +142,6 @@ export function ResultDisplay({ result, mySeat }: ResultDisplayProps) {
             </span>
           </div>
         ))}
-        {result.soloFactor > 1 && (
-          <div className="rd-row rd-row-factor">
-            <span className="rd-row-label rd-row-label-factor">{t.soloFaktor(result.soloFactor)}</span>
-          </div>
-        )}
       </div>
 
       {/* Extrapunkte */}
@@ -171,6 +166,17 @@ export function ResultDisplay({ result, mySeat }: ResultDisplayProps) {
                 </div>
               );
             })}
+          </div>
+        </>
+      )}
+
+      {result.soloFactor > 1 && (
+        <>
+          <div className="rd-separator" />
+          <div className="rd-table">
+            <div className="rd-row">
+              <span className="rd-row-label rd-row-label-factor">{t.soloFaktor(result.soloFactor)}</span>
+            </div>
           </div>
         </>
       )}
