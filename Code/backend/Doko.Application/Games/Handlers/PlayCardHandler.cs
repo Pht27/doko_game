@@ -227,13 +227,7 @@ public sealed class PlayCardHandler(
         );
 
         // Detect Hochzeit forced solo: partner not found after 3 qualifying tricks
-        if (
-            !state.HochzeitBecameForcedSolo
-            && state.ActiveReservation is HochzeitReservation
-            && state.PartyResolver.IsFullyResolved(state)
-            && state.Players.Count(p => state.PartyResolver.ResolveParty(p.Seat, state) == Party.Re)
-                == 1
-        )
+        if (ForceIntoSolo(state))
             state.Apply(new SetHochzeitForcedSoloModification());
 
         // Auto-make Pflichtansage if the completed trick triggers one
@@ -279,4 +273,11 @@ public sealed class PlayCardHandler(
 
     private static GameActionResult<PlayCardResult> Fail(GameError error) =>
         new GameActionResult<PlayCardResult>.Failure(error);
+
+    private static bool ForceIntoSolo(GameState state) =>
+        !state.HochzeitBecameForcedSolo
+        && state.ActiveReservation is HochzeitReservation
+        && state.PartyResolver.IsFullyResolved(state)
+        && state.Players.Count(p => state.PartyResolver.ResolveParty(p.Seat, state) == Party.Re)
+            == 1;
 }

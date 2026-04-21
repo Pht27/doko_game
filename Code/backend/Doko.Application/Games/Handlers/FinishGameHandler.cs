@@ -22,10 +22,8 @@ internal sealed class FinishGameHandler(IGameScorer scorer)
         var netPoints = NetPointsCalculator.Calculate(result, state);
 
         // Rauskommer advances only after Normal and Hochzeit games; Soli and Armut replay with same leader.
-        // Forced Hochzeit solo (partner not found) also replays with same leader.
         bool advanceRauskommer =
             state.SilentMode is null
-            && !state.HochzeitBecameForcedSolo
             && (
                 state.ActiveReservation is null
                 || state.ActiveReservation.Priority == ReservationPriority.Hochzeit
