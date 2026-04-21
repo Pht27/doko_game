@@ -15,6 +15,7 @@ If no argument is given, use the file currently open in the IDE.
    - Which files are affected
    - Any non-obvious decisions or trade-offs
    - When doing frontend, always think in a mobile friendly way! This is mainly going to be used as an app
+   - If there is a contradiction of what the input says to what the rules say (or the rules do not have a paragraph about that situation / rule), note that and update the rules accordingly.
 
 4. **Ask for confirmation** - Let the user decide if they like the plan. If not, go back to the drawing board.
 
