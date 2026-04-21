@@ -278,4 +278,40 @@ public class DeclareHealthStatusHandlerTests
         state.SilentMode.Should().BeNull();
         state.ActiveReservation.Should().BeNull();
     }
+
+    // Edge case: P0 has both ♣Q (StilleHochzeit), P1 has both ♠Q+♠K (Kontrasolo).
+    // When all say "gesund", Kontrasolo takes priority over StilleHochzeit.
+    [Fact]
+    public async Task DeclareHealth_AllGesund_KontrasoloAndStilleHochzeitBothPresent_KontrasoloWins()
+    {
+        var (repo, pub, _) = AppB.Infrastructure();
+        var rules = RuleSet.Default() with { AllowKontrasolo = true, AllowStilleHochzeit = true };
+        var gameId = await GameInHealthCheckWithRules(repo, pub, rules);
+
+        await DeclareAllGesund(repo, pub, gameId);
+
+        var state = await repo.GetAsync(gameId);
+        state!.SilentMode!.Type.Should().Be(SilentGameModeType.KontraSolo);
+        state.SilentMode.Player.Should().Be(AppB.P1); // P1 wins, P0's StilleHochzeit is ignored
+    }
+
+    // Edge case scenario 1: P0 has StilleHochzeit, P1 has Kontrasolo cards, but P2 declares Vorbehalt.
+    // Silent mode detection does not run — P2's reservation proceeds normally.
+    [Fact]
+    public async Task DeclareHealth_OtherPlayerVorbehalt_KontrasoloAndStilleHochzeitHandsIgnored()
+    {
+        var (repo, pub, _) = AppB.Infrastructure();
+        var rules = RuleSet.Default() with { AllowKontrasolo = true, AllowStilleHochzeit = true };
+        var gameId = await GameInHealthCheckWithRules(repo, pub, rules);
+
+        var handler = new DeclareHealthStatusHandler(repo, pub);
+        await handler.ExecuteAsync(new DeclareHealthStatusCommand(gameId, AppB.P0, false)); // gesund
+        await handler.ExecuteAsync(new DeclareHealthStatusCommand(gameId, AppB.P1, false)); // gesund
+        await handler.ExecuteAsync(new DeclareHealthStatusCommand(gameId, AppB.P2, true)); // Vorbehalt
+        await handler.ExecuteAsync(new DeclareHealthStatusCommand(gameId, AppB.P3, false)); // gesund
+
+        var state = await repo.GetAsync(gameId);
+        state!.Phase.Should().Be(GamePhase.ReservationSoloCheck);
+        state.SilentMode.Should().BeNull();
+    }
 }
