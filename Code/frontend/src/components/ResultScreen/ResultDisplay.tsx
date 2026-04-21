@@ -170,7 +170,7 @@ export function ResultDisplay({ result, mySeat }: ResultDisplayProps) {
         </>
       )}
 
-      {result.soloFactor > 1 && (
+      {result.soloFactor > 1 && myParty === (result.gameMode === 'KontraSolo' ? 'Kontra' : 'Re') && (
         <>
           <div className="rd-separator" />
           <div className="rd-table">
