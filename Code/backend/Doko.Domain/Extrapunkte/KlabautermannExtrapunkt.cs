@@ -14,6 +14,7 @@ public sealed class KlabautermannExtrapunkt : IExtrapunkt
     private static readonly CardType PikKoenig = new(Suit.Pik, Rank.Koenig);
 
     public ExtrapunktType Type => ExtrapunktType.Klabautermann;
+    public bool UsesFinalPartyState => true;
 
     public IReadOnlyList<ExtrapunktAward> Evaluate(Trick completedTrick, GameState state)
     {

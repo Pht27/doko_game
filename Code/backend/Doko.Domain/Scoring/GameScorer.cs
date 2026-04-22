@@ -48,9 +48,22 @@ public sealed class GameScorer : IGameScorer
         int loserAugen = winner == Party.Re ? kontraAugen : reAugen;
 
         // ── 3. Collect all Extrapunkte awards ─────────────────────────────────────
+        // Extrapunkte that check party membership (UsesFinalPartyState=true) are re-evaluated
+        // using the final state so Genscher team changes are reflected correctly.
+        var activeExtrapunkte = ExtrapunktRegistry.GetActive(state.Rules, state.ActiveReservation);
+        var finalStateExtrapunkte = activeExtrapunkte.Where(e => e.UsesFinalPartyState).ToList();
+        var finalStateTypeSet = finalStateExtrapunkte.Select(e => e.Type).ToHashSet();
+
         var allAwards = game
             .Tricks.SelectMany(t => t.Awards)
-            .Where(a => a.Delta > 0) // Delta=0 awards are trick-winner overrides, not score bonuses
+            .Where(a => a.Delta > 0 && !finalStateTypeSet.Contains(a.Type))
+            .Concat(
+                game.Tricks.SelectMany(tr =>
+                    finalStateExtrapunkte
+                        .SelectMany(e => e.Evaluate(tr.Trick, state))
+                        .Where(a => a.Delta > 0)
+                )
+            )
             .ToList();
 
         int reExtra = allAwards

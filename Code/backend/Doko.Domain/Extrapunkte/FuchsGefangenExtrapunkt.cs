@@ -14,6 +14,7 @@ public sealed class FuchsGefangenExtrapunkt : IExtrapunkt
     private static readonly CardType KaroAss = new(Suit.Karo, Rank.Ass);
 
     public ExtrapunktType Type => ExtrapunktType.FuchsGefangen;
+    public bool UsesFinalPartyState => true;
 
     public IReadOnlyList<ExtrapunktAward> Evaluate(Trick completedTrick, GameState state)
     {

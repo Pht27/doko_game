@@ -15,6 +15,7 @@ public sealed class AgatheExtrapunkt : IExtrapunkt
     private static readonly CardType KreuzBube = new(Suit.Kreuz, Rank.Bube);
 
     public ExtrapunktType Type => ExtrapunktType.Agathe;
+    public bool UsesFinalPartyState => true;
 
     public IReadOnlyList<ExtrapunktAward> Evaluate(Trick completedTrick, GameState state)
     {
