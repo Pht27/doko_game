@@ -187,6 +187,28 @@ public class KontraSoloAnnouncementTests
     }
 
     [Fact]
+    public void IsAnnouncementEffective_ReturnsFalse_ForKontraSoloPlayer_EvenWithKreuzDame()
+    {
+        // Regression: solo player holding a ♣Q must still be non-effective — identity, not card holdings.
+        var kreuzDame = B.Card(10, Suit.Kreuz, Rank.Dame);
+        var hands = new Dictionary<PlayerSeat, Hand>
+        {
+            [B.P0] = B.HandOf(kreuzDame), // Kontrasolo player with ♣Q
+            [B.P1] = B.HandOf(B.Card(2, Suit.Pik, Rank.Ass)),
+            [B.P2] = B.HandOf(B.Card(3, Suit.Herz, Rank.Ass)),
+            [B.P3] = B.HandOf(B.Card(4, Suit.Karo, Rank.Ass)),
+        };
+        var resolver = new KontraSoloPartyResolver(B.P0);
+        var state = GameState.Create(
+            players: B.FourPlayers(),
+            partyResolver: resolver,
+            initialHands: hands,
+            phase: GamePhase.Playing
+        );
+        resolver.IsAnnouncementEffective(B.P0, state).Should().BeFalse();
+    }
+
+    [Fact]
     public void IsAnnouncementEffective_ReturnsTrue_ForEffectiveRePlayer()
     {
         var (resolver, hands) = B.KontraSoloResolver();

@@ -22,6 +22,8 @@ public sealed class KontraSoloPartyResolver(PlayerSeat kontraSoloPlayer) : IPart
 
     public bool IsAnnouncementEffective(PlayerSeat player, GameState state)
     {
+        if (player == kontraSoloPlayer)
+            return false;
         if (state.InitialHands is null)
             return true;
         return state.InitialHands[player].Cards.Any(c => c.Type == KreuzDame);
