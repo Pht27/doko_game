@@ -57,7 +57,10 @@ public static class AnnouncementRules
         if (party is null)
             return null;
 
-        var announced = EffectiveAnnouncementsFor(party.Value, state);
+        bool isEffective = state.PartyResolver.IsAnnouncementEffective(winner, state);
+        var announced = isEffective
+            ? EffectiveAnnouncementsFor(party.Value, state)
+            : AllButtonOnlyAnnouncements(state);
 
         AnnouncementType? mandatoryType = null;
         if (!announced.Contains(AnnouncementType.Win))
@@ -69,7 +72,11 @@ public static class AnnouncementRules
             return null;
 
         int trickNum = count - 1;
-        return new Announcement(winner, mandatoryType.Value, trickNum, 0) { IsMandatory = true };
+        return new Announcement(winner, mandatoryType.Value, trickNum, 0)
+        {
+            IsMandatory = true,
+            IsEffective = isEffective,
+        };
     }
 
     /// <summary>Returns true if the winning party violated the Feigheit (cowardice) rule.</summary>
@@ -143,9 +150,10 @@ public static class AnnouncementRules
 
     private static bool CanAnnounceButtonOnly(AnnouncementType type, Party party, GameState state)
     {
-        // Button-only players share a chain so they can't detect each other via blocked moves.
-        var sharedChain = ButtonOnlyAnnouncementsFor(party, state);
-        return FollowsChain(type, sharedChain, otherHasAbsage: false);
+        // All non-effective announcements are pooled cross-party so that button-only players
+        // can chain off each other AND off the Kontrasolo player's Pflichtansage — preventing
+        // the info leak where B (Re, no ♣Q) detects that A's (Kontra) announcement wasn't normal.
+        return FollowsChain(type, AllButtonOnlyAnnouncements(state), otherHasAbsage: false);
     }
 
     private static bool FollowsChain(
@@ -185,14 +193,6 @@ public static class AnnouncementRules
             .Select(a => a.Type)
             .ToHashSet();
 
-    private static ISet<AnnouncementType> ButtonOnlyAnnouncementsFor(
-        Party party,
-        GameState state
-    ) =>
-        state
-            .Announcements.Where(a =>
-                !a.IsEffective && state.PartyResolver.ResolveParty(a.Player, state) == party
-            )
-            .Select(a => a.Type)
-            .ToHashSet();
+    private static ISet<AnnouncementType> AllButtonOnlyAnnouncements(GameState state) =>
+        state.Announcements.Where(a => !a.IsEffective).Select(a => a.Type).ToHashSet();
 }

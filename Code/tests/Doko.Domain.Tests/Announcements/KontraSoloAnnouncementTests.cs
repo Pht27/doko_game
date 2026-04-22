@@ -122,6 +122,55 @@ public class KontraSoloAnnouncementTests
         AnnouncementRules.CanAnnounce(B.P3, AnnouncementType.Keine90, state).Should().BeTrue();
     }
 
+    // ── Pflichtansage for Kontrasolo player ───────────────────────────────────
+
+    [Fact]
+    public void GetMandatoryAnnouncement_IsNotEffective_ForKontraSoloPlayer()
+    {
+        var state = KontraSoloState(completedTricks: [HighValueTrick(B.P0)]);
+
+        var ann = AnnouncementRules.GetMandatoryAnnouncement(B.P0, state);
+
+        ann.Should().NotBeNull();
+        ann!.IsEffective.Should().BeFalse();
+        ann.IsMandatory.Should().BeTrue();
+    }
+
+    [Fact]
+    public void GetMandatoryAnnouncement_DoesNotRepeatWin_AfterFirstNonEffectiveWin()
+    {
+        // A (Kontrasolo) already got a non-effective Win from trick 1.
+        // When A wins trick 2 (also high), the mandatory should be Keine90, not Win again.
+        var firstNonEffectiveWin = new Announcement(B.P0, AnnouncementType.Win, 0, 0)
+        {
+            IsMandatory = true,
+            IsEffective = false,
+        };
+        var state = KontraSoloState(
+            announcements: [firstNonEffectiveWin],
+            completedTricks: [HighValueTrick(B.P0), HighValueTrick(B.P0, 4)]
+        );
+
+        var ann = AnnouncementRules.GetMandatoryAnnouncement(B.P0, state);
+
+        ann.Should().NotBeNull();
+        ann!.Type.Should().Be(AnnouncementType.Keine90);
+    }
+
+    [Fact]
+    public void ButtonOnlyRePlayer_CanChainOffKontraSoloPflichtansage()
+    {
+        // In a normal game, A (no ♣Q) and B (no ♣Q) would both be Kontra.
+        // A's forced Win allows B's Keine90. In Kontrasolo the same must hold to avoid an info leak.
+        var kontraSoloPflichtWin = new Announcement(B.P0, AnnouncementType.Win, 0, 0)
+        {
+            IsMandatory = true,
+            IsEffective = false,
+        };
+        var state = KontraSoloState(announcements: [kontraSoloPflichtWin]);
+        AnnouncementRules.CanAnnounce(B.P3, AnnouncementType.Keine90, state).Should().BeTrue();
+    }
+
     // ── IsEffective flag set by MakeAnnouncementHandler (via IsAnnouncementEffective) ──
 
     [Fact]
@@ -161,5 +210,17 @@ public class KontraSoloAnnouncementTests
             phase: GamePhase.Playing
         );
         resolver.IsAnnouncementEffective(B.P3, state).Should().BeFalse();
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private static Trick HighValueTrick(PlayerSeat winner, byte startId = 0)
+    {
+        var trick = new Trick();
+        trick.Add(new TrickCard(B.Card(startId, Suit.Kreuz, Rank.Ass), winner));
+        trick.Add(new TrickCard(B.Card((byte)(startId + 1), Suit.Pik, Rank.Ass), B.P1));
+        trick.Add(new TrickCard(B.Card((byte)(startId + 2), Suit.Herz, Rank.Ass), B.P2));
+        trick.Add(new TrickCard(B.Card((byte)(startId + 3), Suit.Karo, Rank.Ass), B.P3));
+        return trick;
     }
 }
