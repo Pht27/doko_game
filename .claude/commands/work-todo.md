@@ -8,7 +8,7 @@ If no argument is given, use the file currently open in the IDE.
 
 1. **Read the todo file** at `$ARGUMENTS` to understand what needs to be done.
 
-2. **Research** — explore the codebase to understand the current state. Find all relevant files, patterns, and existing conventions related to the task.
+2. **Research** — explore the codebase to understand the current state. Find all relevant files, patterns, and existing conventions related to the task. Check in `.claude/guidelines` if you should review any fitting guidelines.
 
 3. **Plan** — write a concise implementation plan directly into the todo markdown file. Include:
    - What needs to change and why
@@ -25,6 +25,6 @@ If no argument is given, use the file currently open in the IDE.
 
 7. **Mark as finished** — move the todo file into a `finished/` subfolder next to its current location (e.g. `docs/todos/99_finished/todo_fix_csharpier_problems.md`). Create the subfolder if it does not exist.
 
-8. Run `dotnet csharpier format .` to format backend files.
+8. Run `dotnet csharpier format .` to format backend files if any changed.
 
 9. **Commit** the changes along the way with fitting commit messages that summarizes what was done in sensible chunks. DO NOT MERGE TO MAIN.
