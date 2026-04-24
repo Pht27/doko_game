@@ -1,0 +1,52 @@
+/* ReservationDialog — two-column reservation declaration dialog */
+@reference "../../../styles/index.css";
+
+.rd-dialog {
+  @apply bg-gray-800/95 rounded-2xl shadow-2xl border border-white/10 flex flex-col w-full overflow-hidden;
+  /* Never taller than ~60% of the viewport so it doesn't reach the hand */
+  max-height: 60svh;
+}
+
+.rd-header {
+  @apply flex items-center justify-between px-4 py-3 border-b border-white/10 flex-shrink-0;
+}
+
+.rd-title {
+  @apply text-white font-bold text-sm;
+}
+
+.rd-pass-btn {
+  @apply bg-white/10 hover:bg-white/20 active:bg-white/25 text-white/70 rounded-lg px-3 py-1 text-xs font-semibold transition-colors;
+}
+
+.rd-body {
+  @apply flex min-h-0 flex-1 overflow-hidden;
+}
+
+/* Left column: category tabs */
+.rd-left {
+  @apply flex flex-col gap-1 p-2 border-r border-white/10 min-w-[108px] overflow-y-auto;
+}
+
+.rd-cat-btn {
+  @apply w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-colors flex-shrink-0
+    text-white/50 hover:text-white/80 hover:bg-white/8 active:bg-white/12;
+}
+
+.rd-cat-btn-active {
+  @apply bg-indigo-600/30 text-indigo-200 hover:bg-indigo-600/40 hover:text-indigo-100;
+}
+
+/* Right column: detail options */
+.rd-right {
+  @apply flex flex-col gap-1 p-2 flex-1 overflow-y-auto;
+}
+
+.rd-detail-btn {
+  @apply w-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white
+    rounded-lg py-1.5 text-sm font-medium transition-colors flex-shrink-0;
+}
+
+.rd-detail-btn-confirm {
+  @apply mt-1;
+}
