@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import type { GameResultDto } from '@/types/api';
 import { t } from '@/utils/translations';
 import { GeschmissenDisplay } from './GeschmissenDisplay';
-import { ResultDisplay } from './ResultDisplay';
+import { ResultDisplay } from './ResultDisplay/ResultDisplay';
 import { LobbyHistory } from './LobbyHistory';
 import { ReadyVoteButton } from '../shared/ReadyVoteButton';
 import './ResultScreen.css';
