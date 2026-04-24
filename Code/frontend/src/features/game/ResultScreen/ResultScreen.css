@@ -182,10 +182,23 @@
   @apply bg-kontra-500/20 text-kontra-300;
 }
 
-/* Augen + stiche row */
+/* Augen + stiche + party players section */
 
-.rd-augen-row {
-  @apply flex items-baseline justify-center gap-2 text-sm font-semibold;
+.rd-augen-section {
+  @apply grid items-center;
+  grid-template-columns: 1fr auto 1fr;
+}
+
+.rd-augen-left {
+  @apply flex flex-col items-end gap-0.5;
+}
+
+.rd-augen-right {
+  @apply flex flex-col items-start gap-0.5;
+}
+
+.rd-augen-score-row {
+  @apply flex items-baseline gap-1.5 text-sm font-semibold;
 }
 
 .rd-augen-party {
@@ -204,8 +217,30 @@
   @apply text-white/50 font-normal text-xs;
 }
 
-.rd-augen-divider {
-  @apply text-white/20;
+.rd-augen-vert-divider {
+  @apply self-stretch mx-2;
+  width: 1px;
+  background-color: rgb(255 255 255 / 0.2);
+}
+
+.rd-party-players {
+  @apply text-xs font-semibold;
+}
+
+.rd-party-re {
+  @apply text-re-300;
+}
+
+.rd-party-kontra {
+  @apply text-kontra-300;
+}
+
+.rd-party-winner {
+  @apply opacity-100;
+}
+
+.rd-party-loser {
+  @apply opacity-40;
 }
 
 /* Separator */

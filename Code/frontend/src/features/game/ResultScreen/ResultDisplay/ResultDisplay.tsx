@@ -48,6 +48,7 @@ export function ResultDisplay({ result, mySeat }: ResultDisplayProps) {
         kontraAugen={result.kontraAugen}
         kontraStiche={result.kontraStiche}
         isReWinner={isReWinner}
+        result={result}
       />
 
       {result.feigheit && (
