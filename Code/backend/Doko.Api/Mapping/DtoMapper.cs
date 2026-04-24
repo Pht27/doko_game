@@ -79,6 +79,7 @@ public static class DtoMapper
         GameResult r,
         int[]? netPointsPerSeat = null,
         int[]? lobbyStandings = null,
+        Party?[]? partyPerSeat = null,
         bool isGeschmissen = false,
         IReadOnlyList<GameResultDto>? matchHistory = null,
         string? gameMode = null
@@ -103,6 +104,7 @@ public static class DtoMapper
                     ar.AnnouncementType.ToString()
                 ))
                 .ToList(),
+            partyPerSeat?.Select(p => p?.ToString()).ToArray() ?? [],
             isGeschmissen,
             matchHistory
         );
@@ -127,6 +129,7 @@ public static class DtoMapper
             NetPointsPerSeat: new int[4],
             LobbyStandings: (IReadOnlyList<int>?)lobbyStandings ?? [],
             AnnouncementRecords: [],
+            PartyPerSeat: [],
             IsGeschmissen: true,
             MatchHistory: matchHistory
         );

@@ -371,6 +371,55 @@ public class GameScorerTests
         result.Winner.Should().Be(Party.Re);
     }
 
+    [Fact]
+    public void Score_Feigheit_TotalScore_IncludesExtrapunkte()
+    {
+        // Re wins 176 vs 0 → Feigheit (5 missing announcements, penalty=3).
+        // Re also gets a Doppelkopf award (loserExtra=1, since Re is the loser after flip).
+        // Kontra (winner after flip) has no extras → winnerExtra=0.
+        // TotalScore = penalty(3) + winnerExtra(0) - loserExtra(1) = 2.
+        var state = SoloState();
+        var reAward = new ExtrapunktAward(ExtrapunktType.Doppelkopf, B.P0, 1); // Re benefits
+        var tricks = new List<TrickResult>
+        {
+            new(B.HighValueTrick(B.P0, 0).Trick, B.P0, [reAward]),
+            B.HighValueTrick(B.P0, 4),
+            B.HighValueTrick(B.P0, 8),
+            B.HighValueTrick(B.P0, 12),
+            B.ZeroValueTrick(B.P1, 16),
+        };
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.Feigheit.Should().BeTrue();
+        result.Winner.Should().Be(Party.Kontra); // flipped
+        result.GameValue.Should().Be(3); // Feigheit penalty only
+        result.ValueComponents.Should().ContainSingle(c => c.Label == "Feigheit" && c.Value == 3);
+        result.AllAwards.Should().ContainSingle(a => a.Type == ExtrapunktType.Doppelkopf);
+        result.TotalScore.Should().Be(2); // penalty(3) - loserExtra(1) = 2
+    }
+
+    [Fact]
+    public void Score_Feigheit_TotalScore_WinnerExtraAdded()
+    {
+        // Re wins 176 vs 0 → Feigheit (penalty=3). Kontra (winner after flip) gets a Doppelkopf.
+        // TotalScore = penalty(3) + winnerExtra(1) - loserExtra(0) = 4.
+        var state = SoloState();
+        var kontraAward = new ExtrapunktAward(ExtrapunktType.Doppelkopf, B.P1, 1); // Kontra benefits
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P0, 0),
+            B.HighValueTrick(B.P0, 4),
+            B.HighValueTrick(B.P0, 8),
+            B.HighValueTrick(B.P0, 12),
+            new(B.ZeroValueTrick(B.P1, 16).Trick, B.P1, [kontraAward]),
+        };
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.Feigheit.Should().BeTrue();
+        result.Winner.Should().Be(Party.Kontra);
+        result.TotalScore.Should().Be(4); // penalty(3) + winnerExtra(1) = 4
+    }
+
     // ── SoloFactor + TotalScore ───────────────────────────────────────────────
 
     [Fact]

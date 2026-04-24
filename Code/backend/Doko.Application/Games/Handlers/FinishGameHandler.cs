@@ -19,7 +19,7 @@ internal sealed class FinishGameHandler(IGameScorer scorer)
 
         state.Apply(new AdvancePhaseModification(GamePhase.Finished));
 
-        var netPoints = NetPointsCalculator.Calculate(result, state);
+        var (netPoints, partyPerSeat) = NetPointsCalculator.Calculate(result, state);
 
         // Rauskommer advances only after Normal and Hochzeit games; Soli and Armut replay with same leader.
         bool advanceRauskommer =
@@ -31,6 +31,6 @@ internal sealed class FinishGameHandler(IGameScorer scorer)
 
         string? gameMode =
             state.ActiveReservation?.Priority.ToString() ?? state.SilentMode?.Type.ToString();
-        return new GameFinishedResult(result, netPoints, advanceRauskommer, gameMode);
+        return new GameFinishedResult(result, netPoints, partyPerSeat, advanceRauskommer, gameMode);
     }
 }

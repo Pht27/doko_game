@@ -12,6 +12,7 @@ using Doko.Application.Lobbies;
 using Doko.Domain.Announcements;
 using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
+using Doko.Domain.Parties;
 using Doko.Domain.Players;
 using Doko.Domain.Scoring;
 using Doko.Domain.Sonderkarten;
@@ -229,7 +230,7 @@ public class GamesController(
             var lobby = await lobbyRepository.GetByGameIdAsync(new GameId(guid), ct);
             if (lobby?.GameHistory.Count > 0)
             {
-                var (lastResult, gameMode, netPoints) = lobby.GameHistory[^1];
+                var (lastResult, gameMode, netPoints, partyPerSeat) = lobby.GameHistory[^1];
                 var standings = lobby.Standings.ToArray();
                 var matchHistory = BuildMatchHistory(lobby.GameHistory.SkipLast(1).ToList());
                 response = response with
@@ -238,6 +239,7 @@ public class GamesController(
                         lastResult,
                         netPoints,
                         standings,
+                        partyPerSeat: partyPerSeat,
                         matchHistory: matchHistory,
                         gameMode: gameMode
                     ),
@@ -283,6 +285,7 @@ public class GamesController(
     )
     {
         var netPoints = finished.NetPointsPerSeat.ToArray();
+        var partyPerSeat = finished.PartyPerSeat.ToArray();
         int[]? standings = null;
         IReadOnlyList<GameResultDto>? matchHistory = null;
 
@@ -290,7 +293,7 @@ public class GamesController(
         if (lobby != null)
         {
             lobby.UpdateStandings(netPoints);
-            lobby.AddGameRecord(finished.Result, finished.GameMode, netPoints);
+            lobby.AddGameRecord(finished.Result, finished.GameMode, netPoints, partyPerSeat);
             lobby.SetAdvanceRauskommer(finished.ShouldAdvanceRauskommer);
             standings = lobby.Standings.ToArray();
             matchHistory = BuildMatchHistory(lobby.GameHistory.SkipLast(1).ToList());
@@ -307,6 +310,7 @@ public class GamesController(
                         finished.Result,
                         netPoints,
                         standings,
+                        partyPerSeat: partyPerSeat,
                         matchHistory: matchHistory,
                         gameMode: finished.GameMode
                     ),
@@ -316,8 +320,23 @@ public class GamesController(
     }
 
     private static IReadOnlyList<GameResultDto> BuildMatchHistory(
-        IEnumerable<(GameResult Result, string? GameMode, int[] NetPoints)> history
-    ) => history.Select(e => DtoMapper.ToDto(e.Result, e.NetPoints, gameMode: e.GameMode)).ToList();
+        IEnumerable<(
+            GameResult Result,
+            string? GameMode,
+            int[] NetPoints,
+            Party?[] PartyPerSeat
+        )> history
+    ) =>
+        history
+            .Select(e =>
+                DtoMapper.ToDto(
+                    e.Result,
+                    e.NetPoints,
+                    partyPerSeat: e.PartyPerSeat,
+                    gameMode: e.GameMode
+                )
+            )
+            .ToList();
 
     private PlayerSeat GetPlayerSeat()
     {

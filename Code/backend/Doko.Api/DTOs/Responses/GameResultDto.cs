@@ -22,6 +22,7 @@ public record GameResultDto(
     IReadOnlyList<int> NetPointsPerSeat,
     IReadOnlyList<int> LobbyStandings,
     IReadOnlyList<AnnouncementRecordDto> AnnouncementRecords,
+    IReadOnlyList<string?> PartyPerSeat,
     bool IsGeschmissen = false,
     IReadOnlyList<GameResultDto>? MatchHistory = null
 );

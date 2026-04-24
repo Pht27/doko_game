@@ -97,6 +97,7 @@ export interface GameResultDto {
   totalScore: number;
   netPointsPerSeat: number[];
   lobbyStandings: number[];
+  partyPerSeat: (string | null)[];
   isGeschmissen: boolean;
   matchHistory?: GameResultDto[];
 }

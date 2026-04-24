@@ -53,9 +53,9 @@ export function buildComponentRows(
 }
 
 export function getSeatParty(seat: number, result: GameResultDto): Party | null {
-  const pts = result.netPointsPerSeat[seat];
-  if (pts === undefined || pts === 0) return null;
-  return pts > 0 ? (result.winner as Party) : result.winner === 'Re' ? 'Kontra' : 'Re';
+  const party = result.partyPerSeat[seat];
+  if (party === 'Re' || party === 'Kontra') return party;
+  return null;
 }
 
 export function fmt(n: number): string {

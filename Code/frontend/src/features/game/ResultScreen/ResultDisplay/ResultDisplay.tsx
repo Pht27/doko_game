@@ -1,6 +1,6 @@
 import type { GameResultDto } from '@/types/api';
 import { t } from '@/utils/translations';
-import { type Party, buildComponentRows } from './resultDisplay.utils';
+import { type Party, buildComponentRows, getSeatParty } from './resultDisplay.utils';
 import { WinnerBanner } from './WinnerBanner';
 import { AugenRow } from './AugenRow';
 import { ValueComponentsTable } from './ValueComponentsTable';
@@ -19,13 +19,7 @@ export function ResultDisplay({ result, mySeat }: ResultDisplayProps) {
 
   const myNetPoints = mySeat !== undefined ? (result.netPointsPerSeat[mySeat] ?? 0) : null;
   const myParty: Party | null =
-    myNetPoints === null
-      ? null
-      : myNetPoints > 0
-        ? winner
-        : winner === 'Re'
-          ? 'Kontra'
-          : 'Re';
+    mySeat !== undefined ? (getSeatParty(mySeat, result) ?? null) : null;
   const sign = myParty === null ? 1 : myParty === winner ? 1 : -1;
 
   const gameModeLabel = result.gameMode ? t.gameModeLabel(result.gameMode) : null;

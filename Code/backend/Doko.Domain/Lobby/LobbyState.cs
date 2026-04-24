@@ -1,4 +1,5 @@
 using Doko.Domain.GameFlow;
+using Doko.Domain.Parties;
 using Doko.Domain.Players;
 using Doko.Domain.Scoring;
 
@@ -12,7 +13,12 @@ public class LobbyState
     private readonly int[] _standings = new int[4];
     private readonly HashSet<PlayerSeat> _newGameVoters = [];
     private readonly HashSet<PlayerSeat> _lobbyStartVoters = [];
-    private readonly List<(GameResult Result, string? GameMode, int[] NetPoints)> _gameHistory = [];
+    private readonly List<(
+        GameResult Result,
+        string? GameMode,
+        int[] NetPoints,
+        Party?[] PartyPerSeat
+    )> _gameHistory = [];
     private readonly HashSet<int> _opaSeats = [];
     private bool _advanceRauskommer = true;
 
@@ -44,9 +50,13 @@ public class LobbyState
     /// <summary>Cumulative lobby standings per seat (index 0–3).</summary>
     public IReadOnlyList<int> Standings => Array.AsReadOnly(_standings);
 
-    /// <summary>Ordered list of completed game results with their net points per seat.</summary>
-    public IReadOnlyList<(GameResult Result, string? GameMode, int[] NetPoints)> GameHistory =>
-        _gameHistory.AsReadOnly();
+    /// <summary>Ordered list of completed game results with their net points and party per seat.</summary>
+    public IReadOnlyList<(
+        GameResult Result,
+        string? GameMode,
+        int[] NetPoints,
+        Party?[] PartyPerSeat
+    )> GameHistory => _gameHistory.AsReadOnly();
 
     /// <summary>Number of players who have voted to start a new game.</summary>
     public int NewGameVoteCount => _newGameVoters.Count;
@@ -201,6 +211,10 @@ public class LobbyState
     }
 
     /// <summary>Records a completed game result in the match history.</summary>
-    public void AddGameRecord(GameResult result, string? gameMode, int[] netPointsPerSeat) =>
-        _gameHistory.Add((result, gameMode, netPointsPerSeat));
+    public void AddGameRecord(
+        GameResult result,
+        string? gameMode,
+        int[] netPointsPerSeat,
+        Party?[] partyPerSeat
+    ) => _gameHistory.Add((result, gameMode, netPointsPerSeat, partyPerSeat));
 }
