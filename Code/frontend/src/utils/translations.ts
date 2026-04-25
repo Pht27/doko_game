@@ -106,6 +106,10 @@ export const t = {
   geschmissenTitle: 'Schmeißen!',
   geschmissenSubtitle: 'Das Spiel wurde zurückgegeben. Gleicher Rauskommer.',
 
+  // ── Extrapunkte ────────────────────────────────────────────────────────────
+  extrapunktLabel: (type: string) =>
+    (extrapunktLabels[type] as string | undefined) ?? type,
+
   // ── GameInfo ───────────────────────────────────────────────────────────────
   stichInfo: (trickNumber: number, completed: number) =>
     `Stich ${trickNumber} · ${completed} gespielt`,
@@ -174,17 +178,24 @@ const soloLabels: Record<string, string> = {
 
 // Mapping from ReservationPriority enum names to German game mode labels
 const gameModeLabels: Record<string, string> = {
-  KaroSolo: 'Karo-Solo',
-  KreuzSolo: 'Kreuz-Solo',
-  PikSolo: 'Pik-Solo',
-  HerzSolo: 'Herz-Solo',
-  Damensolo: 'Damen-Solo',
-  Bubensolo: 'Buben-Solo',
-  Fleischloses: 'Fleischloses',
-  Knochenloses: 'Knochenloses',
+  ...soloLabels,
   SchlankerMartin: 'Schlanker Martin',
   Armut: 'Armut',
   Hochzeit: 'Hochzeit',
+};
+
+// Mapping from ExtrapunktType enum names to German display labels
+const extrapunktLabels: Record<string, string> = {
+  Doppelkopf: 'Doppelkopf',
+  FuchsGefangen: 'Fuchs gefangen',
+  Karlchen: 'Karlchen',
+  Agathe: 'Agathe',
+  Fischauge: 'Fischauge',
+  GansGefangen: 'Gans gefangen',
+  Festmahl: 'Festmahl',
+  Blutbad: 'Blutbad',
+  Klabautermann: 'Klabautermann',
+  Kaffeekranzchen: 'Kaffeekränzchen',
 };
 
 // Mapping from GamePhase enum names to German labels

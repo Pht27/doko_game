@@ -18,7 +18,7 @@ export function AwardsTable({ awards, myParty, result }: AwardsTableProps) {
         const awardSign = myParty === null ? 1 : awardParty === myParty ? 1 : -1;
         return <ScoreRow
             key={i}
-            label={award.type}
+            label={t.extrapunktLabel(award.type)}
             awardee={{ name: t.seatShort(award.benefittingPlayer), party: awardParty }}
             value={awardSign * award.delta}
           />;
