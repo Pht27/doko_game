@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import { t } from '@/utils/translations';
 import { showTestFeatures } from '@/utils/env';
+import { appVersion } from '@/utils/releaseNotes';
+import { ReleaseNotesModal } from '@/components/ReleaseNotesModal/ReleaseNotesModal';
 
 interface LandingPageProps {
   onMultiplayer: () => void;
@@ -7,8 +10,10 @@ interface LandingPageProps {
 }
 
 export function LandingPage({ onMultiplayer, onTestGame }: LandingPageProps) {
+  const [showReleaseNotes, setShowReleaseNotes] = useState(false);
+
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center gap-10 px-6">
+    <div className="relative w-full h-full flex flex-col items-center justify-center gap-10 px-6">
       <h1 className="text-5xl font-bold tracking-wide text-white">{t.landingTitle}</h1>
 
       <div className="flex flex-col gap-4 w-full max-w-xs">
@@ -28,6 +33,15 @@ export function LandingPage({ onMultiplayer, onTestGame }: LandingPageProps) {
           </button>
         )}
       </div>
+
+      <button
+        onClick={() => setShowReleaseNotes(true)}
+        className="absolute bottom-3 right-4 text-white/25 text-xs hover:text-white/45 transition-colors"
+      >
+        v{appVersion}
+      </button>
+
+      {showReleaseNotes && <ReleaseNotesModal onClose={() => setShowReleaseNotes(false)} />}
     </div>
   );
 }

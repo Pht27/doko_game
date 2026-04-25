@@ -12,6 +12,7 @@ export const t = {
   multiplayer: 'Mehrspieler',
   createLobby: 'Lobby erstellen',
   testGame: 'Testspiel starten',
+  releaseNotesTitle: 'Versionshinweise',
 
   // ── MultiplayerBrowserPage / LobbyDetailView ───────────────────────────────
   back: '← Zurück',
