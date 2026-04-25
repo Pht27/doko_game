@@ -5,6 +5,7 @@
 ### Verbessert
 - Die Startseite wird jetzt im Hochformat angezeigt – kein Drehen nötig, bevor man ins Spiel geht.
 - Lobby und Spiel wechseln automatisch ins Querformat, sobald man die Startseite verlässt.
+- PWA-Splash-Screen erzwingt kein Querformat mehr – kein ruckartiges Drehen beim App-Start.
 
 ## [1.0.0] - 2026-04-25
 
