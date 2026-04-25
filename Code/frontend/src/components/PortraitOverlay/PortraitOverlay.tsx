@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react'
 
-export function PortraitOverlay() {
+interface PortraitOverlayProps {
+  requireLandscape?: boolean
+}
+
+export function PortraitOverlay({ requireLandscape = true }: PortraitOverlayProps) {
   const [isPortrait, setIsPortrait] = useState(
     () => window.matchMedia('(orientation: portrait)').matches
   )
@@ -12,7 +16,7 @@ export function PortraitOverlay() {
     return () => mq.removeEventListener('change', handler)
   }, [])
 
-  if (!isPortrait) return null
+  if (!requireLandscape || !isPortrait) return null
 
   return (
     <div className="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-green-900 text-white">

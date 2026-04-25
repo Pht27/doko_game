@@ -1,5 +1,11 @@
 # Release Notes
 
+## [1.0.1] - 2026-04-25
+
+### Verbessert
+- Die Startseite wird jetzt im Hochformat angezeigt – kein Drehen nötig, bevor man ins Spiel geht.
+- Lobby und Spiel wechseln automatisch ins Querformat, sobald man die Startseite verlässt.
+
 ## [1.0.0] - 2026-04-25
 
 ### Neu

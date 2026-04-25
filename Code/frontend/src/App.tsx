@@ -55,12 +55,21 @@ function detectInitialView(): AppView {
   return { kind: 'home' };
 }
 
+function orientationFor(view: AppView): 'portrait' | 'landscape' {
+  return view.kind === 'home' ? 'portrait' : 'landscape';
+}
+
 export default function App() {
+  const [view, setView] = useState<AppView>(detectInitialView);
+  const [joinError, setJoinError] = useState<string | null>(null);
+
+  const orientation = orientationFor(view);
+
   useEffect(() => {
-    screen.orientation?.lock('landscape').catch(() => {
+    screen.orientation?.lock(orientation).catch(() => {
       // Not supported on iOS Safari — PortraitOverlay handles that case
     });
-  }, []);
+  }, [orientation]);
 
   useEffect(() => {
     const isPwa =
@@ -83,9 +92,6 @@ export default function App() {
       window.removeEventListener('touchstart', enterFullscreen);
     };
   }, []);
-
-  const [view, setView] = useState<AppView>(detectInitialView);
-  const [joinError, setJoinError] = useState<string | null>(null);
 
   // Auto-join when arriving via invite URL without an existing session
   const joiningLobbyId = view.kind === 'joining' ? view.lobbyId : null;
@@ -216,7 +222,7 @@ export default function App() {
   if (view.kind === 'home') {
     return (
       <>
-        <PortraitOverlay />
+        <PortraitOverlay requireLandscape={orientation === 'landscape'} />
         <LandingPage
           onMultiplayer={() => setView({ kind: 'multiplayer-browser' })}
           onTestGame={() => setView({ kind: 'hot-seat' })}
@@ -228,7 +234,7 @@ export default function App() {
   if (view.kind === 'joining') {
     return (
       <>
-        <PortraitOverlay />
+        <PortraitOverlay requireLandscape={orientation === 'landscape'} />
         <div className="w-full h-full flex items-center justify-center">
           {joinError
             ? <p className="text-red-400 text-lg">{joinError}</p>
@@ -241,7 +247,7 @@ export default function App() {
   if (view.kind === 'multiplayer-browser') {
     return (
       <>
-        <PortraitOverlay />
+        <PortraitOverlay requireLandscape={orientation === 'landscape'} />
         <MultiplayerBrowserPage
           selectedLobbyId={view.selectedLobbyId}
           onBack={() => setView({ kind: 'home' })}
@@ -257,7 +263,7 @@ export default function App() {
   if (!gameSession) {
     return (
       <>
-        <PortraitOverlay />
+        <PortraitOverlay requireLandscape={orientation === 'landscape'} />
         <GameLoader
           loading={isHotSeat ? hotSeat.loading : false}
           error={isHotSeat ? hotSeat.error : null}
