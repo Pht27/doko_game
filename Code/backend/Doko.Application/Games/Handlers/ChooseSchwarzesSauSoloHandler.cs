@@ -70,6 +70,9 @@ public sealed class ChooseSchwarzesSauSoloHandler(
         // they were made under the wrong party structure.
         state.Apply(new ClearAnnouncementsModification());
 
+        // Extrapunkte earned during the pre-solo phase are invalidated.
+        state.Apply(new ClearScoredTrickAwardsModification());
+
         state.Apply(new AdvancePhaseModification(GamePhase.Playing));
         state.Apply(new SetCurrentTurnModification(command.Player));
 

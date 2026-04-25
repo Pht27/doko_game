@@ -163,3 +163,11 @@ public sealed record ClearActiveSonderkartenModification : GameStateModification
 /// Normalspiel phase carry no meaning under the new solo's party structure.
 /// </summary>
 public sealed record ClearAnnouncementsModification : GameStateModification;
+
+/// <summary>
+/// Strips all extrapunkt awards from every already-scored trick.
+/// Applied when a Schwarze-Sau solo is chosen: extrapunkte earned during the preceding
+/// Normalspiel phase are invalidated. Future tricks will accumulate awards under the
+/// new solo's extrapunkt rules.
+/// </summary>
+public sealed record ClearScoredTrickAwardsModification : GameStateModification;

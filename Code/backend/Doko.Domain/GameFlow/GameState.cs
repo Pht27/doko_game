@@ -435,6 +435,10 @@ public sealed class GameState
                 Announcements = [];
                 break;
 
+            case ClearScoredTrickAwardsModification:
+                ScoredTricks = ScoredTricks.Select(r => r with { Awards = [] }).ToList();
+                break;
+
             default:
                 throw new ArgumentOutOfRangeException(
                     nameof(modification),
