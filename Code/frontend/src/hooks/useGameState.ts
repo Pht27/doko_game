@@ -112,6 +112,15 @@ export function useGameState(
       setNewGameId(payload.gameId);
     });
 
+    connection.onreconnected(async () => {
+      try {
+        await joinGameGroup(connection, gameId!);
+        refetchRef.current?.();
+      } catch {
+        // reconnect is best-effort
+      }
+    });
+
     connection
       .start()
       .then(() => joinGameGroup(connection, gameId!))

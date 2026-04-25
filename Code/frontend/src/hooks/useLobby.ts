@@ -24,12 +24,12 @@ export interface LobbyHookState {
 const SESSION_KEY = 'dokoLobbySession';
 
 export function saveLobbySession(session: LobbySession): void {
-  sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
 }
 
 export function loadLobbySession(lobbyId: string): LobbySession | null {
   try {
-    const raw = sessionStorage.getItem(SESSION_KEY);
+    const raw = localStorage.getItem(SESSION_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as LobbySession;
     return parsed.lobbyId === lobbyId ? parsed : null;
@@ -41,7 +41,7 @@ export function loadLobbySession(lobbyId: string): LobbySession | null {
 /** Returns whatever session is stored, regardless of which lobby it belongs to. */
 export function loadAnySession(): LobbySession | null {
   try {
-    const raw = sessionStorage.getItem(SESSION_KEY);
+    const raw = localStorage.getItem(SESSION_KEY);
     return raw ? (JSON.parse(raw) as LobbySession) : null;
   } catch {
     return null;
@@ -49,7 +49,7 @@ export function loadAnySession(): LobbySession | null {
 }
 
 export function clearLobbySession(): void {
-  sessionStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(SESSION_KEY);
 }
 
 export function useLobby(session: LobbySession | null, lobbyId: string): LobbyHookState {
@@ -129,6 +129,24 @@ export function useLobby(session: LobbySession | null, lobbyId: string): LobbyHo
 
       hub.on('scenarioChanged', (data: { name: string | null }) => {
         if (!cancelled) setSelectedScenario(data.name ?? null);
+      });
+
+      hub.onreconnected(async () => {
+        if (cancelled) return;
+        try {
+          await joinLobbyGroup(hub, session!.lobbyId);
+          // Catch up on any event missed during the disconnect (e.g. gameStarted)
+          const view = await getLobby(lobbyId);
+          if (cancelled) return;
+          setSeats(view.seats);
+          setOpaSeats(view.opaSeats ?? []);
+          setStartVoteCount(view.startVoteCount ?? 0);
+          setIsStarted(view.isStarted);
+          setSelectedScenario(view.selectedScenario ?? null);
+          if (view.activeGameId) setGameId(view.activeGameId);
+        } catch {
+          // reconnect is best-effort
+        }
       });
 
       try {
