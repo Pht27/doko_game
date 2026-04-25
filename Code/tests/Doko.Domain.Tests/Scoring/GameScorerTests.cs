@@ -90,6 +90,32 @@ public class GameScorerTests
     }
 
     [Fact]
+    public void Score_GegenDieAlten_NotAdded_WhenSoloAndKontraWins()
+    {
+        // Solo game (BubensoloReservation active) → Kontra wins but no "Gegen die Alten"
+        var state = GameState.Create(
+            rules: NoFeigheit,
+            players: B.FourPlayers(),
+            partyResolver: B.SoloResolver(),
+            activeReservation: new BubensoloReservation(B.P0)
+        );
+        // Re (solo, P0) wins only 1 trick = 44 Augen; Kontra wins 3 tricks = 132 Augen → Kontra wins
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P0, 0),
+            B.HighValueTrick(B.P1, 4),
+            B.HighValueTrick(B.P1, 8),
+            B.HighValueTrick(B.P1, 12),
+        };
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.Winner.Should().Be(Party.Kontra);
+        result.ValueComponents.Should().NotContain(c => c.Label == "Gegen die Alten");
+        // gameValue = 1 (Gewonnen) + threshold bonuses only, no "Gegen die Alten"
+        result.GameValue.Should().Be(1);
+    }
+
+    [Fact]
     public void Score_Keine90_Bonus_WhenLoserBelow90()
     {
         // Re=176 (4×44), Kontra=44 → loserAugen=44 < 90 → +1; < 60 → +1

@@ -183,7 +183,12 @@ public sealed class GameScorer : IGameScorer
         gameValue++;
         components.Add(new("Gewonnen", 1));
 
-        if (winner == Party.Kontra)
+        bool isSolo =
+            state.ActiveReservation?.IsSolo == true
+            || state.SilentMode is not null
+            || state.HochzeitBecameForcedSolo;
+
+        if (winner == Party.Kontra && !isSolo)
         {
             gameValue++;
             components.Add(new("Gegen die Alten", 1));
