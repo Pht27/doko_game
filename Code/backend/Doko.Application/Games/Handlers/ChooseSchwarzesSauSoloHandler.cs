@@ -66,6 +66,10 @@ public sealed class ChooseSchwarzesSauSoloHandler(
         else
             state.Apply(new ClearActiveSonderkartenModification());
 
+        // Announcements from the pre-solo Normalspiel phase are always discarded —
+        // they were made under the wrong party structure.
+        state.Apply(new ClearAnnouncementsModification());
+
         state.Apply(new AdvancePhaseModification(GamePhase.Playing));
         state.Apply(new SetCurrentTurnModification(command.Player));
 

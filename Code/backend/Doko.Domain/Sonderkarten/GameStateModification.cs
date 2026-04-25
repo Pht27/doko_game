@@ -156,3 +156,10 @@ public sealed record SetSchwarzesSauModification : GameStateModification;
 /// solo is chosen: the new trump evaluator makes previously-active sonderkarten irrelevant.
 /// </summary>
 public sealed record ClearActiveSonderkartenModification : GameStateModification;
+
+/// <summary>
+/// Discards all announcements made so far.
+/// Applied unconditionally when a Schwarze-Sau solo is chosen — announcements from the
+/// Normalspiel phase carry no meaning under the new solo's party structure.
+/// </summary>
+public sealed record ClearAnnouncementsModification : GameStateModification;

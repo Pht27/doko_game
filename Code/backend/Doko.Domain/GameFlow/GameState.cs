@@ -431,6 +431,10 @@ public sealed class GameState
                 ClosedWindows = new HashSet<SonderkarteType>();
                 break;
 
+            case ClearAnnouncementsModification:
+                Announcements = [];
+                break;
+
             default:
                 throw new ArgumentOutOfRangeException(
                     nameof(modification),
