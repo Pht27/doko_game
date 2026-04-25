@@ -55,7 +55,7 @@ export default defineConfig(({ mode }) => {
         theme_color: '#ffffff',
         background_color: '#ffffff',
         display: 'fullscreen',
-        orientation: 'any',
+        orientation: 'landscape',
         start_url: '/',
         icons: [
           {

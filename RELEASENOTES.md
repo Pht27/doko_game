@@ -6,6 +6,9 @@
 - Regelseite: Alle Spielregeln übersichtlich erklärt – erreichbar über die Startseite.
 - Schnellnavigation zwischen den Abschnitten (Karten & Trumpf, Parteien, Soli, Sonderkarten, …) ohne Scrollen.
 
+### Behoben
+- Auf iOS erscheint der grüne „Bitte drehen"-Screen nicht mehr mitten im Spiel – die Ausrichtung ist systemseitig gesperrt.
+
 ## [1.0.1] - 2026-04-25
 
 ### Verbessert
