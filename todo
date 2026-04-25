@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Todo workflow orchestrator — wraps .claude/todo_orchestrator
+# Usage: ./todo <path-to-todo.md> [options]
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VENV="$ROOT/.venv/bin/python"
+
+if [ ! -f "$VENV" ]; then
+  echo "Error: .venv not found. Run the setup first:"
+  echo "  python3 -m venv .venv && .venv/bin/pip install -r .claude/requirements-orchestrator.txt"
+  exit 1
+fi
+
+PYTHONPATH="$ROOT/.claude" "$VENV" -m todo_orchestrator "$@"

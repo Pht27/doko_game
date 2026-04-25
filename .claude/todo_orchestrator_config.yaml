@@ -1,0 +1,15 @@
+models:
+  research: claude-haiku-4-5-20251001
+  plan: claude-sonnet-4-6
+  implement: claude-sonnet-4-6
+  review: claude-haiku-4-5-20251001
+  release_notes: claude-haiku-4-5-20251001
+
+paths:
+  agents: .claude/agents
+  prompts: .claude/prompts
+  guidelines: .claude/guidelines
+  release_notes: RELEASENOTES.md
+  finished_dir: 99_finished
+
+max_tokens: 8096
