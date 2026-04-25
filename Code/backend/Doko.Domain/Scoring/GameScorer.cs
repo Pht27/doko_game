@@ -22,120 +22,21 @@ public sealed class GameScorer : IGameScorer
         if (state.ActiveReservation?.Priority == ReservationPriority.SchlankerMartin)
             return ScoreSchlankerMartin(game);
 
-        // ── 1. Sum Augen and tricks per party ────────────────────────────────────
-        int reAugen = 0;
-        int kontraAugen = 0;
-        int reStiche = 0;
-        int kontraStiche = 0;
+        var (reAugen, kontraAugen, reStiche, kontraStiche) = SumTrickResults(game, state);
 
-        foreach (var trickResult in game.Tricks)
-        {
-            int trickAugen = ComputeEffectiveAugen(trickResult.Trick);
-            var winnerParty = state.PartyResolver.ResolveParty(trickResult.Winner, state);
-            if (winnerParty == Party.Re)
-            {
-                reAugen += trickAugen;
-                reStiche++;
-            }
-            else
-            {
-                kontraAugen += trickAugen;
-                kontraStiche++;
-            }
-        }
-
-        // ── 2. Determine winner ───────────────────────────────────────────────────
-        // If a party made Absagen (Keine90+) that were not fulfilled, they lose automatically.
-        // Otherwise Re needs 121+; Kontra wins if Re does not reach 121.
         Party winner = DetermineWinner(state, reAugen, kontraAugen);
         int loserAugen = winner == Party.Re ? kontraAugen : reAugen;
 
-        // ── 3. Collect all Extrapunkte awards ─────────────────────────────────────
-        // Extrapunkte that check party membership (UsesFinalPartyState=true) are re-evaluated
-        // using the final state so Genscher team changes are reflected correctly.
-        var activeExtrapunkte = ExtrapunktRegistry.GetActive(state.Rules, state.ActiveReservation);
-        var finalStateExtrapunkte = activeExtrapunkte.Where(e => e.UsesFinalPartyState).ToList();
-        var finalStateTypeSet = finalStateExtrapunkte.Select(e => e.Type).ToHashSet();
+        var (allAwards, reExtra, kontraExtra) = CollectExtrapunkteAwards(game, state);
 
-        var allAwards = game
-            .Tricks.SelectMany(t => t.Awards)
-            .Where(a => a.Delta > 0 && !finalStateTypeSet.Contains(a.Type))
-            .Concat(
-                game.Tricks.SelectMany(tr =>
-                    finalStateExtrapunkte
-                        .SelectMany(e => e.Evaluate(tr.Trick, state))
-                        .Where(a => a.Delta > 0)
-                )
-            )
-            .ToList();
+        var (gameValue, components, announcementRecords) = BuildBaseValue(
+            state,
+            winner,
+            loserAugen
+        );
 
-        int reExtra = allAwards
-            .Where(a => state.PartyResolver.ResolveParty(a.BenefittingPlayer, state) == Party.Re)
-            .Sum(a => a.Delta);
-        int kontraExtra = allAwards
-            .Where(a =>
-                state.PartyResolver.ResolveParty(a.BenefittingPlayer, state) == Party.Kontra
-            )
-            .Sum(a => a.Delta);
+        int soloFactor = GetSoloFactor(state);
 
-        // ── 4. Build base game value ───────────────────────────────────────────────
-        int gameValue = 0;
-        var components = new List<GameValueComponent>();
-
-        // Gewonnen
-        gameValue++;
-        components.Add(new("Gewonnen", 1));
-
-        // Gegen die Alten (Kontra party wins)
-        if (winner == Party.Kontra)
-        {
-            gameValue++;
-            components.Add(new("Gegen die Alten", 1));
-        }
-
-        // Threshold bonuses (loser didn't reach the threshold)
-        if (loserAugen < 90)
-        {
-            gameValue++;
-            components.Add(new("Keine 90", 1));
-        }
-        if (loserAugen < 60)
-        {
-            gameValue++;
-            components.Add(new("Keine 60", 1));
-        }
-        if (loserAugen < 30)
-        {
-            gameValue++;
-            components.Add(new("Keine 30", 1));
-        }
-        if (loserAugen == 0)
-        {
-            gameValue++;
-            components.Add(new("Schwarz", 1));
-        }
-
-        // One point per effective announcement (by any party).
-        // Button-only announcements (IsEffective=false) are excluded — they have no scoring effect.
-        var announcementRecords = new List<AnnouncementRecord>();
-        foreach (var announcement in state.Announcements.Where(a => a.IsEffective))
-        {
-            var party = state.PartyResolver.ResolveParty(announcement.Player, state);
-            if (party is null)
-                continue;
-            gameValue++;
-            announcementRecords.Add(new(party.Value, announcement.Type));
-        }
-
-        // ── 5. SoloFactor ─────────────────────────────────────────────────────────
-        int soloFactor =
-            state.ActiveReservation?.IsSolo == true
-            || state.SilentMode is not null
-            || state.HochzeitBecameForcedSolo
-                ? 3
-                : 1;
-
-        // ── 6. Feigheit ────────────────────────────────────────────────────────────
         var provisionalResult = new GameResult(
             winner,
             reAugen,
@@ -147,7 +48,7 @@ public sealed class GameScorer : IGameScorer
             Feigheit: false,
             components,
             soloFactor,
-            TotalScore: 0, // placeholder; recomputed below
+            TotalScore: 0,
             announcementRecords
         );
 
@@ -165,7 +66,6 @@ public sealed class GameScorer : IGameScorer
             components = [new("Feigheit", gameValue)];
         }
 
-        // ── 7. TotalScore ─────────────────────────────────────────────────────────
         // Gesamtergebnis = (Spielwert + winnerExtra - loserExtra) × SoloFaktor
         // Extrapunkte are multiplied by the solo factor (solo player earns/pays 3×)
         int finalWinnerExtra = winner == Party.Re ? reExtra : kontraExtra;
@@ -187,6 +87,137 @@ public sealed class GameScorer : IGameScorer
             announcementRecords
         );
     }
+
+    private static (int reAugen, int kontraAugen, int reStiche, int kontraStiche) SumTrickResults(
+        CompletedGame game,
+        GameFlow.GameState state
+    )
+    {
+        int reAugen = 0;
+        int kontraAugen = 0;
+        int reStiche = 0;
+        int kontraStiche = 0;
+
+        foreach (var trickResult in game.Tricks)
+        {
+            int augen = ComputeEffectiveAugen(trickResult.Trick);
+            if (state.PartyResolver.ResolveParty(trickResult.Winner, state) == Party.Re)
+            {
+                reAugen += augen;
+                reStiche++;
+            }
+            else
+            {
+                kontraAugen += augen;
+                kontraStiche++;
+            }
+        }
+
+        return (reAugen, kontraAugen, reStiche, kontraStiche);
+    }
+
+    private static (
+        List<ExtrapunktAward> allAwards,
+        int reExtra,
+        int kontraExtra
+    ) CollectExtrapunkteAwards(CompletedGame game, GameFlow.GameState state)
+    {
+        var activeExtrapunkte = ExtrapunktRegistry.GetActive(state.Rules, state.ActiveReservation);
+
+        // Extrapunkte that check party membership (UsesFinalPartyState=true) are re-evaluated
+        // using the final state so Genscher team changes are reflected correctly.
+        var finalStateExtrapunkte = activeExtrapunkte.Where(e => e.UsesFinalPartyState).ToList();
+        var finalStateTypeSet = finalStateExtrapunkte.Select(e => e.Type).ToHashSet();
+
+        var allAwards = game
+            .Tricks.SelectMany(t => t.Awards)
+            .Where(a => a.Delta > 0 && !finalStateTypeSet.Contains(a.Type))
+            .Concat(
+                game.Tricks.SelectMany(tr =>
+                    finalStateExtrapunkte
+                        .SelectMany(e => e.Evaluate(tr.Trick, state))
+                        .Where(a => a.Delta > 0)
+                )
+            )
+            .ToList();
+
+        int reExtra = SumExtraForParty(allAwards, Party.Re, state);
+        int kontraExtra = SumExtraForParty(allAwards, Party.Kontra, state);
+        return (allAwards, reExtra, kontraExtra);
+    }
+
+    private static int SumExtraForParty(
+        List<ExtrapunktAward> awards,
+        Party party,
+        GameFlow.GameState state
+    ) =>
+        awards
+            .Where(a => state.PartyResolver.ResolveParty(a.BenefittingPlayer, state) == party)
+            .Sum(a => a.Delta);
+
+    private static (
+        int gameValue,
+        List<GameValueComponent> components,
+        List<AnnouncementRecord> announcementRecords
+    ) BuildBaseValue(GameFlow.GameState state, Party winner, int loserAugen)
+    {
+        int gameValue = 0;
+        var components = new List<GameValueComponent>();
+        var announcementRecords = new List<AnnouncementRecord>();
+
+        gameValue++;
+        components.Add(new("Gewonnen", 1));
+
+        if (winner == Party.Kontra)
+        {
+            gameValue++;
+            components.Add(new("Gegen die Alten", 1));
+        }
+
+        AddThresholdBonus(ref gameValue, components, loserAugen, threshold: 90, "Keine 90");
+        AddThresholdBonus(ref gameValue, components, loserAugen, threshold: 60, "Keine 60");
+        AddThresholdBonus(ref gameValue, components, loserAugen, threshold: 30, "Keine 30");
+
+        if (loserAugen == 0)
+        {
+            gameValue++;
+            components.Add(new("Schwarz", 1));
+        }
+
+        // Button-only announcements (IsEffective=false) are excluded — they have no scoring effect.
+        foreach (var announcement in state.Announcements.Where(a => a.IsEffective))
+        {
+            var party = state.PartyResolver.ResolveParty(announcement.Player, state);
+            if (party is null)
+                continue;
+            gameValue++;
+            announcementRecords.Add(new(party.Value, announcement.Type));
+        }
+
+        return (gameValue, components, announcementRecords);
+    }
+
+    private static void AddThresholdBonus(
+        ref int gameValue,
+        List<GameValueComponent> components,
+        int loserAugen,
+        int threshold,
+        string label
+    )
+    {
+        if (loserAugen < threshold)
+        {
+            gameValue++;
+            components.Add(new(label, 1));
+        }
+    }
+
+    private static int GetSoloFactor(GameFlow.GameState state) =>
+        state.ActiveReservation?.IsSolo == true
+        || state.SilentMode is not null
+        || state.HochzeitBecameForcedSolo
+            ? 3
+            : 1;
 
     private static Party DetermineWinner(GameFlow.GameState state, int reAugen, int kontraAugen)
     {
