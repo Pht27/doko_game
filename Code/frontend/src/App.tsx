@@ -8,6 +8,7 @@ import { joinSeat, getLobby, leaveLobby, voteNewGame, withdrawNewGame } from './
 import { GameBoard } from '@/features/game/GameBoard/GameBoard';
 import { GameLoader } from '@/features/game/GameLoader/GameLoader';
 import { LandingPage } from '@/pages/LandingPage/LandingPage';
+import { RulesPage } from '@/pages/RulesPage/RulesPage';
 import { MultiplayerBrowserPage } from '@/features/lobby/MultiplayerBrowserPage/MultiplayerBrowserPage';
 import { PortraitOverlay } from './components/PortraitOverlay/PortraitOverlay';
 import { t } from '@/utils/translations';
@@ -17,6 +18,7 @@ import type { GameResultDto } from './types/api';
 
 type AppView =
   | { kind: 'home' }
+  | { kind: 'rules' }
   | { kind: 'joining'; lobbyId: string }
   | { kind: 'multiplayer-browser'; selectedLobbyId?: string }
   | { kind: 'hot-seat' }
@@ -56,7 +58,7 @@ function detectInitialView(): AppView {
 }
 
 function orientationFor(view: AppView): 'portrait' | 'landscape' {
-  return view.kind === 'home' ? 'portrait' : 'landscape';
+  return view.kind === 'home' || view.kind === 'rules' ? 'portrait' : 'landscape';
 }
 
 export default function App() {
@@ -226,7 +228,17 @@ export default function App() {
         <LandingPage
           onMultiplayer={() => setView({ kind: 'multiplayer-browser' })}
           onTestGame={() => setView({ kind: 'hot-seat' })}
+          onRules={() => setView({ kind: 'rules' })}
         />
+      </>
+    );
+  }
+
+  if (view.kind === 'rules') {
+    return (
+      <>
+        <PortraitOverlay requireLandscape={orientation === 'landscape'} />
+        <RulesPage onBack={() => setView({ kind: 'home' })} />
       </>
     );
   }

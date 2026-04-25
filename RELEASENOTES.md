@@ -1,5 +1,11 @@
 # Release Notes
 
+## [1.1.0] - 2026-04-25
+
+### Neu
+- Regelseite: Alle Spielregeln übersichtlich erklärt – erreichbar über die Startseite.
+- Schnellnavigation zwischen den Abschnitten (Karten & Trumpf, Parteien, Soli, Sonderkarten, …) ohne Scrollen.
+
 ## [1.0.1] - 2026-04-25
 
 ### Verbessert

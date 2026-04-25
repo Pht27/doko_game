@@ -7,9 +7,10 @@ import { ReleaseNotesModal } from '@/components/ReleaseNotesModal/ReleaseNotesMo
 interface LandingPageProps {
   onMultiplayer: () => void;
   onTestGame: () => void;
+  onRules: () => void;
 }
 
-export function LandingPage({ onMultiplayer, onTestGame }: LandingPageProps) {
+export function LandingPage({ onMultiplayer, onTestGame, onRules }: LandingPageProps) {
   const [showReleaseNotes, setShowReleaseNotes] = useState(false);
 
   return (
@@ -32,6 +33,13 @@ export function LandingPage({ onMultiplayer, onTestGame }: LandingPageProps) {
             {t.testGame}
           </button>
         )}
+
+        <button
+          onClick={onRules}
+          className="w-full py-3 text-base font-medium rounded-2xl bg-white/5 hover:bg-white/10 active:bg-white/5 text-white/50 hover:text-white/70 transition-colors"
+        >
+          {t.rulesTitle}
+        </button>
       </div>
 
       <button

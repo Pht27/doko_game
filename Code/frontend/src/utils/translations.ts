@@ -138,6 +138,21 @@ export const t = {
   sonderkarteName: (type: string) =>
     (sonderkarteNames[type] as string | undefined) ?? type,
 
+  // ── RulesPage ──────────────────────────────────────────────────────────────
+  rulesTitle: 'Regeln',
+  rulesNav: {
+    overview: 'Übersicht',
+    cards: 'Karten & Trumpf',
+    parties: 'Parteien',
+    gameplay: 'Spielablauf',
+    reservations: 'Vorbehalte',
+    solos: 'Soli',
+    announcements: 'Ansagen',
+    sonderkarten: 'Sonderkarten',
+    extrapunkte: 'Extrapunkte',
+    scoring: 'Spielwert',
+  },
+
   // ── AnnouncementButton ─────────────────────────────────────────────────────
   // Announcement type labels shown on the buttons (keyed by the type string from the API)
   announcementLabels: {

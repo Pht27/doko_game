@@ -1,0 +1,92 @@
+@reference "../../styles/index.css";
+
+.rp-page {
+  @apply w-full h-full flex flex-col bg-[#1a1a2e] text-white overflow-hidden;
+}
+
+.rp-header {
+  @apply flex items-center gap-3 px-4 py-3 border-b border-white/10 shrink-0;
+}
+
+.rp-back-btn {
+  @apply text-white/60 hover:text-white/90 active:text-white/40 text-sm transition-colors px-1 py-1;
+}
+
+.rp-header-title {
+  @apply text-lg font-semibold tracking-wide;
+}
+
+.rp-nav {
+  @apply flex gap-2 px-4 py-2 overflow-x-auto shrink-0 border-b border-white/10;
+  scrollbar-width: none;
+}
+
+.rp-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.rp-nav-pill {
+  @apply shrink-0 px-3 py-1 rounded-full text-sm font-medium transition-colors whitespace-nowrap;
+  @apply bg-white/10 text-white/60 hover:bg-white/20 hover:text-white/90 active:bg-white/5;
+}
+
+.rp-nav-pill-active {
+  @apply bg-indigo-600 text-white;
+}
+
+.rp-content {
+  @apply flex-1 overflow-y-auto px-4 py-4;
+  scroll-behavior: smooth;
+}
+
+.rp-section {
+  @apply mb-8;
+}
+
+.rp-section-title {
+  @apply text-xl font-bold mb-3 text-white;
+}
+
+.rp-section-text {
+  @apply text-white/75 text-sm leading-relaxed mb-2;
+}
+
+.rp-subsection-title {
+  @apply text-base font-semibold mt-4 mb-2 text-indigo-300;
+}
+
+.rp-table {
+  @apply w-full text-sm border-collapse mb-3;
+}
+
+.rp-table th {
+  @apply text-left text-white/50 font-medium pb-1 pr-4 border-b border-white/10;
+}
+
+.rp-table td {
+  @apply py-1 pr-4 text-white/75 border-b border-white/5;
+}
+
+.rp-table td:first-child {
+  @apply font-mono text-white/90;
+}
+
+.rp-badge {
+  @apply inline-block px-2 py-0.5 rounded text-xs font-medium mr-1 mb-1;
+}
+
+.rp-badge-config {
+  @apply bg-yellow-900/50 text-yellow-300;
+}
+
+.rp-badge-core {
+  @apply bg-green-900/50 text-green-300;
+}
+
+.rp-list {
+  @apply text-white/75 text-sm leading-relaxed list-disc pl-5 mb-2 space-y-1;
+}
+
+.rp-tag {
+  @apply text-white/50 font-mono text-xs;
+}
