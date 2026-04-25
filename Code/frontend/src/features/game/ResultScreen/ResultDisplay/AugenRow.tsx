@@ -20,6 +20,8 @@ export function AugenRow({ reAugen, reStiche, kontraAugen, kontraStiche, isReWin
     else if (party === 'Kontra') kontraSeats.push(seat);
   }
 
+  const rowCount = Math.max(reSeats.length, kontraSeats.length);
+
   return (
     <div className="rd-augen-section">
       <div className="rd-augen-left">
@@ -30,9 +32,20 @@ export function AugenRow({ reAugen, reStiche, kontraAugen, kontraStiche, isReWin
             {reStiche != null && <span className="rd-augen-stiche"> ({reStiche})</span>}
           </span>
         </div>
-        <div className={isReWinner ? 'rd-party-players rd-party-re rd-party-winner' : 'rd-party-players rd-party-re rd-party-loser'}>
-          {reSeats.map(s => t.seatShort(s)).join(', ')}
-        </div>
+        {Array.from({ length: rowCount }, (_, i) => {
+          const seat = reSeats[i];
+          return seat !== undefined ? (
+            <div key={seat} className={isReWinner ? 'rd-player-row rd-party-re rd-party-winner' : 'rd-player-row rd-party-re rd-party-loser'}>
+              <span className="rd-player-name">{t.seatShort(seat)}</span>
+              <span className="rd-player-score">
+                {result.augenPerSeat[seat]}
+                <span className="rd-augen-stiche"> ({result.stichePerSeat[seat]})</span>
+              </span>
+            </div>
+          ) : (
+            <div key={`empty-re-${i}`} className="rd-player-row" />
+          );
+        })}
       </div>
 
       <div className="rd-augen-vert-divider" />
@@ -45,9 +58,20 @@ export function AugenRow({ reAugen, reStiche, kontraAugen, kontraStiche, isReWin
           </span>
           <span className={!isReWinner ? 'rd-augen-party rd-augen-winner' : 'rd-augen-party'}>Kontra</span>
         </div>
-        <div className={!isReWinner ? 'rd-party-players rd-party-kontra rd-party-winner' : 'rd-party-players rd-party-kontra rd-party-loser'}>
-          {kontraSeats.map(s => t.seatShort(s)).join(', ')}
-        </div>
+        {Array.from({ length: rowCount }, (_, i) => {
+          const seat = kontraSeats[i];
+          return seat !== undefined ? (
+            <div key={seat} className={!isReWinner ? 'rd-player-row rd-player-row-right rd-party-kontra rd-party-winner' : 'rd-player-row rd-player-row-right rd-party-kontra rd-party-loser'}>
+              <span className="rd-player-score">
+                {result.augenPerSeat[seat]}
+                <span className="rd-augen-stiche"> ({result.stichePerSeat[seat]})</span>
+              </span>
+              <span className="rd-player-name">{t.seatShort(seat)}</span>
+            </div>
+          ) : (
+            <div key={`empty-kontra-${i}`} className="rd-player-row rd-player-row-right" />
+          );
+        })}
       </div>
     </div>
   );

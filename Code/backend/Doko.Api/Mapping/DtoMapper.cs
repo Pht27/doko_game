@@ -109,6 +109,8 @@ public static class DtoMapper
                 ))
                 .ToList(),
             partyPerSeat?.Select(p => p?.ToString()).ToArray() ?? [],
+            r.StichePerSeat,
+            r.AugenPerSeat,
             isGeschmissen,
             matchHistory
         );
@@ -134,6 +136,8 @@ public static class DtoMapper
             LobbyStandings: (IReadOnlyList<int>?)lobbyStandings ?? [],
             AnnouncementRecords: [],
             PartyPerSeat: [],
+            StichePerSeat: new int[4],
+            AugenPerSeat: new int[4],
             IsGeschmissen: true,
             MatchHistory: matchHistory
         );

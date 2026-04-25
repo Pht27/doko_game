@@ -20,5 +20,7 @@ public record GameResult(
     IReadOnlyList<GameValueComponent> ValueComponents,
     int SoloFactor,
     int TotalScore,
-    IReadOnlyList<AnnouncementRecord> AnnouncementRecords
+    IReadOnlyList<AnnouncementRecord> AnnouncementRecords,
+    IReadOnlyList<int> StichePerSeat,
+    IReadOnlyList<int> AugenPerSeat
 );

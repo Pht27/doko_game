@@ -100,6 +100,8 @@ export interface GameResultDto {
   netPointsPerSeat: number[];
   lobbyStandings: number[];
   partyPerSeat: (string | null)[];
+  stichePerSeat: number[];
+  augenPerSeat: number[];
   isGeschmissen: boolean;
   matchHistory?: GameResultDto[];
 }

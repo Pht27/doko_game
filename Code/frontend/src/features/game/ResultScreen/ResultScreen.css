@@ -223,10 +223,6 @@
   background-color: rgb(255 255 255 / 0.2);
 }
 
-.rd-party-players {
-  @apply text-xs font-semibold;
-}
-
 .rd-party-re {
   @apply text-re-300;
 }
@@ -241,6 +237,23 @@
 
 .rd-party-loser {
   @apply opacity-40;
+}
+
+.rd-player-row {
+  @apply flex items-baseline gap-1 text-xs font-semibold justify-end;
+  min-height: 1em;
+}
+
+.rd-player-row-right {
+  @apply justify-start;
+}
+
+.rd-player-name {
+  @apply font-semibold;
+}
+
+.rd-player-score {
+  @apply tabular-nums font-normal text-white/70;
 }
 
 /* Separator */

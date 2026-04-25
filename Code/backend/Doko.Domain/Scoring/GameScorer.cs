@@ -22,7 +22,8 @@ public sealed class GameScorer : IGameScorer
         if (state.ActiveReservation?.Priority == ReservationPriority.SchlankerMartin)
             return ScoreSchlankerMartin(game);
 
-        var (reAugen, kontraAugen, reStiche, kontraStiche) = SumTrickResults(game, state);
+        var (reAugen, kontraAugen, reStiche, kontraStiche, stichePerSeat, augenPerSeat) =
+            SumTrickResults(game, state);
 
         Party winner = DetermineWinner(state, reAugen, kontraAugen);
         int loserAugen = winner == Party.Re ? kontraAugen : reAugen;
@@ -49,7 +50,9 @@ public sealed class GameScorer : IGameScorer
             components,
             soloFactor,
             TotalScore: 0,
-            announcementRecords
+            announcementRecords,
+            stichePerSeat,
+            augenPerSeat
         );
 
         bool feigheit = AnnouncementRules.ViolatesFeigheit(provisionalResult, state);
@@ -84,23 +87,35 @@ public sealed class GameScorer : IGameScorer
             components,
             soloFactor,
             totalScore,
-            announcementRecords
+            announcementRecords,
+            stichePerSeat,
+            augenPerSeat
         );
     }
 
-    private static (int reAugen, int kontraAugen, int reStiche, int kontraStiche) SumTrickResults(
-        CompletedGame game,
-        GameFlow.GameState state
-    )
+    private static (
+        int reAugen,
+        int kontraAugen,
+        int reStiche,
+        int kontraStiche,
+        int[] stichePerSeat,
+        int[] augenPerSeat
+    ) SumTrickResults(CompletedGame game, GameFlow.GameState state)
     {
         int reAugen = 0;
         int kontraAugen = 0;
         int reStiche = 0;
         int kontraStiche = 0;
+        var stichePerSeat = new int[4];
+        var augenPerSeat = new int[4];
 
         foreach (var trickResult in game.Tricks)
         {
             int augen = ComputeEffectiveAugen(trickResult.Trick);
+            int seatIndex = (int)trickResult.Winner;
+            stichePerSeat[seatIndex]++;
+            augenPerSeat[seatIndex] += augen;
+
             if (state.PartyResolver.ResolveParty(trickResult.Winner, state) == Party.Re)
             {
                 reAugen += augen;
@@ -113,7 +128,7 @@ public sealed class GameScorer : IGameScorer
             }
         }
 
-        return (reAugen, kontraAugen, reStiche, kontraStiche);
+        return (reAugen, kontraAugen, reStiche, kontraStiche, stichePerSeat, augenPerSeat);
     }
 
     private static (
@@ -265,6 +280,8 @@ public sealed class GameScorer : IGameScorer
         var tricksPerPlayer = new Dictionary<Players.PlayerSeat, int>();
         int reAugen = 0;
         int kontraAugen = 0;
+        var stichePerSeat = new int[4];
+        var augenPerSeat = new int[4];
 
         foreach (var trickResult in game.Tricks)
         {
@@ -272,6 +289,10 @@ public sealed class GameScorer : IGameScorer
                 tricksPerPlayer.GetValueOrDefault(trickResult.Winner) + 1;
 
             int augen = ComputeEffectiveAugen(trickResult.Trick);
+            int seatIndex = (int)trickResult.Winner;
+            stichePerSeat[seatIndex]++;
+            augenPerSeat[seatIndex] += augen;
+
             if (state.PartyResolver.ResolveParty(trickResult.Winner, state) == Party.Re)
                 reAugen += augen;
             else
@@ -314,7 +335,9 @@ public sealed class GameScorer : IGameScorer
             components,
             SoloFactor: 3,
             totalScore,
-            AnnouncementRecords: []
+            AnnouncementRecords: [],
+            stichePerSeat,
+            augenPerSeat
         );
     }
 

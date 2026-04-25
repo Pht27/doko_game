@@ -227,7 +227,9 @@ public class AnnouncementRulesTests
             ValueComponents: [],
             SoloFactor: 1,
             TotalScore: 1,
-            AnnouncementRecords: []
+            AnnouncementRecords: [],
+            StichePerSeat: new int[4],
+            AugenPerSeat: new int[4]
         );
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
     }
@@ -254,7 +256,9 @@ public class AnnouncementRulesTests
             ValueComponents: [],
             SoloFactor: 1,
             TotalScore: 1,
-            AnnouncementRecords: []
+            AnnouncementRecords: [],
+            StichePerSeat: new int[4],
+            AugenPerSeat: new int[4]
         );
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
     }
@@ -292,7 +296,9 @@ public class AnnouncementRulesTests
             ValueComponents: [],
             SoloFactor: 1,
             TotalScore: 1,
-            AnnouncementRecords: []
+            AnnouncementRecords: [],
+            StichePerSeat: new int[4],
+            AugenPerSeat: new int[4]
         );
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
     }
@@ -319,7 +325,9 @@ public class AnnouncementRulesTests
             ValueComponents: [],
             SoloFactor: 1,
             TotalScore: 1,
-            AnnouncementRecords: []
+            AnnouncementRecords: [],
+            StichePerSeat: new int[4],
+            AugenPerSeat: new int[4]
         );
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeTrue();
     }
@@ -352,7 +360,9 @@ public class AnnouncementRulesTests
             ValueComponents: [],
             SoloFactor: 1,
             TotalScore: 1,
-            AnnouncementRecords: []
+            AnnouncementRecords: [],
+            StichePerSeat: new int[4],
+            AugenPerSeat: new int[4]
         );
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
     }
@@ -381,7 +391,9 @@ public class AnnouncementRulesTests
             ValueComponents: [],
             SoloFactor: 1,
             TotalScore: 1,
-            AnnouncementRecords: []
+            AnnouncementRecords: [],
+            StichePerSeat: new int[4],
+            AugenPerSeat: new int[4]
         );
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
     }
@@ -413,7 +425,9 @@ public class AnnouncementRulesTests
             ValueComponents: [],
             SoloFactor: 1,
             TotalScore: 1,
-            AnnouncementRecords: []
+            AnnouncementRecords: [],
+            StichePerSeat: new int[4],
+            AugenPerSeat: new int[4]
         );
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
     }
