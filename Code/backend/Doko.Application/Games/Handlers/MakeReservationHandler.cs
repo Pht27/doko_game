@@ -4,6 +4,7 @@ using Doko.Application.Games.Commands;
 using Doko.Application.Games.Results;
 using Doko.Domain.GameFlow;
 using Doko.Domain.GameFlow.Events;
+using Doko.Domain.Parties;
 using Doko.Domain.Players;
 using Doko.Domain.Reservations;
 using Doko.Domain.Sonderkarten;
@@ -196,9 +197,13 @@ public sealed class MakeReservationHandler(
             );
         }
 
-        // No Solo — advance to Armut check
-        AdvanceToNextCheckPhase(state, GamePhase.ReservationArmutCheck, VorbehaltPlayers(state));
-        return await SaveAndReturnOk(state, events, new MakeReservationResult(false, null), ct);
+        // No Solo — advance to Armut check (skipping players not eligible for Armut)
+        return await AdvanceToNextCheckPhaseOrResolveAsync(
+            state,
+            events,
+            GamePhase.ReservationArmutCheck,
+            ct
+        );
     }
 
     private async Task<GameActionResult<MakeReservationResult>> ResolveArmutCheckAsync(
@@ -229,13 +234,13 @@ public sealed class MakeReservationHandler(
             );
         }
 
-        // No Armut — advance to Schmeißen check
-        AdvanceToNextCheckPhase(
+        // No Armut — advance to Schmeißen check (skipping players not eligible for Schmeißen)
+        return await AdvanceToNextCheckPhaseOrResolveAsync(
             state,
+            events,
             GamePhase.ReservationSchmeissenCheck,
-            VorbehaltPlayers(state)
+            ct
         );
-        return await SaveAndReturnOk(state, events, new MakeReservationResult(false, null), ct);
     }
 
     private async Task<GameActionResult<MakeReservationResult>> ResolveSchmeissenCheckAsync(
@@ -257,9 +262,13 @@ public sealed class MakeReservationHandler(
             );
         }
 
-        // No Schmeißen — advance to Hochzeit check
-        AdvanceToNextCheckPhase(state, GamePhase.ReservationHochzeitCheck, VorbehaltPlayers(state));
-        return await SaveAndReturnOk(state, events, new MakeReservationResult(false, null), ct);
+        // No Schmeißen — advance to Hochzeit check (skipping players not eligible for Hochzeit)
+        return await AdvanceToNextCheckPhaseOrResolveAsync(
+            state,
+            events,
+            GamePhase.ReservationHochzeitCheck,
+            ct
+        );
     }
 
     private async Task<GameActionResult<MakeReservationResult>> ResolveHochzeitCheckAsync(
@@ -384,15 +393,80 @@ public sealed class MakeReservationHandler(
             .ToList();
     }
 
-    private static void AdvanceToNextCheckPhase(
+    /// <summary>
+    /// Advances to the next check phase, but only queues players who are eligible for that
+    /// phase's reservation type. If no eligible players remain, the phase is resolved immediately
+    /// (everyone auto-passes), which may cascade further until a winner is found or the game starts.
+    /// </summary>
+    private async Task<
+        GameActionResult<MakeReservationResult>
+    > AdvanceToNextCheckPhaseOrResolveAsync(
         Domain.GameFlow.GameState state,
+        List<IDomainEvent> events,
         GamePhase next,
-        IReadOnlyList<PlayerSeat> players
+        CancellationToken ct
     )
     {
+        var eligible = EligiblePlayersForPhase(state, next);
         state.Apply(new ClearReservationDeclarationsModification());
-        state.Apply(new SetPendingRespondersModification(players));
         state.Apply(new AdvancePhaseModification(next));
-        state.Apply(new SetCurrentTurnModification(players[0]));
+
+        if (eligible.Count > 0)
+        {
+            state.Apply(new SetPendingRespondersModification(eligible));
+            state.Apply(new SetCurrentTurnModification(eligible[0]));
+            return await SaveAndReturnOk(state, events, new MakeReservationResult(false, null), ct);
+        }
+
+        // No eligible players — resolve the phase immediately with empty declarations
+        state.Apply(new SetPendingRespondersModification([]));
+        return await ResolvePhaseAsync(state, events, ct);
+    }
+
+    /// <summary>
+    /// Returns the Vorbehalt players who are eligible to declare the reservation type for
+    /// the given phase. For SoloCheck the full Vorbehalt list is returned (no filtering).
+    /// </summary>
+    private static IReadOnlyList<PlayerSeat> EligiblePlayersForPhase(
+        Domain.GameFlow.GameState state,
+        GamePhase phase
+    )
+    {
+        var vorbehalt = VorbehaltPlayers(state);
+        return phase switch
+        {
+            GamePhase.ReservationArmutCheck =>
+            [
+                .. vorbehalt.Where(seat =>
+                {
+                    var ps = state.Players.First(p => p.Seat == seat);
+                    var dummyPartner = (PlayerSeat)(((int)seat + 1) % 4);
+                    return new ArmutReservation(seat, dummyPartner).IsEligible(
+                        ps.Hand,
+                        state.Rules
+                    );
+                }),
+            ],
+            GamePhase.ReservationSchmeissenCheck =>
+            [
+                .. vorbehalt.Where(seat =>
+                {
+                    var ps = state.Players.First(p => p.Seat == seat);
+                    return new SchmeissenReservation().IsEligible(ps.Hand, state.Rules);
+                }),
+            ],
+            GamePhase.ReservationHochzeitCheck =>
+            [
+                .. vorbehalt.Where(seat =>
+                {
+                    var ps = state.Players.First(p => p.Seat == seat);
+                    return new HochzeitReservation(seat, HochzeitCondition.FirstTrick).IsEligible(
+                        ps.Hand,
+                        state.Rules
+                    );
+                }),
+            ],
+            _ => vorbehalt,
+        };
     }
 }
