@@ -246,6 +246,21 @@ public sealed class PlayCardHandler(
             );
         }
 
+        // Schwarze Sau: when the second ♠Q appears in a completed trick, pause for solo selection.
+        // Only interrupt if there are cards left; if hands are empty the game ends normally and
+        // scoring falls back to Normalspiel (astronomically unlikely edge case).
+        if (
+            state.IsSchwarzesSau
+            && !state.Players.All(p => p.Hand.Cards.Count == 0)
+            && IsSecondPikDameTrick(state)
+        )
+        {
+            state.Apply(new AdvancePhaseModification(GamePhase.SchwarzesSauSoloSelect));
+            state.Apply(new SetCurrentTurnModification(winner));
+            await SaveAndPublishAsync(state, events, ct);
+            return Ok(new PlayCardResult(true, winner, false, null));
+        }
+
         if (state.Players.All(p => p.Hand.Cards.Count == 0))
         {
             var finished = _finisher.Execute(state);
@@ -256,6 +271,26 @@ public sealed class PlayCardHandler(
         state.Apply(new SetCurrentTurnModification(winner));
         await SaveAndPublishAsync(state, events, ct);
         return Ok(new PlayCardResult(true, winner, false, null));
+    }
+
+    /// <summary>
+    /// Returns true when the just-completed trick (last entry of
+    /// <see cref="GameState.CompletedTricks"/>) pushed the running ♠Q count from &lt;2 to ≥2.
+    /// Handles the case where both Pik Damen appear in the same trick.
+    /// </summary>
+    private static bool IsSecondPikDameTrick(GameState state)
+    {
+        var pikDame = new CardType(Suit.Pik, Rank.Dame);
+        var justCompleted = state.CompletedTricks.Last();
+
+        int inThisTrick = justCompleted.Cards.Count(c => c.Card.Type == pikDame);
+        if (inThisTrick == 0)
+            return false;
+
+        int totalSoFar = state.CompletedTricks.Sum(t => t.Cards.Count(c => c.Card.Type == pikDame));
+        int beforeThisTrick = totalSoFar - inThisTrick;
+
+        return beforeThisTrick < 2 && totalSoFar >= 2;
     }
 
     private async Task SaveAndPublishAsync(

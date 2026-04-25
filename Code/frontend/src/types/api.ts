@@ -59,6 +59,8 @@ export interface PlayerGameViewResponse {
   armutExchangeCardCount: number | null;
   armutReturnedTrump: boolean | null;
   activeGameMode: string | null;
+  shouldChooseSchwarzesSauSolo: boolean;
+  eligibleSchwarzesSauSolos: string[];
   finishedResult?: GameResultDto | null;
   newGameVoteCount?: number;
 }
@@ -166,6 +168,10 @@ export interface ExchangeArmutCardsRequest {
 
 export interface ExchangeArmutCardsResponse {
   returnedTrumpCount: number;
+}
+
+export interface ChooseSchwarzesSauSoloRequest {
+  solo: string;
 }
 
 // ── SignalR events ─────────────────────────────────────────────────────────────

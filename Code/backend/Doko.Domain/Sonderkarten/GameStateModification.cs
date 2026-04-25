@@ -142,3 +142,17 @@ public sealed record SetSilentGameModeModification(GameFlow.SilentGameMode? Mode
 /// Sonderkarten and Extrapunkte active, and scored with soloFactor=3).
 /// </summary>
 public sealed record SetHochzeitForcedSoloModification : GameStateModification;
+
+/// <summary>
+/// Marks the game as Schwarze Sau (Armut with no partner found). From this point the game
+/// watches for the second ♠Q trick and then interrupts with
+/// <see cref="GamePhase.SchwarzesSauSoloSelect"/>.
+/// </summary>
+public sealed record SetSchwarzesSauModification : GameStateModification;
+
+/// <summary>
+/// Clears all active sonderkarte state (active list and closed windows).
+/// Applied in <see cref="GamePhase.SchwarzesSauSoloSelect"/> when a non-Schlanker-Martin
+/// solo is chosen: the new trump evaluator makes previously-active sonderkarten irrelevant.
+/// </summary>
+public sealed record ClearActiveSonderkartenModification : GameStateModification;

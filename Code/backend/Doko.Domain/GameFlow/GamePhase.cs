@@ -29,6 +29,13 @@ public enum GamePhase
     ArmutCardExchange,
 
     Playing,
+
+    /// <summary>
+    /// Schwarze Sau: the trick with the second ♠Q has been completed. The trick winner must
+    /// choose a solo; the game then continues under that solo's rules from this point on.
+    /// </summary>
+    SchwarzesSauSoloSelect,
+
     Scoring,
     Finished,
 

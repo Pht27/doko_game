@@ -6,6 +6,7 @@ using Doko.Application.Games.Results;
 using Doko.Application.Lobbies;
 using Doko.Domain.GameFlow;
 using Doko.Domain.Players;
+using Doko.Domain.Reservations;
 using Doko.Domain.Rules;
 
 namespace Doko.Api.Services;
@@ -24,6 +25,7 @@ public sealed class OpaService(
     ILobbyRepository lobbyRepository,
     IDeclareHealthStatusHandler declareHealth,
     IAcceptArmutHandler acceptArmut,
+    IChooseSchwarzesSauSoloHandler chooseSchwarzesSauSolo,
     IPlayCardHandler playCard
 ) : IOpaService
 {
@@ -55,6 +57,10 @@ public sealed class OpaService(
                     await DeclineArmutAsync(gameId, state.CurrentTurn, ct);
                     break;
 
+                case GamePhase.SchwarzesSauSoloSelect:
+                    await ChooseFirstSchwarzesSauSoloAsync(gameId, state.CurrentTurn, ct);
+                    break;
+
                 case GamePhase.Playing:
                     var finished = await PlayFirstCardAsync(gameId, state, ct);
                     if (finished is not null)
@@ -78,6 +84,16 @@ public sealed class OpaService(
     private async Task DeclineArmutAsync(GameId gameId, PlayerSeat seat, CancellationToken ct)
     {
         await acceptArmut.ExecuteAsync(new AcceptArmutCommand(gameId, seat, Accepts: false), ct);
+    }
+
+    private async Task ChooseFirstSchwarzesSauSoloAsync(
+        GameId gameId,
+        PlayerSeat seat,
+        CancellationToken ct
+    )
+    {
+        var command = new ChooseSchwarzesSauSoloCommand(gameId, seat, ReservationPriority.KaroSolo);
+        await chooseSchwarzesSauSolo.ExecuteAsync(command, ct);
     }
 
     private async Task<GameFinishedResult?> PlayFirstCardAsync(

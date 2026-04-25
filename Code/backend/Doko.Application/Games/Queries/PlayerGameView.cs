@@ -88,4 +88,17 @@ public record PlayerGameView(
     /// (e.g. "KaroSolo", "Hochzeit", "Armut"). Null means Normalspiel.
     /// </summary>
     public string? ActiveGameMode { get; init; } = null;
+
+    /// <summary>
+    /// True when this player won the second ♠Q trick and must choose a solo in
+    /// <see cref="GamePhase.SchwarzesSauSoloSelect"/>.
+    /// </summary>
+    public bool ShouldChooseSchwarzesSauSolo { get; init; } = false;
+
+    /// <summary>
+    /// The solos the player may choose from during <see cref="GamePhase.SchwarzesSauSoloSelect"/>.
+    /// All priorities KaroSolo (0) through SchlankerMartin (8). Empty outside that phase or
+    /// when it is not this player's turn.
+    /// </summary>
+    public IReadOnlyList<ReservationPriority> EligibleSchwarzesSauSolos { get; init; } = [];
 }

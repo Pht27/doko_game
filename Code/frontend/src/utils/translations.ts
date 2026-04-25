@@ -67,6 +67,10 @@ export const t = {
     `Wähle ${total} Karte(n) aus deiner Hand (${selected}/${total})`,
   bestaetigen: 'Bestätigen',
 
+  // ── SchwarzesSauSoloDialog ─────────────────────────────────────────────────
+  schwarzesSauSoloTitle: (playerId: number) => `S${playerId}: Schwarze Sau - Solo wählen`,
+  schwarzesSauSoloSubtitle: 'Du hast die zweite Pik Dame gewonnen. Wähle ein Solo.',
+
   // ── SonderkarteOverlay ─────────────────────────────────────────────────────
   sonderkarteBadge: 'Sonderkarte',
   genscherBadge: 'Genscher',
@@ -174,12 +178,12 @@ const soloLabels: Record<string, string> = {
   Bubensolo: 'Buben-Solo',
   Fleischloses: 'Fleischloses',
   Knochenloses: 'Knochenloses',
+  SchlankerMartin: 'Schlanker Martin',
 };
 
 // Mapping from ReservationPriority enum names to German game mode labels
 const gameModeLabels: Record<string, string> = {
   ...soloLabels,
-  SchlankerMartin: 'Schlanker Martin',
   Armut: 'Armut',
   Hochzeit: 'Hochzeit',
 };
@@ -207,6 +211,7 @@ const phaseLabels: Record<string, string> = {
   ReservationHochzeitCheck: 'Hochzeit-Runde',
   ArmutPartnerFinding: 'Partner suchen',
   ArmutCardExchange: 'Karten tauschen',
+  SchwarzesSauSoloSelect: 'Schwarze Sau - Solo',
   Playing: 'Normalspiel',
   Scoring: 'Abrechnung',
 };

@@ -14,6 +14,7 @@ using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
 using Doko.Domain.Parties;
 using Doko.Domain.Players;
+using Doko.Domain.Reservations;
 using Doko.Domain.Scoring;
 using Doko.Domain.Sonderkarten;
 using Microsoft.AspNetCore.Authorization;
@@ -34,6 +35,7 @@ public class GamesController(
     IMakeReservationHandler makeReservation,
     IAcceptArmutHandler acceptArmut,
     IExchangeArmutCardsHandler exchangeArmutCards,
+    IChooseSchwarzesSauSoloHandler chooseSchwarzesSauSolo,
     IPlayCardHandler playCard,
     IMakeAnnouncementHandler makeAnnouncement,
     IGameQueryService gameQuery,
@@ -140,6 +142,26 @@ public class GamesController(
         var command = new ExchangeArmutCardsCommand(new GameId(guid), player, cardIds);
         var result = await exchangeArmutCards.ExecuteAsync(command, ct);
         return result.ToActionResult(r => Ok(new ExchangeArmutCardsResponse(r.ReturnedTrumpCount)));
+    }
+
+    [HttpPost("{gameId}/schwarze-sau-solo")]
+    public async Task<IActionResult> ChooseSchwarzesSauSolo(
+        string gameId,
+        [FromBody] ChooseSchwarzesSauSoloRequest req,
+        CancellationToken ct
+    )
+    {
+        if (!Guid.TryParse(gameId, out var guid))
+            return NotFound(new ErrorResponse("game_not_found"));
+
+        if (!Enum.TryParse<ReservationPriority>(req.Solo, out var priority))
+            return BadRequest(new ErrorResponse("invalid_reservation"));
+
+        var player = GetPlayerSeat();
+        var command = new ChooseSchwarzesSauSoloCommand(new GameId(guid), player, priority);
+        var result = await chooseSchwarzesSauSolo.ExecuteAsync(command, ct);
+        await opaService.ExecuteOpaActionsAsync(new GameId(guid), ct);
+        return result.ToActionResult(_ => Ok());
     }
 
     [HttpPost("{gameId}/cards")]

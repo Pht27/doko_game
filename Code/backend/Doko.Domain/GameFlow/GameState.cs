@@ -149,6 +149,13 @@ public sealed class GameState
     /// </summary>
     public bool HochzeitBecameForcedSolo { get; private set; }
 
+    /// <summary>
+    /// True when the game is running as Schwarze Sau (Armut with no partner found).
+    /// The game watches for the second ♠Q trick and then interrupts with
+    /// <see cref="GamePhase.SchwarzesSauSoloSelect"/>.
+    /// </summary>
+    public bool IsSchwarzesSau { get; private set; }
+
 #pragma warning disable CS8618 // Non-nullable fields initialized via factory/Apply
     private GameState() { }
 #pragma warning restore CS8618
@@ -413,6 +420,15 @@ public sealed class GameState
 
             case SetHochzeitForcedSoloModification:
                 HochzeitBecameForcedSolo = true;
+                break;
+
+            case SetSchwarzesSauModification:
+                IsSchwarzesSau = true;
+                break;
+
+            case ClearActiveSonderkartenModification:
+                ActiveSonderkarten = [];
+                ClosedWindows = new HashSet<SonderkarteType>();
                 break;
 
             default:

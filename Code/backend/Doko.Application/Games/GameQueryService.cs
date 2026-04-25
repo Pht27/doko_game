@@ -65,6 +65,11 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
                 : null,
             ArmutReturnedTrump = state.ArmutReturnedTrump,
             ActiveGameMode = state.ActiveReservation?.Priority.ToString(),
+            ShouldChooseSchwarzesSauSolo = BuildShouldChooseSchwarzesSauSolo(
+                requestingPlayer,
+                state
+            ),
+            EligibleSchwarzesSauSolos = BuildEligibleSchwarzesSauSolos(requestingPlayer, state),
         };
     }
 
@@ -257,6 +262,26 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
         state.Phase == GamePhase.ArmutCardExchange && state.ArmutRichPlayer == player
             ? state.ArmutTransferCount
             : null;
+
+    private static bool BuildShouldChooseSchwarzesSauSolo(PlayerSeat player, GameState state) =>
+        state.Phase == GamePhase.SchwarzesSauSoloSelect && state.CurrentTurn == player;
+
+    /// <summary>
+    /// All solo priorities are eligible in Schwarze Sau — no hand restriction.
+    /// Returns the full list only for the player whose turn it is; empty for observers.
+    /// </summary>
+    private static IReadOnlyList<ReservationPriority> BuildEligibleSchwarzesSauSolos(
+        PlayerSeat player,
+        GameState state
+    )
+    {
+        if (!BuildShouldChooseSchwarzesSauSolo(player, state))
+            return [];
+
+        return Enum.GetValues<ReservationPriority>()
+            .Where(p => (int)p <= (int)ReservationPriority.SchlankerMartin)
+            .ToList();
+    }
 
     /// In Kontrasolo, non-solo players see their Kreuz-Dame-based party for announcement labels.
     /// They don't know they're "Re" in the Kontrasolo sense; the button should reflect normal rules.

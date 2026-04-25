@@ -18,6 +18,7 @@ import { HealthCheckDialog } from '../dialogs/HealthCheckDialog';
 import { ReservationDialog } from '../dialogs/ReservationDialog';
 import { ArmutPartnerDialog } from '../dialogs/ArmutPartnerDialog';
 import { ArmutReturnDialog } from '../dialogs/ArmutReturnDialog';
+import { SchwarzesSauSoloDialog } from '../dialogs/SchwarzesSauSoloDialog';
 import { t } from '@/utils/translations';
 
 interface GameBoardProps {
@@ -234,6 +235,16 @@ export function GameBoard({
             cardReturnCount={view.armutCardReturnCount}
             selectedCount={actions.armutReturnSelected.size}
             onConfirm={() => actions.handleArmutExchange(Array.from(actions.armutReturnSelected))}
+          />
+        </div>
+      )}
+
+      {view?.shouldChooseSchwarzesSauSolo && view.eligibleSchwarzesSauSolos.length > 0 && (
+        <div className="absolute left-1/2 -translate-x-1/2 top-[20%] z-20 w-[calc(100%-2rem)] max-w-sm">
+          <SchwarzesSauSoloDialog
+            playerId={activePlayer}
+            eligibleSolos={view.eligibleSchwarzesSauSolos}
+            onChoose={actions.handleSchwarzesSauSolo}
           />
         </div>
       )}

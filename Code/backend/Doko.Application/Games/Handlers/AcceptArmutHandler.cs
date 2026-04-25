@@ -106,6 +106,7 @@ public sealed class AcceptArmutHandler(IGameRepository repository, IGameEventPub
         // Nobody accepted — Schwarze Sau
         // Poor player starts; normal game mode (no partner resolution yet)
         state.Apply(new SetGameModeModification(null));
+        state.Apply(new SetSchwarzesSauModification());
         state.Apply(new AdvancePhaseModification(GamePhase.Playing));
         state.Apply(new SetCurrentTurnModification(state.ArmutPlayer!.Value));
 

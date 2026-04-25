@@ -22,6 +22,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMakeReservationHandler, MakeReservationHandler>();
         services.AddScoped<IAcceptArmutHandler, AcceptArmutHandler>();
         services.AddScoped<IExchangeArmutCardsHandler, ExchangeArmutCardsHandler>();
+        services.AddScoped<IChooseSchwarzesSauSoloHandler, ChooseSchwarzesSauSoloHandler>();
         services.AddScoped<IPlayCardHandler, PlayCardHandler>();
         services.AddScoped<IMakeAnnouncementHandler, MakeAnnouncementHandler>();
         services.AddScoped<IGameQueryService, GameQueryService>();

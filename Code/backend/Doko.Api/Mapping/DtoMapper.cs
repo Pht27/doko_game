@@ -50,6 +50,10 @@ public static class DtoMapper
             ArmutExchangeCardCount = view.ArmutExchangeCardCount,
             ArmutReturnedTrump = view.ArmutReturnedTrump,
             ActiveGameMode = view.ActiveGameMode,
+            ShouldChooseSchwarzesSauSolo = view.ShouldChooseSchwarzesSauSolo,
+            EligibleSchwarzesSauSolos = view
+                .EligibleSchwarzesSauSolos.Select(p => p.ToString())
+                .ToList(),
         };
 
     public static CardDto ToDto(Card card) =>
