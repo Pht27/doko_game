@@ -26,6 +26,7 @@ If no argument is given, use the file currently open in the IDE.
 7. **Update release notes and version** — based on what was implemented:
    - Read the current version from `RELEASENOTES.md`
    - Classify the change:
+     - If it was just a code base internal change like a refactoring or documentation, no update is needed
      - Small fix / minor adjustment → bump patch: `X.Y.Z → X.Y.(Z+1)`
      - New independent feature visible to users → bump minor: `X.Y.Z → X.(Y+1).0`
      - Never bump the major version (X)
