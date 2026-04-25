@@ -672,4 +672,141 @@ public class GameScorerTests
             partyResolver: B.SoloResolver(), // P0=Re, P1/P2/P3=Kontra
             announcements: announcements
         );
+
+    // ── Schlanker Martin ──────────────────────────────────────────────────────
+
+    [Fact]
+    public void SchlankerMartin_ReWins_WhenSoloHasFewestTricks()
+    {
+        // P0 (Re/solo) wins 2 tricks; P1/P2/P3 each win 2 → fewest, so Re wins
+        // Actual: P0=2, P1=4, P2=2, P3=2 → solo still has fewest via <=
+        var state = SchlankerMartinState();
+        var tricks = new List<TrickResult>
+        {
+            B.ZeroValueTrick(B.P0, 0),
+            B.ZeroValueTrick(B.P1, 4),
+            B.ZeroValueTrick(B.P1, 8),
+            B.ZeroValueTrick(B.P1, 12),
+            B.ZeroValueTrick(B.P1, 16),
+            B.ZeroValueTrick(B.P0, 20),
+            B.ZeroValueTrick(B.P2, 24),
+            B.ZeroValueTrick(B.P2, 28),
+            B.ZeroValueTrick(B.P3, 32),
+            B.ZeroValueTrick(B.P3, 36),
+        };
+        // P0=2, P1=4, P2=2, P3=2  → soloTricks(2) <= kontraMin(2) → Re wins, tie → gameValue=0
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.Winner.Should().Be(Party.Re);
+        result.GameValue.Should().Be(0);
+        result.TotalScore.Should().Be(0);
+        result.SoloFactor.Should().Be(3);
+    }
+
+    [Fact]
+    public void SchlankerMartin_ReWins_WhenSoloHasStrictlyFewestTricks()
+    {
+        // P0=1, P1=3, P2=3, P3=3  → soloTricks(1) < kontraMin(3) → Re wins with gameValue=1
+        var state = SchlankerMartinState();
+        var tricks = new List<TrickResult>
+        {
+            B.ZeroValueTrick(B.P0, 0),
+            B.ZeroValueTrick(B.P1, 4),
+            B.ZeroValueTrick(B.P1, 8),
+            B.ZeroValueTrick(B.P1, 12),
+            B.ZeroValueTrick(B.P2, 16),
+            B.ZeroValueTrick(B.P2, 20),
+            B.ZeroValueTrick(B.P2, 24),
+            B.ZeroValueTrick(B.P3, 28),
+            B.ZeroValueTrick(B.P3, 32),
+            B.ZeroValueTrick(B.P3, 36),
+        };
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.Winner.Should().Be(Party.Re);
+        result.GameValue.Should().Be(1);
+        result.TotalScore.Should().Be(3);
+    }
+
+    [Fact]
+    public void SchlankerMartin_KontraWins_WhenAnotherPlayerHasFewerTricks()
+    {
+        // P0=4, P1=2, P2=2, P3=2 → soloTricks(4) > kontraMin(2) → Re loses, gameValue=1
+        var state = SchlankerMartinState();
+        var tricks = new List<TrickResult>
+        {
+            B.ZeroValueTrick(B.P0, 0),
+            B.ZeroValueTrick(B.P0, 4),
+            B.ZeroValueTrick(B.P0, 8),
+            B.ZeroValueTrick(B.P0, 12),
+            B.ZeroValueTrick(B.P1, 16),
+            B.ZeroValueTrick(B.P1, 20),
+            B.ZeroValueTrick(B.P2, 24),
+            B.ZeroValueTrick(B.P2, 28),
+            B.ZeroValueTrick(B.P3, 32),
+            B.ZeroValueTrick(B.P3, 36),
+        };
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.Winner.Should().Be(Party.Kontra);
+        result.GameValue.Should().Be(1);
+        result.TotalScore.Should().Be(3);
+    }
+
+    [Fact]
+    public void SchlankerMartin_IgnoresAugen_ForWinnerDecision()
+    {
+        // P0 wins 2 tricks with high Augen, others win 3 each → Re wins by trick count despite more Augen
+        var state = SchlankerMartinState();
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P0, 0),
+            B.HighValueTrick(B.P0, 4),
+            B.ZeroValueTrick(B.P1, 8),
+            B.ZeroValueTrick(B.P1, 12),
+            B.ZeroValueTrick(B.P1, 16),
+            B.ZeroValueTrick(B.P2, 20),
+            B.ZeroValueTrick(B.P2, 24),
+            B.ZeroValueTrick(B.P2, 28),
+            B.ZeroValueTrick(B.P3, 32),
+            B.ZeroValueTrick(B.P3, 36),
+        };
+        // P0=2 (lots of Augen), P1=3, P2=3, P3=2 → soloTricks(2) <= kontraMin(2) → Re wins, tie
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.Winner.Should().Be(Party.Re);
+        result.GameValue.Should().Be(0);
+    }
+
+    [Fact]
+    public void SchlankerMartin_NoExtrapunkteOrAnnouncements()
+    {
+        var state = SchlankerMartinState();
+        var tricks = new List<TrickResult>
+        {
+            B.ZeroValueTrick(B.P0, 0),
+            B.ZeroValueTrick(B.P1, 4),
+            B.ZeroValueTrick(B.P1, 8),
+            B.ZeroValueTrick(B.P1, 12),
+            B.ZeroValueTrick(B.P1, 16),
+            B.ZeroValueTrick(B.P0, 20),
+            B.ZeroValueTrick(B.P2, 24),
+            B.ZeroValueTrick(B.P2, 28),
+            B.ZeroValueTrick(B.P3, 32),
+            B.ZeroValueTrick(B.P3, 36),
+        };
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.AllAwards.Should().BeEmpty();
+        result.AnnouncementRecords.Should().BeEmpty();
+        result.Feigheit.Should().BeFalse();
+    }
+
+    private static GameState SchlankerMartinState() =>
+        GameState.Create(
+            rules: RuleSet.Default(),
+            players: B.FourPlayers(),
+            partyResolver: B.SoloResolver(),
+            activeReservation: new SchlankerMartinReservation(B.P0)
+        );
 }

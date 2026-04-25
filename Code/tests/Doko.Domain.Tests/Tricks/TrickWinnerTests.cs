@@ -127,4 +127,55 @@ public class TrickWinnerTests
         );
         trick.Winner(Trump, SecondBeatsFirst).Should().Be(B.P0);
     }
+
+    // ── secondBeatsFirst (Schlanker Martin) ───────────────────────────────────
+
+    [Fact]
+    public void SecondBeatsFirst_EqualPlainCards_SecondWins()
+    {
+        var trick = B.Trick(
+            (0, Suit.Kreuz, Rank.Ass, B.P0), // ♣A leads
+            (1, Suit.Kreuz, Rank.Ass, B.P1), // equal ♣A — wins because secondBeatsFirst
+            (2, Suit.Kreuz, Rank.Neun, B.P2),
+            (3, Suit.Kreuz, Rank.Neun, B.P3)
+        );
+        trick.Winner(Trump, SecondBeatsFirst, secondBeatsFirst: true).Should().Be(B.P1);
+    }
+
+    [Fact]
+    public void SecondBeatsFirst_EqualPlainCards_FirstWins_WhenFlagOff()
+    {
+        var trick = B.Trick(
+            (0, Suit.Kreuz, Rank.Ass, B.P0),
+            (1, Suit.Kreuz, Rank.Ass, B.P1),
+            (2, Suit.Kreuz, Rank.Neun, B.P2),
+            (3, Suit.Kreuz, Rank.Neun, B.P3)
+        );
+        trick.Winner(Trump, SecondBeatsFirst, secondBeatsFirst: false).Should().Be(B.P0);
+    }
+
+    [Fact]
+    public void SecondBeatsFirst_EqualNonDulleTrumps_SecondWins()
+    {
+        var trick = B.Trick(
+            (0, Suit.Karo, Rank.Ass, B.P0), // first Fuchs
+            (1, Suit.Karo, Rank.Ass, B.P1), // second Fuchs — wins because secondBeatsFirst
+            (2, Suit.Karo, Rank.Neun, B.P2),
+            (3, Suit.Karo, Rank.Neun, B.P3)
+        );
+        trick.Winner(Trump, SecondBeatsFirst, secondBeatsFirst: true).Should().Be(B.P1);
+    }
+
+    [Fact]
+    public void SecondBeatsFirst_DulleTieUsesPassedDulleRule_NotFlag()
+    {
+        // With secondBeatsFirst=true but FirstBeatsSecond DulleRule: first Dulle wins
+        var trick = B.Trick(
+            (0, Suit.Herz, Rank.Zehn, B.P0), // first Dulle
+            (1, Suit.Herz, Rank.Zehn, B.P1), // second Dulle
+            (2, Suit.Karo, Rank.Neun, B.P2),
+            (3, Suit.Karo, Rank.Neun, B.P3)
+        );
+        trick.Winner(Trump, FirstBeatsSecond, secondBeatsFirst: true).Should().Be(B.P0);
+    }
 }

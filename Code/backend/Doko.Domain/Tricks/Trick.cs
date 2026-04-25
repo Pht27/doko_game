@@ -18,7 +18,15 @@ public sealed class Trick
     public void Add(TrickCard trickCard) => _cards.Add(trickCard);
 
     /// <summary>Returns the winner of this trick. Only valid when IsComplete is true.</summary>
-    public PlayerSeat Winner(ITrumpEvaluator trumpEvaluator, Rules.DulleRule dulleRule)
+    /// <param name="secondBeatsFirst">
+    /// When true, any tie between equal-ranked cards is won by the later card (Schlanker Martin).
+    /// Applies to plain-suit ties and non-Dulle trump ties; Dulle ties are governed by <paramref name="dulleRule"/>.
+    /// </param>
+    public PlayerSeat Winner(
+        ITrumpEvaluator trumpEvaluator,
+        Rules.DulleRule dulleRule,
+        bool secondBeatsFirst = false
+    )
     {
         var led = _cards[0];
         bool winnerIsTrump = trumpEvaluator.IsTrump(led.Card.Type);
@@ -39,7 +47,7 @@ public sealed class Trick
                 if (!winnerIsTrump && tc.Card.Type.Suit == led.Card.Type.Suit)
                 {
                     int rank = trumpEvaluator.GetPlainRank(tc.Card.Type);
-                    if (rank > winnerRank)
+                    if (rank > winnerRank || (rank == winnerRank && secondBeatsFirst))
                     {
                         winner = tc.Player;
                         winnerType = tc.Card.Type;
@@ -71,13 +79,12 @@ public sealed class Trick
                 }
                 // FirstBeatsSecond: first wins — no change
             }
-            else if (trumpRank > winnerRank)
+            else if (trumpRank > winnerRank || (trumpRank == winnerRank && secondBeatsFirst))
             {
                 winner = tc.Player;
                 winnerType = tc.Card.Type;
                 winnerRank = trumpRank;
             }
-            // Equal non-Dulle trumps: first played wins — no change
         }
 
         return winner;

@@ -213,8 +213,17 @@ public sealed class PlayCardHandler(
     {
         var trick = state.CurrentTrick!;
         var isLastTrick = state.CompletedTricks.Count == state.Rules.LastTrickIndex;
-        var dulleRule = isLastTrick ? DulleRule.FirstBeatsSecond : state.Rules.DulleRule;
-        var winner = trick.Winner(state.TrumpEvaluator, dulleRule);
+        bool isSchlankerMartin =
+            state.ActiveReservation?.Priority == ReservationPriority.SchlankerMartin;
+        var dulleRule =
+            isSchlankerMartin || isLastTrick
+                ? state.Rules.DulleRule.Reversed()
+                : state.Rules.DulleRule;
+        var winner = trick.Winner(
+            state.TrumpEvaluator,
+            dulleRule,
+            secondBeatsFirst: isSchlankerMartin
+        );
         var awards = ExtrapunktRegistry
             .GetActive(state.Rules, state.ActiveReservation)
             .SelectMany(e => e.Evaluate(trick, state))

@@ -19,6 +19,9 @@ public sealed class GameScorer : IGameScorer
     {
         var state = game.FinalState;
 
+        if (state.ActiveReservation?.Priority == ReservationPriority.SchlankerMartin)
+            return ScoreSchlankerMartin(game);
+
         // ── 1. Sum Augen and tricks per party ────────────────────────────────────
         int reAugen = 0;
         int kontraAugen = 0;
@@ -221,6 +224,67 @@ public sealed class GameScorer : IGameScorer
             return true;
 
         return false;
+    }
+
+    private static GameResult ScoreSchlankerMartin(CompletedGame game)
+    {
+        var state = game.FinalState;
+
+        // Count tricks and Augen per player
+        var tricksPerPlayer = new Dictionary<Players.PlayerSeat, int>();
+        int reAugen = 0;
+        int kontraAugen = 0;
+
+        foreach (var trickResult in game.Tricks)
+        {
+            tricksPerPlayer[trickResult.Winner] =
+                tricksPerPlayer.GetValueOrDefault(trickResult.Winner) + 1;
+
+            int augen = ComputeEffectiveAugen(trickResult.Trick);
+            if (state.PartyResolver.ResolveParty(trickResult.Winner, state) == Party.Re)
+                reAugen += augen;
+            else
+                kontraAugen += augen;
+        }
+
+        // Solo player is the one mapped to Re
+        var soloSeat = state
+            .Players.Single(p => state.PartyResolver.ResolveParty(p.Seat, state) == Party.Re)
+            .Seat;
+
+        int soloTricks = tricksPerPlayer.GetValueOrDefault(soloSeat);
+        int kontraMinTricks = state
+            .Players.Where(p => p.Seat != soloSeat)
+            .Min(p => tricksPerPlayer.GetValueOrDefault(p.Seat));
+
+        // Re wins when solo player has fewest or ties for fewest
+        var winner = soloTricks <= kontraMinTricks ? Party.Re : Party.Kontra;
+
+        // Game value 0 on exact tie, 1 when there is a strict difference
+        int gameValue = soloTricks == kontraMinTricks ? 0 : 1;
+
+        int reStiche = tricksPerPlayer.GetValueOrDefault(soloSeat);
+        int kontraStiche = game.Tricks.Count - reStiche;
+
+        var components =
+            gameValue == 1 ? (IReadOnlyList<GameValueComponent>)[new("Gewonnen", 1)] : [];
+
+        int totalScore = gameValue * 3; // soloFactor = 3
+
+        return new GameResult(
+            winner,
+            reAugen,
+            kontraAugen,
+            reStiche,
+            kontraStiche,
+            gameValue,
+            AllAwards: [],
+            Feigheit: false,
+            components,
+            SoloFactor: 3,
+            totalScore,
+            AnnouncementRecords: []
+        );
     }
 
     private static int ComputeEffectiveAugen(Tricks.Trick trick)
