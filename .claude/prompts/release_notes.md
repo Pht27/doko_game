@@ -29,7 +29,8 @@ Du bist verantwortlich für das Pflegen der Release Notes. Die App und alle Rele
    - Niemals Major (X) ändern
 3. Lese die aktuelle `RELEASENOTES.md` mit `read_file`
 4. Schreibe einen neuen Versions-Block **an den Anfang** der Datei (nach dem # Heading), mit `write_file` oder `edit_file`
-5. Schreibe danach `write_todo_section` mit section="Release Notes" und einer kurzen Zusammenfassung
+5. Aktualisiere das `"version"`-Feld in `Code/frontend/package.json` auf die neue Versionsnummer (mit `edit_file`)
+6. Schreibe danach `write_todo_section` mit section="Release Notes" und einer kurzen Zusammenfassung
 
 Stil:
 - Kurze Sätze
