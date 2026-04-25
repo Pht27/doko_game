@@ -256,15 +256,36 @@
 }
 
 .rd-row {
-  @apply flex justify-between items-baseline gap-2 text-xs;
+  @apply flex items-baseline justify-between gap-2 text-xs;
 }
 
 .rd-row-label {
   @apply text-white/60 flex-1;
 }
 
+/* Award rows — 3-column grid, awardee pinned at the midpoint */
+
+.rd-award-row {
+  @apply text-xs;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: baseline;
+}
+
+.rd-award-row .rd-row-value {
+  justify-self: end;
+}
+
 .rd-award-player {
-  @apply text-white/35;
+  @apply text-center;
+}
+
+.rd-award-player-re {
+  @apply text-re-400;
+}
+
+.rd-award-player-kontra {
+  @apply text-kontra-400;
 }
 
 .rd-row-label-factor {

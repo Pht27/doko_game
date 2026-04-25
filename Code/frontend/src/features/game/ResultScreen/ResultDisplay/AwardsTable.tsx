@@ -16,13 +16,12 @@ export function AwardsTable({ awards, myParty, result }: AwardsTableProps) {
       {awards.map((award, i) => {
         const awardParty = getSeatParty(award.benefittingPlayer, result);
         const awardSign = myParty === null ? 1 : awardParty === myParty ? 1 : -1;
-        const label = (
-          <>
-            {award.type}
-            <span className="rd-award-player"> ({t.seatShort(award.benefittingPlayer)})</span>
-          </>
-        );
-        return <ScoreRow key={i} label={label} value={awardSign * award.delta} />;
+        return <ScoreRow
+            key={i}
+            label={award.type}
+            awardee={{ name: t.seatShort(award.benefittingPlayer), party: awardParty }}
+            value={awardSign * award.delta}
+          />;
       })}
     </div>
   );
