@@ -19,6 +19,8 @@ interface HandDisplayProps {
   maxSelection?: number;
   /** Card currently being played (shows fly-out animation). */
   playingCardId?: number | null;
+  /** Cards that have at least one activatable sonderkarte effect. */
+  sonderkarteCardIds?: Set<number>;
 }
 
 /** Returns the horizontal step (rem) between adjacent card centers for the current viewport and card count. */
@@ -88,6 +90,7 @@ export function HandDisplay({
   selectedCardIds,
   maxSelection,
   playingCardId,
+  sonderkarteCardIds,
 }: HandDisplayProps) {
   const cardStep = useCardStep(cards.length);
 
@@ -98,12 +101,13 @@ export function HandDisplay({
         const canSelect = selectionMode && (isSelected || (selectedCardIds?.size ?? 0) < (maxSelection ?? Infinity));
         const clickable = selectionMode ? canSelect : (isMyTurn && legalCardIds.has(card.id));
         const isPlaying = playingCardId === card.id;
+        const hasSonderkarte = sonderkarteCardIds?.has(card.id) ?? false;
         const CardSvg = cardSvgComponent(card.suit, card.rank);
 
         return (
           <div
             key={card.id}
-            className="card-wrapper"
+            className={`card-wrapper${hasSonderkarte ? ' card-wrapper-sonderkarte' : ''}`}
             style={{ zIndex: i, transform: getCardTransform(i, cards.length, isSelected, cardStep) }}
           >
             <CardSvg

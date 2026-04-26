@@ -62,6 +62,10 @@
   @apply brightness-75 cursor-default;
 }
 
+.card-wrapper-sonderkarte .card {
+  @apply ring-2 ring-orange-400/70;
+}
+
 .card-selectable {
   @apply cursor-pointer hover:-translate-y-3 ring-2 ring-orange-400 transition-transform;
 }

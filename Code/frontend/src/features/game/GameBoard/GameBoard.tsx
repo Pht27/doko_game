@@ -87,6 +87,11 @@ export function GameBoard({
 
   const legalCardIds = new Set(view?.legalCards.map((c) => c.id) ?? []);
 
+  const trickCountByPlayer = (view?.completedTricks ?? []).reduce<Record<number, number>>((acc, trick) => {
+    if (trick.winner != null) acc[trick.winner] = (acc[trick.winner] ?? 0) + 1;
+    return acc;
+  }, {});
+
   return (
     <div className="w-full h-full relative flex flex-col bg-[#1a1a2e] select-none overflow-hidden">
       {/* Floating top-right: game info (clickable when lobby standings available) */}
@@ -118,6 +123,7 @@ export function GameBoard({
             isCurrentTurn={view?.currentTurn === topOpponent.id}
             orientation="top"
             sonderkarteNotif={sonderkarteNotification?.player === topOpponent.id ? sonderkarteNotification.type : null}
+            trickCount={trickCountByPlayer[topOpponent.id] ?? 0}
             onClick={allowPlayerSwitching ? () => onPlayerSwitch(topOpponent.id) : undefined}
           />
         )}
@@ -127,6 +133,7 @@ export function GameBoard({
             isCurrentTurn={view?.currentTurn === leftOpponent.id}
             orientation="left"
             sonderkarteNotif={sonderkarteNotification?.player === leftOpponent.id ? sonderkarteNotification.type : null}
+            trickCount={trickCountByPlayer[leftOpponent.id] ?? 0}
             onClick={allowPlayerSwitching ? () => onPlayerSwitch(leftOpponent.id) : undefined}
           />
         ) : <div />}
@@ -145,6 +152,7 @@ export function GameBoard({
             isCurrentTurn={view?.currentTurn === rightOpponent.id}
             orientation="right"
             sonderkarteNotif={sonderkarteNotification?.player === rightOpponent.id ? sonderkarteNotification.type : null}
+            trickCount={trickCountByPlayer[rightOpponent.id] ?? 0}
             onClick={allowPlayerSwitching ? () => onPlayerSwitch(rightOpponent.id) : undefined}
           />
         ) : <div />}
@@ -194,6 +202,7 @@ export function GameBoard({
             selectedCardIds={actions.armutReturnSelected}
             maxSelection={view.armutCardReturnCount ?? undefined}
             playingCardId={actions.playingCardId}
+            sonderkarteCardIds={new Set(Object.keys(view.eligibleSonderkartenPerCard).map(Number))}
           />
         )}
       </div>
