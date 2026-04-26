@@ -1,5 +1,10 @@
 # Release Notes
 
+## [1.0.1] - 2026-04-26
+
+### Behoben
+- App zeigt auf iOS-Geräten (iPhone, iPad, Mac Safari) jetzt korrekt Inhalte an, statt nur den lila Hintergrund.
+
 ## [1.0.0] - 2026-04-26
 
 **Initialer Release mit allen fertigen Koppeldopf-Regeln**

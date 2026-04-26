@@ -75,7 +75,7 @@ export default function App() {
   useEffect(() => {
     if (orientation === 'portrait') {
       setLandscapeLockFailed(false);
-      screen.orientation?.lock('portrait').catch(() => {});
+      screen.orientation?.lock?.('portrait')?.catch(() => {});
       return;
     }
 
@@ -123,9 +123,9 @@ export default function App() {
     function reapplyLock() {
       if (!document.fullscreenElement) return;
       const target = orientation === 'portrait' ? 'portrait' : 'landscape';
-      screen.orientation?.lock(target)
-        .then(() => { if (target === 'landscape') setLandscapeLockFailed(false); })
-        .catch(() => { if (target === 'landscape') setLandscapeLockFailed(true); });
+      screen.orientation?.lock?.(target)
+        ?.then(() => { if (target === 'landscape') setLandscapeLockFailed(false); })
+        ?.catch(() => { if (target === 'landscape') setLandscapeLockFailed(true); });
     }
     document.addEventListener('fullscreenchange', reapplyLock);
     return () => document.removeEventListener('fullscreenchange', reapplyLock);
