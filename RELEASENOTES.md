@@ -1,5 +1,10 @@
 # Release Notes
 
+## [1.1.2] - 2026-04-26
+
+### Verbessert
+- Zurück-Schaltfläche zeigt nur noch einen Pfeil (←) ohne Text und ist eine wiederverwendbare Komponente.
+
 ## [1.1.1] - 2026-04-25
 
 ### Behoben

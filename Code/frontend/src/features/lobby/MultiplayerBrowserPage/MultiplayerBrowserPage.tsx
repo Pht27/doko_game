@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { t } from '@/utils/translations';
+import { BackButton } from '@/components/BackButton/BackButton';
 import { listLobbies, createLobby, leaveLobby } from '@/api/lobby';
 import { saveLobbySession, clearLobbySession, loadAnySession } from '@/hooks/useLobby';
 import { LobbyDetailView } from './LobbyDetailView';
@@ -95,12 +96,7 @@ export function MultiplayerBrowserPage({
     <div className="w-full h-full flex flex-col">
       {/* Back button */}
       <div className="px-4 pt-3 pb-1 shrink-0">
-        <button
-          onClick={onBack}
-          className="text-white/60 hover:text-white text-sm transition-colors"
-        >
-          {t.back}
-        </button>
+        <BackButton onClick={onBack} />
       </div>
 
       {/* Two-panel layout */}

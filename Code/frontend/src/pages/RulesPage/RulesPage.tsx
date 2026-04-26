@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { t } from '@/utils/translations';
+import { BackButton } from '@/components/BackButton/BackButton';
 import './RulesPage.css';
 
 interface RulesPageProps {
@@ -65,9 +66,7 @@ export function RulesPage({ onBack }: RulesPageProps) {
   return (
     <div className="rp-page">
       <div className="rp-header">
-        <button className="rp-back-btn" onClick={onBack}>
-          {t.back}
-        </button>
+        <BackButton onClick={onBack} />
         <span className="rp-header-title">{t.rulesTitle}</span>
       </div>
 
