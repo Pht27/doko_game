@@ -19,10 +19,17 @@ export function AnnouncementButton({
     return t.announcementLabel(type);
   }
 
+  function btnClass(type: string): string {
+    const lbl = label(type);
+    if (lbl === 'Re') return 'announcement-btn announcement-btn-re';
+    if (lbl === 'Kontra') return 'announcement-btn announcement-btn-kontra';
+    return 'announcement-btn announcement-btn-other';
+  }
+
   return (
     <div className="announcement-buttons">
       {legalAnnouncements.map((type) => (
-        <button key={type} onClick={() => onAnnounce(type)} className="announcement-btn">
+        <button key={type} onClick={() => onAnnounce(type)} className={btnClass(type)}>
           {label(type)}
         </button>
       ))}

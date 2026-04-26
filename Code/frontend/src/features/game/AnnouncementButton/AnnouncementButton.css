@@ -6,5 +6,17 @@
 }
 
 .announcement-btn {
-  @apply bg-yellow-500 hover:bg-yellow-400 text-black font-bold rounded-lg px-4 py-2 text-sm shadow transition-colors;
+  @apply font-bold rounded-lg px-4 py-2 text-sm shadow transition-colors text-white;
+}
+
+.announcement-btn-re {
+  @apply bg-re-600/75 hover:bg-re-500/85;
+}
+
+.announcement-btn-kontra {
+  @apply bg-kontra-600/75 hover:bg-kontra-500/85;
+}
+
+.announcement-btn-other {
+  @apply bg-white/20 hover:bg-white/30;
 }
