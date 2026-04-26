@@ -68,9 +68,14 @@ export default function App() {
   const orientation = orientationFor(view);
 
   useEffect(() => {
-    screen.orientation?.lock(orientation).catch(() => {
-      // Not supported on iOS Safari — PortraitOverlay handles that case
-    });
+    if (orientation === 'portrait') {
+      // Override the manifest's landscape lock for portrait views
+      screen.orientation?.lock('portrait').catch(() => {});
+    } else {
+      // Unlock back to the manifest's system-level landscape lock — more
+      // reliable than lock('landscape') and prevents auto-rotation on Android
+      screen.orientation?.unlock?.();
+    }
   }, [orientation]);
 
   useEffect(() => {
