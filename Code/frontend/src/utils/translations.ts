@@ -34,7 +34,7 @@ export const t = {
 
   // ── ArmutInfoBanner ────────────────────────────────────────────────────────
   armutInfoBanner: (count: number, hasTrump: boolean) =>
-    `Armut: ${count} Karte(n) zurückgegeben${hasTrump ? ' · mit Trump' : ' · kein Trump'}`,
+    `Armut: ${count} Karte(n) zurückgegeben${hasTrump ? ' · mit Trumpf' : ' · kein Trumpf'}`,
 
   // ── HealthCheckDialog ──────────────────────────────────────────────────────
   healthCheckTitle: (playerId: number) => `S${playerId}: Gesund oder Vorbehalt?`,
