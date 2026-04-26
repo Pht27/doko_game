@@ -2,6 +2,19 @@
 
 ## [1.0.2] - 2026-04-26
 
+### Neu
+- Beim Start jedes Spiels erscheint kurz ein Popup, das den Spielmodus ankündigt (z. B. „Karo-Solo · S2" oder „Normalspiel"). Bei Hochzeit, Armut und Soli wird der zugehörige Spieler mit angezeigt.
+- Wenn eine Sonderkarte aktiviert wird, erscheint ebenfalls ein Popup mit Name des Spielers und der Sonderkarte (z. B. „S3 · Schweinchen"). Das Popup verschwindet nach 3 Sekunden automatisch und kann auch mit einem X weggeklickt werden.
+
+### Verbessert
+- In der Lobby sehen alle Spieler, wer bereits auf „Bereit" gedrückt hat (grünes Häkchen beim Spielerplatz).
+
+### Behoben
+- Beim Schlanken Martin kommt jetzt der Spieler raus, der ihn angemeldet hat.
+- Die Spielrichtung (gegen den Uhrzeigersinn) wird auf dem Spielfeld jetzt korrekt angezeigt.
+- Spieler werden überall einheitlich als S1–S4 bezeichnet (statt S0–S3 im Spiel und Spieler 1–4 in der Lobby).
+- In der Armut gibt es kein Karlchen, keine Agathe und kein Fischauge mehr.
+
 
 ## [1.0.1] - 2026-04-26
 

@@ -54,7 +54,7 @@ public sealed class ChooseSchwarzesSauSoloHandler(
         var reservation = CreateReservation(command.Solo, command.Player);
 
         // Apply the solo's trump evaluator and party resolver.
-        state.Apply(new SetGameModeModification(reservation));
+        state.Apply(new SetGameModeModification(reservation, command.Player));
 
         // Sonderkarte handling:
         // - Non-Schlanker-Martin solos change the trump evaluator completely, so previously-active

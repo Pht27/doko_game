@@ -321,12 +321,11 @@ public sealed class MakeReservationHandler(
         IReservation winner
     )
     {
-        state.Apply(new SetGameModeModification(winner));
+        var declarant = FirstDeclarantId(state, winner);
+        state.Apply(new SetGameModeModification(winner, declarant));
         state.Apply(new AdvancePhaseModification(GamePhase.Playing));
         // Solo declarer leads in Solo games; VorbehaltRauskommer leads otherwise.
-        var spieleRauskommer = IsSoloReservation(winner)
-            ? FirstDeclarantId(state, winner)
-            : state.VorbehaltRauskommer;
+        var spieleRauskommer = IsSoloReservation(winner) ? declarant : state.VorbehaltRauskommer;
         state.Apply(new SetCurrentTurnModification(spieleRauskommer));
     }
 
@@ -344,9 +343,9 @@ public sealed class MakeReservationHandler(
         var gameMode = schlankerMartin.IsEligible(playerState.Hand, state.Rules)
             ? (IReservation?)schlankerMartin
             : null;
-        state.Apply(new SetGameModeModification(gameMode));
+        state.Apply(new SetGameModeModification(gameMode, gameMode != null ? martinPlayer : null));
         state.Apply(new AdvancePhaseModification(GamePhase.Playing));
-        state.Apply(new SetCurrentTurnModification(state.VorbehaltRauskommer));
+        state.Apply(new SetCurrentTurnModification(martinPlayer));
     }
 
     /// <summary>

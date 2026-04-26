@@ -13,16 +13,18 @@ public static class ExtrapunktRegistry
         if (activeReservation?.IsSolo == true)
             return [];
 
+        bool isArmut = activeReservation is ArmutReservation;
+
         var list = new List<IExtrapunkt>();
         if (rules.EnableDoppelkopf)
             list.Add(new DoppelkopfExtrapunkt());
         if (rules.EnableFuchsGefangen)
             list.Add(new FuchsGefangenExtrapunkt());
-        if (rules.EnableKarlchen)
+        if (rules.EnableKarlchen && !isArmut)
             list.Add(new KarlchenExtrapunkt());
-        if (rules.EnableAgathe)
+        if (rules.EnableAgathe && !isArmut)
             list.Add(new AgatheExtrapunkt());
-        if (rules.EnableFischauge)
+        if (rules.EnableFischauge && !isArmut)
             list.Add(new FischaugeExtrapunkt());
         if (rules.EnableGansGefangen)
             list.Add(new GansGefangenExtrapunkt());

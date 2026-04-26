@@ -23,7 +23,7 @@ interface LobbyDetailViewProps {
 export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFinishedResult }: LobbyDetailViewProps) {
   const [session, setSession] = useState<LobbySession | null>(() => loadLobbySession(lobbyId));
 
-  const { seats, opaSeats, gameId, isStarted, lobbyClosed, startVoteCount, selectedScenario, error } = useLobby(session, lobbyId);
+  const { seats, opaSeats, gameId, isStarted, lobbyClosed, startVoteCount, readySeats, selectedScenario, error } = useLobby(session, lobbyId);
 
   const [copied, setCopied] = useState(false);
   const [hasVoted, setHasVoted] = useState(false);
@@ -205,6 +205,7 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
           const occupied = seats[i];
           const isOpa = opaSeats.includes(i);
           const isMe = isMyLobby && session!.seatIndex === i;
+          const isReady = readySeats.includes(i);
           const isBusy = busySeat === i;
           const canInteract = !occupied && !isInAnotherLobby && !isMe;
           const canAddOpa = isMyLobby && !occupied && !isStarted;
@@ -255,6 +256,9 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
                   t.seatLabel(i)
                 )}
               </span>
+              {isReady && !canRemoveOpa && !canAddOpa && (
+                <span className="ml-auto text-green-400 text-sm shrink-0" title="Bereit">✓</span>
+              )}
               {canRemoveOpa && (
                 <button
                   onClick={(e) => { e.stopPropagation(); doRemoveOpa(i); }}

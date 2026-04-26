@@ -73,7 +73,7 @@ public sealed class AcceptArmutHandler(IGameRepository repository, IGameEventPub
 
         // Set game mode now that both players are known
         var reservation = new ArmutReservation(poorPlayer, command.Player);
-        state.Apply(new SetGameModeModification(reservation));
+        state.Apply(new SetGameModeModification(reservation, poorPlayer));
 
         state.Apply(new AdvancePhaseModification(GamePhase.ArmutCardExchange));
         // Rich player exchanges the cards
@@ -105,7 +105,7 @@ public sealed class AcceptArmutHandler(IGameRepository repository, IGameEventPub
 
         // Nobody accepted — Schwarze Sau
         // Poor player starts; normal game mode (no partner resolution yet)
-        state.Apply(new SetGameModeModification(null));
+        state.Apply(new SetGameModeModification(null, null));
         state.Apply(new SetSchwarzesSauModification());
         state.Apply(new AdvancePhaseModification(GamePhase.Playing));
         state.Apply(new SetCurrentTurnModification(state.ArmutPlayer!.Value));

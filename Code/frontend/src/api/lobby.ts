@@ -23,6 +23,7 @@ export interface LobbyViewResponse {
   activeGameId?: string | null;
   opaSeats?: number[] | null;
   selectedScenario?: string | null;
+  readySeats?: number[] | null;
 }
 
 export function createLobby(): Promise<LobbyJoinResponse> {

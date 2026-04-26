@@ -108,4 +108,10 @@ public record PlayerGameView(
     /// "Re" / "Kontra" for the Win announcement, "Keine90" etc. for higher ones.
     /// </summary>
     public string? OwnHighestAnnouncement { get; init; } = null;
+
+    /// <summary>
+    /// The seat number of the player who declared the active game mode (Solo, Hochzeit, Armut).
+    /// Null for Normalspiel or when no explicit declarant exists.
+    /// </summary>
+    public int? GameModePlayerSeat { get; init; } = null;
 }

@@ -10,6 +10,7 @@ import { SelfPlayerLabel } from '../shared/SelfPlayerLabel';
 import { HandDisplay } from '../HandDisplay/HandDisplay';
 import { AnnouncementButton } from '../AnnouncementButton/AnnouncementButton';
 import { LastTrickOverlay } from '../LastTrickOverlay/LastTrickOverlay';
+import { GameAnnouncePopup } from '../GameAnnouncePopup/GameAnnouncePopup';
 import { cardBackSvgPath } from '@/api/cards';
 import { ArmutBanner } from './subcomponents/ArmutBanner';
 import { CenterArea } from './subcomponents/CenterArea';
@@ -30,6 +31,8 @@ interface GameBoardProps {
   actions: GameActions;
   finishedResult: GameResultDto | null;
   sonderkarteNotification: SonderkarteNotification | null;
+  popupAnnouncement: { message: string; id: number } | null;
+  onClearPopup: () => void;
   viewLoading: boolean;
   viewError: string | null;
   allowPlayerSwitching: boolean;
@@ -42,7 +45,7 @@ interface GameBoardProps {
 
 /** Returns which compass direction a player sits relative to the active player. */
 function seatOf(player: number, activePlayer: number): 'bottom' | 'left' | 'top' | 'right' {
-  const seats = ['bottom', 'left', 'top', 'right'] as const;
+  const seats = ['bottom', 'right', 'top', 'left'] as const;
   return seats[(player - activePlayer + 4) % 4];
 }
 
@@ -54,6 +57,8 @@ export function GameBoard({
   actions,
   finishedResult,
   sonderkarteNotification,
+  popupAnnouncement,
+  onClearPopup,
   viewLoading,
   viewError,
   allowPlayerSwitching,
@@ -104,6 +109,17 @@ export function GameBoard({
             trickNumber={(view.currentTrick?.trickNumber ?? 0) + 1}
             completedTricks={view.completedTricks.length}
             onClick={() => setShowInfoOverlay(true)}
+          />
+        </div>
+      )}
+
+      {/* Announce popup: game mode at game start, sonderkarte activations */}
+      {popupAnnouncement && (
+        <div className="absolute top-[8%] left-1/2 -translate-x-1/2 z-25 pointer-events-auto">
+          <GameAnnouncePopup
+            key={popupAnnouncement.id}
+            message={popupAnnouncement.message}
+            onDismiss={onClearPopup}
           />
         </div>
       )}

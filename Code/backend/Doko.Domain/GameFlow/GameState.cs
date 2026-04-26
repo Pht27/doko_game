@@ -81,6 +81,9 @@ public sealed class GameState
         private set;
     } = new Dictionary<PlayerSeat, IReservation?>();
 
+    /// <summary>The player who declared the active game mode (Solo, Hochzeit, Armut player). Null for Normalspiel.</summary>
+    public PlayerSeat? GameModePlayerSeat { get; private set; }
+
     /// <summary>The player who declared Armut. Set when Armut wins the reservation check.</summary>
     public PlayerSeat? ArmutPlayer { get; private set; }
 
@@ -248,6 +251,7 @@ public sealed class GameState
 
             case SetGameModeModification m:
                 ActiveReservation = m.Reservation;
+                GameModePlayerSeat = m.Player;
                 var ctx = m.Reservation?.Apply();
                 TrumpEvaluator = ctx?.TrumpEvaluator ?? NormalTrumpEvaluator.Instance;
                 PartyResolver = ctx?.PartyResolver ?? NormalPartyResolver.Instance;

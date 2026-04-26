@@ -64,6 +64,7 @@ export interface PlayerGameViewResponse {
   ownHighestAnnouncement: string | null;
   finishedResult?: GameResultDto | null;
   newGameVoteCount?: number;
+  gameModePlayerSeat?: number | null;
 }
 
 // ── Results ───────────────────────────────────────────────────────────────────

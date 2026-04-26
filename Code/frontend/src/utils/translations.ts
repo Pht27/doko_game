@@ -37,12 +37,12 @@ export const t = {
     `Armut: ${count} Karte(n) zurückgegeben${hasTrump ? ' · mit Trumpf' : ' · kein Trumpf'}`,
 
   // ── HealthCheckDialog ──────────────────────────────────────────────────────
-  healthCheckTitle: (playerId: number) => `S${playerId}: Gesund oder Vorbehalt?`,
+  healthCheckTitle: (playerId: number) => `S${playerId + 1}: Gesund oder Vorbehalt?`,
   gesund: 'Gesund',
   vorbehalt: 'Vorbehalt',
 
   // ── ReservationDialog ──────────────────────────────────────────────────────
-  reservationTitle: (playerId: number) => `S${playerId}: Ansagen`,
+  reservationTitle: (playerId: number) => `S${playerId + 1}: Ansagen`,
   pass: 'Passen',
   bestaetigenSolo: 'Bestätigen',
   hochzeitLabel: (condition: string) =>
@@ -55,7 +55,7 @@ export const t = {
     (soloLabels[reservation] as string | undefined) ?? reservation,
 
   // ── ArmutPartnerDialog ─────────────────────────────────────────────────────
-  armutPartnerTitle: (playerId: number) => `S${playerId}: Armut annehmen?`,
+  armutPartnerTitle: (playerId: number) => `S${playerId + 1}: Armut annehmen?`,
   armutPartnerDescription:
     'Ein Mitspieler hat Armut (≤ 3 Trümpfe). Möchtest du sein reicher Partner werden?',
   annehmen: 'Annehmen',
@@ -63,13 +63,13 @@ export const t = {
 
   // ── ArmutReturnDialog ──────────────────────────────────────────────────────
   armutReturnTitle: (playerId: number, count: number) =>
-    `S${playerId}: ${count} Karte(n) zurückgeben`,
+    `S${playerId + 1}: ${count} Karte(n) zurückgeben`,
   armutReturnDescription: (selected: number, total: number) =>
     `Wähle ${total} Karte(n) aus deiner Hand (${selected}/${total})`,
   bestaetigen: 'Bestätigen',
 
   // ── SchwarzesSauSoloDialog ─────────────────────────────────────────────────
-  schwarzesSauSoloTitle: (playerId: number) => `S${playerId}: Schwarze Sau - Solo wählen`,
+  schwarzesSauSoloTitle: (playerId: number) => `S${playerId + 1}: Schwarze Sau - Solo wählen`,
   schwarzesSauSoloSubtitle: 'Du hast die zweite Pik Dame gewonnen. Wähle ein Solo.',
 
   // ── SonderkarteOverlay ─────────────────────────────────────────────────────
@@ -96,7 +96,7 @@ export const t = {
   extrapunkteNetto: 'Extrapunkte',
   keineExtrapunkte: '–',
   neuesSpiel: 'Neues Spiel',
-  awardLabel: (type: string, player: number) => `${type} (S${player})`,
+  awardLabel: (type: string, player: number) => `${type} (S${player + 1})`,
   playerLabel: (seat: number) => `Spieler ${seat + 1}`,
   seatShort: (seat: number) => `S${seat + 1}`,
   punkteAenderung: 'Punkteänderung',
@@ -132,11 +132,20 @@ export const t = {
   cardAlt: (rank: string, suit: string) => `${rank} ${suit}`,
 
   // ── PlayerLabel ────────────────────────────────────────────────────────────
-  playerName: (id: number) => `S${id}`,
+  playerName: (id: number) => `S${id + 1}`,
   kartenAnzahl: (count: number) => `${count} Karten`,
   unbekanntePartei: 'unbekannt',
   sonderkarteName: (type: string) =>
     (sonderkarteNames[type] as string | undefined) ?? type,
+
+  // ── GameAnnouncePopup ──────────────────────────────────────────────────────
+  gameModePopupMessage: (mode: string | null, playerSeat: number | null) => {
+    const modeLabel = t.gameModeLabel(mode);
+    if (playerSeat !== null && mode !== null) return `${modeLabel} · S${playerSeat + 1}`;
+    return modeLabel;
+  },
+  sonderkartePopupMessage: (playerSeat: number, sonderkarteType: string) =>
+    `S${playerSeat + 1} · ${(sonderkarteNames[sonderkarteType] as string | undefined) ?? sonderkarteType}`,
 
   // ── RulesPage ──────────────────────────────────────────────────────────────
   rulesTitle: 'Regeln',

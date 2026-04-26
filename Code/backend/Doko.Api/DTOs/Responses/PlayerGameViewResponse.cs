@@ -59,4 +59,7 @@ public record PlayerGameViewResponse(
 
     /// <summary>Current new-game vote count. Populated together with FinishedResult.</summary>
     public int NewGameVoteCount { get; init; } = 0;
+
+    /// <summary>The seat number of the player who declared the active game mode (Solo, Hochzeit, Armut). Null for Normalspiel.</summary>
+    public int? GameModePlayerSeat { get; init; } = null;
 }

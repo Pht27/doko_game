@@ -40,7 +40,8 @@ public sealed record AdvancePhaseModification(GamePhase NewPhase) : GameStateMod
 /// Resolves the game mode after reservations: sets the active reservation (null = normal game),
 /// and rebuilds the trump evaluator and party resolver accordingly.
 /// </summary>
-public sealed record SetGameModeModification(IReservation? Reservation) : GameStateModification;
+public sealed record SetGameModeModification(IReservation? Reservation, PlayerSeat? Player = null)
+    : GameStateModification;
 
 /// <summary>Sets whose turn it is.</summary>
 public sealed record SetCurrentTurnModification(PlayerSeat Player) : GameStateModification;

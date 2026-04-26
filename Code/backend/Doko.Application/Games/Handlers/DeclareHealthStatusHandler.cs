@@ -90,7 +90,7 @@ public sealed class DeclareHealthStatusHandler(
             if (silentMode is not null)
                 state.Apply(new SetSilentGameModeModification(silentMode));
             else
-                state.Apply(new SetGameModeModification(null));
+                state.Apply(new SetGameModeModification(null, null));
             state.Apply(new AdvancePhaseModification(GamePhase.Playing));
             state.Apply(new SetCurrentTurnModification(state.VorbehaltRauskommer));
         }

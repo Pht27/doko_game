@@ -298,7 +298,8 @@ public class LobbiesController(
                 lobby.LobbyStartVoteCount,
                 lobby.ActiveGameId?.ToString(),
                 lobby.OpaSeats.ToArray(),
-                lobby.SelectedScenario
+                lobby.SelectedScenario,
+                lobby.LobbyStartVoterSeats.ToArray()
             )
         );
     }
@@ -362,7 +363,15 @@ public class LobbiesController(
             await lobbyRepository.SaveAsync(lobby, ct);
             await hub
                 .Clients.Group($"lobby_{lobbyId}")
-                .SendAsync("lobbyReadyVoteChanged", new { count = lobby.LobbyStartVoteCount }, ct);
+                .SendAsync(
+                    "lobbyReadyVoteChanged",
+                    new
+                    {
+                        count = lobby.LobbyStartVoteCount,
+                        seats = lobby.LobbyStartVoterSeats.ToArray(),
+                    },
+                    ct
+                );
         }
 
         return Ok(new { voteCount = lobby.LobbyStartVoteCount });
@@ -388,7 +397,15 @@ public class LobbiesController(
 
         await hub
             .Clients.Group($"lobby_{lobbyId}")
-            .SendAsync("lobbyReadyVoteChanged", new { count = lobby.LobbyStartVoteCount }, ct);
+            .SendAsync(
+                "lobbyReadyVoteChanged",
+                new
+                {
+                    count = lobby.LobbyStartVoteCount,
+                    seats = lobby.LobbyStartVoterSeats.ToArray(),
+                },
+                ct
+            );
 
         return Ok(new { voteCount = lobby.LobbyStartVoteCount });
     }
