@@ -1,5 +1,16 @@
 # Release Notes
 
+## [1.2.1] - 2026-04-26
+
+### Behoben
+- Spieler-Labels der Gegner verrutschen nicht mehr, wenn noch keine Karte gespielt wurde.
+- Ansage-Abzeichen (z.B. „Keine 90") werden jetzt in der korrekten Parteifarbe angezeigt.
+- Im Schlanken Martin sind Ansagen nicht mehr möglich.
+- Auf Android-PWA bleibt das Querformat jetzt aktiv gesperrt; die Drehhinweis-Overlay erscheint seltener.
+
+### Neu
+- Eigenes Spieler-Label als Overlay am unteren Bildschirmrand: zeigt Name, Stichanzahl und eigene Ansage in der wahrgenommenen Parteifarbe (wie der Ansage-Button).
+
 ## [1.2.0] - 2026-04-26
 
 ### Verbessert
