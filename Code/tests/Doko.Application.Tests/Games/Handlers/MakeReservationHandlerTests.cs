@@ -1,9 +1,32 @@
+using Doko.Application.Abstractions;
 using Doko.Application.Tests.Helpers;
 
 namespace Doko.Application.Tests.Games.Handlers;
 
 public class MakeReservationHandlerTests
 {
+    /// <summary>
+    /// Deals P0 a hand of 10 plain (non-Armut-trump) cards so P0 is Armut-eligible.
+    /// All other cards go to P1–P3.
+    /// </summary>
+    private sealed class ArmutEligibleShuffler : IDeckShuffler
+    {
+        public IReadOnlyList<Card> Shuffle(IReadOnlyList<Card> deck)
+        {
+            var nonArmutTrump = deck
+                .Where(c =>
+                    c.Type.Rank != Rank.Bube
+                    && c.Type.Rank != Rank.Dame
+                    && !(c.Type.Suit == Suit.Herz && c.Type.Rank == Rank.Zehn)
+                    && !(c.Type.Suit == Suit.Karo && c.Type.Rank != Rank.Ass)
+                )
+                .Take(10)
+                .ToList();
+            var rest = deck.Where(c => !nonArmutTrump.Contains(c)).ToList();
+            return [.. nonArmutTrump, .. rest];
+        }
+    }
+
     /// <summary>
     /// Creates a game, deals cards, and completes the health check with all players saying Gesund.
     /// Returns the gameId; after this the state is in ReservationSoloCheck.
@@ -36,20 +59,21 @@ public class MakeReservationHandlerTests
     /// </summary>
     private async Task<GameId> GameInSoloCheckPhaseAllVorbehalt(
         Doko.Application.Tests.Fakes.InMemoryGameRepository repo,
-        Doko.Application.Tests.Fakes.RecordingGameEventPublisher pub
+        Doko.Application.Tests.Fakes.RecordingGameEventPublisher pub,
+        RuleSet? rules = null,
+        IDeckShuffler? deckShuffler = null
     )
     {
         var id = (
             (GameActionResult<StartGameResult>.Ok)
                 await new StartGameHandler(repo, pub).ExecuteAsync(
-                    new StartGameCommand(AppB.FourPlayerSeats, RuleSet.Minimal())
+                    new StartGameCommand(AppB.FourPlayerSeats, rules ?? RuleSet.Minimal())
                 )
         )
             .Value
             .GameId;
-        await new DealCardsHandler(repo, pub, new Fakes.FakeDeckShuffler()).ExecuteAsync(
-            new DealCardsCommand(id)
-        );
+        await new DealCardsHandler(repo, pub, deckShuffler ?? new Fakes.FakeDeckShuffler())
+            .ExecuteAsync(new DealCardsCommand(id));
         var healthHandler = new DeclareHealthStatusHandler(repo, pub);
         foreach (var player in AppB.FourPlayerSeats)
             await healthHandler.ExecuteAsync(new DeclareHealthStatusCommand(id, player, true));
@@ -77,7 +101,8 @@ public class MakeReservationHandlerTests
     public async Task MakeReservation_AllNormal_AdvancesToArmutCheck()
     {
         var (repo, pub, _) = AppB.Infrastructure();
-        var gameId = await GameInSoloCheckPhaseAllVorbehalt(repo, pub);
+        var rules = RuleSet.Minimal() with { AllowArmut = true };
+        var gameId = await GameInSoloCheckPhaseAllVorbehalt(repo, pub, rules, new ArmutEligibleShuffler());
         var useCase = new MakeReservationHandler(repo, pub);
 
         // All four Vorbehalt players pass on Solo
