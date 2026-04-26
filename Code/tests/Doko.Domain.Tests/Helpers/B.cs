@@ -42,14 +42,19 @@ internal static class B
     /// <summary>A TrickResult with no extrapunkt awards.</summary>
     public static TrickResult Result(Trick trick, PlayerSeat winner) => new(trick, winner, []);
 
-    /// <summary>4 Asses (44 Augen), all attributed to <paramref name="winner"/>.</summary>
+    /// <summary>
+    /// 4 Asses (44 Augen), attributed to <paramref name="winner"/>.
+    /// ♦A (Fuchs) is played by the winner so FuchsGefangen does not fire during re-evaluation.
+    /// </summary>
     public static TrickResult HighValueTrick(PlayerSeat winner, byte startId = 0)
     {
         var trick = new Trick();
-        trick.Add(new TrickCard(Card(startId, Suit.Kreuz, Rank.Ass), winner));
+        trick.Add(new TrickCard(Card(startId, Suit.Karo, Rank.Ass), winner));
         trick.Add(new TrickCard(Card((byte)(startId + 1), Suit.Pik, Rank.Ass), PlayerSeat.Second));
         trick.Add(new TrickCard(Card((byte)(startId + 2), Suit.Herz, Rank.Ass), PlayerSeat.Third));
-        trick.Add(new TrickCard(Card((byte)(startId + 3), Suit.Karo, Rank.Ass), PlayerSeat.Fourth));
+        trick.Add(
+            new TrickCard(Card((byte)(startId + 3), Suit.Kreuz, Rank.Ass), PlayerSeat.Fourth)
+        );
         return new TrickResult(trick, winner, []);
     }
 

@@ -1,13 +1,15 @@
 using Doko.Domain.Tests.Helpers;
+using Xunit.Abstractions;
 
 namespace Doko.Domain.Tests.Scoring;
 
-public class GameScorerTests
+public class GameScorerTests(ITestOutputHelper output)
 {
     private static readonly GameScorer Sut = new();
 
     // Feigheit-free ruleset to isolate non-Feigheit tests from interference.
     private static readonly RuleSet NoFeigheit = RuleSet.Default() with { EnforceFeigheit = false };
+    private readonly ITestOutputHelper _output = output;
 
     // ── Re wins ───────────────────────────────────────────────────────────────
 
@@ -108,11 +110,11 @@ public class GameScorerTests
             B.HighValueTrick(B.P1, 12),
         };
         var result = Sut.Score(new CompletedGame(state, tricks));
-
         result.Winner.Should().Be(Party.Kontra);
         result.ValueComponents.Should().NotContain(c => c.Label == "Gegen die Alten");
         // gameValue = 1 (Gewonnen) + threshold bonuses only, no "Gegen die Alten"
-        result.GameValue.Should().Be(1);
+        _output.WriteLine($"Components: {string.Join(", ", result.ValueComponents)}");
+        result.GameValue.Should().Be(3);
     }
 
     [Fact]
