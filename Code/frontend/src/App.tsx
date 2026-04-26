@@ -69,12 +69,11 @@ export default function App() {
 
   useEffect(() => {
     if (orientation === 'portrait') {
-      // Override the manifest's landscape lock for portrait views
       screen.orientation?.lock('portrait').catch(() => {});
     } else {
-      // Unlock back to the manifest's system-level landscape lock — more
-      // reliable than lock('landscape') and prevents auto-rotation on Android
-      screen.orientation?.unlock?.();
+      // Explicitly lock landscape rather than unlocking — unlocking allows
+      // auto-rotation on Android PWA, which triggers the portrait overlay.
+      screen.orientation?.lock('landscape').catch(() => {});
     }
   }, [orientation]);
 
