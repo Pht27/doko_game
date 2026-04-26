@@ -6,17 +6,26 @@
 }
 
 .announcement-btn {
-  @apply font-bold rounded-lg px-4 py-2 text-sm shadow transition-colors text-white;
+  @apply font-semibold text-xs px-3.5 py-1.5 transition-all;
+  border-radius: 10px;
 }
 
 .announcement-btn-re {
-  @apply bg-re-600/75 hover:bg-re-500/85;
+  background: theme(colors.re.500 / 25%);
+  border: 1px solid theme(colors.re.500 / 40%);
+  color: theme(colors.re.300);
+}
+
+.announcement-btn-re:hover {
+  background: theme(colors.re.500 / 35%);
 }
 
 .announcement-btn-kontra {
-  @apply bg-kontra-600/75 hover:bg-kontra-500/85;
+  background: theme(colors.kontra.500 / 25%);
+  border: 1px solid theme(colors.kontra.500 / 40%);
+  color: theme(colors.kontra.300);
 }
 
-.announcement-btn-other {
-  @apply bg-white/20 hover:bg-white/30;
+.announcement-btn-kontra:hover {
+  background: theme(colors.kontra.500 / 35%);
 }

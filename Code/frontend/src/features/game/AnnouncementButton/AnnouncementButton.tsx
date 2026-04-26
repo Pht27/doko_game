@@ -19,17 +19,14 @@ export function AnnouncementButton({
     return t.announcementLabel(type);
   }
 
-  function btnClass(type: string): string {
-    const lbl = label(type);
-    if (lbl === 'Re') return 'announcement-btn announcement-btn-re';
-    if (lbl === 'Kontra') return 'announcement-btn announcement-btn-kontra';
-    return 'announcement-btn announcement-btn-other';
-  }
+  // Use same logic as label('Win'): Re when known Re, Kontra otherwise (preserves
+  // the illusion in Kontrasolo where ownParty may be null)
+  const partyClass = ownParty === 'Re' ? 'announcement-btn-re' : 'announcement-btn-kontra';
 
   return (
     <div className="announcement-buttons">
       {legalAnnouncements.map((type) => (
-        <button key={type} onClick={() => onAnnounce(type)} className={btnClass(type)}>
+        <button key={type} onClick={() => onAnnounce(type)} className={`announcement-btn ${partyClass}`}>
           {label(type)}
         </button>
       ))}
