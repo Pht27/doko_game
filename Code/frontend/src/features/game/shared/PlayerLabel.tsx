@@ -7,18 +7,19 @@ interface PlayerLabelProps {
   isCurrentTurn: boolean;
   orientation: 'top' | 'left' | 'right';
   sonderkarteNotif?: string | null;
+  trickCount?: number;
   onClick?: () => void;
 }
 
-export function PlayerLabel({ player, isCurrentTurn, orientation, sonderkarteNotif, onClick }: PlayerLabelProps) {
+export function PlayerLabel({ player, isCurrentTurn, orientation, sonderkarteNotif, trickCount, onClick }: PlayerLabelProps) {
   const active = isCurrentTurn ? 'player-label-active' : 'player-label-inactive';
 
-  const partyColor =
+  const nameColor =
     player.knownParty === 'Re'
-      ? 'player-party-re'
+      ? 'player-name-re'
       : player.knownParty === 'Kontra'
-        ? 'player-party-kontra'
-        : 'player-party-unknown';
+        ? 'player-name-kontra'
+        : '';
 
   const layout =
     orientation === 'top'
@@ -38,8 +39,12 @@ export function PlayerLabel({ player, isCurrentTurn, orientation, sonderkarteNot
 
   const inner = (
     <>
-      <span className="player-label-name">{t.playerName(player.id)}</span>
-      <span className={`player-party-dot ${partyColor}`} title={player.knownParty ?? t.unbekanntePartei} />
+      <div className="player-label-row">
+        <span className={`player-label-name ${nameColor}`}>{t.playerName(player.id)}</span>
+        {trickCount !== undefined && trickCount > 0 && (
+          <span className="player-trick-count">{trickCount}</span>
+        )}
+      </div>
       {player.highestAnnouncement && (
         <span className={`player-ann-badge ${annColor}`}>
           {t.announcementLabel(player.highestAnnouncement)}
