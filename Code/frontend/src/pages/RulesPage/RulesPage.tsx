@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { t } from '@/utils/translations';
 import { BackButton } from '@/components/BackButton/BackButton';
 import './RulesPage.css';
@@ -33,6 +33,25 @@ const SECTION_KEYWORDS: Record<SectionId, string> = {
 export function RulesPage({ onBack }: RulesPageProps) {
   const [openSections, setOpenSections] = useState<Set<SectionId>>(new Set(['grundlagen']));
   const [search, setSearch] = useState('');
+  const [collapsed, setCollapsed] = useState(false);
+  const sectionsRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  function handleSectionsScroll() {
+    const el = sectionsRef.current;
+    const header = headerRef.current;
+    if (!el || !header) return;
+    if (!collapsed && el.scrollTop > 20) {
+      // Only collapse if the remaining scroll distance exceeds the header height gain.
+      // Otherwise the layout change would steal enough space to reset scrollTop to 0.
+      const maxScroll = el.scrollHeight - el.clientHeight;
+      if (maxScroll - el.scrollTop > header.clientHeight) {
+        setCollapsed(true);
+      }
+    } else if (collapsed && el.scrollTop < 5) {
+      setCollapsed(false);
+    }
+  }
 
   function toggleSection(id: SectionId) {
     setOpenSections((prev) => {
@@ -52,18 +71,21 @@ export function RulesPage({ onBack }: RulesPageProps) {
 
   return (
     <div className="rp-page">
-      <div className="rp-header">
-        <div className="rp-header-top">
+      <div className={`rp-header${collapsed ? ' rp-header--collapsed' : ''}`} ref={headerRef}>
+        <div className="rp-header-nav">
           <BackButton onClick={onBack} />
+          <span className="rp-header-title-inline">{t.rulesTitle}</span>
         </div>
-        <div className="rp-header-cards">
-          <div className="rp-hcard"><img src={card('h10')} alt="Herz 10" /></div>
-          <div className="rp-hcard"><img src={card('krD')} alt="Kreuz Dame" /></div>
-          <div className="rp-hcard"><img src={card('kA')} alt="Karo Ass" /></div>
-          <div className="rp-hcard"><img src={card('krB')} alt="Kreuz Bube" /></div>
+        <div className="rp-header-collapsible">
+          <div className="rp-header-cards">
+            <div className="rp-hcard"><img src={card('h10')} alt="Herz 10" /></div>
+            <div className="rp-hcard"><img src={card('krD')} alt="Kreuz Dame" /></div>
+            <div className="rp-hcard"><img src={card('kA')} alt="Karo Ass" /></div>
+            <div className="rp-hcard"><img src={card('krB')} alt="Kreuz Bube" /></div>
+          </div>
+          <h1 className="rp-header-title">{t.rulesTitle}</h1>
+          <p className="rp-header-sub">Koppeldopf — Karten, Trumpf &amp; Spielregeln</p>
         </div>
-        <h1 className="rp-header-title">{t.rulesTitle}</h1>
-        <p className="rp-header-sub">Koppeldopf — Karten, Trumpf &amp; Spielregeln</p>
       </div>
 
       <div className="rp-search-bar">
@@ -82,7 +104,7 @@ export function RulesPage({ onBack }: RulesPageProps) {
         </div>
       </div>
 
-      <div className="rp-sections">
+      <div className="rp-sections" ref={sectionsRef} onScroll={handleSectionsScroll}>
 
         {/* 1. Grundlagen */}
         {sectionVisible('grundlagen', 'Koppeldopf 4 Spieler 48 Karten Re Kontra Augen Ass Zehn König Dame Bube Neun') && (
