@@ -2,24 +2,21 @@
 @reference "../../../styles/index.css";
 
 .self-player-label {
-  @apply flex flex-row items-center justify-center gap-2.5 px-5 py-2 text-xs text-white/90;
-  border-radius: 0.75rem 0.75rem 0 0; /* rounded top corners, flush bottom edge */
-  background: rgba(0, 0, 0, 0.65);
-  border-top: 2px solid transparent;
+  @apply flex flex-row items-center justify-center gap-2.5 px-5 py-1 text-xs
+    rounded-t-xl bg-white/5 border border-white/15 border-b-0 text-white/60;
 }
 
-/* Active turn: yellow top border instead of a full ring (bottom is against screen edge) */
-.self-label-active {
-  border-top-color: theme(colors.yellow.400);
-}
-
-/* Party backgrounds — nearly opaque so text is always readable */
 .self-bg-re {
-  background: theme(colors.re.600 / 82%);
+  @apply bg-re-500/25 border-re-500/40 text-re-300;
 }
 
 .self-bg-kontra {
-  background: theme(colors.kontra.600 / 82%);
+  @apply bg-kontra-500/25 border-kontra-500/40 text-kontra-300;
+}
+
+/* Active turn: thicker yellow top border */
+.self-label-active {
+  @apply border-t-2 border-t-yellow-400;
 }
 
 .self-label-name {
@@ -27,13 +24,13 @@
 }
 
 .self-label-tricks {
-  @apply text-[10px] font-bold bg-white/20 rounded px-1.5 py-0.5 leading-none;
+  @apply text-[10px] font-bold bg-white/15 rounded px-1.5 py-0.5 leading-none;
 }
 
 .self-label-ann {
-  @apply text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-white/20;
+  @apply text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-white/15;
 }
 
 .self-label-dot {
-  @apply text-white/40 text-[10px];
+  @apply opacity-40 text-[10px];
 }
