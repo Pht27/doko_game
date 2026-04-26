@@ -1,16 +1,17 @@
 using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
 using Doko.Domain.Sonderkarten;
-using Doko.Domain.Tricks;
 
-namespace Doko.Domain.Extrapunkte;
+namespace Doko.Domain.Tricks;
 
 /// <summary>
 /// "Animal" cards used by Festmahl and Blutbad:
-/// Fischaugen (♦9 after first trump played) + the Schweinchen family (♦A/♦10/♦K when active).
+/// Fuchs/Schweinchen (♦A), Fischauge (♦9 after first trump), Superschweinchen (♦10), Hyperschweinchen (♦K).
+/// ♦A is always an animal — as Fuchs when Schweinchen is inactive, as Schweinchen when active.
 /// </summary>
 internal enum AnimalKind
 {
+    Fuchs,
     Fischauge,
     Schweinchen,
     Superschweinchen,
@@ -29,8 +30,10 @@ internal static class AnimalHelpers
         var type = tc.Card.Type;
         if (type == KaroNeun && FischaugeActive(state))
             return AnimalKind.Fischauge;
-        if (type == KaroAss && state.ActiveSonderkarten.Contains(SonderkarteType.Schweinchen))
-            return AnimalKind.Schweinchen;
+        if (type == KaroAss)
+            return state.ActiveSonderkarten.Contains(SonderkarteType.Schweinchen)
+                ? AnimalKind.Schweinchen
+                : AnimalKind.Fuchs;
         if (type == KaroZehn && state.ActiveSonderkarten.Contains(SonderkarteType.Superschweinchen))
             return AnimalKind.Superschweinchen;
         if (

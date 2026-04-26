@@ -1,6 +1,6 @@
 using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
-using Doko.Domain.Rules;
+using Doko.Domain.Players;
 using Doko.Domain.Sonderkarten;
 using Doko.Domain.Tricks;
 
@@ -16,7 +16,11 @@ public sealed class KarlchenExtrapunkt : IExtrapunkt
 
     public ExtrapunktType Type => ExtrapunktType.Karlchen;
 
-    public IReadOnlyList<ExtrapunktAward> Evaluate(Trick completedTrick, GameState state)
+    public IReadOnlyList<ExtrapunktAward> Evaluate(
+        Trick completedTrick,
+        GameState state,
+        PlayerSeat effectiveTrickWinner
+    )
     {
         bool heidmannActive = state.ActiveSonderkarten.Contains(SonderkarteType.Heidmann);
         bool heidfrauActive = state.ActiveSonderkarten.Contains(SonderkarteType.Heidfrau);
@@ -26,11 +30,10 @@ public sealed class KarlchenExtrapunkt : IExtrapunkt
         if (state.CompletedTricks.Count != state.Rules.LastTrickIndex)
             return [];
 
-        var winner = completedTrick.Winner(state.TrumpEvaluator, DulleRule.FirstBeatsSecond);
         bool winnerPlayedKarlchen = completedTrick.Cards.Any(tc =>
-            tc.Card.Type == KreuzBube && tc.Player == winner
+            tc.Card.Type == KreuzBube && tc.Player == effectiveTrickWinner
         );
 
-        return winnerPlayedKarlchen ? [new ExtrapunktAward(Type, winner, 1)] : [];
+        return winnerPlayedKarlchen ? [new ExtrapunktAward(Type, effectiveTrickWinner, 1)] : [];
     }
 }

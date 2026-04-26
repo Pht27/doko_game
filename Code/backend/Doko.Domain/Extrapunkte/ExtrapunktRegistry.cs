@@ -26,10 +26,6 @@ public static class ExtrapunktRegistry
             list.Add(new FischaugeExtrapunkt());
         if (rules.EnableGansGefangen)
             list.Add(new GansGefangenExtrapunkt());
-        if (rules.EnableBlutbad)
-            list.Add(new BlutbadExtrapunkt()); // Blutbad before Festmahl
-        if (rules.EnableFestmahl)
-            list.Add(new FestmahlExtrapunkt());
         if (rules.EnableKlabautermann)
             list.Add(new KlabautermannExtrapunkt());
         if (rules.EnableKaffeekranzchen)

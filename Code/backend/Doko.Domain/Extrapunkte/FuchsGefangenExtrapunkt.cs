@@ -1,5 +1,6 @@
 using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
+using Doko.Domain.Players;
 using Doko.Domain.Sonderkarten;
 using Doko.Domain.Tricks;
 
@@ -16,14 +17,17 @@ public sealed class FuchsGefangenExtrapunkt : IExtrapunkt
     public ExtrapunktType Type => ExtrapunktType.FuchsGefangen;
     public bool UsesFinalPartyState => true;
 
-    public IReadOnlyList<ExtrapunktAward> Evaluate(Trick completedTrick, GameState state)
+    public IReadOnlyList<ExtrapunktAward> Evaluate(
+        Trick completedTrick,
+        GameState state,
+        PlayerSeat effectiveTrickWinner
+    )
     {
         // ♦A are Schweinchen when that sonderkarte is active — not Füchse
         if (state.ActiveSonderkarten.Contains(SonderkarteType.Schweinchen))
             return [];
 
-        var winner = completedTrick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
-        var winnerParty = state.PartyResolver.ResolveParty(winner, state);
+        var winnerParty = state.PartyResolver.ResolveParty(effectiveTrickWinner, state);
         if (winnerParty is null)
             return [];
 
@@ -34,7 +38,7 @@ public sealed class FuchsGefangenExtrapunkt : IExtrapunkt
                 continue;
             var foxParty = state.PartyResolver.ResolveParty(tc.Player, state);
             if (foxParty is not null && foxParty != winnerParty)
-                awards.Add(new ExtrapunktAward(Type, winner, 1));
+                awards.Add(new ExtrapunktAward(Type, effectiveTrickWinner, 1));
         }
         return awards;
     }

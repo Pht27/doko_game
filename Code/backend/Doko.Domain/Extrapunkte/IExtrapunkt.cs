@@ -1,4 +1,5 @@
 using Doko.Domain.GameFlow;
+using Doko.Domain.Players;
 using Doko.Domain.Tricks;
 
 namespace Doko.Domain.Extrapunkte;
@@ -14,5 +15,14 @@ public interface IExtrapunkt
     /// </summary>
     bool UsesFinalPartyState => false;
 
-    IReadOnlyList<ExtrapunktAward> Evaluate(Trick completedTrick, GameState state);
+    /// <summary>
+    /// Evaluates this extrapunkt for the given completed trick.
+    /// <paramref name="effectiveTrickWinner"/> is the actual trick winner after all
+    /// <see cref="ITrickWinnerRule"/> overrides have been applied.
+    /// </summary>
+    IReadOnlyList<ExtrapunktAward> Evaluate(
+        Trick completedTrick,
+        GameState state,
+        PlayerSeat effectiveTrickWinner
+    );
 }

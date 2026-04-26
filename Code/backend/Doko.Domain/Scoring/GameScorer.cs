@@ -150,7 +150,7 @@ public sealed class GameScorer : IGameScorer
             .Concat(
                 game.Tricks.SelectMany(tr =>
                     finalStateExtrapunkte
-                        .SelectMany(e => e.Evaluate(tr.Trick, state))
+                        .SelectMany(e => e.Evaluate(tr.Trick, state, tr.Winner))
                         .Where(a => a.Delta > 0)
                 )
             )
@@ -381,11 +381,10 @@ public sealed class GameScorer : IGameScorer
         if (loserAugen < 30 && !winnerAnnounced.Contains(AnnouncementType.Keine30))
             missing++;
 
-        bool loserWonNoTricks = !state.CompletedTricks.Any(t =>
-            state.PartyResolver.ResolveParty(
-                t.Winner(state.TrumpEvaluator, state.Rules.DulleRule),
-                state
-            ) != provisionalWinner
+        // Use stored effective winners (ScoredTricks) so Festmahl/Blutbad/Meuterei overrides
+        // are accounted for when checking whether the loser won any tricks.
+        bool loserWonNoTricks = !state.ScoredTricks.Any(tr =>
+            state.PartyResolver.ResolveParty(tr.Winner, state) != provisionalWinner
         );
         if (loserWonNoTricks && !winnerAnnounced.Contains(AnnouncementType.Schwarz))
             missing++;

@@ -1,5 +1,6 @@
 using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
+using Doko.Domain.Players;
 using Doko.Domain.Sonderkarten;
 using Doko.Domain.Tricks;
 
@@ -17,7 +18,11 @@ public sealed class GansGefangenExtrapunkt : IExtrapunkt
     public ExtrapunktType Type => ExtrapunktType.GansGefangen;
     public bool UsesFinalPartyState => true;
 
-    public IReadOnlyList<ExtrapunktAward> Evaluate(Trick completedTrick, GameState state)
+    public IReadOnlyList<ExtrapunktAward> Evaluate(
+        Trick completedTrick,
+        GameState state,
+        PlayerSeat effectiveTrickWinner
+    )
     {
         if (!AnimalHelpers.FischaugeActive(state))
             return [];
@@ -31,18 +36,17 @@ public sealed class GansGefangenExtrapunkt : IExtrapunkt
         if (fishes.Count == 0 || foxes.Count != 1)
             return [];
 
-        var winner = completedTrick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
         var fox = foxes[0];
-        if (fox.Player != winner)
+        if (fox.Player != effectiveTrickWinner)
             return [];
 
-        var winnerParty = state.PartyResolver.ResolveParty(winner, state);
+        var winnerParty = state.PartyResolver.ResolveParty(effectiveTrickWinner, state);
         var awards = new List<ExtrapunktAward>();
         foreach (var fish in fishes)
         {
             var fishParty = state.PartyResolver.ResolveParty(fish.Player, state);
             if (fishParty is not null && fishParty != winnerParty)
-                awards.Add(new ExtrapunktAward(Type, winner, 1));
+                awards.Add(new ExtrapunktAward(Type, effectiveTrickWinner, 1));
         }
         return awards;
     }

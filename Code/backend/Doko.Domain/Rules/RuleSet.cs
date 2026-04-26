@@ -49,10 +49,13 @@ public record RuleSet
     public bool EnableAgathe { get; init; }
     public bool EnableFischauge { get; init; }
     public bool EnableGansGefangen { get; init; }
-    public bool EnableFestmahl { get; init; }
-    public bool EnableBlutbad { get; init; }
     public bool EnableKlabautermann { get; init; }
     public bool EnableKaffeekranzchen { get; init; }
+
+    // Trick-winner override rules
+    public bool EnableFestmahl { get; init; }
+    public bool EnableBlutbad { get; init; }
+    public bool EnableMeuterei { get; init; }
 
     /// <summary>Standard Koppeldopf rules with all optional features enabled.</summary>
     public static RuleSet Default() =>
@@ -91,10 +94,11 @@ public record RuleSet
             EnableAgathe = true,
             EnableFischauge = true,
             EnableGansGefangen = true,
-            EnableFestmahl = true,
-            EnableBlutbad = true,
             EnableKlabautermann = true,
             EnableKaffeekranzchen = true,
+            EnableFestmahl = true,
+            EnableBlutbad = true,
+            EnableMeuterei = true,
         };
 
     /// <summary>Minimal rules with all optional features disabled.</summary>

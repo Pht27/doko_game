@@ -219,20 +219,30 @@ public sealed class PlayCardHandler(
             isSchlankerMartin || isLastTrick
                 ? state.Rules.DulleRule.Reversed()
                 : state.Rules.DulleRule;
-        var winner = trick.Winner(
+        var normalWinner = trick.Winner(
             state.TrumpEvaluator,
             dulleRule,
             secondBeatsFirst: isSchlankerMartin
         );
+        var effectiveWinner = TrickWinnerRuleRegistry.GetEffectiveWinner(
+            trick,
+            state,
+            normalWinner
+        );
         var awards = ExtrapunktRegistry
             .GetActive(state.Rules, state.ActiveReservation)
-            .SelectMany(e => e.Evaluate(trick, state))
+            .SelectMany(e => e.Evaluate(trick, state, effectiveWinner))
             .ToList();
-        var result = new TrickResult(trick, winner, awards);
+        var result = new TrickResult(trick, effectiveWinner, awards);
 
         state.Apply(new AddCompletedTrickModification(trick, result));
         events.Add(
-            new TrickCompletedEvent(state.Id, state.CompletedTricks.Count - 1, winner, result)
+            new TrickCompletedEvent(
+                state.Id,
+                state.CompletedTricks.Count - 1,
+                effectiveWinner,
+                result
+            )
         );
 
         // Detect Hochzeit forced solo: partner not found after 3 qualifying tricks
@@ -240,7 +250,10 @@ public sealed class PlayCardHandler(
             state.Apply(new SetHochzeitForcedSoloModification());
 
         // Auto-make Pflichtansage if the completed trick triggers one
-        var pflichtAnnouncement = AnnouncementRules.GetMandatoryAnnouncement(winner, state);
+        var pflichtAnnouncement = AnnouncementRules.GetMandatoryAnnouncement(
+            effectiveWinner,
+            state
+        );
         if (pflichtAnnouncement is not null)
         {
             state.Apply(new AddAnnouncementModification(pflichtAnnouncement));
@@ -265,21 +278,21 @@ public sealed class PlayCardHandler(
         )
         {
             state.Apply(new AdvancePhaseModification(GamePhase.SchwarzesSauSoloSelect));
-            state.Apply(new SetCurrentTurnModification(winner));
+            state.Apply(new SetCurrentTurnModification(effectiveWinner));
             await SaveAndPublishAsync(state, events, ct);
-            return Ok(new PlayCardResult(true, winner, false, null));
+            return Ok(new PlayCardResult(true, effectiveWinner, false, null));
         }
 
         if (state.Players.All(p => p.Hand.Cards.Count == 0))
         {
             var finished = _finisher.Execute(state);
             await SaveAndPublishAsync(state, events, ct);
-            return Ok(new PlayCardResult(true, winner, true, finished));
+            return Ok(new PlayCardResult(true, effectiveWinner, true, finished));
         }
 
-        state.Apply(new SetCurrentTurnModification(winner));
+        state.Apply(new SetCurrentTurnModification(effectiveWinner));
         await SaveAndPublishAsync(state, events, ct);
-        return Ok(new PlayCardResult(true, winner, false, null));
+        return Ok(new PlayCardResult(true, effectiveWinner, false, null));
     }
 
     /// <summary>

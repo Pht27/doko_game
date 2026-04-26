@@ -8,8 +8,6 @@ public enum ExtrapunktType
     Agathe,
     Fischauge,
     GansGefangen,
-    Festmahl,
-    Blutbad,
     Klabautermann,
     Kaffeekranzchen,
 }
