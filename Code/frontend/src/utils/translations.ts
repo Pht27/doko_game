@@ -212,8 +212,6 @@ const extrapunktLabels: Record<string, string> = {
   Agathe: 'Agathe',
   Fischauge: 'Fischauge',
   GansGefangen: 'Gans gefangen',
-  Festmahl: 'Festmahl',
-  Blutbad: 'Blutbad',
   Klabautermann: 'Klabautermann',
   Kaffeekranzchen: 'Kaffeekränzchen',
 };

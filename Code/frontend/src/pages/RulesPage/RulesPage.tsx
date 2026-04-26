@@ -436,7 +436,7 @@ export function RulesPage({ onBack }: RulesPageProps) {
           <h2 className="rp-section-title">{t.rulesNav.extrapunkte}</h2>
           <p className="rp-section-text">
             In Soli deaktiviert (außer in Stillen Soli). Extrapunkte beider Parteien werden
-            gegeinander verrechnet.
+            gegeneinander verrechnet.
           </p>
 
           <table className="rp-table">
@@ -472,20 +472,52 @@ export function RulesPage({ onBack }: RulesPageProps) {
                 <td>Fuchs schlägt Fischauge der Gegenpartei → +1</td>
               </tr>
               <tr>
-                <td>Festmahl</td>
-                <td>Stich mit ≥ 3 Tieren, zwei gleich: zweite Karte der Mehrheit gewinnt</td>
-              </tr>
-              <tr>
-                <td>Blutbad</td>
-                <td>Stich mit ≥ 3 verschiedenen Tiertypen: Nicht-Tier gewinnt</td>
-              </tr>
-              <tr>
                 <td>Klabautermann</td>
                 <td>♠ Dame schlägt ♠ König der Gegenpartei → +1</td>
               </tr>
               <tr>
                 <td>Kaffeekränzchen</td>
                 <td>Stich aus 4 Damen → +1</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3 className="rp-subsection-title">Stich-Gewinner-Sonderregeln</h3>
+          <p className="rp-section-text">
+            Diese Regeln geben <strong>keinen Extrapunkt</strong> – sie bestimmen nur, wer den
+            Stich bekommt. Tiere sind: Fuchs (♦ A), Schweinchen (♦ A wenn aktiv), Fischauge
+            (♦ 9 nach dem ersten Trumpfstich), Superschweinchen (♦ 10), Hyperschweinchen (♦ K).
+          </p>
+
+          <table className="rp-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Bedingung</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Festmahl</td>
+                <td>
+                  Stich mit ≥ 3 Tieren, zwei vom gleichen Typ: die zweite Karte der Mehrheit
+                  gewinnt. Bei zwei Paaren gewinnt die letzte Karte des Stichs.
+                </td>
+              </tr>
+              <tr>
+                <td>Blutbad</td>
+                <td>
+                  Stich mit ≥ 3 verschiedenen Tiertypen: die einzige Nicht-Tier-Karte gewinnt.
+                  Sind alle Karten Tiere, gewinnt das Fischauge.
+                </td>
+              </tr>
+              <tr>
+                <td>Meuterei</td>
+                <td>
+                  Ein ♠ König an Stelle 1 oder 2, danach eine ♠ Dame (Klabautermann-Fangversuch),
+                  danach ein zweiter ♠ König – und die ♠ Dame wäre die höchste Karte: der zweite
+                  ♠ König gewinnt stattdessen. Kein Klabautermann-Punkt wird vergeben.
+                </td>
               </tr>
             </tbody>
           </table>
