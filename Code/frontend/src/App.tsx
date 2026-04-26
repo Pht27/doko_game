@@ -115,6 +115,22 @@ export default function App() {
     };
   }, []);
 
+  // Re-apply the orientation lock after fullscreen transitions.
+  // On the first visit to the lobby, requestFullscreen() fires on the same click
+  // that changes the view, and the fullscreen transition resets the orientation
+  // lock that was just applied. This effect catches that and re-locks.
+  useEffect(() => {
+    function reapplyLock() {
+      if (!document.fullscreenElement) return;
+      const target = orientation === 'portrait' ? 'portrait' : 'landscape';
+      screen.orientation?.lock(target)
+        .then(() => { if (target === 'landscape') setLandscapeLockFailed(false); })
+        .catch(() => { if (target === 'landscape') setLandscapeLockFailed(true); });
+    }
+    document.addEventListener('fullscreenchange', reapplyLock);
+    return () => document.removeEventListener('fullscreenchange', reapplyLock);
+  }, [orientation]);
+
   // Auto-join when arriving via invite URL without an existing session
   const joiningLobbyId = view.kind === 'joining' ? view.lobbyId : null;
   useEffect(() => {
