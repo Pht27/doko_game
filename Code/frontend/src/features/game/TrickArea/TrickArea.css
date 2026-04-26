@@ -19,11 +19,6 @@
   /* Fly-away transition is set via inline style by the component */
 }
 
-/* ── Empty state ──────────────────────────────────────────────────────────── */
-.trick-empty {
-  @apply flex items-center justify-center w-32 h-32 rounded-full border-2 border-white/10 text-white/20 text-sm;
-}
-
 /* ── Card positioner (outer wrapper — handles seat-based placement) ──────── */
 .trick-card-positioner {
   position: absolute;

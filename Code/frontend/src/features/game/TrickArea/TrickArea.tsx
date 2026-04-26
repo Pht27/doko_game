@@ -2,7 +2,6 @@ import React from 'react';
 import type { CSSProperties } from 'react';
 import type { TrickSummaryDto } from '@/types/api';
 import { Card } from '../Card/Card';
-import { t } from '@/utils/translations';
 import {
   MAX_TILT_DEG,
   SEAT_OFFSET,
@@ -57,11 +56,7 @@ function stackOffset(index: number, cardId: number): { ox: number; oy: number; r
 
 export function TrickArea({ trick, requestingPlayer, seatOf, animPhase = null, winnerSeat }: TrickAreaProps) {
   if (!trick || trick.cards.length === 0) {
-    return (
-      <div className="trick-empty">
-        {t.keinStich}
-      </div>
-    );
+    return null;
   }
 
   const isStacked = animPhase === 'stack' || animPhase === 'fly';
