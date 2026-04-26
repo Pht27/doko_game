@@ -52,7 +52,8 @@ public class LobbiesController(
             .Select(l => new LobbyListItemResponse(
                 l.Id.ToString(),
                 l.Seats.Select(s => s != null).ToArray(),
-                l.IsStarted
+                l.IsStarted,
+                l.CreatedAt
             ))
             .ToArray();
         return Ok(response);

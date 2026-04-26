@@ -11,6 +11,7 @@ export interface LobbyListItemResponse {
   lobbyId: string;
   seats: boolean[];
   isStarted: boolean;
+  createdAt: string;
 }
 
 export interface LobbyViewResponse {

@@ -122,9 +122,12 @@ export function MultiplayerBrowserPage({
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-sm font-medium truncate">
-                        Lobby
-                      </span>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-sm font-medium">Lobby</span>
+                        <span className={`text-[10px] ${isSelected ? 'text-white/60' : 'text-white/30'}`}>
+                          {new Date(lobby.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
                       <div className="flex items-center gap-1.5 shrink-0">
                         {lobby.isStarted && (
                           <span className={`text-xs font-medium ${isSelected ? 'text-orange-300' : 'text-orange-400'}`}>

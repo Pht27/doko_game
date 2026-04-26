@@ -7,7 +7,12 @@ public record LobbyJoinResponse(
     string? ActiveGameId = null
 );
 
-public record LobbyListItemResponse(string LobbyId, bool[] Seats, bool IsStarted);
+public record LobbyListItemResponse(
+    string LobbyId,
+    bool[] Seats,
+    bool IsStarted,
+    DateTimeOffset CreatedAt
+);
 
 public record LobbyViewResponse(
     string LobbyId,
