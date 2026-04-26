@@ -1,5 +1,10 @@
 # Release Notes
 
+## [1.2.2] - 2026-04-26
+
+## Neu
+- Auf der Regelseite verschwindet der Header nun beim scrollen
+
 ## [1.2.1] - 2026-04-26
 
 ### Behoben
