@@ -54,6 +54,7 @@ public static class DtoMapper
             EligibleSchwarzesSauSolos = view
                 .EligibleSchwarzesSauSolos.Select(p => p.ToString())
                 .ToList(),
+            OwnHighestAnnouncement = view.OwnHighestAnnouncement,
         };
 
     public static CardDto ToDto(Card card) =>

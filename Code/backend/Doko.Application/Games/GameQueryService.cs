@@ -70,6 +70,7 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
                 state
             ),
             EligibleSchwarzesSauSolos = BuildEligibleSchwarzesSauSolos(requestingPlayer, state),
+            OwnHighestAnnouncement = BuildOwnHighestAnnouncement(requestingPlayer, state),
         };
     }
 
@@ -308,6 +309,25 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             .ToList();
 
         return new TrickSummary(trickNumber, cards, result.Winner);
+    }
+
+    private static string? BuildOwnHighestAnnouncement(PlayerSeat player, GameState state)
+    {
+        var highestAnn = state.Announcements.Where(a => a.Player == player).MaxBy(a => a.Type);
+        if (highestAnn is null)
+            return null;
+
+        var ownParty = GetAnnouncementDisplayParty(player, state);
+        return highestAnn.Type switch
+        {
+            AnnouncementType.Win => ownParty switch
+            {
+                Party.Re => "Re",
+                Party.Kontra => "Kontra",
+                _ => null,
+            },
+            var t => t.ToString(),
+        };
     }
 
     private static readonly CardType KaroNeun = new(Suit.Karo, Rank.Neun);

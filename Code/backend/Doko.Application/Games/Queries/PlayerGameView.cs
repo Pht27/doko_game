@@ -101,4 +101,11 @@ public record PlayerGameView(
     /// when it is not this player's turn.
     /// </summary>
     public IReadOnlyList<ReservationPriority> EligibleSchwarzesSauSolos { get; init; } = [];
+
+    /// <summary>
+    /// The display label for the requesting player's highest effective announcement,
+    /// or null if they have not announced. Matches the format used for other players:
+    /// "Re" / "Kontra" for the Win announcement, "Keine90" etc. for higher ones.
+    /// </summary>
+    public string? OwnHighestAnnouncement { get; init; } = null;
 }

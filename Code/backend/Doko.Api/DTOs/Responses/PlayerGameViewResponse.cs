@@ -51,6 +51,9 @@ public record PlayerGameViewResponse(
     /// <summary>Solos available for selection during SchwarzesSauSoloSelect. Empty otherwise.</summary>
     public IReadOnlyList<string> EligibleSchwarzesSauSolos { get; init; } = [];
 
+    /// <summary>The requesting player's highest announcement label, or null if none made.</summary>
+    public string? OwnHighestAnnouncement { get; init; } = null;
+
     /// <summary>Populated when phase is Finished so rejoining players see the result screen immediately.</summary>
     public GameResultDto? FinishedResult { get; init; } = null;
 

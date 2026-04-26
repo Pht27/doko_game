@@ -61,6 +61,7 @@ export interface PlayerGameViewResponse {
   activeGameMode: string | null;
   shouldChooseSchwarzesSauSolo: boolean;
   eligibleSchwarzesSauSolos: string[];
+  ownHighestAnnouncement: string | null;
   finishedResult?: GameResultDto | null;
   newGameVoteCount?: number;
 }

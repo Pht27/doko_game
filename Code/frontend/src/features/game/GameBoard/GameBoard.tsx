@@ -6,6 +6,7 @@ import type { MultiplayerNewGameProps } from '../ResultScreen/ResultScreen';
 import { ResultScreen } from '../ResultScreen/ResultScreen';
 import { GameInfo } from '../shared/GameInfo';
 import { PlayerLabel } from '../shared/PlayerLabel';
+import { SelfPlayerLabel } from '../shared/SelfPlayerLabel';
 import { HandDisplay } from '../HandDisplay/HandDisplay';
 import { AnnouncementButton } from '../AnnouncementButton/AnnouncementButton';
 import { LastTrickOverlay } from '../LastTrickOverlay/LastTrickOverlay';
@@ -188,6 +189,19 @@ export function GameBoard({
       {/* Loading / error feedback above the hand */}
       {viewLoading && !view && <div className="text-center text-white/40 text-xs py-1">{t.loading}</div>}
       {viewError && <div className="text-center text-red-400 text-xs py-1">{viewError}</div>}
+
+      {/* Own player label — centered overlay above the hand */}
+      {view && (
+        <div className="absolute bottom-[20%] left-1/2 -translate-x-1/2 z-10">
+          <SelfPlayerLabel
+            playerId={activePlayer}
+            trickCount={trickCountByPlayer[activePlayer] ?? 0}
+            ownParty={view.ownParty}
+            highestAnnouncement={view.ownHighestAnnouncement}
+            isCurrentTurn={view.isMyTurn}
+          />
+        </div>
+      )}
 
       {/* Hand — .hand-container clips the bottom half of the cards so they
            appear to rise from below the table edge (see HandDisplay.css) */}
