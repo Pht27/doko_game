@@ -1,6 +1,6 @@
 # Release Notes
 
-## [1.0.2] - 2026-04-26
+## [1.1.0] - 2026-04-26
 
 ### Neu
 - Beim Start jedes Spiels erscheint kurz ein Popup, das den Spielmodus ankündigt (z. B. „Karo-Solo · S2" oder „Normalspiel"). Bei Hochzeit, Armut und Soli wird der zugehörige Spieler mit angezeigt.
