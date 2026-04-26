@@ -216,6 +216,8 @@ export default function App() {
     newGameVoteCount,
     newGameId,
     refetch,
+    popupAnnouncement,
+    clearPopupAnnouncement,
   } = useGameState(gameSession?.tokens ?? [], gameSession?.gameId ?? null, activePlayer);
 
   // If the game is gone (backend restart), clear stale session and go home
@@ -332,6 +334,8 @@ export default function App() {
         actions={actions}
         finishedResult={finishedResult}
         sonderkarteNotification={sonderkarteNotification}
+        popupAnnouncement={popupAnnouncement}
+        onClearPopup={clearPopupAnnouncement}
         viewLoading={viewLoading}
         viewError={viewError}
         allowPlayerSwitching={isHotSeat}

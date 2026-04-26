@@ -65,6 +65,7 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
                 : null,
             ArmutReturnedTrump = state.ArmutReturnedTrump,
             ActiveGameMode = state.ActiveReservation?.Priority.ToString(),
+            GameModePlayerSeat = (int?)state.GameModePlayerSeat,
             ShouldChooseSchwarzesSauSolo = BuildShouldChooseSchwarzesSauSolo(
                 requestingPlayer,
                 state

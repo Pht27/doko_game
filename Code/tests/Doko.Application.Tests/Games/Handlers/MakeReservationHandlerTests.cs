@@ -13,8 +13,7 @@ public class MakeReservationHandlerTests
     {
         public IReadOnlyList<Card> Shuffle(IReadOnlyList<Card> deck)
         {
-            var nonArmutTrump = deck
-                .Where(c =>
+            var nonArmutTrump = deck.Where(c =>
                     c.Type.Rank != Rank.Bube
                     && c.Type.Rank != Rank.Dame
                     && !(c.Type.Suit == Suit.Herz && c.Type.Rank == Rank.Zehn)
@@ -72,8 +71,11 @@ public class MakeReservationHandlerTests
         )
             .Value
             .GameId;
-        await new DealCardsHandler(repo, pub, deckShuffler ?? new Fakes.FakeDeckShuffler())
-            .ExecuteAsync(new DealCardsCommand(id));
+        await new DealCardsHandler(
+            repo,
+            pub,
+            deckShuffler ?? new Fakes.FakeDeckShuffler()
+        ).ExecuteAsync(new DealCardsCommand(id));
         var healthHandler = new DeclareHealthStatusHandler(repo, pub);
         foreach (var player in AppB.FourPlayerSeats)
             await healthHandler.ExecuteAsync(new DeclareHealthStatusCommand(id, player, true));
@@ -102,7 +104,12 @@ public class MakeReservationHandlerTests
     {
         var (repo, pub, _) = AppB.Infrastructure();
         var rules = RuleSet.Minimal() with { AllowArmut = true };
-        var gameId = await GameInSoloCheckPhaseAllVorbehalt(repo, pub, rules, new ArmutEligibleShuffler());
+        var gameId = await GameInSoloCheckPhaseAllVorbehalt(
+            repo,
+            pub,
+            rules,
+            new ArmutEligibleShuffler()
+        );
         var useCase = new MakeReservationHandler(repo, pub);
 
         // All four Vorbehalt players pass on Solo

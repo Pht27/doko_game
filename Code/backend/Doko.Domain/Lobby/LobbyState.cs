@@ -64,6 +64,10 @@ public class LobbyState
     /// <summary>Number of players who have voted ready to start the initial lobby game.</summary>
     public int LobbyStartVoteCount => _lobbyStartVoters.Count;
 
+    /// <summary>Seat indices (0–3) of players who have voted ready to start the initial lobby game.</summary>
+    public IReadOnlySet<int> LobbyStartVoterSeats =>
+        _lobbyStartVoters.Select(s => (int)s).ToHashSet();
+
     private LobbyState(LobbyId id, DateTimeOffset createdAt)
     {
         Id = id;

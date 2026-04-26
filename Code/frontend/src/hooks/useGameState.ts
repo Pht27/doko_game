@@ -3,6 +3,7 @@ import * as signalR from '@microsoft/signalr';
 import { getGameView } from '../api/game';
 import { createHubConnection, joinGameGroup } from '../api/signalr';
 import type { PlayerGameViewResponse, GameResultDto, SonderkarteNotification } from '../types/api';
+import { t } from '../utils/translations';
 
 export interface GameStateResult {
   view: PlayerGameViewResponse | null;
@@ -17,6 +18,9 @@ export interface GameStateResult {
   /** Set to the new game's ID when a new-game auto-start fires */
   newGameId: string | null;
   refetch: () => void;
+  /** Popup message to announce game mode or sonderkarte activation; auto-clears after 3 s */
+  popupAnnouncement: { message: string; id: number } | null;
+  clearPopupAnnouncement: () => void;
 }
 
 export function useGameState(
@@ -32,11 +36,34 @@ export function useGameState(
     useState<SonderkarteNotification | null>(null);
   const [newGameVoteCount, setNewGameVoteCount] = useState(0);
   const [newGameId, setNewGameId] = useState<string | null>(null);
+  const [popupAnnouncement, setPopupAnnouncement] = useState<{ message: string; id: number } | null>(null);
+
   const notifTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const popupTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const popupIdRef = useRef(0);
+  const announcedGameModeRef = useRef<string | null | undefined>(undefined);
   const connectionRef = useRef<signalR.HubConnection | null>(null);
   const refetchRef = useRef<(() => void) | null>(null);
+  const showPopupRef = useRef<((msg: string) => void) | null>(null);
 
   const token = tokens[activePlayer];
+
+  const showPopup = useCallback((message: string) => {
+    if (popupTimerRef.current) clearTimeout(popupTimerRef.current);
+    const id = ++popupIdRef.current;
+    setPopupAnnouncement({ message, id });
+    popupTimerRef.current = setTimeout(() => setPopupAnnouncement(null), 3000);
+  }, []);
+
+  const clearPopupAnnouncement = useCallback(() => {
+    if (popupTimerRef.current) clearTimeout(popupTimerRef.current);
+    setPopupAnnouncement(null);
+  }, []);
+
+  // Keep showPopupRef in sync so SignalR handlers always call the latest version
+  useEffect(() => {
+    showPopupRef.current = showPopup;
+  }, [showPopup]);
 
   const refetch = useCallback(async () => {
     if (!token || !gameId) return;
@@ -47,6 +74,13 @@ export function useGameState(
       if (data.phase === 'Finished' && data.finishedResult) {
         setFinishedResult(prev => prev ?? data.finishedResult!);
         setNewGameVoteCount(prev => prev === 0 ? (data.newGameVoteCount ?? 0) : prev);
+      }
+      // Announce game mode when the game first enters Playing phase (undefined = not yet seen)
+      if (data.phase === 'Playing' && announcedGameModeRef.current === undefined) {
+        const incomingMode = data.activeGameMode ?? null;
+        announcedGameModeRef.current = incomingMode;
+        const msg = t.gameModePopupMessage(incomingMode, data.gameModePlayerSeat ?? null);
+        showPopupRef.current?.(msg);
       }
       setError(null);
     } catch (e) {
@@ -61,6 +95,7 @@ export function useGameState(
     setFinishedResult(null);
     setNewGameVoteCount(0);
     setNewGameId(null);
+    announcedGameModeRef.current = undefined;
   }, [gameId]);
 
   // Keep ref in sync so SignalR handlers always call the latest refetch
@@ -92,6 +127,7 @@ export function useGameState(
       if (notifTimerRef.current) clearTimeout(notifTimerRef.current);
       setSonderkarteNotification(payload);
       notifTimerRef.current = setTimeout(() => setSonderkarteNotification(null), 3000);
+      showPopupRef.current?.(t.sonderkartePopupMessage(payload.player, payload.type));
       refetchRef.current?.();
     };
 
@@ -131,5 +167,5 @@ export function useGameState(
     };
   }, [gameId, tokens]);
 
-  return { view, loading, error, finishedResult, sonderkarteNotification, newGameVoteCount, newGameId, refetch };
+  return { view, loading, error, finishedResult, sonderkarteNotification, newGameVoteCount, newGameId, refetch, popupAnnouncement, clearPopupAnnouncement };
 }
