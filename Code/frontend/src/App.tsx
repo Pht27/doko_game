@@ -67,14 +67,30 @@ export default function App() {
 
   const orientation = orientationFor(view);
 
+  // Only show the portrait overlay when the lock actually fails (e.g. iOS).
+  // While locking is in-flight or already succeeded, suppress it to avoid the
+  // green flash that appeared during the async lock transition.
+  const [landscapeLockFailed, setLandscapeLockFailed] = useState(false);
+
   useEffect(() => {
     if (orientation === 'portrait') {
+      setLandscapeLockFailed(false);
       screen.orientation?.lock('portrait').catch(() => {});
-    } else {
-      // Explicitly lock landscape rather than unlocking — unlocking allows
-      // auto-rotation on Android PWA, which triggers the portrait overlay.
-      screen.orientation?.lock('landscape').catch(() => {});
+      return;
     }
+
+    // Landscape required. If the lock API is absent (iOS Safari), fall back to
+    // showing the overlay immediately so the user knows to rotate manually.
+    if (!screen.orientation?.lock) {
+      setLandscapeLockFailed(true);
+      return;
+    }
+
+    // Optimistically hide the overlay while the lock is being applied.
+    setLandscapeLockFailed(false);
+    screen.orientation.lock('landscape')
+      .then(() => setLandscapeLockFailed(false))
+      .catch(() => setLandscapeLockFailed(true));
   }, [orientation]);
 
   useEffect(() => {
@@ -228,7 +244,7 @@ export default function App() {
   if (view.kind === 'home') {
     return (
       <>
-        <PortraitOverlay requireLandscape={orientation === 'landscape'} />
+        <PortraitOverlay requireLandscape={false} />
         <LandingPage
           onMultiplayer={() => setView({ kind: 'multiplayer-browser' })}
           onTestGame={() => setView({ kind: 'hot-seat' })}
@@ -241,7 +257,7 @@ export default function App() {
   if (view.kind === 'rules') {
     return (
       <>
-        <PortraitOverlay requireLandscape={orientation === 'landscape'} />
+        <PortraitOverlay requireLandscape={false} />
         <RulesPage onBack={() => setView({ kind: 'home' })} />
       </>
     );
@@ -250,7 +266,7 @@ export default function App() {
   if (view.kind === 'joining') {
     return (
       <>
-        <PortraitOverlay requireLandscape={orientation === 'landscape'} />
+        <PortraitOverlay requireLandscape={landscapeLockFailed} />
         <div className="w-full h-full flex items-center justify-center">
           {joinError
             ? <p className="text-red-400 text-lg">{joinError}</p>
@@ -263,7 +279,7 @@ export default function App() {
   if (view.kind === 'multiplayer-browser') {
     return (
       <>
-        <PortraitOverlay requireLandscape={orientation === 'landscape'} />
+        <PortraitOverlay requireLandscape={landscapeLockFailed} />
         <MultiplayerBrowserPage
           selectedLobbyId={view.selectedLobbyId}
           onBack={() => setView({ kind: 'home' })}
@@ -279,7 +295,7 @@ export default function App() {
   if (!gameSession) {
     return (
       <>
-        <PortraitOverlay requireLandscape={orientation === 'landscape'} />
+        <PortraitOverlay requireLandscape={landscapeLockFailed} />
         <GameLoader
           loading={isHotSeat ? hotSeat.loading : false}
           error={isHotSeat ? hotSeat.error : null}
@@ -291,7 +307,7 @@ export default function App() {
 
   return (
     <>
-      <PortraitOverlay />
+      <PortraitOverlay requireLandscape={landscapeLockFailed} />
       <GameBoard
         view={gameView}
         activePlayer={activePlayer}
