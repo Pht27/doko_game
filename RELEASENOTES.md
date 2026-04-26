@@ -1,5 +1,17 @@
 # Release Notes
 
+## [1.2.0] - 2026-04-26
+
+### Verbessert
+- Startseite: neues Layout mit dekorativen Kartensymbolen und überarbeiteten Buttons.
+- Regelseite: vollständig überarbeitet mit übersichtlicherer Struktur und verbessertem Stil.
+- Spielfeld: leerer Stichbereich wird nicht mehr angezeigt – bevor Karten gespielt werden, ist die Mitte leer.
+- Ansage-Buttons zeigen die Parteifarbe: Re in Blau, Kontra in Lila.
+- Handkarten mit aktivierbarem Sonderkarteneffekt haben einen orangen Rahmen.
+- Spielernamen werden in der Parteifarbe angezeigt, sobald die Partei bekannt ist.
+- Spieler-Labels zeigen die Anzahl gewonnener Stiche.
+- Lobby-Browser zeigt den Erstellungszeitpunkt jeder Lobby.
+
 ## [1.1.2] - 2026-04-26
 
 ### Verbessert
