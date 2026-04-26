@@ -1,11 +1,15 @@
 # Release Notes
 
-## [1.2.2] - 2026-04-26
+## [1.0.0] - 2026-04-26
+
+**Initialer Release mit allen fertigen Koppeldopf-Regeln**
+
+## [0.2.2] - 2026-04-26
 
 ## Neu
 - Auf der Regelseite verschwindet der Header nun beim scrollen
 
-## [1.2.1] - 2026-04-26
+## [0.2.1] - 2026-04-26
 
 ### Behoben
 - Spieler-Labels der Gegner verrutschen nicht mehr, wenn noch keine Karte gespielt wurde.
@@ -16,7 +20,7 @@
 ### Neu
 - Eigenes Spieler-Label als Overlay am unteren Bildschirmrand: zeigt Name, Stichanzahl und eigene Ansage in der wahrgenommenen Parteifarbe (wie der Ansage-Button).
 
-## [1.2.0] - 2026-04-26
+## [0.2.0] - 2026-04-26
 
 ### Verbessert
 - Startseite: neues Layout mit dekorativen Kartensymbolen und überarbeiteten Buttons.
@@ -28,12 +32,12 @@
 - Spieler-Labels zeigen die Anzahl gewonnener Stiche.
 - Lobby-Browser zeigt den Erstellungszeitpunkt jeder Lobby.
 
-## [1.1.2] - 2026-04-26
+## [0.1.2] - 2026-04-26
 
 ### Verbessert
 - Zurück-Schaltfläche zeigt nur noch einen Pfeil (←) ohne Text und ist eine wiederverwendbare Komponente.
 
-## [1.1.1] - 2026-04-25
+## [0.1.1] - 2026-04-25
 
 ### Behoben
 - **Festmahl**: Bei einem Stich mit drei Tieren, wovon zwei gleich sind, gewinnt das zweite Tier der Mehrheit den Stich.
@@ -41,7 +45,7 @@
 - **Meuterei**: Zwei Pik-Könige und eine Pik-Dame im selben Stich – der Spieler des zweiten Pik-Königs gewinnt; Klabautermann wird dabei nicht fälschlicherweise vergeben.
 - Fuchs (♦A) zählt immer als Tier für Festmahl und Blutbad, unabhängig von aktiven Schweinchen.
 
-## [1.1.0] - 2026-04-25
+## [0.1.0] - 2026-04-25
 
 ### Neu
 - Regelseite: Alle Spielregeln übersichtlich erklärt – erreichbar über die Startseite.
@@ -50,17 +54,16 @@
 ### Behoben
 - Auf iOS erscheint der grüne „Bitte drehen"-Screen nicht mehr mitten im Spiel – die Ausrichtung ist systemseitig gesperrt.
 
-## [1.0.1] - 2026-04-25
+## [0.0.2] - 2026-04-25
 
 ### Verbessert
 - Die Startseite wird jetzt im Hochformat angezeigt – kein Drehen nötig, bevor man ins Spiel geht.
 - Lobby und Spiel wechseln automatisch ins Querformat, sobald man die Startseite verlässt.
 - PWA-Splash-Screen erzwingt kein Querformat mehr – kein ruckartiges Drehen beim App-Start.
 
-## [1.0.0] - 2026-04-25
+## [0.0.1] - 2026-04-25
 
 ### Neu
-- Erster Release!!
 - Mehrspieler-Doppelkopf für 4 Spieler
 - Lobby-System mit Einladungslinks
 - Alle Ansagen (Solo, Hochzeit, Armut, Schmeißen, ...)
