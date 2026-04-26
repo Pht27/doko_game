@@ -1,43 +1,39 @@
-/* SelfPlayerLabel — horizontal overlay label for the active player, bottom of screen */
+/* SelfPlayerLabel — party-coloured bar glued to the bottom of the screen */
 @reference "../../../styles/index.css";
 
 .self-player-label {
-  @apply flex flex-row items-center gap-2 px-3 py-1.5 rounded-xl text-xs
-    bg-black/40 backdrop-blur-sm;
+  @apply flex flex-row items-center justify-center gap-2.5 px-5 py-2 text-xs text-white/90;
+  border-radius: 0.75rem 0.75rem 0 0; /* rounded top corners, flush bottom edge */
+  background: rgba(0, 0, 0, 0.65);
+  border-top: 2px solid transparent;
 }
 
+/* Active turn: yellow top border instead of a full ring (bottom is against screen edge) */
 .self-label-active {
-  @apply ring-2 ring-yellow-400 bg-yellow-400/10;
+  border-top-color: theme(colors.yellow.400);
+}
+
+/* Party backgrounds — nearly opaque so text is always readable */
+.self-bg-re {
+  background: theme(colors.re.600 / 82%);
+}
+
+.self-bg-kontra {
+  background: theme(colors.kontra.600 / 82%);
 }
 
 .self-label-name {
-  @apply font-semibold text-white/80;
-}
-
-.self-label-re {
-  @apply text-re-400;
-}
-
-.self-label-kontra {
-  @apply text-kontra-400;
+  @apply font-bold;
 }
 
 .self-label-tricks {
-  @apply text-[10px] font-bold bg-white/15 rounded px-1 py-0.5 leading-none text-white/70;
+  @apply text-[10px] font-bold bg-white/20 rounded px-1.5 py-0.5 leading-none;
 }
 
 .self-label-ann {
-  @apply text-[10px] font-bold px-1.5 py-0.5 rounded-md;
+  @apply text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-white/20;
 }
 
-.self-ann-re {
-  @apply bg-re-600/80 text-white;
-}
-
-.self-ann-kontra {
-  @apply bg-kontra-600/80 text-white;
-}
-
-.self-ann-other {
-  @apply bg-white/20 text-white;
+.self-label-dot {
+  @apply text-white/40 text-[10px];
 }

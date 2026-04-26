@@ -190,9 +190,9 @@ export function GameBoard({
       {viewLoading && !view && <div className="text-center text-white/40 text-xs py-1">{t.loading}</div>}
       {viewError && <div className="text-center text-red-400 text-xs py-1">{viewError}</div>}
 
-      {/* Own player label — centered overlay above the hand */}
+      {/* Own player label — bar glued to the bottom edge of the screen */}
       {view && (
-        <div className="absolute bottom-[20%] left-1/2 -translate-x-1/2 z-10">
+        <div className="absolute bottom-0 left-0 right-0 z-10 flex justify-center">
           <SelfPlayerLabel
             playerId={activePlayer}
             trickCount={trickCountByPlayer[activePlayer] ?? 0}

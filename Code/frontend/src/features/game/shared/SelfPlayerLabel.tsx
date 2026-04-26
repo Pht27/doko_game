@@ -16,30 +16,27 @@ export function SelfPlayerLabel({
   highestAnnouncement,
   isCurrentTurn,
 }: SelfPlayerLabelProps) {
-  const partyClass =
+  const bgClass =
     ownParty === 'Re'
-      ? 'self-label-re'
+      ? 'self-bg-re'
       : ownParty === 'Kontra'
-        ? 'self-label-kontra'
+        ? 'self-bg-kontra'
         : '';
 
-  const annPartyClass =
-    ownParty === 'Re'
-      ? 'self-ann-re'
-      : ownParty === 'Kontra'
-        ? 'self-ann-kontra'
-        : 'self-ann-other';
-
   return (
-    <div className={`self-player-label ${isCurrentTurn ? 'self-label-active' : ''}`}>
-      <span className={`self-label-name ${partyClass}`}>{t.playerName(playerId)}</span>
+    <div className={`self-player-label ${bgClass} ${isCurrentTurn ? 'self-label-active' : ''}`}>
+      <span className="self-label-name">{t.playerName(playerId)}</span>
       {trickCount > 0 && (
-        <span className="self-label-tricks">{trickCount}</span>
+        <>
+          <span className="self-label-dot">·</span>
+          <span className="self-label-tricks">{trickCount}</span>
+        </>
       )}
       {highestAnnouncement && (
-        <span className={`self-label-ann ${annPartyClass}`}>
-          {t.announcementLabel(highestAnnouncement)}
-        </span>
+        <>
+          <span className="self-label-dot">·</span>
+          <span className="self-label-ann">{t.announcementLabel(highestAnnouncement)}</span>
+        </>
       )}
     </div>
   );
