@@ -31,9 +31,9 @@ export function PlayerLabel({ player, isCurrentTurn, orientation, sonderkarteNot
   const clickable = onClick ? 'player-label-clickable' : '';
 
   const annColor =
-    player.highestAnnouncement === 'Re'
+    player.knownParty === 'Re'
       ? 'player-ann-re'
-      : player.highestAnnouncement === 'Kontra'
+      : player.knownParty === 'Kontra'
         ? 'player-ann-kontra'
         : 'player-ann-other';
 

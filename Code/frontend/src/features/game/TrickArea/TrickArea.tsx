@@ -56,7 +56,7 @@ function stackOffset(index: number, cardId: number): { ox: number; oy: number; r
 
 export function TrickArea({ trick, requestingPlayer, seatOf, animPhase = null, winnerSeat }: TrickAreaProps) {
   if (!trick || trick.cards.length === 0) {
-    return null;
+    return <div className="trick-pile" />;
   }
 
   const isStacked = animPhase === 'stack' || animPhase === 'fly';
