@@ -7,16 +7,16 @@
 }
 
 .self-bg-re {
-  @apply bg-re-500/25 border-re-500/40 text-re-300;
+  @apply bg-re-500/70 border-re-500/40 text-re-300;
 }
 
 .self-bg-kontra {
-  @apply bg-kontra-500/25 border-kontra-500/40 text-kontra-300;
+  @apply bg-kontra-600/85 border-kontra-500/40 text-kontra-300;
 }
 
 /* Active turn: thicker yellow top border */
 .self-label-active {
-  @apply border-t-2 border-t-yellow-400;
+  @apply border-2 border-yellow-400 border-b-0;
 }
 
 .self-label-name {
