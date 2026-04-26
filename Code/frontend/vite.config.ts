@@ -1,13 +1,28 @@
 import { defineConfig, loadEnv } from 'vite'
+import { fileURLToPath, URL } from 'node:url'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import svgr from 'vite-plugin-svgr'
 import { VitePWA } from 'vite-plugin-pwa'
 import mkcert from 'vite-plugin-mkcert'
 
+const pkg = JSON.parse(readFileSync('./package.json', 'utf-8')) as { version: string }
+const releaseNotesMd = readFileSync(resolve(__dirname, '../../RELEASENOTES.md'), 'utf-8')
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   return {
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+    __RELEASE_NOTES__: JSON.stringify(releaseNotesMd),
+  },
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
   server: {
     proxy: {
       '/api': {
@@ -39,7 +54,7 @@ export default defineConfig(({ mode }) => {
         description: 'A multiplayer card game',
         theme_color: '#ffffff',
         background_color: '#ffffff',
-        display: 'standalone',
+        display: 'fullscreen',
         orientation: 'landscape',
         start_url: '/',
         icons: [

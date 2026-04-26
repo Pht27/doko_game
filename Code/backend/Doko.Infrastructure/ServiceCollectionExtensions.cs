@@ -1,4 +1,5 @@
 using Doko.Application.Abstractions;
+using Doko.Application.Lobbies;
 using Doko.Infrastructure.Repositories;
 using Doko.Infrastructure.Shuffler;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +16,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddDokoInfrastructure(this IServiceCollection services)
     {
         services.AddSingleton<IGameRepository, InMemoryGameRepository>();
+        services.AddSingleton<ILobbyRepository, InMemoryLobbyRepository>();
         services.AddSingleton<IDeckShuffler, RandomDeckShuffler>();
         return services;
     }

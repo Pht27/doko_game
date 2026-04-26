@@ -18,3 +18,10 @@ export async function joinGameGroup(
 ): Promise<void> {
   await connection.invoke('JoinGame', gameId);
 }
+
+export async function joinLobbyGroup(
+  connection: signalR.HubConnection,
+  lobbyId: string,
+): Promise<void> {
+  await connection.invoke('JoinLobby', lobbyId);
+}

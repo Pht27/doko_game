@@ -59,6 +59,11 @@ export interface PlayerGameViewResponse {
   armutExchangeCardCount: number | null;
   armutReturnedTrump: boolean | null;
   activeGameMode: string | null;
+  shouldChooseSchwarzesSauSolo: boolean;
+  eligibleSchwarzesSauSolos: string[];
+  ownHighestAnnouncement: string | null;
+  finishedResult?: GameResultDto | null;
+  newGameVoteCount?: number;
 }
 
 // ── Results ───────────────────────────────────────────────────────────────────
@@ -74,16 +79,32 @@ export interface GameValueComponentDto {
   value: number;
 }
 
+export interface AnnouncementRecordDto {
+  party: string;
+  type: string;
+}
+
 export interface GameResultDto {
   winner: string;
   reAugen: number;
   kontraAugen: number;
+  reStiche: number;
+  kontraStiche: number;
+  gameMode: string | null;
   gameValue: number;
   allAwards: ExtrapunktAwardDto[];
   feigheit: boolean;
   valueComponents: GameValueComponentDto[];
+  announcementRecords: AnnouncementRecordDto[];
   soloFactor: number;
   totalScore: number;
+  netPointsPerSeat: number[];
+  lobbyStandings: number[];
+  partyPerSeat: (string | null)[];
+  stichePerSeat: number[];
+  augenPerSeat: number[];
+  isGeschmissen: boolean;
+  matchHistory?: GameResultDto[];
 }
 
 // ── Responses ─────────────────────────────────────────────────────────────────
@@ -152,16 +173,25 @@ export interface ExchangeArmutCardsResponse {
   returnedTrumpCount: number;
 }
 
+export interface ChooseSchwarzesSauSoloRequest {
+  solo: string;
+}
+
 // ── SignalR events ─────────────────────────────────────────────────────────────
 
 export type SignalREvent =
+  | 'HealthDeclared'
   | 'CardPlayed'
   | 'TrickCompleted'
   | 'AnnouncementMade'
   | 'ReservationMade'
+  | 'ArmutResponse'
+  | 'ArmutCardsExchanged'
+  | 'PartyRevealed'
   | 'GameFinished'
   | 'SonderkarteTriggered'
-  | 'ArmutCardsExchanged';
+  | 'NewGameVoteChanged'
+  | 'NewGameStarted';
 
 export interface SonderkarteNotification {
   player: number;

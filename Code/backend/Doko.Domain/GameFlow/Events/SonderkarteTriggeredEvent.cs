@@ -5,7 +5,7 @@ namespace Doko.Domain.GameFlow.Events;
 
 public sealed record SonderkarteTriggeredEvent(
     GameId GameId,
-    PlayerId Player,
+    PlayerSeat Player,
     SonderkarteType Type,
     IReadOnlyList<GameStateModification> Modifications
 ) : IDomainEvent;

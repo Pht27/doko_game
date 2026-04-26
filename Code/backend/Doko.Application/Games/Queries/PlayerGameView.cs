@@ -10,7 +10,7 @@ namespace Doko.Application.Games.Queries;
 public record PlayerGameView(
     GameId GameId,
     GamePhase Phase,
-    PlayerId RequestingPlayer,
+    PlayerSeat RequestingPlayer,
     Party? OwnParty,
     IReadOnlyList<Card> Hand,
     IReadOnlyList<Card> LegalCards,
@@ -20,7 +20,7 @@ public record PlayerGameView(
     IReadOnlyList<PlayerPublicState> OtherPlayers,
     TrickSummary? CurrentTrick,
     IReadOnlyList<TrickSummary> CompletedTricks,
-    PlayerId CurrentTurn,
+    PlayerSeat CurrentTurn,
     bool IsMyTurn
 )
 {
@@ -88,4 +88,24 @@ public record PlayerGameView(
     /// (e.g. "KaroSolo", "Hochzeit", "Armut"). Null means Normalspiel.
     /// </summary>
     public string? ActiveGameMode { get; init; } = null;
+
+    /// <summary>
+    /// True when this player won the second ♠Q trick and must choose a solo in
+    /// <see cref="GamePhase.SchwarzesSauSoloSelect"/>.
+    /// </summary>
+    public bool ShouldChooseSchwarzesSauSolo { get; init; } = false;
+
+    /// <summary>
+    /// The solos the player may choose from during <see cref="GamePhase.SchwarzesSauSoloSelect"/>.
+    /// All priorities KaroSolo (0) through SchlankerMartin (8). Empty outside that phase or
+    /// when it is not this player's turn.
+    /// </summary>
+    public IReadOnlyList<ReservationPriority> EligibleSchwarzesSauSolos { get; init; } = [];
+
+    /// <summary>
+    /// The display label for the requesting player's highest effective announcement,
+    /// or null if they have not announced. Matches the format used for other players:
+    /// "Re" / "Kontra" for the Win announcement, "Keine90" etc. for higher ones.
+    /// </summary>
+    public string? OwnHighestAnnouncement { get; init; } = null;
 }

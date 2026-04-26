@@ -15,4 +15,14 @@ public class GameHub : Hub
     {
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, gameId);
     }
+
+    public async Task JoinLobby(string lobbyId)
+    {
+        await Groups.AddToGroupAsync(Context.ConnectionId, $"lobby_{lobbyId}");
+    }
+
+    public async Task LeaveLobby(string lobbyId)
+    {
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"lobby_{lobbyId}");
+    }
 }

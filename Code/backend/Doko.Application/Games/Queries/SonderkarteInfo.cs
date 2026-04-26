@@ -72,12 +72,6 @@ public record SonderkarteInfo(SonderkarteType Type, string Name, string Descript
                 "Kemmerich",
                 "You originally held both ♥ Jacks — you may withdraw one announcement your party has made."
             ),
-
-            [SonderkarteType.Schatz] = new(
-                SonderkarteType.Schatz,
-                "Schatz",
-                "You originally held both ♥ 9s — the point value of ♥ 10s (Dullen) transfers to your ♥ 9s for scoring."
-            ),
         };
 
     public static SonderkarteInfo For(SonderkarteType type) => All[type];

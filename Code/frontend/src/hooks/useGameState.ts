@@ -12,6 +12,10 @@ export interface GameStateResult {
   finishedResult: GameResultDto | null;
   /** Brief notification when a sonderkarte was just triggered; auto-clears after 3 s */
   sonderkarteNotification: SonderkarteNotification | null;
+  /** How many players have voted to start a new game */
+  newGameVoteCount: number;
+  /** Set to the new game's ID when a new-game auto-start fires */
+  newGameId: string | null;
   refetch: () => void;
 }
 
@@ -26,8 +30,11 @@ export function useGameState(
   const [finishedResult, setFinishedResult] = useState<GameResultDto | null>(null);
   const [sonderkarteNotification, setSonderkarteNotification] =
     useState<SonderkarteNotification | null>(null);
+  const [newGameVoteCount, setNewGameVoteCount] = useState(0);
+  const [newGameId, setNewGameId] = useState<string | null>(null);
   const notifTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const connectionRef = useRef<signalR.HubConnection | null>(null);
+  const refetchRef = useRef<(() => void) | null>(null);
 
   const token = tokens[activePlayer];
 
@@ -37,6 +44,10 @@ export function useGameState(
     try {
       const data = await getGameView(token, gameId);
       setView(data);
+      if (data.phase === 'Finished' && data.finishedResult) {
+        setFinishedResult(prev => prev ?? data.finishedResult!);
+        setNewGameVoteCount(prev => prev === 0 ? (data.newGameVoteCount ?? 0) : prev);
+      }
       setError(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -45,10 +56,17 @@ export function useGameState(
     }
   }, [token, gameId]);
 
-  // Reset finished result when the game changes
+  // Reset per-game state when the game changes
   useEffect(() => {
     setFinishedResult(null);
+    setNewGameVoteCount(0);
+    setNewGameId(null);
   }, [gameId]);
+
+  // Keep ref in sync so SignalR handlers always call the latest refetch
+  useEffect(() => {
+    refetchRef.current = refetch;
+  }, [refetch]);
 
   // Re-fetch whenever active player changes
   useEffect(() => {
@@ -62,27 +80,46 @@ export function useGameState(
     connectionRef.current = connection;
 
     const handleEvent = (_payload: unknown) => {
-      refetch();
+      refetchRef.current?.();
     };
 
     const handleGameFinished = (payload: { result: GameResultDto }) => {
       setFinishedResult(payload.result);
-      refetch();
+      refetchRef.current?.();
     };
 
     const handleSonderkarteTriggered = (payload: SonderkarteNotification) => {
       if (notifTimerRef.current) clearTimeout(notifTimerRef.current);
       setSonderkarteNotification(payload);
       notifTimerRef.current = setTimeout(() => setSonderkarteNotification(null), 3000);
-      refetch();
+      refetchRef.current?.();
     };
 
+    connection.on('HealthDeclared', handleEvent);
     connection.on('CardPlayed', handleEvent);
     connection.on('TrickCompleted', handleEvent);
     connection.on('AnnouncementMade', handleEvent);
     connection.on('ReservationMade', handleEvent);
+    connection.on('ArmutResponse', handleEvent);
+    connection.on('ArmutCardsExchanged', handleEvent);
+    connection.on('PartyRevealed', handleEvent);
     connection.on('SonderkarteTriggered', handleSonderkarteTriggered);
     connection.on('GameFinished', handleGameFinished);
+    connection.on('NewGameVoteChanged', (payload: { count: number }) => {
+      setNewGameVoteCount(payload.count);
+    });
+    connection.on('NewGameStarted', (payload: { gameId: string }) => {
+      setNewGameId(payload.gameId);
+    });
+
+    connection.onreconnected(async () => {
+      try {
+        await joinGameGroup(connection, gameId!);
+        refetchRef.current?.();
+      } catch {
+        // reconnect is best-effort
+      }
+    });
 
     connection
       .start()
@@ -94,5 +131,5 @@ export function useGameState(
     };
   }, [gameId, tokens]);
 
-  return { view, loading, error, finishedResult, sonderkarteNotification, refetch };
+  return { view, loading, error, finishedResult, sonderkarteNotification, newGameVoteCount, newGameId, refetch };
 }

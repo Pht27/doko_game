@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import type { PlayerGameViewResponse, TrickSummaryDto } from '../types/api';
-import type { AnimPhase } from '../components/TrickArea/TrickArea';
+import type { AnimPhase } from '@/features/game/TrickArea/TrickArea';
 
 const NEXT: Record<string, AnimPhase> = {
   appear: 'winner',

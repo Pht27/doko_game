@@ -43,7 +43,7 @@ public class ApiTestFixture : WebApplicationFactory<Program>
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(TestJwtKey));
         var descriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity([new Claim("player_id", playerId.ToString())]),
+            Subject = new ClaimsIdentity([new Claim("seat_index", playerId.ToString())]),
             Expires = DateTime.UtcNow.AddHours(1),
             SigningCredentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256),
         };

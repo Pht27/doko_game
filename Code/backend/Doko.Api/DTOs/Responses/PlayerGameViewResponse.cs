@@ -44,4 +44,19 @@ public record PlayerGameViewResponse(
 
     /// <summary>The active game mode (e.g. "KaroSolo", "Hochzeit", "Armut"). Null = Normalspiel.</summary>
     public string? ActiveGameMode { get; init; } = null;
+
+    /// <summary>True when this player must choose a solo during SchwarzesSauSoloSelect.</summary>
+    public bool ShouldChooseSchwarzesSauSolo { get; init; } = false;
+
+    /// <summary>Solos available for selection during SchwarzesSauSoloSelect. Empty otherwise.</summary>
+    public IReadOnlyList<string> EligibleSchwarzesSauSolos { get; init; } = [];
+
+    /// <summary>The requesting player's highest announcement label, or null if none made.</summary>
+    public string? OwnHighestAnnouncement { get; init; } = null;
+
+    /// <summary>Populated when phase is Finished so rejoining players see the result screen immediately.</summary>
+    public GameResultDto? FinishedResult { get; init; } = null;
+
+    /// <summary>Current new-game vote count. Populated together with FinishedResult.</summary>
+    public int NewGameVoteCount { get; init; } = 0;
 }

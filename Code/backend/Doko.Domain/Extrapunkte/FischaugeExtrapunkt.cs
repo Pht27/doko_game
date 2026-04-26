@@ -1,5 +1,6 @@
 using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
+using Doko.Domain.Players;
 using Doko.Domain.Tricks;
 
 namespace Doko.Domain.Extrapunkte;
@@ -14,16 +15,19 @@ public sealed class FischaugeExtrapunkt : IExtrapunkt
 
     public ExtrapunktType Type => ExtrapunktType.Fischauge;
 
-    public IReadOnlyList<ExtrapunktAward> Evaluate(Trick completedTrick, GameState state)
+    public IReadOnlyList<ExtrapunktAward> Evaluate(
+        Trick completedTrick,
+        GameState state,
+        PlayerSeat effectiveTrickWinner
+    )
     {
         if (!AnimalHelpers.FischaugeActive(state))
             return [];
 
-        var winner = completedTrick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
         bool winnerPlayedFischauge = completedTrick.Cards.Any(tc =>
-            tc.Card.Type == KaroNeun && tc.Player == winner
+            tc.Card.Type == KaroNeun && tc.Player == effectiveTrickWinner
         );
 
-        return winnerPlayedFischauge ? [new ExtrapunktAward(Type, winner, 1)] : [];
+        return winnerPlayedFischauge ? [new ExtrapunktAward(Type, effectiveTrickWinner, 1)] : [];
     }
 }

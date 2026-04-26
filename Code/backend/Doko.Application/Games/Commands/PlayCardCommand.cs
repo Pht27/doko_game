@@ -7,12 +7,12 @@ namespace Doko.Application.Games.Commands;
 
 public record PlayCardCommand(
     GameId GameId,
-    PlayerId Player,
+    PlayerSeat Player,
     CardId Card,
     IReadOnlyList<SonderkarteType> ActivateSonderkarten,
     /// <summary>
     /// Required when the player activates Genscherdamen or Gegengenscherdamen.
     /// The named player becomes the Genscher's Re partner.
     /// </summary>
-    PlayerId? GenscherPartner = null
+    PlayerSeat? GenscherPartner = null
 );

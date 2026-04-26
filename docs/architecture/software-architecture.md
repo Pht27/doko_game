@@ -158,7 +158,6 @@ A reservation is declared before play begins. The highest-priority reservation w
 | Type | Kind | Description |
 |---|---|---|
 | `ReservationPriority` | enum | `Solo = 0 \| Armut = 1 \| Hochzeit = 2 \| Schmeissen = 3` |
-| `SoloType` | enum | `KreuzSolo \| PikSolo \| HerzSolo \| KaroSolo \| Damensolo \| Bubensolo \| Fleischloses \| Nullo \| Knochenloses \| SchlankerMartin \| StilleSolo` |
 
 #### Interface
 
@@ -173,7 +172,6 @@ IReservation
 
 | Class | Description |
 |---|---|
-| `SoloReservation(SoloType type, PlayerId player)` | Any solo variant; builds matching `ITrumpEvaluator` |
 | `ArmutReservation(PlayerId player)` | ≤3 trump cards excluding Füchse; player offers trump cards for exchange. If all others decline: `OnDeclined()` returns a `SchwarzeSauGameMode` which activates `SchwarzeSauPartyResolver`. |
 | `HochzeitReservation(PlayerId player)` | Holding both ♣Q; activates `HochzeitPartyResolver` |
 | `SchmeissenReservation(PlayerId player)` | Triggers redeal |
@@ -208,7 +206,7 @@ Sonderkarten are triggered by a player holding **both copies** of a specific car
 
 | Type | Kind | Description |
 |---|---|---|
-| `SonderkarteType` | enum | `Schweinchen \| Superschweinchen \| Hyperschweinchen \| LinksGehangter \| RechtsGehangter \| Genscherdamen \| Gegengenscherdamen \| Heidmann \| Heidfrau \| Kemmerich \| Schatz` |
+| `SonderkarteType` | enum | `Schweinchen \| Superschweinchen \| Hyperschweinchen \| LinksGehangter \| RechtsGehangter \| Genscherdamen \| Gegengenscherdamen \| Heidmann \| Heidfrau \| Kemmerich ` |
 
 #### Sealed `GameStateModification` Hierarchy
 
@@ -242,7 +240,6 @@ ISonderkarte
 |---|---|
 | `GehangterSonderkarte(bool leftward)` | Returns `ReverseDirectionModification` |
 | `KemmerichSonderkarte` | Returns `WithdrawAnnouncementModification` for an announcement of the holder's choice |
-| `SchatzSonderkarte` | Returns `TransferCardPointsModification` for ♥9 *(WIP)* |
 
 #### Registry
 
@@ -421,7 +418,6 @@ RuleSet   // immutable record
   bool EnableHeidmann
   bool EnableHeidfrau
   bool EnableKemmerich
-  bool EnableSchatz
 
   // Announcement mechanics
   bool AllowAnnouncements

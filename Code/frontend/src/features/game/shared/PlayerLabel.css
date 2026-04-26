@@ -1,0 +1,67 @@
+/* PlayerLabel — styles for opponent player name badges */
+@reference "../../../styles/index.css";
+
+.player-label {
+  @apply flex flex-col items-center gap-1 px-3 py-2 rounded-xl text-xs transition-all;
+}
+
+.player-label-active {
+  @apply ring-2 ring-yellow-400 bg-yellow-400/10 text-yellow-300;
+}
+
+.player-label-inactive {
+  @apply text-white/60;
+}
+
+.player-label-top,
+.player-label-left,
+.player-label-right {
+  @apply flex-col;
+}
+
+.player-label-row {
+  @apply flex items-center gap-1.5;
+}
+
+.player-label-name {
+  @apply font-semibold;
+}
+
+.player-name-re {
+  @apply text-re-400;
+}
+
+.player-name-kontra {
+  @apply text-kontra-400;
+}
+
+.player-trick-count {
+  @apply text-[10px] font-bold bg-white/15 rounded px-1 py-0.5 leading-none text-white/70;
+}
+
+.player-label-clickable {
+  @apply cursor-pointer hover:bg-white/10 hover:scale-105 transition-transform;
+}
+
+/* Announcement badge — shown when a player has announced */
+.player-ann-badge {
+  @apply text-[10px] font-bold px-1.5 py-0.5 rounded-md;
+}
+
+.player-ann-re {
+  @apply bg-re-600/80 text-white;
+}
+
+.player-ann-kontra {
+  @apply bg-kontra-600/80 text-white;
+}
+
+.player-ann-other {
+  @apply bg-white/20 text-white;
+}
+
+/* Sonderkarte notification — briefly appears after a sonderkarte is triggered */
+.player-sonderkarte-notif {
+  @apply text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-amber-500/80 text-black
+    animate-pulse;
+}

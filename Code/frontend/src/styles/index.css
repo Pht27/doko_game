@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+@theme {
+  --color-re-300: var(--color-blue-300);
+  --color-re-400: var(--color-blue-400);
+  --color-re-500: var(--color-blue-500);
+  --color-re-600: var(--color-blue-600);
+  /* Kontra: purple — base ≈ #8e27d8 */
+  --color-kontra-300: oklch(78% 0.18 303);
+  --color-kontra-400: oklch(65% 0.23 303);
+  --color-kontra-500: oklch(52% 0.27 303);
+  --color-kontra-600: oklch(43% 0.27 303);
+}
+
 * {
   box-sizing: border-box;
 }

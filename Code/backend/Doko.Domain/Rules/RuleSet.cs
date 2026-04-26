@@ -5,6 +5,8 @@ public record RuleSet
     // Deck
     public bool PlayWithNines { get; init; }
 
+    public int LastTrickIndex => PlayWithNines ? 11 : 9;
+
     // Game modes
     public bool AllowFarbsoli { get; init; }
     public bool AllowDamensolo { get; init; }
@@ -14,6 +16,8 @@ public record RuleSet
     public bool AllowKnochenloses { get; init; }
     public bool AllowSchlankerMartin { get; init; }
     public bool AllowStilleSolo { get; init; }
+    public bool AllowKontrasolo { get; init; }
+    public bool AllowStilleHochzeit { get; init; }
     public bool AllowArmut { get; init; }
     public bool AllowHochzeit { get; init; }
     public bool AllowSchmeissen { get; init; }
@@ -32,7 +36,6 @@ public record RuleSet
     public bool EnableHeidmann { get; init; }
     public bool EnableHeidfrau { get; init; }
     public bool EnableKemmerich { get; init; }
-    public bool EnableSchatz { get; init; }
 
     // Announcements
     public bool AllowAnnouncements { get; init; }
@@ -46,10 +49,13 @@ public record RuleSet
     public bool EnableAgathe { get; init; }
     public bool EnableFischauge { get; init; }
     public bool EnableGansGefangen { get; init; }
-    public bool EnableFestmahl { get; init; }
-    public bool EnableBlutbad { get; init; }
     public bool EnableKlabautermann { get; init; }
     public bool EnableKaffeekranzchen { get; init; }
+
+    // Trick-winner override rules
+    public bool EnableFestmahl { get; init; }
+    public bool EnableBlutbad { get; init; }
+    public bool EnableMeuterei { get; init; }
 
     /// <summary>Standard Koppeldopf rules with all optional features enabled.</summary>
     public static RuleSet Default() =>
@@ -63,6 +69,8 @@ public record RuleSet
             AllowKnochenloses = true,
             AllowSchlankerMartin = true,
             AllowStilleSolo = true,
+            AllowKontrasolo = true,
+            AllowStilleHochzeit = true,
             AllowArmut = true,
             AllowHochzeit = true,
             AllowSchmeissen = true,
@@ -77,7 +85,6 @@ public record RuleSet
             EnableHeidmann = true,
             EnableHeidfrau = true,
             EnableKemmerich = true,
-            EnableSchatz = true,
             AllowAnnouncements = true,
             EnforcePflichtansage = true,
             EnforceFeigheit = true,
@@ -87,10 +94,11 @@ public record RuleSet
             EnableAgathe = true,
             EnableFischauge = true,
             EnableGansGefangen = true,
-            EnableFestmahl = true,
-            EnableBlutbad = true,
             EnableKlabautermann = true,
             EnableKaffeekranzchen = true,
+            EnableFestmahl = true,
+            EnableBlutbad = true,
+            EnableMeuterei = true,
         };
 
     /// <summary>Minimal rules with all optional features disabled.</summary>

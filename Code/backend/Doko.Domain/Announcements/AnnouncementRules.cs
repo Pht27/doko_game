@@ -1,6 +1,7 @@
 using Doko.Domain.GameFlow;
 using Doko.Domain.Parties;
 using Doko.Domain.Players;
+using Doko.Domain.Reservations;
 using Doko.Domain.Scoring;
 
 namespace Doko.Domain.Announcements;
@@ -8,48 +9,30 @@ namespace Doko.Domain.Announcements;
 public static class AnnouncementRules
 {
     /// <summary>Returns true if the player is allowed to make the given announcement in the current game state.</summary>
-    public static bool CanAnnounce(PlayerId player, AnnouncementType type, GameState state)
+    public static bool CanAnnounce(PlayerSeat player, AnnouncementType type, GameState state)
     {
         if (!state.Rules.AllowAnnouncements)
             return false;
 
-        // Timing: base deadline depends on the game type (e.g. in Hochzeit it is relative to the
-        // Findungsstich). Each announcement shifts the deadline forward by 4 (one full trick).
-        var baseDeadline = state.PartyResolver.AnnouncementBaseDeadline(state);
-        if (baseDeadline is null)
-            return false;
-        int totalCardsPlayed =
-            state.CompletedTricks.Count * 4 + (state.CurrentTrick?.Cards.Count ?? 0);
-        int totalAnnouncements = state.Announcements.Count;
-        int deadline = baseDeadline.Value + 4 * totalAnnouncements;
-        if (totalCardsPlayed >= deadline)
+        if (state.ActiveReservation?.Priority == ReservationPriority.SchlankerMartin)
             return false;
 
-        // Party membership check
+        // Kontrasolo player cannot announce at all — they already know they play solo.
+        if (IsKontraSoloPlayer(player, state))
+            return false;
+
+        // Timing: each announcement shifts the deadline forward by 4 (one full trick).
+        // All announcements — including button-only ones — extend the deadline to avoid info leaks.
+        if (PastDeadline(state))
+            return false;
+
         var party = state.PartyResolver.ResolveParty(player, state);
         if (party is null)
             return false;
 
-        var partyAnnouncements = state
-            .Announcements.Where(a => state.PartyResolver.ResolveParty(a.Player, state) == party)
-            .Select(a => a.Type)
-            .ToHashSet();
-
-        // Consecutive ordering: Win must come before Keine90, etc.
-        // The player's party must have already made the preceding announcement.
-        return type switch
-        {
-            AnnouncementType.Win => !partyAnnouncements.Contains(AnnouncementType.Win),
-            AnnouncementType.Keine90 => partyAnnouncements.Contains(AnnouncementType.Win)
-                && !partyAnnouncements.Contains(AnnouncementType.Keine90),
-            AnnouncementType.Keine60 => partyAnnouncements.Contains(AnnouncementType.Keine90)
-                && !partyAnnouncements.Contains(AnnouncementType.Keine60),
-            AnnouncementType.Keine30 => partyAnnouncements.Contains(AnnouncementType.Keine60)
-                && !partyAnnouncements.Contains(AnnouncementType.Keine30),
-            AnnouncementType.Schwarz => partyAnnouncements.Contains(AnnouncementType.Keine30)
-                && !partyAnnouncements.Contains(AnnouncementType.Schwarz),
-            _ => false,
-        };
+        return state.PartyResolver.IsAnnouncementEffective(player, state)
+            ? CanAnnounceEffective(type, party.Value, state)
+            : CanAnnounceButtonOnly(type, party.Value, state);
     }
 
     /// <summary>
@@ -57,7 +40,7 @@ public static class AnnouncementRules
     /// <see cref="Announcement"/> the trick winner is required to make (Pflichtansage),
     /// or null if none applies. Only the first two tricks can trigger a Pflichtansage.
     /// </summary>
-    public static Announcement? GetMandatoryAnnouncement(PlayerId winner, GameState state)
+    public static Announcement? GetMandatoryAnnouncement(PlayerSeat winner, GameState state)
     {
         if (!state.Rules.EnforcePflichtansage)
             return null;
@@ -78,23 +61,26 @@ public static class AnnouncementRules
         if (party is null)
             return null;
 
-        var partyAnnouncements = state
-            .Announcements.Where(a => state.PartyResolver.ResolveParty(a.Player, state) == party)
-            .Select(a => a.Type)
-            .ToHashSet();
+        bool isEffective = state.PartyResolver.IsAnnouncementEffective(winner, state);
+        var announced = isEffective
+            ? EffectiveAnnouncementsFor(party.Value, state)
+            : AllButtonOnlyAnnouncements(state);
 
         AnnouncementType? mandatoryType = null;
-
-        if (!partyAnnouncements.Contains(AnnouncementType.Win))
+        if (!announced.Contains(AnnouncementType.Win))
             mandatoryType = AnnouncementType.Win;
-        else if (count == 2 && !partyAnnouncements.Contains(AnnouncementType.Keine90))
+        else if (count == 2 && !announced.Contains(AnnouncementType.Keine90))
             mandatoryType = AnnouncementType.Keine90;
 
         if (mandatoryType is null)
             return null;
 
         int trickNum = count - 1;
-        return new Announcement(winner, mandatoryType.Value, trickNum, 0) { IsMandatory = true };
+        return new Announcement(winner, mandatoryType.Value, trickNum, 0)
+        {
+            IsMandatory = true,
+            IsEffective = isEffective,
+        };
     }
 
     /// <summary>Returns true if the winning party violated the Feigheit (cowardice) rule.</summary>
@@ -103,17 +89,21 @@ public static class AnnouncementRules
         if (!state.Rules.EnforceFeigheit)
             return false;
 
-        // Feigheit does not apply in Soli
-        if (state.ActiveReservation is not null)
+        // Feigheit does not apply in Soli (declared or silent) or forced Hochzeit solo
+        if (
+            state.ActiveReservation?.IsSolo == true
+            || state.SilentMode is not null
+            || state.HochzeitBecameForcedSolo
+        )
+            return false;
+
+        // Feigheit does not apply when a Genscher changed the teams
+        if (state.GenscherTeamsChanged)
             return false;
 
         var winner = result.Winner;
         var loserAugen = winner == Party.Re ? result.KontraAugen : result.ReAugen;
-
-        var winnerAnnounced = state
-            .Announcements.Where(a => state.PartyResolver.ResolveParty(a.Player, state) == winner)
-            .Select(a => a.Type)
-            .ToHashSet();
+        var winnerAnnounced = EffectiveAnnouncementsFor(winner, state);
 
         int missing = 0;
         if (loserAugen < 120 && !winnerAnnounced.Contains(AnnouncementType.Win))
@@ -137,4 +127,76 @@ public static class AnnouncementRules
 
         return missing > 2;
     }
+
+    // ── Private helpers ───────────────────────────────────────────────────────
+
+    private static bool IsKontraSoloPlayer(PlayerSeat player, GameState state) =>
+        state.SilentMode?.Type == SilentGameModeType.KontraSolo
+        && state.SilentMode.Player == player;
+
+    private static bool PastDeadline(GameState state)
+    {
+        var baseDeadline = state.PartyResolver.AnnouncementBaseDeadline(state);
+        if (baseDeadline is null)
+            return true;
+        int cardsPlayed = state.CompletedTricks.Count * 4 + (state.CurrentTrick?.Cards.Count ?? 0);
+        int deadline = baseDeadline.Value + 4 * state.Announcements.Count;
+        return cardsPlayed > deadline;
+    }
+
+    private static bool CanAnnounceEffective(AnnouncementType type, Party party, GameState state)
+    {
+        var otherParty = party == Party.Re ? Party.Kontra : Party.Re;
+        var myChain = EffectiveAnnouncementsFor(party, state);
+        bool otherHasAbsage = HasAbsage(EffectiveAnnouncementsFor(otherParty, state));
+        return FollowsChain(type, myChain, otherHasAbsage);
+    }
+
+    private static bool CanAnnounceButtonOnly(AnnouncementType type, Party party, GameState state)
+    {
+        // All non-effective announcements are pooled cross-party so that button-only players
+        // can chain off each other AND off the Kontrasolo player's Pflichtansage — preventing
+        // the info leak where B (Re, no ♣Q) detects that A's (Kontra) announcement wasn't normal.
+        return FollowsChain(type, AllButtonOnlyAnnouncements(state), otherHasAbsage: false);
+    }
+
+    private static bool FollowsChain(
+        AnnouncementType type,
+        ISet<AnnouncementType> chain,
+        bool otherHasAbsage
+    ) =>
+        type switch
+        {
+            AnnouncementType.Win => !chain.Contains(AnnouncementType.Win),
+            AnnouncementType.Keine90 => !otherHasAbsage
+                && chain.Contains(AnnouncementType.Win)
+                && !chain.Contains(AnnouncementType.Keine90),
+            AnnouncementType.Keine60 => !otherHasAbsage
+                && chain.Contains(AnnouncementType.Keine90)
+                && !chain.Contains(AnnouncementType.Keine60),
+            AnnouncementType.Keine30 => !otherHasAbsage
+                && chain.Contains(AnnouncementType.Keine60)
+                && !chain.Contains(AnnouncementType.Keine30),
+            AnnouncementType.Schwarz => !otherHasAbsage
+                && chain.Contains(AnnouncementType.Keine30)
+                && !chain.Contains(AnnouncementType.Schwarz),
+            _ => false,
+        };
+
+    private static bool HasAbsage(ISet<AnnouncementType> announcements) =>
+        announcements.Contains(AnnouncementType.Keine90)
+        || announcements.Contains(AnnouncementType.Keine60)
+        || announcements.Contains(AnnouncementType.Keine30)
+        || announcements.Contains(AnnouncementType.Schwarz);
+
+    private static ISet<AnnouncementType> EffectiveAnnouncementsFor(Party party, GameState state) =>
+        state
+            .Announcements.Where(a =>
+                a.IsEffective && state.PartyResolver.ResolveParty(a.Player, state) == party
+            )
+            .Select(a => a.Type)
+            .ToHashSet();
+
+    private static ISet<AnnouncementType> AllButtonOnlyAnnouncements(GameState state) =>
+        state.Announcements.Where(a => !a.IsEffective).Select(a => a.Type).ToHashSet();
 }

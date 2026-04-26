@@ -1,38 +1,23 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using Doko.Api.DTOs.Responses;
+using Doko.Api.Services;
+using Doko.Domain.Players;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Doko.Api.Controllers;
 
 [ApiController]
 [Route("auth")]
-public class AuthController(IConfiguration configuration) : ControllerBase
+public class AuthController(ITokenService tokenService) : ControllerBase
 {
     [HttpPost("token")]
     public IActionResult Token([FromBody] TokenRequest req)
     {
-        if (req.PlayerId < 0 || req.PlayerId > 3)
-            return BadRequest(new ErrorResponse("invalid_player_id"));
+        if (req.SeatIndex < 0 || req.SeatIndex > 3)
+            return BadRequest(new ErrorResponse("invalid_seat_index"));
 
-        var key =
-            configuration["Jwt:Key"]
-            ?? throw new InvalidOperationException("Jwt:Key is not configured.");
-        var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
-
-        var descriptor = new SecurityTokenDescriptor
-        {
-            Subject = new ClaimsIdentity([new Claim("player_id", req.PlayerId.ToString())]),
-            Expires = DateTime.UtcNow.AddDays(1),
-            SigningCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256),
-        };
-
-        var handler = new JwtSecurityTokenHandler();
-        var token = handler.CreateToken(descriptor);
-        return Ok(new { token = handler.WriteToken(token) });
+        var token = tokenService.GenerateToken((PlayerSeat)req.SeatIndex);
+        return Ok(new { token });
     }
 }
 
-public record TokenRequest(int PlayerId);
+public record TokenRequest(int SeatIndex);

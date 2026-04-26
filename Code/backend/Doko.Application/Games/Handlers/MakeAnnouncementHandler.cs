@@ -39,7 +39,11 @@ public sealed class MakeAnnouncementHandler(
         int trickNum = state.CompletedTricks.Count;
         int cardIdx = state.CurrentTrick?.Cards.Count ?? 0;
 
-        var announcement = new Announcement(command.Player, command.Type, trickNum, cardIdx);
+        bool isEffective = state.PartyResolver.IsAnnouncementEffective(command.Player, state);
+        var announcement = new Announcement(command.Player, command.Type, trickNum, cardIdx)
+        {
+            IsEffective = isEffective,
+        };
         state.Apply(new AddAnnouncementModification(announcement));
 
         await repository.SaveAsync(state, ct);

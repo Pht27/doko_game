@@ -1,0 +1,32 @@
+/* SchwarzesSauSoloDialog — mid-game solo selection after the second ♠Q trick */
+@reference "../../../styles/index.css";
+
+.ssd-dialog {
+  @apply bg-gray-800/95 rounded-2xl shadow-2xl border border-white/10 flex flex-col w-full overflow-hidden;
+  max-height: 60svh;
+}
+
+.ssd-header {
+  @apply flex flex-col gap-0.5 px-4 py-3 border-b border-white/10 flex-shrink-0;
+}
+
+.ssd-title {
+  @apply text-white font-bold text-sm;
+}
+
+.ssd-subtitle {
+  @apply text-white/50 text-xs;
+}
+
+.ssd-body {
+  @apply grid grid-cols-2 gap-1.5 p-3 overflow-y-auto;
+}
+
+.ssd-solo-btn {
+  @apply w-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white
+    rounded-lg py-2 text-sm font-medium transition-colors;
+}
+
+.ssd-solo-btn-martin {
+  @apply col-span-2;
+}

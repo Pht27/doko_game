@@ -5,7 +5,7 @@ namespace Doko.Domain.GameFlow.Events;
 
 public sealed record AnnouncementMadeEvent(
     GameId GameId,
-    PlayerId Player,
+    PlayerSeat Player,
     AnnouncementType Type,
     int TrickNumber,
     int CardIndexInTrick

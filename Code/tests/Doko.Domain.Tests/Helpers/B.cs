@@ -4,10 +4,10 @@ namespace Doko.Domain.Tests.Helpers;
 internal static class B
 {
     // ── Players ───────────────────────────────────────────────────────────────
-    public static readonly PlayerId P0 = new(0);
-    public static readonly PlayerId P1 = new(1);
-    public static readonly PlayerId P2 = new(2);
-    public static readonly PlayerId P3 = new(3);
+    public static readonly PlayerSeat P0 = PlayerSeat.First;
+    public static readonly PlayerSeat P1 = PlayerSeat.Second;
+    public static readonly PlayerSeat P2 = PlayerSeat.Third;
+    public static readonly PlayerSeat P3 = PlayerSeat.Fourth;
 
     /// <summary>Four players seated First–Fourth, all with empty hands.</summary>
     public static IReadOnlyList<PlayerState> FourPlayers(
@@ -17,10 +17,10 @@ internal static class B
         Hand? p3 = null
     ) =>
         [
-            new(P0, PlayerSeat.First, p0 ?? Hand.Empty, null),
-            new(P1, PlayerSeat.Second, p1 ?? Hand.Empty, null),
-            new(P2, PlayerSeat.Third, p2 ?? Hand.Empty, null),
-            new(P3, PlayerSeat.Fourth, p3 ?? Hand.Empty, null),
+            new(PlayerSeat.First, p0 ?? Hand.Empty, null),
+            new(PlayerSeat.Second, p1 ?? Hand.Empty, null),
+            new(PlayerSeat.Third, p2 ?? Hand.Empty, null),
+            new(PlayerSeat.Fourth, p3 ?? Hand.Empty, null),
         ];
 
     // ── Cards ─────────────────────────────────────────────────────────────────
@@ -31,7 +31,7 @@ internal static class B
 
     // ── Tricks ────────────────────────────────────────────────────────────────
     /// <summary>Builds a complete 4-card trick from (cardId, suit, rank, player) tuples.</summary>
-    public static Trick Trick(params (byte id, Suit suit, Rank rank, PlayerId player)[] cards)
+    public static Trick Trick(params (byte id, Suit suit, Rank rank, PlayerSeat player)[] cards)
     {
         var trick = new Trick();
         foreach (var (id, suit, rank, player) in cards)
@@ -40,33 +40,40 @@ internal static class B
     }
 
     /// <summary>A TrickResult with no extrapunkt awards.</summary>
-    public static TrickResult Result(Trick trick, PlayerId winner) => new(trick, winner, []);
+    public static TrickResult Result(Trick trick, PlayerSeat winner) => new(trick, winner, []);
 
-    /// <summary>4 Asses (44 Augen), all attributed to <paramref name="winner"/>.</summary>
-    public static TrickResult HighValueTrick(PlayerId winner, byte startId = 0)
+    /// <summary>
+    /// 4 Asses (44 Augen), attributed to <paramref name="winner"/>.
+    /// ♦A (Fuchs) is played by the winner so FuchsGefangen does not fire during re-evaluation.
+    /// </summary>
+    public static TrickResult HighValueTrick(PlayerSeat winner, byte startId = 0)
     {
         var trick = new Trick();
-        trick.Add(new TrickCard(Card(startId, Suit.Kreuz, Rank.Ass), winner));
-        trick.Add(new TrickCard(Card((byte)(startId + 1), Suit.Pik, Rank.Ass), new PlayerId(1)));
-        trick.Add(new TrickCard(Card((byte)(startId + 2), Suit.Herz, Rank.Ass), new PlayerId(2)));
-        trick.Add(new TrickCard(Card((byte)(startId + 3), Suit.Karo, Rank.Ass), new PlayerId(3)));
+        trick.Add(new TrickCard(Card(startId, Suit.Karo, Rank.Ass), winner));
+        trick.Add(new TrickCard(Card((byte)(startId + 1), Suit.Pik, Rank.Ass), PlayerSeat.Second));
+        trick.Add(new TrickCard(Card((byte)(startId + 2), Suit.Herz, Rank.Ass), PlayerSeat.Third));
+        trick.Add(
+            new TrickCard(Card((byte)(startId + 3), Suit.Kreuz, Rank.Ass), PlayerSeat.Fourth)
+        );
         return new TrickResult(trick, winner, []);
     }
 
     /// <summary>4 Nines (0 Augen), all attributed to <paramref name="winner"/>.</summary>
-    public static TrickResult ZeroValueTrick(PlayerId winner, byte startId = 0)
+    public static TrickResult ZeroValueTrick(PlayerSeat winner, byte startId = 0)
     {
         var trick = new Trick();
         trick.Add(new TrickCard(Card(startId, Suit.Kreuz, Rank.Neun), winner));
-        trick.Add(new TrickCard(Card((byte)(startId + 1), Suit.Pik, Rank.Neun), new PlayerId(1)));
-        trick.Add(new TrickCard(Card((byte)(startId + 2), Suit.Herz, Rank.Neun), new PlayerId(2)));
-        trick.Add(new TrickCard(Card((byte)(startId + 3), Suit.Karo, Rank.Neun), new PlayerId(3)));
+        trick.Add(new TrickCard(Card((byte)(startId + 1), Suit.Pik, Rank.Neun), PlayerSeat.Second));
+        trick.Add(new TrickCard(Card((byte)(startId + 2), Suit.Herz, Rank.Neun), PlayerSeat.Third));
+        trick.Add(
+            new TrickCard(Card((byte)(startId + 3), Suit.Karo, Rank.Neun), PlayerSeat.Fourth)
+        );
         return new TrickResult(trick, winner, []);
     }
 
     // ── Announcements ─────────────────────────────────────────────────────────
     public static Announcement Ann(
-        PlayerId player,
+        PlayerSeat player,
         AnnouncementType type,
         bool isMandatory = false,
         int trickNum = 0,
@@ -78,17 +85,39 @@ internal static class B
     public static IPartyResolver SoloResolver() => new SoloPartyResolver(P0);
 
     /// <summary>
+    /// KontraSoloPartyResolver where P0 is the Kontrasolo player (Kontra).
+    /// P1 and P2 hold ♣Q (effective Re); P3 does not (button-only Re).
+    /// Returns the resolver and the matching initial hands.
+    /// </summary>
+    public static (
+        KontraSoloPartyResolver resolver,
+        IReadOnlyDictionary<PlayerSeat, Hand> initialHands
+    ) KontraSoloResolver()
+    {
+        var kreuzDame1 = Card(0, Suit.Kreuz, Rank.Dame);
+        var kreuzDame2 = Card(1, Suit.Kreuz, Rank.Dame);
+        var hands = new Dictionary<PlayerSeat, Hand>
+        {
+            [P0] = HandOf(Card(2, Suit.Pik, Rank.Dame)), // Kontrasolo player, no ♣Q
+            [P1] = HandOf(kreuzDame1), // effective Re
+            [P2] = HandOf(kreuzDame2), // effective Re
+            [P3] = HandOf(Card(3, Suit.Herz, Rank.Ass)), // button-only Re
+        };
+        return (new KontraSoloPartyResolver(P0), hands);
+    }
+
+    /// <summary>
     /// NormalPartyResolver backed by initial hands where P0 and P2 hold ♣Q (Re),
     /// P1 and P3 do not (Kontra).
     /// </summary>
     public static (
         IPartyResolver resolver,
-        IReadOnlyDictionary<PlayerId, Hand> initialHands
+        IReadOnlyDictionary<PlayerSeat, Hand> initialHands
     ) NormalResolver()
     {
         var kreuzDame = Card(0, Suit.Kreuz, Rank.Dame);
         var kreuzDame2 = Card(1, Suit.Kreuz, Rank.Dame);
-        var hands = new Dictionary<PlayerId, Hand>
+        var hands = new Dictionary<PlayerSeat, Hand>
         {
             [P0] = HandOf(kreuzDame),
             [P1] = HandOf(Card(2, Suit.Pik, Rank.Ass)),
@@ -108,7 +137,7 @@ internal static class B
         IReadOnlyList<Trick>? completedTricks = null,
         IReadOnlyList<SonderkarteType>? activeSonderkarten = null,
         IPartyResolver? partyResolver = null,
-        IReadOnlyDictionary<PlayerId, Hand>? initialHands = null
+        IReadOnlyDictionary<PlayerSeat, Hand>? initialHands = null
     ) =>
         GameState.Create(
             rules: rules,

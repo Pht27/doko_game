@@ -1,0 +1,31 @@
+/* AnnouncementButton — styles for the announcement action buttons */
+@reference "../../../styles/index.css";
+
+.announcement-buttons {
+  @apply flex gap-2 justify-center;
+}
+
+.announcement-btn {
+  @apply font-semibold text-xs px-3.5 py-1.5 transition-all;
+  border-radius: 10px;
+}
+
+.announcement-btn-re {
+  background: theme(colors.re.500 / 25%);
+  border: 1px solid theme(colors.re.500 / 40%);
+  color: theme(colors.re.300);
+}
+
+.announcement-btn-re:hover {
+  background: theme(colors.re.500 / 35%);
+}
+
+.announcement-btn-kontra {
+  background: theme(colors.kontra.500 / 25%);
+  border: 1px solid theme(colors.kontra.500 / 40%);
+  color: theme(colors.kontra.300);
+}
+
+.announcement-btn-kontra:hover {
+  background: theme(colors.kontra.500 / 35%);
+}

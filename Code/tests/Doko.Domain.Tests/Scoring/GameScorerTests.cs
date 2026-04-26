@@ -1,13 +1,15 @@
 using Doko.Domain.Tests.Helpers;
+using Xunit.Abstractions;
 
 namespace Doko.Domain.Tests.Scoring;
 
-public class GameScorerTests
+public class GameScorerTests(ITestOutputHelper output)
 {
     private static readonly GameScorer Sut = new();
 
     // Feigheit-free ruleset to isolate non-Feigheit tests from interference.
     private static readonly RuleSet NoFeigheit = RuleSet.Default() with { EnforceFeigheit = false };
+    private readonly ITestOutputHelper _output = output;
 
     // ── Re wins ───────────────────────────────────────────────────────────────
 
@@ -87,6 +89,32 @@ public class GameScorerTests
         result.Winner.Should().Be(Party.Kontra);
         // gameValue = 1 (Gewonnen) + 1 (Gegen die Alten) + threshold bonuses for Re<90
         result.GameValue.Should().BeGreaterThanOrEqualTo(2);
+    }
+
+    [Fact]
+    public void Score_GegenDieAlten_NotAdded_WhenSoloAndKontraWins()
+    {
+        // Solo game (BubensoloReservation active) → Kontra wins but no "Gegen die Alten"
+        var state = GameState.Create(
+            rules: NoFeigheit,
+            players: B.FourPlayers(),
+            partyResolver: B.SoloResolver(),
+            activeReservation: new BubensoloReservation(B.P0)
+        );
+        // Re (solo, P0) wins only 1 trick = 44 Augen; Kontra wins 3 tricks = 132 Augen → Kontra wins
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P0, 0),
+            B.HighValueTrick(B.P1, 4),
+            B.HighValueTrick(B.P1, 8),
+            B.HighValueTrick(B.P1, 12),
+        };
+        var result = Sut.Score(new CompletedGame(state, tricks));
+        result.Winner.Should().Be(Party.Kontra);
+        result.ValueComponents.Should().NotContain(c => c.Label == "Gegen die Alten");
+        // gameValue = 1 (Gewonnen) + threshold bonuses only, no "Gegen die Alten"
+        _output.WriteLine($"Components: {string.Join(", ", result.ValueComponents)}");
+        result.GameValue.Should().Be(3);
     }
 
     [Fact]
@@ -177,6 +205,122 @@ public class GameScorerTests
         result.GameValue.Should().Be(3);
     }
 
+    // ── Absage: automatic loss when Absage unfulfilled ────────────────────────
+
+    [Fact]
+    public void Score_KontraWins_WhenReFailsKeine90Absage()
+    {
+        // Re=143, Kontra=97. Re announced keine 90, but Kontra has 97 ≥ 90 → Re loses automatically.
+        var state = SoloState(
+            rules: NoFeigheit,
+            announcements:
+            [
+                B.Ann(B.P0, AnnouncementType.Win),
+                B.Ann(B.P0, AnnouncementType.Keine90),
+                B.Ann(B.P1, AnnouncementType.Win),
+            ]
+        );
+        // Re: 3×44=132+11=143 (use 3 high tricks + partial), Kontra: 97
+        // Simplest: 3 Re tricks (132) + Kontra trick with 44 = Re 132, Kontra 44 → not 97
+        // Let's do Re=4×44=176-33=143 → too complex; use explicit Augen via trick split
+        // 3 Re tricks (3×44=132), 1 Kontra trick (44), 1 more Kontra trick (44) = Re 132, Kontra 88 < 90 → test wrong
+        // Instead: Re 2 tricks (88), Kontra 3 tricks (132) → Re<121 AND Re's keine90 means Kontra<90 but Kontra=132≥90 → Re loses
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P0, 0),
+            B.HighValueTrick(B.P0, 4),
+            B.HighValueTrick(B.P1, 8),
+            B.HighValueTrick(B.P1, 12),
+            B.HighValueTrick(B.P1, 16),
+        };
+        // Re=88, Kontra=132. Re's keine90 requires Kontra<90, but Kontra=132≥90 → Re loses.
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.Winner.Should().Be(Party.Kontra);
+        result.ReAugen.Should().Be(88);
+        result.KontraAugen.Should().Be(132);
+    }
+
+    [Fact]
+    public void Score_KontraWins_WhenReFailsKeine90_EvenIfReHas121Plus()
+    {
+        // Re=132, Kontra=108. Re announced keine90, but Kontra has 108 ≥ 90.
+        // Even though Re would normally win (132≥121), the Absage failure makes Re lose.
+        var state = SoloState(
+            rules: NoFeigheit,
+            announcements:
+            [
+                B.Ann(B.P0, AnnouncementType.Win),
+                B.Ann(B.P0, AnnouncementType.Keine90),
+            ]
+        );
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P0, 0),
+            B.HighValueTrick(B.P0, 4),
+            B.HighValueTrick(B.P0, 8),
+            B.HighValueTrick(B.P1, 12),
+            B.HighValueTrick(B.P1, 16),
+            B.HighValueTrick(B.P1, 20),
+        };
+        // Re=132, Kontra=132 → Kontra≥90 → Re's keine90 fails → Kontra wins
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.Winner.Should().Be(Party.Kontra);
+    }
+
+    [Fact]
+    public void Score_ReWins_WhenKontraFailsKeine90Absage()
+    {
+        // Kontra announced keine90, but Re has ≥90 → Kontra loses automatically.
+        var state = SoloState(
+            rules: NoFeigheit,
+            announcements:
+            [
+                B.Ann(B.P1, AnnouncementType.Win),
+                B.Ann(B.P1, AnnouncementType.Keine90),
+            ]
+        );
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P0, 0),
+            B.HighValueTrick(B.P0, 4),
+            B.HighValueTrick(B.P0, 8),
+            B.HighValueTrick(B.P1, 12),
+            B.HighValueTrick(B.P1, 16),
+        };
+        // Re=132, Kontra=88. Kontra's keine90 requires Re<90, but Re=132≥90 → Kontra loses.
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.Winner.Should().Be(Party.Re);
+    }
+
+    [Fact]
+    public void Score_Keine90AbsageFulfilled_UsesNormalAugenLogic()
+    {
+        // Re announced keine90, Kontra has 44 < 90 → Absage fulfilled → normal Augen logic applies.
+        var state = SoloState(
+            rules: NoFeigheit,
+            announcements:
+            [
+                B.Ann(B.P0, AnnouncementType.Win),
+                B.Ann(B.P0, AnnouncementType.Keine90),
+            ]
+        );
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P0, 0),
+            B.HighValueTrick(B.P0, 4),
+            B.HighValueTrick(B.P0, 8),
+            B.HighValueTrick(B.P0, 12),
+            B.HighValueTrick(B.P1, 16),
+        };
+        // Re=176, Kontra=44 < 90 → fulfilled → Re wins with normal logic
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.Winner.Should().Be(Party.Re);
+    }
+
     // ── Feigheit ──────────────────────────────────────────────────────────────
 
     [Fact]
@@ -255,43 +399,53 @@ public class GameScorerTests
         result.Winner.Should().Be(Party.Re);
     }
 
-    // ── CardPointTransfers (Schatz) ───────────────────────────────────────────
-
     [Fact]
-    public void Score_SchatzTransfer_ShiftsAugenBetweenCards()
+    public void Score_Feigheit_TotalScore_IncludesExtrapunkte()
     {
-        // Transfer ♦A (11 pts) to ♣A: ♦A worth 0, ♣A worth 11+11=22.
-        // Re wins the ♣A trick; Kontra wins the ♦A trick.
-        // Without transfer: Re=11, Kontra=11. With transfer: Re=22, Kontra=0.
-        var state = SoloState(rules: NoFeigheit);
-        state.Apply(
-            new TransferCardPointsModification(
-                new CardType(Suit.Karo, Rank.Ass), // from ♦A
-                new CardType(Suit.Kreuz, Rank.Ass)
-            )
-        ); // to ♣A
-
-        var reTrick = new Trick();
-        reTrick.Add(new TrickCard(B.Card(0, Suit.Kreuz, Rank.Ass), B.P0));
-        reTrick.Add(new TrickCard(B.Card(1, Suit.Kreuz, Rank.Neun), B.P1));
-        reTrick.Add(new TrickCard(B.Card(2, Suit.Kreuz, Rank.Neun), B.P2));
-        reTrick.Add(new TrickCard(B.Card(3, Suit.Kreuz, Rank.Neun), B.P3));
-
-        var kontraTrick = new Trick();
-        kontraTrick.Add(new TrickCard(B.Card(4, Suit.Karo, Rank.Ass), B.P1));
-        kontraTrick.Add(new TrickCard(B.Card(5, Suit.Kreuz, Rank.Neun), B.P0));
-        kontraTrick.Add(new TrickCard(B.Card(6, Suit.Kreuz, Rank.Neun), B.P2));
-        kontraTrick.Add(new TrickCard(B.Card(7, Suit.Kreuz, Rank.Neun), B.P3));
-
+        // Re wins 176 vs 0 → Feigheit (5 missing announcements, penalty=3).
+        // Re also gets a Doppelkopf award (loserExtra=1, since Re is the loser after flip).
+        // Kontra (winner after flip) has no extras → winnerExtra=0.
+        // TotalScore = penalty(3) + winnerExtra(0) - loserExtra(1) = 2.
+        var state = SoloState();
+        var reAward = new ExtrapunktAward(ExtrapunktType.Doppelkopf, B.P0, 1); // Re benefits
         var tricks = new List<TrickResult>
         {
-            new(reTrick, B.P0, []), // Re wins ♣A trick
-            new(kontraTrick, B.P1, []), // Kontra wins ♦A trick
+            new(B.HighValueTrick(B.P0, 0).Trick, B.P0, [reAward]),
+            B.HighValueTrick(B.P0, 4),
+            B.HighValueTrick(B.P0, 8),
+            B.HighValueTrick(B.P0, 12),
+            B.ZeroValueTrick(B.P1, 16),
         };
         var result = Sut.Score(new CompletedGame(state, tricks));
 
-        result.ReAugen.Should().Be(22); // ♣A = 11 + 11 (absorbed ♦A points)
-        result.KontraAugen.Should().Be(0); // ♦A = 0 (transferred away)
+        result.Feigheit.Should().BeTrue();
+        result.Winner.Should().Be(Party.Kontra); // flipped
+        result.GameValue.Should().Be(3); // Feigheit penalty only
+        result.ValueComponents.Should().ContainSingle(c => c.Label == "Feigheit" && c.Value == 3);
+        result.AllAwards.Should().ContainSingle(a => a.Type == ExtrapunktType.Doppelkopf);
+        result.TotalScore.Should().Be(2); // penalty(3) - loserExtra(1) = 2
+    }
+
+    [Fact]
+    public void Score_Feigheit_TotalScore_WinnerExtraAdded()
+    {
+        // Re wins 176 vs 0 → Feigheit (penalty=3). Kontra (winner after flip) gets a Doppelkopf.
+        // TotalScore = penalty(3) + winnerExtra(1) - loserExtra(0) = 4.
+        var state = SoloState();
+        var kontraAward = new ExtrapunktAward(ExtrapunktType.Doppelkopf, B.P1, 1); // Kontra benefits
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P0, 0),
+            B.HighValueTrick(B.P0, 4),
+            B.HighValueTrick(B.P0, 8),
+            B.HighValueTrick(B.P0, 12),
+            new(B.ZeroValueTrick(B.P1, 16).Trick, B.P1, [kontraAward]),
+        };
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.Feigheit.Should().BeTrue();
+        result.Winner.Should().Be(Party.Kontra);
+        result.TotalScore.Should().Be(4); // penalty(3) + winnerExtra(1) = 4
     }
 
     // ── SoloFactor + TotalScore ───────────────────────────────────────────────
@@ -390,10 +544,151 @@ public class GameScorerTests
 
         result.SoloFactor.Should().Be(3);
         result.GameValue.Should().Be(1);
-        result.TotalScore.Should().Be(4); // 1 × 3 + 1 (extrapunkt, NOT multiplied by soloFactor)
+        result.TotalScore.Should().Be(6); // (GameValue 1 + winnerExtra 1) × soloFactor 3
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void Score_SoloFactor_IsThree_WhenSilentModeActive()
+    {
+        // SilentMode = KontraSolo → soloFactor = 3 even without an ActiveReservation
+        var state = SoloState(rules: NoFeigheit);
+        state.Apply(
+            new SetSilentGameModeModification(
+                new SilentGameMode(SilentGameModeType.KontraSolo, B.P0)
+            )
+        );
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P0, 0),
+            B.HighValueTrick(B.P0, 4),
+            B.HighValueTrick(B.P0, 8),
+            B.HighValueTrick(B.P1, 12),
+            B.HighValueTrick(B.P1, 16),
+            B.HighValueTrick(B.P1, 20),
+        };
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.SoloFactor.Should().Be(3);
+    }
+
+    [Fact]
+    public void Score_SoloFactor_IsThree_WhenHochzeitBecameForcedSolo()
+    {
+        // HochzeitBecameForcedSolo=true → soloFactor=3 even though ActiveReservation.IsSolo=false
+        var state = SoloState(rules: NoFeigheit);
+        state.Apply(new SetHochzeitForcedSoloModification());
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P0, 0),
+            B.HighValueTrick(B.P0, 4),
+            B.HighValueTrick(B.P0, 8),
+            B.HighValueTrick(B.P1, 12),
+            B.HighValueTrick(B.P1, 16),
+            B.HighValueTrick(B.P1, 20),
+        };
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.SoloFactor.Should().Be(3);
+    }
+
+    // ── Kontrasolo: button-only announcements have no scoring effect ──────────
+
+    [Fact]
+    public void Score_ButtonOnlyAnnouncement_DoesNotAddToGameValue()
+    {
+        // P3 makes a button-only Win (IsEffective=false) — game value must stay at 1 (Gewonnen only).
+        var (resolver, hands) = B.KontraSoloResolver();
+        var buttonOnlyWin = new Announcement(B.P3, AnnouncementType.Win, 0, 0)
+        {
+            IsEffective = false,
+        };
+        var state = GameState.Create(
+            rules: NoFeigheit,
+            players: B.FourPlayers(),
+            partyResolver: resolver,
+            initialHands: hands,
+            announcements: [buttonOnlyWin]
+        );
+        // P1+P2 (Re, effective) win enough tricks.
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P1, 0),
+            B.HighValueTrick(B.P1, 4),
+            B.HighValueTrick(B.P1, 8),
+            B.HighValueTrick(B.P0, 12), // Kontrasolo player (Kontra) wins one trick
+        };
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        // Gewonnen(1) + Keine90-threshold(1) + Keine60-threshold(1) = 3; no announcement point.
+        result.GameValue.Should().Be(3);
+        result.AnnouncementRecords.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Score_ButtonOnlyAbsage_DoesNotCauseUnfulfilledAbsageLoss()
+    {
+        // P3 makes a button-only Keine90. Re wins but Kontra still gets ≥ 90 Augen.
+        // Without IsEffective=false this would normally count as an unfulfilled Absage and Re would lose.
+        var (resolver, hands) = B.KontraSoloResolver();
+        var buttonOnlyWin = new Announcement(B.P3, AnnouncementType.Win, 0, 0)
+        {
+            IsEffective = false,
+        };
+        var buttonOnlyKeine90 = new Announcement(B.P3, AnnouncementType.Keine90, 0, 0)
+        {
+            IsEffective = false,
+        };
+        var state = GameState.Create(
+            rules: NoFeigheit,
+            players: B.FourPlayers(),
+            partyResolver: resolver,
+            initialHands: hands,
+            announcements: [buttonOnlyWin, buttonOnlyKeine90]
+        );
+        // Re wins (≥121 Augen) but Kontra gets 90+ Augen.
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P1, 0), // Re: 44
+            B.HighValueTrick(B.P1, 4), // Re: 44
+            B.HighValueTrick(B.P1, 8), // Re: 44
+            B.HighValueTrick(B.P0, 12), // Kontra: 44  (≥90 → would fail real Keine90)
+            B.HighValueTrick(B.P0, 16), // Kontra: 44
+            B.HighValueTrick(B.P0, 20), // Kontra: 44
+        };
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        // Re wins because no effective Keine90 was made — the button-only one doesn't count.
+        result.Winner.Should().Be(Party.Re);
+    }
+
+    [Fact]
+    public void Score_EffectiveAnnouncement_AddsToGameValue()
+    {
+        // Effective Win by P1 (has ♣Q) must add +1 to game value.
+        var (resolver, hands) = B.KontraSoloResolver();
+        var effectiveWin = B.Ann(B.P1, AnnouncementType.Win);
+        var state = GameState.Create(
+            rules: NoFeigheit,
+            players: B.FourPlayers(),
+            partyResolver: resolver,
+            initialHands: hands,
+            announcements: [effectiveWin]
+        );
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P1, 0),
+            B.HighValueTrick(B.P1, 4),
+            B.HighValueTrick(B.P1, 8),
+            B.HighValueTrick(B.P0, 12),
+        };
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        // Gewonnen(1) + Keine90-threshold(1) + Keine60-threshold(1) + Re-Win-announcement(1) = 4.
+        result.GameValue.Should().Be(4);
+        result.AnnouncementRecords.Should().HaveCount(1);
+    }
 
     private static GameState SoloState(
         RuleSet? rules = null,
@@ -404,5 +699,142 @@ public class GameScorerTests
             players: B.FourPlayers(),
             partyResolver: B.SoloResolver(), // P0=Re, P1/P2/P3=Kontra
             announcements: announcements
+        );
+
+    // ── Schlanker Martin ──────────────────────────────────────────────────────
+
+    [Fact]
+    public void SchlankerMartin_ReWins_WhenSoloHasFewestTricks()
+    {
+        // P0 (Re/solo) wins 2 tricks; P1/P2/P3 each win 2 → fewest, so Re wins
+        // Actual: P0=2, P1=4, P2=2, P3=2 → solo still has fewest via <=
+        var state = SchlankerMartinState();
+        var tricks = new List<TrickResult>
+        {
+            B.ZeroValueTrick(B.P0, 0),
+            B.ZeroValueTrick(B.P1, 4),
+            B.ZeroValueTrick(B.P1, 8),
+            B.ZeroValueTrick(B.P1, 12),
+            B.ZeroValueTrick(B.P1, 16),
+            B.ZeroValueTrick(B.P0, 20),
+            B.ZeroValueTrick(B.P2, 24),
+            B.ZeroValueTrick(B.P2, 28),
+            B.ZeroValueTrick(B.P3, 32),
+            B.ZeroValueTrick(B.P3, 36),
+        };
+        // P0=2, P1=4, P2=2, P3=2  → soloTricks(2) <= kontraMin(2) → Re wins, tie → gameValue=0
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.Winner.Should().Be(Party.Re);
+        result.GameValue.Should().Be(0);
+        result.TotalScore.Should().Be(0);
+        result.SoloFactor.Should().Be(3);
+    }
+
+    [Fact]
+    public void SchlankerMartin_ReWins_WhenSoloHasStrictlyFewestTricks()
+    {
+        // P0=1, P1=3, P2=3, P3=3  → soloTricks(1) < kontraMin(3) → Re wins with gameValue=1
+        var state = SchlankerMartinState();
+        var tricks = new List<TrickResult>
+        {
+            B.ZeroValueTrick(B.P0, 0),
+            B.ZeroValueTrick(B.P1, 4),
+            B.ZeroValueTrick(B.P1, 8),
+            B.ZeroValueTrick(B.P1, 12),
+            B.ZeroValueTrick(B.P2, 16),
+            B.ZeroValueTrick(B.P2, 20),
+            B.ZeroValueTrick(B.P2, 24),
+            B.ZeroValueTrick(B.P3, 28),
+            B.ZeroValueTrick(B.P3, 32),
+            B.ZeroValueTrick(B.P3, 36),
+        };
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.Winner.Should().Be(Party.Re);
+        result.GameValue.Should().Be(1);
+        result.TotalScore.Should().Be(3);
+    }
+
+    [Fact]
+    public void SchlankerMartin_KontraWins_WhenAnotherPlayerHasFewerTricks()
+    {
+        // P0=4, P1=2, P2=2, P3=2 → soloTricks(4) > kontraMin(2) → Re loses, gameValue=1
+        var state = SchlankerMartinState();
+        var tricks = new List<TrickResult>
+        {
+            B.ZeroValueTrick(B.P0, 0),
+            B.ZeroValueTrick(B.P0, 4),
+            B.ZeroValueTrick(B.P0, 8),
+            B.ZeroValueTrick(B.P0, 12),
+            B.ZeroValueTrick(B.P1, 16),
+            B.ZeroValueTrick(B.P1, 20),
+            B.ZeroValueTrick(B.P2, 24),
+            B.ZeroValueTrick(B.P2, 28),
+            B.ZeroValueTrick(B.P3, 32),
+            B.ZeroValueTrick(B.P3, 36),
+        };
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.Winner.Should().Be(Party.Kontra);
+        result.GameValue.Should().Be(1);
+        result.TotalScore.Should().Be(3);
+    }
+
+    [Fact]
+    public void SchlankerMartin_IgnoresAugen_ForWinnerDecision()
+    {
+        // P0 wins 2 tricks with high Augen, others win 3 each → Re wins by trick count despite more Augen
+        var state = SchlankerMartinState();
+        var tricks = new List<TrickResult>
+        {
+            B.HighValueTrick(B.P0, 0),
+            B.HighValueTrick(B.P0, 4),
+            B.ZeroValueTrick(B.P1, 8),
+            B.ZeroValueTrick(B.P1, 12),
+            B.ZeroValueTrick(B.P1, 16),
+            B.ZeroValueTrick(B.P2, 20),
+            B.ZeroValueTrick(B.P2, 24),
+            B.ZeroValueTrick(B.P2, 28),
+            B.ZeroValueTrick(B.P3, 32),
+            B.ZeroValueTrick(B.P3, 36),
+        };
+        // P0=2 (lots of Augen), P1=3, P2=3, P3=2 → soloTricks(2) <= kontraMin(2) → Re wins, tie
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.Winner.Should().Be(Party.Re);
+        result.GameValue.Should().Be(0);
+    }
+
+    [Fact]
+    public void SchlankerMartin_NoExtrapunkteOrAnnouncements()
+    {
+        var state = SchlankerMartinState();
+        var tricks = new List<TrickResult>
+        {
+            B.ZeroValueTrick(B.P0, 0),
+            B.ZeroValueTrick(B.P1, 4),
+            B.ZeroValueTrick(B.P1, 8),
+            B.ZeroValueTrick(B.P1, 12),
+            B.ZeroValueTrick(B.P1, 16),
+            B.ZeroValueTrick(B.P0, 20),
+            B.ZeroValueTrick(B.P2, 24),
+            B.ZeroValueTrick(B.P2, 28),
+            B.ZeroValueTrick(B.P3, 32),
+            B.ZeroValueTrick(B.P3, 36),
+        };
+        var result = Sut.Score(new CompletedGame(state, tricks));
+
+        result.AllAwards.Should().BeEmpty();
+        result.AnnouncementRecords.Should().BeEmpty();
+        result.Feigheit.Should().BeFalse();
+    }
+
+    private static GameState SchlankerMartinState() =>
+        GameState.Create(
+            rules: RuleSet.Default(),
+            players: B.FourPlayers(),
+            partyResolver: B.SoloResolver(),
+            activeReservation: new SchlankerMartinReservation(B.P0)
         );
 }

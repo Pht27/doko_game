@@ -9,9 +9,9 @@ namespace Doko.Domain.Reservations;
 /// <summary>Fleischloses (Nullo): no trump; plain rank A > 10 > K > Q > J > 9.</summary>
 public sealed class FleischlosesReservation : IReservation
 {
-    private readonly PlayerId _soloPlayer;
+    private readonly PlayerSeat _soloPlayer;
 
-    public FleischlosesReservation(PlayerId soloPlayer) => _soloPlayer = soloPlayer;
+    public FleischlosesReservation(PlayerSeat soloPlayer) => _soloPlayer = soloPlayer;
 
     public ReservationPriority Priority => ReservationPriority.Fleischloses;
 

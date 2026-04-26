@@ -4,6 +4,7 @@ using Doko.Application.Games.Commands;
 using Doko.Application.Games.Results;
 using Doko.Domain.GameFlow;
 using Doko.Domain.GameFlow.Events;
+using Doko.Domain.Parties;
 using Doko.Domain.Players;
 using Doko.Domain.Reservations;
 using Doko.Domain.Sonderkarten;
@@ -84,7 +85,7 @@ public sealed class MakeReservationHandler(
         if (!IsAllowedInPhase(command.Reservation, state.Phase, state))
             return GameError.ReservationNotEligible;
 
-        var playerState = state.Players.First(p => p.Id == command.Player);
+        var playerState = state.Players.First(p => p.Seat == command.Player);
         if (
             command.Reservation is not null
             && !command.Reservation.IsEligible(playerState.Hand, state.Rules)
@@ -196,9 +197,13 @@ public sealed class MakeReservationHandler(
             );
         }
 
-        // No Solo — advance to Armut check
-        AdvanceToNextCheckPhase(state, GamePhase.ReservationArmutCheck, VorbehaltPlayers(state));
-        return await SaveAndReturnOk(state, events, new MakeReservationResult(false, null), ct);
+        // No Solo — advance to Armut check (skipping players not eligible for Armut)
+        return await AdvanceToNextCheckPhaseOrResolveAsync(
+            state,
+            events,
+            GamePhase.ReservationArmutCheck,
+            ct
+        );
     }
 
     private async Task<GameActionResult<MakeReservationResult>> ResolveArmutCheckAsync(
@@ -212,11 +217,11 @@ public sealed class MakeReservationHandler(
         if (winner is ArmutReservation)
         {
             // Find which player declared Armut (first in order = lowest seat)
-            var armutPlayerId = FirstDeclarantId(state, winner);
-            state.Apply(new SetArmutPlayerModification(armutPlayerId));
+            var armutPlayerSeat = FirstDeclarantId(state, winner);
+            state.Apply(new SetArmutPlayerModification(armutPlayerSeat));
 
             // Determine partner-finding queue: players after poor player in seat order
-            var partnerCandidates = PlayersAfter(state, armutPlayerId);
+            var partnerCandidates = PlayersAfter(state, armutPlayerSeat);
             state.Apply(new SetPendingRespondersModification(partnerCandidates));
             state.Apply(new AdvancePhaseModification(GamePhase.ArmutPartnerFinding));
             state.Apply(new SetCurrentTurnModification(partnerCandidates[0]));
@@ -229,13 +234,13 @@ public sealed class MakeReservationHandler(
             );
         }
 
-        // No Armut — advance to Schmeißen check
-        AdvanceToNextCheckPhase(
+        // No Armut — advance to Schmeißen check (skipping players not eligible for Schmeißen)
+        return await AdvanceToNextCheckPhaseOrResolveAsync(
             state,
+            events,
             GamePhase.ReservationSchmeissenCheck,
-            VorbehaltPlayers(state)
+            ct
         );
-        return await SaveAndReturnOk(state, events, new MakeReservationResult(false, null), ct);
     }
 
     private async Task<GameActionResult<MakeReservationResult>> ResolveSchmeissenCheckAsync(
@@ -257,9 +262,13 @@ public sealed class MakeReservationHandler(
             );
         }
 
-        // No Schmeißen — advance to Hochzeit check
-        AdvanceToNextCheckPhase(state, GamePhase.ReservationHochzeitCheck, VorbehaltPlayers(state));
-        return await SaveAndReturnOk(state, events, new MakeReservationResult(false, null), ct);
+        // No Schmeißen — advance to Hochzeit check (skipping players not eligible for Hochzeit)
+        return await AdvanceToNextCheckPhaseOrResolveAsync(
+            state,
+            events,
+            GamePhase.ReservationHochzeitCheck,
+            ct
+        );
     }
 
     private async Task<GameActionResult<MakeReservationResult>> ResolveHochzeitCheckAsync(
@@ -314,7 +323,11 @@ public sealed class MakeReservationHandler(
     {
         state.Apply(new SetGameModeModification(winner));
         state.Apply(new AdvancePhaseModification(GamePhase.Playing));
-        state.Apply(new SetCurrentTurnModification(state.Players[0].Id));
+        // Solo declarer leads in Solo games; VorbehaltRauskommer leads otherwise.
+        var spieleRauskommer = IsSoloReservation(winner)
+            ? FirstDeclarantId(state, winner)
+            : state.VorbehaltRauskommer;
+        state.Apply(new SetCurrentTurnModification(spieleRauskommer));
     }
 
     /// <summary>
@@ -323,17 +336,17 @@ public sealed class MakeReservationHandler(
     /// </summary>
     private static void ApplyFallbackGameMode(
         Domain.GameFlow.GameState state,
-        PlayerId martinPlayer
+        PlayerSeat martinPlayer
     )
     {
-        var playerState = state.Players.First(p => p.Id == martinPlayer);
+        var playerState = state.Players.First(p => p.Seat == martinPlayer);
         var schlankerMartin = new SchlankerMartinReservation(martinPlayer);
         var gameMode = schlankerMartin.IsEligible(playerState.Hand, state.Rules)
             ? (IReservation?)schlankerMartin
             : null;
         state.Apply(new SetGameModeModification(gameMode));
         state.Apply(new AdvancePhaseModification(GamePhase.Playing));
-        state.Apply(new SetCurrentTurnModification(state.Players[0].Id));
+        state.Apply(new SetCurrentTurnModification(state.VorbehaltRauskommer));
     }
 
     /// <summary>
@@ -344,51 +357,116 @@ public sealed class MakeReservationHandler(
         state
             .ReservationDeclarations.Where(kv => kv.Value is not null)
             .OrderBy(kv => kv.Value!.Priority)
-            .ThenBy(kv => (int)state.Players.First(p => p.Id == kv.Key).Seat)
+            .ThenBy(kv => (int)kv.Key)
             .Select(kv => kv.Value)
             .FirstOrDefault();
 
     /// <summary>Returns the player ID of the first declarant of the given reservation (by seat order).</summary>
-    private static PlayerId FirstDeclarantId(
+    private static PlayerSeat FirstDeclarantId(
         Domain.GameFlow.GameState state,
         IReservation target
     ) =>
         state
             .ReservationDeclarations.Where(kv => kv.Value?.Priority == target.Priority)
-            .OrderBy(kv => (int)state.Players.First(p => p.Id == kv.Key).Seat)
+            .OrderBy(kv => (int)kv.Key)
             .First()
             .Key;
 
     /// <summary>Returns Vorbehalt players in seat order.</summary>
-    private static IReadOnlyList<PlayerId> VorbehaltPlayers(Domain.GameFlow.GameState state) =>
+    private static IReadOnlyList<PlayerSeat> VorbehaltPlayers(Domain.GameFlow.GameState state) =>
         state
-            .Players.Where(p => state.HealthDeclarations.TryGetValue(p.Id, out var hasV) && hasV)
-            .Select(p => p.Id)
+            .Players.Where(p => state.HealthDeclarations.TryGetValue(p.Seat, out var hasV) && hasV)
+            .Select(p => p.Seat)
             .ToList();
 
     /// <summary>Returns players seated after <paramref name="player"/> (wrapping around), in seat order.</summary>
-    private static IReadOnlyList<PlayerId> PlayersAfter(
+    private static IReadOnlyList<PlayerSeat> PlayersAfter(
         Domain.GameFlow.GameState state,
-        PlayerId player
+        PlayerSeat player
     )
     {
-        int seat = (int)state.Players.First(p => p.Id == player).Seat;
+        int seat = (int)player;
         return state
             .Players.OrderBy(p => ((int)p.Seat - seat + 4) % 4)
             .Skip(1) // exclude the player themselves
-            .Select(p => p.Id)
+            .Select(p => p.Seat)
             .ToList();
     }
 
-    private static void AdvanceToNextCheckPhase(
+    /// <summary>
+    /// Advances to the next check phase, but only queues players who are eligible for that
+    /// phase's reservation type. If no eligible players remain, the phase is resolved immediately
+    /// (everyone auto-passes), which may cascade further until a winner is found or the game starts.
+    /// </summary>
+    private async Task<
+        GameActionResult<MakeReservationResult>
+    > AdvanceToNextCheckPhaseOrResolveAsync(
         Domain.GameFlow.GameState state,
+        List<IDomainEvent> events,
         GamePhase next,
-        IReadOnlyList<PlayerId> players
+        CancellationToken ct
     )
     {
+        var eligible = EligiblePlayersForPhase(state, next);
         state.Apply(new ClearReservationDeclarationsModification());
-        state.Apply(new SetPendingRespondersModification(players));
         state.Apply(new AdvancePhaseModification(next));
-        state.Apply(new SetCurrentTurnModification(players[0]));
+
+        if (eligible.Count > 0)
+        {
+            state.Apply(new SetPendingRespondersModification(eligible));
+            state.Apply(new SetCurrentTurnModification(eligible[0]));
+            return await SaveAndReturnOk(state, events, new MakeReservationResult(false, null), ct);
+        }
+
+        // No eligible players — resolve the phase immediately with empty declarations
+        state.Apply(new SetPendingRespondersModification([]));
+        return await ResolvePhaseAsync(state, events, ct);
+    }
+
+    /// <summary>
+    /// Returns the Vorbehalt players who are eligible to declare the reservation type for
+    /// the given phase. For SoloCheck the full Vorbehalt list is returned (no filtering).
+    /// </summary>
+    private static IReadOnlyList<PlayerSeat> EligiblePlayersForPhase(
+        Domain.GameFlow.GameState state,
+        GamePhase phase
+    )
+    {
+        var vorbehalt = VorbehaltPlayers(state);
+        return phase switch
+        {
+            GamePhase.ReservationArmutCheck =>
+            [
+                .. vorbehalt.Where(seat =>
+                {
+                    var ps = state.Players.First(p => p.Seat == seat);
+                    var dummyPartner = (PlayerSeat)(((int)seat + 1) % 4);
+                    return new ArmutReservation(seat, dummyPartner).IsEligible(
+                        ps.Hand,
+                        state.Rules
+                    );
+                }),
+            ],
+            GamePhase.ReservationSchmeissenCheck =>
+            [
+                .. vorbehalt.Where(seat =>
+                {
+                    var ps = state.Players.First(p => p.Seat == seat);
+                    return new SchmeissenReservation().IsEligible(ps.Hand, state.Rules);
+                }),
+            ],
+            GamePhase.ReservationHochzeitCheck =>
+            [
+                .. vorbehalt.Where(seat =>
+                {
+                    var ps = state.Players.First(p => p.Seat == seat);
+                    return new HochzeitReservation(seat, HochzeitCondition.FirstTrick).IsEligible(
+                        ps.Hand,
+                        state.Rules
+                    );
+                }),
+            ],
+            _ => vorbehalt,
+        };
     }
 }

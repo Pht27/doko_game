@@ -19,7 +19,7 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
 {
     public async Task<PlayerGameView?> GetPlayerViewAsync(
         GameId gameId,
-        PlayerId requestingPlayer,
+        PlayerSeat requestingPlayer,
         CancellationToken ct = default
     )
     {
@@ -27,95 +27,145 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
         if (state is null)
             return null;
 
-        var playerState = state.Players.FirstOrDefault(p => p.Id == requestingPlayer);
+        var playerState = state.Players.FirstOrDefault(p => p.Seat == requestingPlayer);
         if (playerState is null)
             return null;
 
         var hand = playerState.Hand.Cards;
         bool isMyTurn = state.Phase == GamePhase.Playing && state.CurrentTurn == requestingPlayer;
 
-        // Own party — null when not yet known (e.g. Hochzeit before Findungsstich)
-        var ownParty = state.PartyResolver.ResolveParty(requestingPlayer, state);
-
-        // Legal cards: only relevant when it's this player's turn
-        IReadOnlyList<Card> legalCards = [];
-        if (isMyTurn && state.CurrentTrick is not null)
+        return new PlayerGameView(
+            gameId,
+            state.Phase,
+            requestingPlayer,
+            GetAnnouncementDisplayParty(requestingPlayer, state),
+            hand,
+            BuildLegalCards(playerState, hand, isMyTurn, state),
+            BuildLegalAnnouncements(requestingPlayer, state),
+            BuildEligibleSonderkarten(hand, isMyTurn, state),
+            BuildOtherPlayers(requestingPlayer, state),
+            BuildCurrentTrickSummary(state),
+            state.ScoredTricks.Select((r, i) => ToCompletedTrickSummary(i, r)).ToList(),
+            state.CurrentTurn,
+            isMyTurn
+        )
         {
-            var trick = state.CurrentTrick ?? new Trick();
-            legalCards = hand.Where(c =>
-                    CardPlayValidator.CanPlay(c, playerState.Hand, trick, state.TrumpEvaluator)
+            HandSorted = BuildHandSorted(hand, state),
+            ShouldDeclareHealth = BuildShouldDeclareHealth(requestingPlayer, state),
+            ShouldDeclareReservation = IsCheckPhaseTurn(requestingPlayer, state),
+            EligibleReservations = BuildEligibleReservations(requestingPlayer, playerState, state),
+            MustDeclareReservation = BuildMustDeclareReservation(requestingPlayer, state),
+            ShouldRespondToArmut = BuildShouldRespondToArmut(requestingPlayer, state),
+            ShouldReturnArmutCards =
+                state.Phase == GamePhase.ArmutCardExchange
+                && state.ArmutRichPlayer == requestingPlayer,
+            ArmutCardReturnCount = BuildArmutCardReturnCount(requestingPlayer, state),
+            ArmutExchangeCardCount = state.ArmutReturnedTrump.HasValue
+                ? state.ArmutTransferCount
+                : null,
+            ArmutReturnedTrump = state.ArmutReturnedTrump,
+            ActiveGameMode = state.ActiveReservation?.Priority.ToString(),
+            ShouldChooseSchwarzesSauSolo = BuildShouldChooseSchwarzesSauSolo(
+                requestingPlayer,
+                state
+            ),
+            EligibleSchwarzesSauSolos = BuildEligibleSchwarzesSauSolos(requestingPlayer, state),
+            OwnHighestAnnouncement = BuildOwnHighestAnnouncement(requestingPlayer, state),
+        };
+    }
+
+    private static IReadOnlyList<Card> BuildLegalCards(
+        PlayerState playerState,
+        IReadOnlyList<Card> hand,
+        bool isMyTurn,
+        GameState state
+    )
+    {
+        if (!isMyTurn)
+            return [];
+        if (state.CurrentTrick is null)
+            return hand.ToList();
+        return hand.Where(c =>
+                CardPlayValidator.CanPlay(
+                    c,
+                    playerState.Hand,
+                    state.CurrentTrick,
+                    state.TrumpEvaluator
                 )
+            )
+            .ToList();
+    }
+
+    private static IReadOnlyList<AnnouncementType> BuildLegalAnnouncements(
+        PlayerSeat player,
+        GameState state
+    )
+    {
+        if (state.Phase != GamePhase.Playing)
+            return [];
+        return Enum.GetValues<AnnouncementType>()
+            .Where(t => AnnouncementRules.CanAnnounce(player, t, state))
+            .ToList();
+    }
+
+    private static Dictionary<CardId, IReadOnlyList<SonderkarteInfo>> BuildEligibleSonderkarten(
+        IReadOnlyList<Card> hand,
+        bool isMyTurn,
+        GameState state
+    )
+    {
+        if (!isMyTurn)
+            return [];
+        var result = new Dictionary<CardId, IReadOnlyList<SonderkarteInfo>>();
+        foreach (var card in hand)
+        {
+            var eligible = SonderkarteRegistry
+                .GetEligibleForCard(card, state, state.Rules)
+                .Select(s => SonderkarteInfo.For(s.Type))
                 .ToList();
+            if (eligible.Count > 0)
+                result[card.Id] = eligible;
         }
-        else if (isMyTurn)
-        {
-            // Leading a new trick — all cards are legal
-            legalCards = hand.ToList();
-        }
+        return result;
+    }
 
-        // Legal announcements
-        var legalAnnouncements =
-            state.Phase == GamePhase.Playing
-                ? Enum.GetValues<AnnouncementType>()
-                    .Where(t => AnnouncementRules.CanAnnounce(requestingPlayer, t, state))
-                    .ToList()
-                : (IReadOnlyList<AnnouncementType>)[];
-
-        // Eligible sonderkarten per card in hand — include display metadata
-        var eligiblePerCard = new Dictionary<CardId, IReadOnlyList<SonderkarteInfo>>();
-        if (isMyTurn)
-        {
-            foreach (var card in hand)
-            {
-                var eligible = SonderkarteRegistry
-                    .GetEligibleForCard(card, state, state.Rules)
-                    .Select(s => SonderkarteInfo.For(s.Type))
-                    .ToList();
-                if (eligible.Count > 0)
-                    eligiblePerCard[card.Id] = eligible;
-            }
-        }
-
-        // Parties are revealed immediately in: all solos, Armut, and Hochzeit once partner found.
+    private static List<PlayerPublicState> BuildOtherPlayers(
+        PlayerSeat requestingPlayer,
+        GameState state
+    )
+    {
+        // Parties are revealed immediately in solos, Armut, and Hochzeit once partner found.
         // In Normalspiel and pre-Findungsstich Hochzeit parties stay hidden until announced.
         bool revealParties =
             state.ActiveReservation is not null
             && (state.ActiveReservation.IsSolo || state.PartyResolver.IsFullyResolved(state));
 
-        // Active game mode label (null = Normalspiel)
-        var activeGameMode = state.ActiveReservation?.Priority.ToString();
-
-        // Other players' public state
-        var others = state
-            .Players.Where(p => p.Id != requestingPlayer)
+        return state
+            .Players.Where(p => p.Seat != requestingPlayer)
             .Select(p =>
             {
-                // Reveal party when mode dictates it, or when the player has announced
-                var hasAnnounced = state.Announcements.Any(a => a.Player == p.Id);
+                var hasAnnounced = state.Announcements.Any(a => a.Player == p.Seat);
+                var displayParty = GetAnnouncementDisplayParty(p.Seat, state);
                 var knownParty = revealParties
-                    ? state.PartyResolver.ResolveParty(p.Id, state)
-                    : p.KnownParty
-                        ?? (hasAnnounced ? state.PartyResolver.ResolveParty(p.Id, state) : null);
+                    ? displayParty
+                    : p.KnownParty ?? (hasAnnounced ? displayParty : null);
 
-                // Most specific announcement: highest enum value wins
                 var highestAnn = state
-                    .Announcements.Where(a => a.Player == p.Id)
+                    .Announcements.Where(a => a.Player == p.Seat)
                     .MaxBy(a => a.Type);
-                string? announcementLabel = null;
-                if (highestAnn is not null)
+                string? announcementLabel = highestAnn?.Type switch
                 {
-                    announcementLabel =
-                        highestAnn.Type == AnnouncementType.Win
-                            ? knownParty == Party.Re
-                                ? "Re"
-                                : knownParty == Party.Kontra
-                                    ? "Kontra"
-                                    : null
-                            : highestAnn.Type.ToString();
-                }
+                    AnnouncementType.Win => knownParty switch
+                    {
+                        Party.Re => "Re",
+                        Party.Kontra => "Kontra",
+                        _ => null,
+                    },
+                    null => null,
+                    var t => t.ToString(),
+                };
 
                 return new PlayerPublicState(
-                    p.Id,
                     p.Seat,
                     knownParty,
                     p.Hand.Cards.Count,
@@ -123,19 +173,15 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
                 );
             })
             .ToList();
+    }
 
-        // Current trick summary
-        TrickSummary? currentTrickSummary = state.CurrentTrick is { Cards.Count: > 0 }
+    private static TrickSummary? BuildCurrentTrickSummary(GameState state) =>
+        state.CurrentTrick is { Cards.Count: > 0 }
             ? ToCurrentTrickSummary(state.CompletedTricks.Count, state.CurrentTrick, state)
             : null;
 
-        // Completed tricks summaries
-        var completedSummaries = state
-            .ScoredTricks.Select((r, i) => ToCompletedTrickSummary(i, r))
-            .ToList();
-
-        // Hand sorted by trump (highest to lowest), then plain suits grouped by suit and sorted
-        var handSorted = hand.OrderByDescending(c => state.TrumpEvaluator.IsTrump(c.Type))
+    private static IReadOnlyList<Card> BuildHandSorted(IReadOnlyList<Card> hand, GameState state) =>
+        hand.OrderByDescending(c => state.TrumpEvaluator.IsTrump(c.Type))
             .ThenByDescending(c =>
                 state.TrumpEvaluator.IsTrump(c.Type) ? state.TrumpEvaluator.GetTrumpRank(c.Type) : 0
             )
@@ -145,106 +191,109 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             )
             .ToList();
 
-        // Health check
-        bool shouldDeclareHealth =
-            state.Phase == GamePhase.ReservationHealthCheck
-            && state.PendingReservationResponders.Count > 0
-            && state.PendingReservationResponders[0] == requestingPlayer;
+    private static bool BuildShouldDeclareHealth(PlayerSeat player, GameState state) =>
+        state.Phase == GamePhase.ReservationHealthCheck
+        && state.PendingReservationResponders.Count > 0
+        && state.PendingReservationResponders[0] == player;
 
-        // Eligible reservations in a check phase (only when it's this player's turn)
-        bool isCheckPhaseTurn =
-            state.Phase
-                is GamePhase.ReservationSoloCheck
-                    or GamePhase.ReservationArmutCheck
-                    or GamePhase.ReservationSchmeissenCheck
-                    or GamePhase.ReservationHochzeitCheck
-            && state.PendingReservationResponders.Count > 0
-            && state.PendingReservationResponders[0] == requestingPlayer;
+    private static bool IsCheckPhaseTurn(PlayerSeat player, GameState state) =>
+        state.Phase
+            is GamePhase.ReservationSoloCheck
+                or GamePhase.ReservationArmutCheck
+                or GamePhase.ReservationSchmeissenCheck
+                or GamePhase.ReservationHochzeitCheck
+        && state.PendingReservationResponders.Count > 0
+        && state.PendingReservationResponders[0] == player;
+
+    private static bool BuildMustDeclareReservation(PlayerSeat player, GameState state)
+    {
+        bool singleVorbehalt = state.HealthDeclarations.Count(kv => kv.Value) == 1;
+        return IsCheckPhaseTurn(player, state)
+            && state.Phase == GamePhase.ReservationSoloCheck
+            && singleVorbehalt;
+    }
+
+    private static IReadOnlyList<ReservationPriority> BuildEligibleReservations(
+        PlayerSeat player,
+        PlayerState playerState,
+        GameState state
+    )
+    {
+        if (!IsCheckPhaseTurn(player, state))
+            return [];
 
         bool singleVorbehalt = state.HealthDeclarations.Count(kv => kv.Value) == 1;
-        bool mustDeclareReservation =
-            isCheckPhaseTurn && state.Phase == GamePhase.ReservationSoloCheck && singleVorbehalt;
-
-        IReadOnlyList<ReservationPriority> eligibleReservations = [];
-        if (isCheckPhaseTurn)
+        return state.Phase switch
         {
-            eligibleReservations = state.Phase switch
-            {
-                GamePhase.ReservationSoloCheck when singleVorbehalt =>
-                    ReservationRegistry.GetEligible(
-                        requestingPlayer,
-                        playerState.Hand,
-                        state.Rules
-                    ),
-                GamePhase.ReservationSoloCheck => ReservationRegistry.GetEligibleSolos(
-                    requestingPlayer,
-                    playerState.Hand,
-                    state.Rules
-                ),
-                GamePhase.ReservationArmutCheck => ReservationRegistry.GetEligibleArmut(
-                    requestingPlayer,
-                    playerState.Hand,
-                    state.Rules
-                ),
-                GamePhase.ReservationSchmeissenCheck => ReservationRegistry.GetEligibleSchmeissen(
-                    requestingPlayer,
-                    playerState.Hand,
-                    state.Rules
-                ),
-                GamePhase.ReservationHochzeitCheck => ReservationRegistry.GetEligibleHochzeit(
-                    requestingPlayer,
-                    playerState.Hand,
-                    state.Rules
-                ),
-                _ => [],
-            };
-        }
+            GamePhase.ReservationSoloCheck when singleVorbehalt => ReservationRegistry.GetEligible(
+                player,
+                playerState.Hand,
+                state.Rules
+            ),
+            GamePhase.ReservationSoloCheck => ReservationRegistry.GetEligibleSolos(
+                player,
+                playerState.Hand,
+                state.Rules
+            ),
+            GamePhase.ReservationArmutCheck => ReservationRegistry.GetEligibleArmut(
+                player,
+                playerState.Hand,
+                state.Rules
+            ),
+            GamePhase.ReservationSchmeissenCheck => ReservationRegistry.GetEligibleSchmeissen(
+                player,
+                playerState.Hand,
+                state.Rules
+            ),
+            GamePhase.ReservationHochzeitCheck => ReservationRegistry.GetEligibleHochzeit(
+                player,
+                playerState.Hand,
+                state.Rules
+            ),
+            _ => [],
+        };
+    }
 
-        // Armut partner finding
-        bool shouldRespondToArmut =
-            state.Phase == GamePhase.ArmutPartnerFinding
-            && state.PendingReservationResponders.Count > 0
-            && state.PendingReservationResponders[0] == requestingPlayer;
+    private static bool BuildShouldRespondToArmut(PlayerSeat player, GameState state) =>
+        state.Phase == GamePhase.ArmutPartnerFinding
+        && state.PendingReservationResponders.Count > 0
+        && state.PendingReservationResponders[0] == player;
 
-        // Armut card exchange
-        bool shouldReturnArmutCards =
-            state.Phase == GamePhase.ArmutCardExchange && state.ArmutRichPlayer == requestingPlayer;
-        int? armutCardReturnCount = shouldReturnArmutCards ? state.ArmutTransferCount : null;
-
-        // Armut exchange announcement — shown to all players after exchange completes
-        int? armutExchangeCardCount = state.ArmutReturnedTrump.HasValue
+    private static int? BuildArmutCardReturnCount(PlayerSeat player, GameState state) =>
+        state.Phase == GamePhase.ArmutCardExchange && state.ArmutRichPlayer == player
             ? state.ArmutTransferCount
             : null;
-        bool? armutReturnedTrump = state.ArmutReturnedTrump;
 
-        return new PlayerGameView(
-            gameId,
-            state.Phase,
-            requestingPlayer,
-            ownParty,
-            hand,
-            legalCards,
-            legalAnnouncements,
-            eligiblePerCard,
-            others,
-            currentTrickSummary,
-            completedSummaries,
-            state.CurrentTurn,
-            isMyTurn
+    private static bool BuildShouldChooseSchwarzesSauSolo(PlayerSeat player, GameState state) =>
+        state.Phase == GamePhase.SchwarzesSauSoloSelect && state.CurrentTurn == player;
+
+    /// <summary>
+    /// All solo priorities are eligible in Schwarze Sau — no hand restriction.
+    /// Returns the full list only for the player whose turn it is; empty for observers.
+    /// </summary>
+    private static IReadOnlyList<ReservationPriority> BuildEligibleSchwarzesSauSolos(
+        PlayerSeat player,
+        GameState state
+    )
+    {
+        if (!BuildShouldChooseSchwarzesSauSolo(player, state))
+            return [];
+
+        return Enum.GetValues<ReservationPriority>()
+            .Where(p => (int)p <= (int)ReservationPriority.SchlankerMartin)
+            .ToList();
+    }
+
+    /// In Kontrasolo, non-solo players see their Kreuz-Dame-based party for announcement labels.
+    /// They don't know they're "Re" in the Kontrasolo sense; the button should reflect normal rules.
+    private static Party? GetAnnouncementDisplayParty(PlayerSeat player, GameState state)
+    {
+        if (
+            state.SilentMode?.Type == SilentGameModeType.KontraSolo
+            && state.SilentMode.Player != player
         )
-        {
-            HandSorted = handSorted,
-            ShouldDeclareHealth = shouldDeclareHealth,
-            ShouldDeclareReservation = isCheckPhaseTurn,
-            EligibleReservations = eligibleReservations,
-            MustDeclareReservation = mustDeclareReservation,
-            ShouldRespondToArmut = shouldRespondToArmut,
-            ShouldReturnArmutCards = shouldReturnArmutCards,
-            ArmutCardReturnCount = armutCardReturnCount,
-            ArmutExchangeCardCount = armutExchangeCardCount,
-            ArmutReturnedTrump = armutReturnedTrump,
-            ActiveGameMode = activeGameMode,
-        };
+            return NormalPartyResolver.Instance.ResolveParty(player, state);
+        return state.PartyResolver.ResolveParty(player, state);
     }
 
     private static TrickSummary ToCompletedTrickSummary(int trickNumber, TrickResult result)
@@ -260,6 +309,25 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             .ToList();
 
         return new TrickSummary(trickNumber, cards, result.Winner);
+    }
+
+    private static string? BuildOwnHighestAnnouncement(PlayerSeat player, GameState state)
+    {
+        var highestAnn = state.Announcements.Where(a => a.Player == player).MaxBy(a => a.Type);
+        if (highestAnn is null)
+            return null;
+
+        var ownParty = GetAnnouncementDisplayParty(player, state);
+        return highestAnn.Type switch
+        {
+            AnnouncementType.Win => ownParty switch
+            {
+                Party.Re => "Re",
+                Party.Kontra => "Kontra",
+                _ => null,
+            },
+            var t => t.ToString(),
+        };
     }
 
     private static readonly CardType KaroNeun = new(Suit.Karo, Rank.Neun);

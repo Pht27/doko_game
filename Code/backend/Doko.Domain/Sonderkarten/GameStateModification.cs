@@ -19,10 +19,7 @@ public sealed record ReverseDirectionModification : GameStateModification;
 /// </summary>
 public sealed record ScheduleDirectionFlipModification : GameStateModification;
 
-public sealed record WithdrawAnnouncementModification(PlayerId Player, AnnouncementType Type)
-    : GameStateModification;
-
-public sealed record TransferCardPointsModification(CardType From, CardType To)
+public sealed record WithdrawAnnouncementModification(PlayerSeat Player, AnnouncementType Type)
     : GameStateModification;
 
 public sealed record ActivateSonderkarteModification(SonderkarteType Type) : GameStateModification;
@@ -46,49 +43,49 @@ public sealed record AdvancePhaseModification(GamePhase NewPhase) : GameStateMod
 public sealed record SetGameModeModification(IReservation? Reservation) : GameStateModification;
 
 /// <summary>Sets whose turn it is.</summary>
-public sealed record SetCurrentTurnModification(PlayerId Player) : GameStateModification;
+public sealed record SetCurrentTurnModification(PlayerSeat Player) : GameStateModification;
 
 /// <summary>Deals hands to all players and records the initial hand snapshot.</summary>
-public sealed record DealHandsModification(IReadOnlyDictionary<PlayerId, Hand> Hands)
+public sealed record DealHandsModification(IReadOnlyDictionary<PlayerSeat, Hand> Hands)
     : GameStateModification;
 
 /// <summary>Records one player's health declaration (Gesund/Vorbehalt) during ReservationHealthCheck.</summary>
-public sealed record RecordHealthDeclarationModification(PlayerId Player, bool HasVorbehalt)
+public sealed record RecordHealthDeclarationModification(PlayerSeat Player, bool HasVorbehalt)
     : GameStateModification;
 
 /// <summary>Replaces the list of players still awaiting a response in the current reservation check phase.</summary>
-public sealed record SetPendingRespondersModification(IReadOnlyList<PlayerId> Responders)
+public sealed record SetPendingRespondersModification(IReadOnlyList<PlayerSeat> Responders)
     : GameStateModification;
 
 /// <summary>Clears all reservation declarations (used when moving between check phases).</summary>
 public sealed record ClearReservationDeclarationsModification : GameStateModification;
 
 /// <summary>Sets the player who declared Armut.</summary>
-public sealed record SetArmutPlayerModification(PlayerId ArmutPlayer) : GameStateModification;
+public sealed record SetArmutPlayerModification(PlayerSeat ArmutPlayer) : GameStateModification;
 
 /// <summary>Sets the rich player who accepted the Armut.</summary>
-public sealed record SetArmutRichPlayerModification(PlayerId RichPlayer) : GameStateModification;
+public sealed record SetArmutRichPlayerModification(PlayerSeat RichPlayer) : GameStateModification;
 
 /// <summary>
 /// Transfers all trump cards from the poor player's hand to the rich player's hand and
 /// records the transfer count in <c>ArmutTransferCount</c>.
 /// </summary>
-public sealed record ArmutGiveTrumpsModification(PlayerId PoorPlayer, PlayerId RichPlayer)
+public sealed record ArmutGiveTrumpsModification(PlayerSeat PoorPlayer, PlayerSeat RichPlayer)
     : GameStateModification;
 
 /// <summary>Records one player's reservation declaration during the reservation phase.</summary>
-public sealed record RecordDeclarationModification(PlayerId Player, IReservation? Declaration)
+public sealed record RecordDeclarationModification(PlayerSeat Player, IReservation? Declaration)
     : GameStateModification;
 
 /// <summary>Replaces a player's hand with a new hand (e.g. after playing a card).</summary>
-public sealed record UpdatePlayerHandModification(PlayerId Player, Hand NewHand)
+public sealed record UpdatePlayerHandModification(PlayerSeat Player, Hand NewHand)
     : GameStateModification;
 
 /// <summary>Sets the current trick (null clears the current trick after it completes).</summary>
 public sealed record SetCurrentTrickModification(Tricks.Trick? Trick) : GameStateModification;
 
 /// <summary>Adds a card played by a player to the current trick.</summary>
-public sealed record AddCardToTrickModification(Players.PlayerId Player, Cards.Card Card)
+public sealed record AddCardToTrickModification(PlayerSeat Player, Cards.Card Card)
     : GameStateModification;
 
 /// <summary>
@@ -103,10 +100,8 @@ public sealed record AddCompletedTrickModification(Tricks.Trick Trick, Scoring.T
 /// playing player has chosen a partner. GameState.Apply creates the GenscherPartyResolver
 /// internally, so the Application layer does not need to know about it.
 /// </summary>
-public sealed record SetGenscherPartnerModification(
-    Players.PlayerId Genscher,
-    Players.PlayerId Partner
-) : GameStateModification;
+public sealed record SetGenscherPartnerModification(PlayerSeat Genscher, PlayerSeat Partner)
+    : GameStateModification;
 
 /// <summary>Appends an announcement to the game state.</summary>
 public sealed record AddAnnouncementModification(Announcements.Announcement Announcement)
@@ -125,3 +120,54 @@ public sealed record CloseActivationWindowModification(SonderkarteType Type)
 /// <see cref="GamePhase.ArmutCardExchange"/>. Used to display the exchange announcement.
 /// </summary>
 public sealed record SetArmutReturnedTrumpModification(bool IncludedTrump) : GameStateModification;
+
+/// <summary>
+/// Records the VorbehaltRauskommer — the player who leads the reservation-check ordering
+/// for this round. Set once at deal time; used by MakeReservationHandler to pick
+/// who plays the first card in Normal/Hochzeit/SchlankerMartin games.
+/// </summary>
+public sealed record SetVorbehaltRauskommerModification(PlayerSeat Player) : GameStateModification;
+
+/// <summary>
+/// Sets a silent (undeclared) game mode — Kontrasolo or Stille Hochzeit.
+/// Applied in the all-Gesund path when no reservation was declared.
+/// Null clears any active silent mode (fallback to normal game).
+/// </summary>
+public sealed record SetSilentGameModeModification(GameFlow.SilentGameMode? Mode)
+    : GameStateModification;
+
+/// <summary>
+/// Flags that an announced Hochzeit failed to find a partner in 3 qualifying tricks,
+/// turning the game into a forced solo (same party structure as Stille Hochzeit but with
+/// Sonderkarten and Extrapunkte active, and scored with soloFactor=3).
+/// </summary>
+public sealed record SetHochzeitForcedSoloModification : GameStateModification;
+
+/// <summary>
+/// Marks the game as Schwarze Sau (Armut with no partner found). From this point the game
+/// watches for the second ♠Q trick and then interrupts with
+/// <see cref="GamePhase.SchwarzesSauSoloSelect"/>.
+/// </summary>
+public sealed record SetSchwarzesSauModification : GameStateModification;
+
+/// <summary>
+/// Clears all active sonderkarte state (active list and closed windows).
+/// Applied in <see cref="GamePhase.SchwarzesSauSoloSelect"/> when a non-Schlanker-Martin
+/// solo is chosen: the new trump evaluator makes previously-active sonderkarten irrelevant.
+/// </summary>
+public sealed record ClearActiveSonderkartenModification : GameStateModification;
+
+/// <summary>
+/// Discards all announcements made so far.
+/// Applied unconditionally when a Schwarze-Sau solo is chosen — announcements from the
+/// Normalspiel phase carry no meaning under the new solo's party structure.
+/// </summary>
+public sealed record ClearAnnouncementsModification : GameStateModification;
+
+/// <summary>
+/// Strips all extrapunkt awards from every already-scored trick.
+/// Applied when a Schwarze-Sau solo is chosen: extrapunkte earned during the preceding
+/// Normalspiel phase are invalidated. Future tricks will accumulate awards under the
+/// new solo's extrapunkt rules.
+/// </summary>
+public sealed record ClearScoredTrickAwardsModification : GameStateModification;

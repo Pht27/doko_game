@@ -3,4 +3,4 @@ using Doko.Domain.Players;
 
 namespace Doko.Domain.Tricks;
 
-public record TrickCard(Card Card, PlayerId Player);
+public record TrickCard(Card Card, PlayerSeat Player);

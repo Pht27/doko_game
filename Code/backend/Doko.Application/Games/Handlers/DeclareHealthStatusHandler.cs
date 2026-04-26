@@ -2,6 +2,7 @@ using Doko.Application.Abstractions;
 using Doko.Application.Common;
 using Doko.Application.Games.Commands;
 using Doko.Application.Games.Results;
+using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
 using Doko.Domain.GameFlow.Events;
 using Doko.Domain.Players;
@@ -64,7 +65,7 @@ public sealed class DeclareHealthStatusHandler(
 
     // ── Private helpers ───────────────────────────────────────────────────────
 
-    private static IReadOnlyList<PlayerId> AdvancePendingQueue(GameState state)
+    private static IReadOnlyList<PlayerSeat> AdvancePendingQueue(GameState state)
     {
         var remaining = state.PendingReservationResponders.Skip(1).ToList();
         state.Apply(new SetPendingRespondersModification(remaining));
@@ -75,25 +76,66 @@ public sealed class DeclareHealthStatusHandler(
 
     private static void ResolveNextPhaseAfterAllDeclared(GameState state)
     {
+        var rauskommerSeat = (int)state.VorbehaltRauskommer;
         var vorbehaltPlayers = state
-            .Players.Where(p => state.HealthDeclarations.TryGetValue(p.Id, out var hasV) && hasV)
-            .Select(p => p.Id)
+            .Players.Where(p => state.HealthDeclarations.TryGetValue(p.Seat, out var hasV) && hasV)
+            .OrderBy(p => ((int)p.Seat - rauskommerSeat + 4) % 4)
+            .Select(p => p.Seat)
             .ToList();
 
         if (vorbehaltPlayers.Count == 0)
         {
-            // No reservation — normal game
-            state.Apply(new SetGameModeModification(null));
+            // No declared reservation — detect silent game modes or fall back to normal game
+            var silentMode = DetectSilentMode(state);
+            if (silentMode is not null)
+                state.Apply(new SetSilentGameModeModification(silentMode));
+            else
+                state.Apply(new SetGameModeModification(null));
             state.Apply(new AdvancePhaseModification(GamePhase.Playing));
-            state.Apply(new SetCurrentTurnModification(state.Players[0].Id));
+            state.Apply(new SetCurrentTurnModification(state.VorbehaltRauskommer));
         }
         else
         {
-            // One or more Vorbehalt players → move to Solo check
+            // One or more Vorbehalt players → move to Solo check, ordered from VorbehaltRauskommer
             state.Apply(new SetPendingRespondersModification(vorbehaltPlayers));
             state.Apply(new AdvancePhaseModification(GamePhase.ReservationSoloCheck));
             state.Apply(new SetCurrentTurnModification(vorbehaltPlayers[0]));
         }
+    }
+
+    private static SilentGameMode? DetectSilentMode(GameState state)
+    {
+        if (state.InitialHands is null)
+            return null;
+
+        var pikDame = new CardType(Suit.Pik, Rank.Dame);
+        var pikKoenig = new CardType(Suit.Pik, Rank.Koenig);
+        var kreuzDame = new CardType(Suit.Kreuz, Rank.Dame);
+
+        if (state.Rules.AllowKontrasolo)
+        {
+            foreach (var player in state.Players)
+            {
+                var hand = state.InitialHands[player.Seat];
+                bool hasKontrasolo =
+                    hand.Cards.Count(c => c.Type == pikDame) >= 2
+                    && hand.Cards.Count(c => c.Type == pikKoenig) >= 2;
+                if (hasKontrasolo)
+                    return new SilentGameMode(SilentGameModeType.KontraSolo, player.Seat);
+            }
+        }
+
+        if (state.Rules.AllowStilleHochzeit)
+        {
+            foreach (var player in state.Players)
+            {
+                var hand = state.InitialHands[player.Seat];
+                if (hand.Cards.Count(c => c.Type == kreuzDame) >= 2)
+                    return new SilentGameMode(SilentGameModeType.StilleHochzeit, player.Seat);
+            }
+        }
+
+        return null;
     }
 
     private async Task<GameActionResult<DeclareHealthStatusResult>> SaveAndReturn(

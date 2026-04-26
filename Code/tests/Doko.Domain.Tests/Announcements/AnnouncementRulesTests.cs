@@ -35,10 +35,11 @@ public class AnnouncementRulesTests
     [Fact]
     public void CanAnnounce_BlockedAtDeadline_FiveCardsPlayed()
     {
-        // 1 completed trick (4) + 1 card in current trick = 5; deadline=5 → 5 >= 5 → blocked
+        // 1 completed trick (4) + 2 cards in current trick = 6; deadline=5 → 6 > 5 → blocked
         var completed = CompleteTrick(B.P0);
         var current = new Trick();
         current.Add(new TrickCard(B.Card(99, Suit.Kreuz, Rank.Neun), B.P0));
+        current.Add(new TrickCard(B.Card(100, Suit.Kreuz, Rank.Zehn), B.P1));
 
         var state = GameState.Create(
             rules: RuleSet.Default(),
@@ -54,7 +55,7 @@ public class AnnouncementRulesTests
     [Fact]
     public void CanAnnounce_DeadlineShiftsWithEachAnnouncement()
     {
-        // 1 announcement made: deadline = 5 + 4*1 = 9. With 5 cards played → 5 < 9 → still allowed.
+        // 1 announcement made: deadline = 5 + 4*1 = 9. With 6 cards played → 6 < 9 → still allowed.
         var completed = CompleteTrick(B.P0);
         var current = new Trick();
         current.Add(new TrickCard(B.Card(99, Suit.Kreuz, Rank.Neun), B.P0));
@@ -215,15 +216,20 @@ public class AnnouncementRulesTests
     {
         var state = B.BasicState(rules: RuleSet.Minimal()); // EnforceFeigheit=false
         var result = new GameResult(
-            Party.Re,
-            180,
-            60,
-            1,
-            [],
+            Winner: Party.Re,
+            ReAugen: 180,
+            KontraAugen: 60,
+            ReStiche: 1,
+            KontraStiche: 0,
+            GameValue: 1,
+            AllAwards: [],
             Feigheit: false,
-            [],
+            ValueComponents: [],
             SoloFactor: 1,
-            TotalScore: 1
+            TotalScore: 1,
+            AnnouncementRecords: [],
+            StichePerSeat: new int[4],
+            AugenPerSeat: new int[4]
         );
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
     }
@@ -239,15 +245,20 @@ public class AnnouncementRulesTests
             activeReservation: new DamensoloReservation(B.P0)
         );
         var result = new GameResult(
-            Party.Re,
-            180,
-            20,
-            1,
-            [],
+            Winner: Party.Re,
+            ReAugen: 180,
+            KontraAugen: 20,
+            ReStiche: 1,
+            KontraStiche: 0,
+            GameValue: 1,
+            AllAwards: [],
             Feigheit: false,
-            [],
+            ValueComponents: [],
             SoloFactor: 1,
-            TotalScore: 1
+            TotalScore: 1,
+            AnnouncementRecords: [],
+            StichePerSeat: new int[4],
+            AugenPerSeat: new int[4]
         );
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
     }
@@ -274,15 +285,20 @@ public class AnnouncementRulesTests
         );
 
         var result = new GameResult(
-            Party.Re,
-            152,
-            88,
-            1,
-            [],
+            Winner: Party.Re,
+            ReAugen: 152,
+            KontraAugen: 88,
+            ReStiche: 1,
+            KontraStiche: 0,
+            GameValue: 1,
+            AllAwards: [],
             Feigheit: false,
-            [],
+            ValueComponents: [],
             SoloFactor: 1,
-            TotalScore: 1
+            TotalScore: 1,
+            AnnouncementRecords: [],
+            StichePerSeat: new int[4],
+            AugenPerSeat: new int[4]
         );
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
     }
@@ -298,15 +314,20 @@ public class AnnouncementRulesTests
         );
 
         var result = new GameResult(
-            Party.Re,
-            196,
-            44,
-            1,
-            [],
+            Winner: Party.Re,
+            ReAugen: 196,
+            KontraAugen: 44,
+            ReStiche: 1,
+            KontraStiche: 0,
+            GameValue: 1,
+            AllAwards: [],
             Feigheit: false,
-            [],
+            ValueComponents: [],
             SoloFactor: 1,
-            TotalScore: 1
+            TotalScore: 1,
+            AnnouncementRecords: [],
+            StichePerSeat: new int[4],
+            AugenPerSeat: new int[4]
         );
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeTrue();
     }
@@ -328,17 +349,144 @@ public class AnnouncementRulesTests
         );
 
         var result = new GameResult(
-            Party.Re,
-            196,
-            44,
-            1,
-            [],
+            Winner: Party.Re,
+            ReAugen: 196,
+            KontraAugen: 44,
+            ReStiche: 1,
+            KontraStiche: 0,
+            GameValue: 1,
+            AllAwards: [],
             Feigheit: false,
-            [],
+            ValueComponents: [],
             SoloFactor: 1,
-            TotalScore: 1
+            TotalScore: 1,
+            AnnouncementRecords: [],
+            StichePerSeat: new int[4],
+            AugenPerSeat: new int[4]
         );
         AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
+    }
+
+    [Fact]
+    public void ViolatesFeigheit_ReturnsFalse_WhenHochzeitBecameForcedSolo()
+    {
+        // Same conditions as ViolatesFeigheit_ReturnsTrue_WhenThreeMissing, but
+        // HochzeitBecameForcedSolo=true exempts the game from Feigheit.
+        var state = GameState.Create(
+            rules: RuleSet.Default(),
+            players: B.FourPlayers(),
+            partyResolver: B.SoloResolver()
+        );
+        state.Apply(new SetHochzeitForcedSoloModification());
+
+        var result = new GameResult(
+            Winner: Party.Re,
+            ReAugen: 196,
+            KontraAugen: 44,
+            ReStiche: 1,
+            KontraStiche: 0,
+            GameValue: 1,
+            AllAwards: [],
+            Feigheit: false,
+            ValueComponents: [],
+            SoloFactor: 1,
+            TotalScore: 1,
+            AnnouncementRecords: [],
+            StichePerSeat: new int[4],
+            AugenPerSeat: new int[4]
+        );
+        AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
+    }
+
+    [Fact]
+    public void ViolatesFeigheit_ReturnsFalse_WhenSilentModeActive()
+    {
+        // Silent modes (Kontrasolo, Stille Hochzeit) also exempt from Feigheit.
+        var state = GameState.Create(
+            rules: RuleSet.Default(),
+            players: B.FourPlayers(),
+            partyResolver: B.SoloResolver()
+        );
+        state.Apply(
+            new SetSilentGameModeModification(
+                new SilentGameMode(SilentGameModeType.KontraSolo, B.P0)
+            )
+        );
+
+        var result = new GameResult(
+            Winner: Party.Re,
+            ReAugen: 196,
+            KontraAugen: 44,
+            ReStiche: 1,
+            KontraStiche: 0,
+            GameValue: 1,
+            AllAwards: [],
+            Feigheit: false,
+            ValueComponents: [],
+            SoloFactor: 1,
+            TotalScore: 1,
+            AnnouncementRecords: [],
+            StichePerSeat: new int[4],
+            AugenPerSeat: new int[4]
+        );
+        AnnouncementRules.ViolatesFeigheit(result, state).Should().BeFalse();
+    }
+
+    // ── CanAnnounce: Absage mutex ─────────────────────────────────────────────
+
+    [Fact]
+    public void CanAnnounce_Keine90_BlockedWhenOtherPartyAlreadyHasKeine90()
+    {
+        // Kontra (P1) already has Keine90. Re (P0) cannot make any Absage.
+        var state = B.BasicState(
+            announcements:
+            [
+                B.Ann(B.P0, AnnouncementType.Win),
+                B.Ann(B.P1, AnnouncementType.Win),
+                B.Ann(B.P1, AnnouncementType.Keine90),
+            ]
+        );
+        AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Keine90, state).Should().BeFalse();
+    }
+
+    [Fact]
+    public void CanAnnounce_Keine90_AllowedWhenOtherPartyHasNoAbsage()
+    {
+        // Kontra (P1) only has Win, no Absage → Re can still announce Keine90.
+        var state = B.BasicState(
+            announcements: [B.Ann(B.P0, AnnouncementType.Win), B.Ann(B.P1, AnnouncementType.Win)]
+        );
+        AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Keine90, state).Should().BeTrue();
+    }
+
+    [Fact]
+    public void CanAnnounce_Keine60_BlockedWhenOtherPartyHasAbsage()
+    {
+        // Re (P0) has Keine90. Kontra (P1) cannot make Keine60 (or any Absage).
+        var state = B.BasicState(
+            announcements:
+            [
+                B.Ann(B.P0, AnnouncementType.Win),
+                B.Ann(B.P0, AnnouncementType.Keine90),
+                B.Ann(B.P1, AnnouncementType.Win),
+                B.Ann(B.P1, AnnouncementType.Keine90), // this would also be blocked; assume it slipped through
+            ]
+        );
+        AnnouncementRules.CanAnnounce(B.P1, AnnouncementType.Keine60, state).Should().BeFalse();
+    }
+
+    [Fact]
+    public void CanAnnounce_SameParty_CanContinueAbsageLadder()
+    {
+        // Re already has Keine90. Re can continue to Keine60 (other party has no Absage).
+        var state = B.BasicState(
+            announcements:
+            [
+                B.Ann(B.P0, AnnouncementType.Win),
+                B.Ann(B.P0, AnnouncementType.Keine90),
+            ]
+        );
+        AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Keine60, state).Should().BeTrue();
     }
 
     // ── CanAnnounce: Hochzeit timing ──────────────────────────────────────────
@@ -390,10 +538,11 @@ public class AnnouncementRulesTests
     [Fact]
     public void CanAnnounce_Hochzeit_BlockedAtDeadline_AfterFindungsstich()
     {
-        // Findungsstich at trick 2 (K=2 → base deadline=13). 13 cards played (3 tricks + 1 in current) → blocked.
+        // Findungsstich at trick 2 (K=2 → base deadline=13). 14 cards played (3 tricks + 2 in current) → 14 > 13 → blocked.
         var resolver = new HochzeitPartyResolver(B.P0, HochzeitCondition.FirstTrick);
         var current = new Trick();
         current.Add(new TrickCard(B.Card(99, Suit.Pik, Rank.Neun), B.P0));
+        current.Add(new TrickCard(B.Card(100, Suit.Herz, Rank.Neun), B.P1));
 
         var state = GameState.Create(
             rules: RuleSet.Default(),
@@ -462,7 +611,7 @@ public class AnnouncementRulesTests
     /// A trick where <paramref name="winner"/> wins ~43 Augen: ♣A, ♣10, ♠A, ♥A.
     /// Card IDs start at <paramref name="startId"/> to avoid conflicts in multi-trick states.
     /// </summary>
-    private static Trick HighValueTrick(PlayerId winner, byte startId = 10)
+    private static Trick HighValueTrick(PlayerSeat winner, byte startId = 10)
     {
         var trick = new Trick();
         trick.Add(new TrickCard(B.Card(startId, Suit.Kreuz, Rank.Ass), winner));
@@ -473,7 +622,7 @@ public class AnnouncementRulesTests
     }
 
     /// <summary>A low-value 4-card trick.</summary>
-    private static Trick CompleteTrick(PlayerId winner)
+    private static Trick CompleteTrick(PlayerSeat winner)
     {
         var trick = new Trick();
         trick.Add(new TrickCard(B.Card(20, Suit.Kreuz, Rank.Ass), winner));

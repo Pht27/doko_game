@@ -1,6 +1,7 @@
 using Doko.Application.Abstractions;
 using Doko.Application.Common;
 using Doko.Application.Games.Commands;
+using Doko.Application.Scenarios;
 using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
 using Doko.Domain.Hands;
@@ -36,26 +37,41 @@ public sealed class DealCardsHandler(
             return new GameActionResult<Unit>.Failure(GameError.InvalidPhase);
 
         var deck = state.Rules.PlayWithNines ? Deck.Standard48() : Deck.Standard40();
-        var shuffled = shuffler.Shuffle(deck);
+        var activeShuffler = ResolveShuffler(command.ScenarioName);
+        var shuffled = activeShuffler.Shuffle(deck);
         var cardsPerPlayer = shuffled.Count / 4;
 
-        var hands = new Dictionary<PlayerId, Hand>();
+        var hands = new Dictionary<PlayerSeat, Hand>();
         for (int i = 0; i < state.Players.Count; i++)
         {
             var playerCards = shuffled.Skip(i * cardsPerPlayer).Take(cardsPerPlayer).ToList();
-            hands[state.Players[i].Id] = new Hand(playerCards);
+            hands[state.Players[i].Seat] = new Hand(playerCards);
         }
 
         state.Apply(new DealHandsModification(hands));
         state.Apply(new AdvancePhaseModification(GamePhase.ReservationHealthCheck));
-        // All four players must declare health status — prime the pending queue.
-        var allPlayers = state.Players.Select(p => p.Id).ToList();
+
+        var rauskommer = command.VorbehaltRauskommer ?? state.Players[0].Seat;
+        state.Apply(new SetVorbehaltRauskommerModification(rauskommer));
+        var rauskommerSeat = (int)rauskommer;
+        var allPlayers = state
+            .Players.OrderBy(p => ((int)p.Seat - rauskommerSeat + 4) % 4)
+            .Select(p => p.Seat)
+            .ToList();
         state.Apply(new SetPendingRespondersModification(allPlayers));
-        state.Apply(new SetCurrentTurnModification(state.Players[0].Id));
+        state.Apply(new SetCurrentTurnModification(rauskommer));
 
         await repository.SaveAsync(state, ct);
         await publisher.PublishAsync(state.Id, [], ct);
 
         return new GameActionResult<Unit>.Ok(Unit.Value);
+    }
+
+    private IDeckShuffler ResolveShuffler(string? scenarioName)
+    {
+        if (scenarioName is null)
+            return shuffler;
+        var config = Scenarios.Scenarios.All.FirstOrDefault(s => s.Name == scenarioName);
+        return config is not null ? new ScenarioShuffler(config) : shuffler;
     }
 }

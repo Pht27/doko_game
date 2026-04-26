@@ -7,7 +7,9 @@ using Doko.Domain.Cards;
 using Doko.Domain.Extrapunkte;
 using Doko.Domain.GameFlow;
 using Doko.Domain.GameFlow.Events;
+using Doko.Domain.Parties;
 using Doko.Domain.Players;
+using Doko.Domain.Reservations;
 using Doko.Domain.Rules;
 using Doko.Domain.Scoring;
 using Doko.Domain.Sonderkarten;
@@ -44,7 +46,7 @@ public sealed class PlayCardHandler(
         if (state.CurrentTurn != command.Player)
             return Fail(GameError.NotYourTurn);
 
-        var playerState = state.Players.First(p => p.Id == command.Player);
+        var playerState = state.Players.First(p => p.Seat == command.Player);
         var card = playerState.Hand.Cards.FirstOrDefault(c => c.Id == command.Card);
         if (card is null)
             return Fail(GameError.IllegalCard);
@@ -158,7 +160,7 @@ public sealed class PlayCardHandler(
             return GameError.GenscherPartnerRequired;
         if (command.GenscherPartner == command.Player)
             return GameError.GenscherPartnerInvalid;
-        if (state.Players.All(p => p.Id != command.GenscherPartner))
+        if (state.Players.All(p => p.Seat != command.GenscherPartner))
             return GameError.GenscherPartnerInvalid;
 
         return null;
@@ -166,12 +168,12 @@ public sealed class PlayCardHandler(
 
     private sealed class CommandInputProvider(PlayCardCommand command) : ISonderkarteInputProvider
     {
-        public PlayerId GetGenscherPartner() => command.GenscherPartner!.Value;
+        public PlayerSeat GetGenscherPartner() => command.GenscherPartner!.Value;
     }
 
     private static void PlayCardIntoTrick(
         GameState state,
-        PlayerId player,
+        PlayerSeat player,
         PlayerState playerState,
         Card card
     )
@@ -182,7 +184,7 @@ public sealed class PlayCardHandler(
 
     private static List<IDomainEvent> BuildEvents(
         GameState state,
-        PlayerId player,
+        PlayerSeat player,
         Card card,
         List<IDomainEvent> sonderkarteEvents
     ) =>
@@ -193,7 +195,7 @@ public sealed class PlayCardHandler(
 
     private async Task<GameActionResult<PlayCardResult>> AdvanceTurnAsync(
         GameState state,
-        PlayerId player,
+        PlayerSeat player,
         List<IDomainEvent> events,
         CancellationToken ct
     )
@@ -210,20 +212,48 @@ public sealed class PlayCardHandler(
     )
     {
         var trick = state.CurrentTrick!;
-        var winner = trick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
+        var isLastTrick = state.CompletedTricks.Count == state.Rules.LastTrickIndex;
+        bool isSchlankerMartin =
+            state.ActiveReservation?.Priority == ReservationPriority.SchlankerMartin;
+        var dulleRule =
+            isSchlankerMartin || isLastTrick
+                ? state.Rules.DulleRule.Reversed()
+                : state.Rules.DulleRule;
+        var normalWinner = trick.Winner(
+            state.TrumpEvaluator,
+            dulleRule,
+            secondBeatsFirst: isSchlankerMartin
+        );
+        var effectiveWinner = TrickWinnerRuleRegistry.GetEffectiveWinner(
+            trick,
+            state,
+            normalWinner
+        );
         var awards = ExtrapunktRegistry
-            .GetActive(state.Rules)
-            .SelectMany(e => e.Evaluate(trick, state))
+            .GetActive(state.Rules, state.ActiveReservation)
+            .SelectMany(e => e.Evaluate(trick, state, effectiveWinner))
             .ToList();
-        var result = new TrickResult(trick, winner, awards);
+        var result = new TrickResult(trick, effectiveWinner, awards);
 
         state.Apply(new AddCompletedTrickModification(trick, result));
         events.Add(
-            new TrickCompletedEvent(state.Id, state.CompletedTricks.Count - 1, winner, result)
+            new TrickCompletedEvent(
+                state.Id,
+                state.CompletedTricks.Count - 1,
+                effectiveWinner,
+                result
+            )
         );
 
+        // Detect Hochzeit forced solo: partner not found after 3 qualifying tricks
+        if (ForceIntoSolo(state))
+            state.Apply(new SetHochzeitForcedSoloModification());
+
         // Auto-make Pflichtansage if the completed trick triggers one
-        var pflichtAnnouncement = AnnouncementRules.GetMandatoryAnnouncement(winner, state);
+        var pflichtAnnouncement = AnnouncementRules.GetMandatoryAnnouncement(
+            effectiveWinner,
+            state
+        );
         if (pflichtAnnouncement is not null)
         {
             state.Apply(new AddAnnouncementModification(pflichtAnnouncement));
@@ -238,16 +268,51 @@ public sealed class PlayCardHandler(
             );
         }
 
+        // Schwarze Sau: when the second ♠Q appears in a completed trick, pause for solo selection.
+        // Only interrupt if there are cards left; if hands are empty the game ends normally and
+        // scoring falls back to Normalspiel (astronomically unlikely edge case).
+        if (
+            state.IsSchwarzesSau
+            && !state.Players.All(p => p.Hand.Cards.Count == 0)
+            && IsSecondPikDameTrick(state)
+        )
+        {
+            state.Apply(new AdvancePhaseModification(GamePhase.SchwarzesSauSoloSelect));
+            state.Apply(new SetCurrentTurnModification(effectiveWinner));
+            await SaveAndPublishAsync(state, events, ct);
+            return Ok(new PlayCardResult(true, effectiveWinner, false, null));
+        }
+
         if (state.Players.All(p => p.Hand.Cards.Count == 0))
         {
             var finished = _finisher.Execute(state);
             await SaveAndPublishAsync(state, events, ct);
-            return Ok(new PlayCardResult(true, winner, true, finished));
+            return Ok(new PlayCardResult(true, effectiveWinner, true, finished));
         }
 
-        state.Apply(new SetCurrentTurnModification(winner));
+        state.Apply(new SetCurrentTurnModification(effectiveWinner));
         await SaveAndPublishAsync(state, events, ct);
-        return Ok(new PlayCardResult(true, winner, false, null));
+        return Ok(new PlayCardResult(true, effectiveWinner, false, null));
+    }
+
+    /// <summary>
+    /// Returns true when the just-completed trick (last entry of
+    /// <see cref="GameState.CompletedTricks"/>) pushed the running ♠Q count from &lt;2 to ≥2.
+    /// Handles the case where both Pik Damen appear in the same trick.
+    /// </summary>
+    private static bool IsSecondPikDameTrick(GameState state)
+    {
+        var pikDame = new CardType(Suit.Pik, Rank.Dame);
+        var justCompleted = state.CompletedTricks.Last();
+
+        int inThisTrick = justCompleted.Cards.Count(c => c.Card.Type == pikDame);
+        if (inThisTrick == 0)
+            return false;
+
+        int totalSoFar = state.CompletedTricks.Sum(t => t.Cards.Count(c => c.Card.Type == pikDame));
+        int beforeThisTrick = totalSoFar - inThisTrick;
+
+        return beforeThisTrick < 2 && totalSoFar >= 2;
     }
 
     private async Task SaveAndPublishAsync(
@@ -265,4 +330,11 @@ public sealed class PlayCardHandler(
 
     private static GameActionResult<PlayCardResult> Fail(GameError error) =>
         new GameActionResult<PlayCardResult>.Failure(error);
+
+    private static bool ForceIntoSolo(GameState state) =>
+        !state.HochzeitBecameForcedSolo
+        && state.ActiveReservation is HochzeitReservation
+        && state.PartyResolver.IsFullyResolved(state)
+        && state.Players.Count(p => state.PartyResolver.ResolveParty(p.Seat, state) == Party.Re)
+            == 1;
 }

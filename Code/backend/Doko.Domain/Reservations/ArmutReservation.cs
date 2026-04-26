@@ -13,10 +13,10 @@ namespace Doko.Domain.Reservations;
 /// </summary>
 public sealed class ArmutReservation : IReservation
 {
-    private readonly PlayerId _poorPlayer;
-    private readonly PlayerId _richPlayer;
+    private readonly PlayerSeat _poorPlayer;
+    private readonly PlayerSeat _richPlayer;
 
-    public ArmutReservation(PlayerId poorPlayer, PlayerId richPlayer)
+    public ArmutReservation(PlayerSeat poorPlayer, PlayerSeat richPlayer)
     {
         _poorPlayer = poorPlayer;
         _richPlayer = richPlayer;

@@ -11,15 +11,16 @@ import type {
   AcceptArmutResponse,
   ExchangeArmutCardsRequest,
   ExchangeArmutCardsResponse,
+  ChooseSchwarzesSauSoloRequest,
   PlayCardRequest,
   PlayCardResponse,
   MakeAnnouncementRequest,
 } from '../types/api';
 
-export function fetchToken(playerId: number): Promise<AuthTokenResponse> {
+export function fetchToken(seatIndex: number): Promise<AuthTokenResponse> {
   return apiFetch('/auth/token', null, {
     method: 'POST',
-    body: JSON.stringify({ playerId }),
+    body: JSON.stringify({ seatIndex }),
   });
 }
 
@@ -72,6 +73,17 @@ export function exchangeArmutCards(
   body: ExchangeArmutCardsRequest,
 ): Promise<ExchangeArmutCardsResponse> {
   return apiFetch(`/games/${gameId}/armut-exchange`, token, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+}
+
+export function chooseSchwarzesSauSolo(
+  token: string,
+  gameId: string,
+  body: ChooseSchwarzesSauSoloRequest,
+): Promise<void> {
+  return apiFetch(`/games/${gameId}/schwarze-sau-solo`, token, {
     method: 'POST',
     body: JSON.stringify(body),
   });

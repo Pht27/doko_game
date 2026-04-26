@@ -8,12 +8,12 @@ namespace Doko.Application.Tests.Helpers;
 /// <summary>Builder helpers for application-layer tests.</summary>
 internal static class AppB
 {
-    public static readonly PlayerId P0 = new(0);
-    public static readonly PlayerId P1 = new(1);
-    public static readonly PlayerId P2 = new(2);
-    public static readonly PlayerId P3 = new(3);
+    public static readonly PlayerSeat P0 = PlayerSeat.First;
+    public static readonly PlayerSeat P1 = PlayerSeat.Second;
+    public static readonly PlayerSeat P2 = PlayerSeat.Third;
+    public static readonly PlayerSeat P3 = PlayerSeat.Fourth;
 
-    public static IReadOnlyList<PlayerId> FourPlayerIds => [P0, P1, P2, P3];
+    public static IReadOnlyList<PlayerSeat> FourPlayerSeats => [P0, P1, P2, P3];
 
     // ── Fixture factory ───────────────────────────────────────────────────────
     public static (
@@ -31,12 +31,12 @@ internal static class AppB
 
     public static GameState StateInPhase(
         GamePhase phase,
-        PlayerId currentTurn = default,
+        PlayerSeat currentTurn = default,
         IReadOnlyList<PlayerState>? players = null
     ) =>
         GameState.Create(
             phase: phase,
-            currentTurn: currentTurn.Value == 0 ? P0 : currentTurn,
+            currentTurn: currentTurn == default ? P0 : currentTurn,
             players: players
         );
 }

@@ -15,14 +15,15 @@ export interface HotSeatState {
   restart: () => void;
 }
 
-export function useHotSeat(): HotSeatState {
+export function useHotSeat(enabled = false): HotSeatState {
   const [session, setSession] = useState<HotSeatSession | null>(null);
   const [activePlayer, setActivePlayer] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [generation, setGeneration] = useState(0);
 
   useEffect(() => {
+    if (!enabled) return;
     let cancelled = false;
 
     async function init() {
@@ -52,7 +53,7 @@ export function useHotSeat(): HotSeatState {
 
     init();
     return () => { cancelled = true; };
-  }, [generation]);
+  }, [enabled, generation]);
 
   const restart = useCallback(() => {
     setGeneration((g) => g + 1);

@@ -1,0 +1,72 @@
+/* TrickArea — stacked card pile with compass offsets */
+@reference "../../../styles/index.css";
+
+/* ── Configurable constants ───────────────────────────────────────────────────
+   These CSS custom properties mirror the TS constants in TrickArea.tsx.
+   Adjust here; update the TS side to match when changing layout behaviour.     */
+.trick-pile {
+  --trick-card-w:       clamp(2.4rem, 11vw, 3.45rem);
+  --trick-card-aspect:  1.57;
+  --trick-card-h:       calc(var(--trick-card-w) * var(--trick-card-aspect));
+  --trick-offset-f:     0.30;
+  --trick-max-tilt-deg: 15; /* informational; actual value lives in TS */
+
+  --trick-spread: calc(1 + 2 * var(--trick-offset-f)); /* 1.60 */
+  width:  calc(var(--trick-card-w) * var(--trick-spread) + 0.75rem);
+  height: calc(var(--trick-card-h) * var(--trick-spread) + 0.75rem);
+
+  position: relative;
+  /* Fly-away transition is set via inline style by the component */
+}
+
+/* ── Card positioner (outer wrapper — handles seat-based placement) ──────── */
+.trick-card-positioner {
+  position: absolute;
+  top:  50%;
+  left: 50%;
+  display: block;
+  /* Position transition is intentionally NOT set here; it's added via the
+     -stacked modifier so only the slide-to-centre move is animated.          */
+}
+
+/* Smooth slide from seat position → stacked centre */
+.trick-card-positioner-stacked {
+  transition: transform 0.5s ease-out;
+}
+
+/* ── Card image (inner — handles face/back and scale animation) ───────────── */
+@keyframes trick-card-fly-in {
+  0%   { transform: translate(var(--fly-from-x, 0px), var(--fly-from-y, 0px)); opacity: 0; }
+  100% { transform: translate(0, 0); opacity: 1; }
+}
+
+.trick-card {
+  display: block;
+  width:         var(--trick-card-w);
+  height:        auto;       /* let the SVG's own aspect ratio drive height */
+  border-radius: 0.25rem;
+  box-shadow:    0 4px 12px rgba(0, 0, 0, 0.5);
+  transform-origin: center;
+  animation: trick-card-fly-in 0.2s ease-out forwards;
+}
+
+.trick-card-mine {
+  @apply ring-2 ring-yellow-400;
+}
+
+/* ── Winner pulse ─────────────────────────────────────────────────────────── */
+/*
+  Scale 1 → 1.3 → 1 over 1 s.
+  The positioner wrapper keeps the card in the right seat position;
+  this animation only touches the img's own transform (scale), so there
+  is no conflict with the positional translate/rotate on the wrapper.
+*/
+@keyframes trick-winner-pulse {
+  0%   { transform: scale(1);   box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+  40%  { transform: scale(1.3); box-shadow: 0 12px 32px rgba(0,0,0,0.7); }
+  100% { transform: scale(1);   box-shadow: 0 4px 12px rgba(0,0,0,0.5); }
+}
+
+.trick-card-winner-pulse {
+  animation: trick-winner-pulse 1s ease-in-out forwards;
+}

@@ -11,34 +11,32 @@ namespace Doko.Domain.Parties;
 /// </summary>
 public sealed class HochzeitPartyResolver : IPartyResolver
 {
-    private readonly PlayerId _hochzeitPlayer;
+    private readonly PlayerSeat _hochzeitPlayer;
     private readonly HochzeitCondition _condition;
 
-    public HochzeitPartyResolver(PlayerId hochzeitPlayer, HochzeitCondition condition)
+    public HochzeitPartyResolver(PlayerSeat hochzeitPlayer, HochzeitCondition condition)
     {
         _hochzeitPlayer = hochzeitPlayer;
         _condition = condition;
     }
 
-    public Party? ResolveParty(PlayerId player, GameState state)
+    public Party? ResolveParty(PlayerSeat player, GameState state)
     {
         if (player == _hochzeitPlayer)
             return Party.Re;
 
-        int qualifyingTricks = 0;
+        int completedTricks = 0;
         foreach (var trick in state.CompletedTricks)
         {
-            if (!Qualifies(trick, state))
-                continue;
-            qualifyingTricks++;
+            completedTricks++;
 
             var winner = trick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
-            if (winner != _hochzeitPlayer)
+            if (winner != _hochzeitPlayer && Qualifies(trick, state) && completedTricks <= 3)
                 return player == winner ? Party.Re : Party.Kontra;
         }
 
-        // After 3 qualifying tricks with no partner → Stille Hochzeit (solo)
-        if (qualifyingTricks >= 3)
+        // After 3 tricks with no partner → Stille Hochzeit (solo)
+        if (completedTricks >= 3)
             return Party.Kontra;
 
         return null; // Still searching for partner
@@ -46,17 +44,15 @@ public sealed class HochzeitPartyResolver : IPartyResolver
 
     public bool IsFullyResolved(GameState state)
     {
-        int qualifyingTricks = 0;
+        int completedTricks = 0;
         foreach (var trick in state.CompletedTricks)
         {
-            if (!Qualifies(trick, state))
-                continue;
-            qualifyingTricks++;
+            completedTricks++;
             var winner = trick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
-            if (winner != _hochzeitPlayer)
+            if (winner != _hochzeitPlayer && Qualifies(trick, state) && completedTricks <= 3)
                 return true;
         }
-        return qualifyingTricks >= 3;
+        return completedTricks >= 3;
     }
 
     /// <summary>

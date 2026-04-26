@@ -9,9 +9,9 @@ namespace Doko.Domain.Reservations;
 /// <summary>Damensolo: only Queens are trump.</summary>
 public sealed class DamensoloReservation : IReservation
 {
-    private readonly PlayerId _soloPlayer;
+    private readonly PlayerSeat _soloPlayer;
 
-    public DamensoloReservation(PlayerId soloPlayer) => _soloPlayer = soloPlayer;
+    public DamensoloReservation(PlayerSeat soloPlayer) => _soloPlayer = soloPlayer;
 
     public ReservationPriority Priority => ReservationPriority.Damensolo;
 

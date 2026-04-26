@@ -12,5 +12,4 @@ public enum SonderkarteType
     Heidmann,
     Heidfrau,
     Kemmerich,
-    Schatz,
 }

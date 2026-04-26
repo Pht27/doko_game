@@ -27,9 +27,7 @@ public sealed class StartGameHandler(IGameRepository repository, IGameEventPubli
             return new GameActionResult<StartGameResult>.Failure(GameError.InvalidPhase);
 
         var players = command
-            .Players.Select(
-                (id, i) => new PlayerState(id, (PlayerSeat)i, Domain.Hands.Hand.Empty, null)
-            )
+            .Players.Select(seat => new PlayerState(seat, Domain.Hands.Hand.Empty, null))
             .ToList();
 
         var state = GameState.Create(

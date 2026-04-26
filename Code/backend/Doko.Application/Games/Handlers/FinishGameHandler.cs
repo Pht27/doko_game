@@ -1,5 +1,6 @@
 using Doko.Application.Games.Results;
 using Doko.Domain.GameFlow;
+using Doko.Domain.Reservations;
 using Doko.Domain.Scoring;
 using Doko.Domain.Sonderkarten;
 
@@ -18,6 +19,18 @@ internal sealed class FinishGameHandler(IGameScorer scorer)
 
         state.Apply(new AdvancePhaseModification(GamePhase.Finished));
 
-        return new GameFinishedResult(result);
+        var (netPoints, partyPerSeat) = NetPointsCalculator.Calculate(result, state);
+
+        // Rauskommer advances only after Normal and Hochzeit games; Soli and Armut replay with same leader.
+        bool advanceRauskommer =
+            state.SilentMode is null
+            && (
+                state.ActiveReservation is null
+                || state.ActiveReservation.Priority == ReservationPriority.Hochzeit
+            );
+
+        string? gameMode =
+            state.ActiveReservation?.Priority.ToString() ?? state.SilentMode?.Type.ToString();
+        return new GameFinishedResult(result, netPoints, partyPerSeat, advanceRauskommer, gameMode);
     }
 }

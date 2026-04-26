@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { playCard, declareHealth, makeReservation, respondToArmut, exchangeArmutCards, makeAnnouncement } from '../api/game';
+import { playCard, declareHealth, makeReservation, respondToArmut, exchangeArmutCards, chooseSchwarzesSauSolo, makeAnnouncement } from '../api/game';
 import type { CardDto, PlayerGameViewResponse, SonderkarteInfoDto } from '../types/api';
 import type { HotSeatSession } from './useHotSeat';
 
@@ -15,6 +15,7 @@ export interface GameActions {
   handleReservation: (reservation: string | null, hochzeitCondition: string | null, armutPartner: number | null) => Promise<void>;
   handleArmutResponse: (accepts: boolean) => Promise<void>;
   handleArmutExchange: (cardIds: number[]) => Promise<void>;
+  handleSchwarzesSauSolo: (solo: string) => Promise<void>;
   handleAnnouncement: (type: string) => Promise<void>;
 }
 
@@ -114,6 +115,16 @@ export function useGameActions(
     }
   }
 
+  async function handleSchwarzesSauSolo(solo: string) {
+    setActionError(null);
+    try {
+      await chooseSchwarzesSauSolo(token, gameId, { solo });
+      refetch();
+    } catch (e) {
+      setActionError(e instanceof Error ? e.message : String(e));
+    }
+  }
+
   async function handleAnnouncement(type: string) {
     setActionError(null);
     try {
@@ -136,6 +147,7 @@ export function useGameActions(
     handleReservation,
     handleArmutResponse,
     handleArmutExchange,
+    handleSchwarzesSauSolo,
     handleAnnouncement,
   };
 }

@@ -13,9 +13,9 @@ public class AuthControllerTests(ApiTestFixture fixture) : IClassFixture<ApiTest
     [InlineData(1)]
     [InlineData(2)]
     [InlineData(3)]
-    public async Task Token_ValidPlayerId_Returns200WithToken(int playerId)
+    public async Task Token_ValidPlayerSeat_Returns200WithToken(int playerId)
     {
-        var response = await _client.PostAsJsonAsync("/auth/token", new { playerId });
+        var response = await _client.PostAsJsonAsync("/auth/token", new { seatIndex = playerId });
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var body = await response.Content.ReadFromJsonAsync<JsonElement>();
@@ -26,9 +26,9 @@ public class AuthControllerTests(ApiTestFixture fixture) : IClassFixture<ApiTest
     [InlineData(-1)]
     [InlineData(4)]
     [InlineData(100)]
-    public async Task Token_InvalidPlayerId_Returns400(int playerId)
+    public async Task Token_InvalidPlayerSeat_Returns400(int playerId)
     {
-        var response = await _client.PostAsJsonAsync("/auth/token", new { playerId });
+        var response = await _client.PostAsJsonAsync("/auth/token", new { seatIndex = playerId });
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
