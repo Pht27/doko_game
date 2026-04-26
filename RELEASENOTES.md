@@ -3,10 +3,10 @@
 ## [1.1.1] - 2026-04-25
 
 ### Behoben
-- **Festmahl**: Wer die Pik-Dame durch einen Kreuz-Buben aussticht, gewinnt den Stich jetzt korrekt.
-- **Blutbad**: Der zweite Kreuz-Bube gewinnt den Stich gegen den ersten Kreuz-Buben.
+- **Festmahl**: Bei einem Stich mit drei Tieren, wovon zwei gleich sind, gewinnt das zweite Tier der Mehrheit den Stich.
+- **Blutbad**: Bei einem Stich mit drei unterschiedlichen Tieren gewinnt die nicht Tier Karte den Stich.
 - **Meuterei**: Zwei Pik-Könige und eine Pik-Dame im selben Stich – der Spieler des zweiten Pik-Königs gewinnt; Klabautermann wird dabei nicht fälschlicherweise vergeben.
-- Fuchs (♦A) zählt immer als Tier für Fuchs-gefangen und verwandte Sonderregeln, unabhängig von aktiven Sonderkarten.
+- Fuchs (♦A) zählt immer als Tier für Festmahl und Blutbad, unabhängig von aktiven Schweinchen.
 
 ## [1.1.0] - 2026-04-25
 
