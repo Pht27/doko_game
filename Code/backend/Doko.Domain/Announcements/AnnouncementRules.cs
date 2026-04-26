@@ -1,6 +1,7 @@
 using Doko.Domain.GameFlow;
 using Doko.Domain.Parties;
 using Doko.Domain.Players;
+using Doko.Domain.Reservations;
 using Doko.Domain.Scoring;
 
 namespace Doko.Domain.Announcements;
@@ -11,6 +12,9 @@ public static class AnnouncementRules
     public static bool CanAnnounce(PlayerSeat player, AnnouncementType type, GameState state)
     {
         if (!state.Rules.AllowAnnouncements)
+            return false;
+
+        if (state.ActiveReservation?.Priority == ReservationPriority.SchlankerMartin)
             return false;
 
         // Kontrasolo player cannot announce at all — they already know they play solo.
