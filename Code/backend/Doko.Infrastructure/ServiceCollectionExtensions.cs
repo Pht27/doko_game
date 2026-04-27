@@ -2,6 +2,7 @@ using Doko.Application.Abstractions;
 using Doko.Application.Lobbies;
 using Doko.Infrastructure.Repositories;
 using Doko.Infrastructure.Shuffler;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Doko.Infrastructure;
@@ -13,11 +14,16 @@ public static class ServiceCollectionExtensions
     /// <see cref="IDeckShuffler"/> (random). <see cref="IGameEventPublisher"/> is intentionally
     /// excluded — each presentation layer registers its own implementation.
     /// </summary>
-    public static IServiceCollection AddDokoInfrastructure(this IServiceCollection services)
+    public static IServiceCollection AddDokoInfrastructure(
+        this IServiceCollection services,
+        IConfiguration configuration
+    )
     {
         services.AddSingleton<IGameRepository, InMemoryGameRepository>();
         services.AddSingleton<ILobbyRepository, InMemoryLobbyRepository>();
         services.AddSingleton<IDeckShuffler, RandomDeckShuffler>();
+        services.Configure<LobbyCleanupOptions>(configuration.GetSection("LobbyCleanup"));
+        services.AddHostedService<LobbyCleanupService>();
         return services;
     }
 }

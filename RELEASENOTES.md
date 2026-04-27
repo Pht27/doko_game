@@ -2,6 +2,9 @@
 
 ## [1.1.0] - 2026-04-26
 
+### Verbessert
+- Lobbies werden automatisch gelöscht, wenn sie länger als 2 Stunden inaktiv waren. So verschwinden verlassene oder abgestürzte Lobbies von selbst.
+
 ### Neu
 - Beim Start jedes Spiels erscheint kurz ein Popup, das den Spielmodus ankündigt (z. B. „Karo-Solo · S2" oder „Normalspiel"). Bei Hochzeit, Armut und Soli wird der zugehörige Spieler mit angezeigt.
 - Wenn eine Sonderkarte aktiviert wird, erscheint ebenfalls ein Popup mit Name des Spielers und der Sonderkarte (z. B. „S3 · Schweinchen"). Das Popup verschwindet nach 3 Sekunden automatisch und kann auch mit einem X weggeklickt werden.

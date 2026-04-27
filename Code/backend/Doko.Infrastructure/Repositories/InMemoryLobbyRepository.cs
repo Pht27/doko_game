@@ -23,6 +23,7 @@ public sealed class InMemoryLobbyRepository : ILobbyRepository
 
     public Task SaveAsync(LobbyState lobby, CancellationToken ct = default)
     {
+        lobby.RecordActivity();
         _store[lobby.Id] = lobby;
         return Task.CompletedTask;
     }

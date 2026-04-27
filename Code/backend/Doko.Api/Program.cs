@@ -15,7 +15,7 @@ var jwtKey =
 
 builder
     .Services.AddDokoApplication()
-    .AddDokoInfrastructure()
+    .AddDokoInfrastructure(builder.Configuration)
     .AddDokoApi()
     .AddSignalR()
     .AddJsonProtocol(options =>
