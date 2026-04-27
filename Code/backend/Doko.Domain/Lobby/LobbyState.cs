@@ -24,6 +24,7 @@ public class LobbyState
 
     public LobbyId Id { get; }
     public DateTimeOffset CreatedAt { get; }
+    public DateTimeOffset LastActivityAt { get; private set; }
 
     /// <summary>All currently seated players (non-null seats).</summary>
     public IEnumerable<LobbyPlayer> Players => _seats.Where(s => s != null).Cast<LobbyPlayer>();
@@ -72,6 +73,7 @@ public class LobbyState
     {
         Id = id;
         CreatedAt = createdAt;
+        LastActivityAt = createdAt;
     }
 
     /// <summary>Creates a new lobby; the creator automatically occupies seat 0.</summary>
@@ -81,6 +83,8 @@ public class LobbyState
         lobby._seats[0] = new LobbyPlayer(PlayerSeat.First, DateTimeOffset.UtcNow);
         return lobby;
     }
+
+    public void RecordActivity() => LastActivityAt = DateTimeOffset.UtcNow;
 
     /// <summary>Set of seat indices (0–3) currently occupied by Opa (the computer player).</summary>
     public IReadOnlySet<int> OpaSeats => _opaSeats;
