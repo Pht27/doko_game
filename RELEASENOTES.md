@@ -1,5 +1,10 @@
 # Release Notes
 
+## [1.1.1] - 2026-04-27
+
+### Verbessert
+- Lobbies werden automatisch gelöscht, wenn sie länger als 2 Stunden inaktiv waren. So verschwinden verlassene oder abgestürzte Lobbies von selbst.
+
 ## [1.1.0] - 2026-04-26
 
 ### Verbessert
