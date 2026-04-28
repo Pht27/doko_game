@@ -8,6 +8,7 @@ using Doko.Domain.Parties;
 using Doko.Domain.Players;
 using Doko.Domain.Reservations;
 using Doko.Domain.Sonderkarten;
+using static Doko.Application.Common.GameActionResultExtensions;
 
 namespace Doko.Application.Games.Handlers;
 
@@ -41,13 +42,14 @@ public sealed class MakeReservationHandler(
         CancellationToken ct = default
     )
     {
-        var state = await repository.GetAsync(command.GameId, ct);
-        if (state is null)
-            return new GameActionResult<MakeReservationResult>.Failure(GameError.GameNotFound);
+        var loaded = await repository.LoadOrFailAsync<MakeReservationResult>(command.GameId, ct);
+        if (loaded.Failure is not null)
+            return loaded.Failure;
+        var state = loaded.State!;
 
         var validationError = Validate(command, state);
         if (validationError is not null)
-            return new GameActionResult<MakeReservationResult>.Failure(validationError.Value);
+            return Fail<MakeReservationResult>(validationError.Value);
 
         var events = new List<IDomainEvent>
         {
@@ -312,7 +314,7 @@ public sealed class MakeReservationHandler(
     {
         await repository.SaveAsync(state, ct);
         await publisher.PublishAsync(state.Id, events, ct);
-        return new GameActionResult<MakeReservationResult>.Ok(result);
+        return Ok(result);
     }
 
     /// <summary>Sets the winning reservation as game mode and transitions to Playing.</summary>

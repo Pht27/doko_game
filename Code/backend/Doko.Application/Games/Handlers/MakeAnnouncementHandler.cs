@@ -5,6 +5,7 @@ using Doko.Domain.Announcements;
 using Doko.Domain.GameFlow;
 using Doko.Domain.GameFlow.Events;
 using Doko.Domain.Sonderkarten;
+using static Doko.Application.Common.GameActionResultExtensions;
 
 namespace Doko.Application.Games.Handlers;
 
@@ -26,15 +27,16 @@ public sealed class MakeAnnouncementHandler(
         CancellationToken ct = default
     )
     {
-        var state = await repository.GetAsync(command.GameId, ct);
-        if (state is null)
-            return new GameActionResult<Unit>.Failure(GameError.GameNotFound);
+        var loaded = await repository.LoadOrFailAsync<Unit>(command.GameId, ct);
+        if (loaded.Failure is not null)
+            return loaded.Failure;
+        var state = loaded.State!;
 
         if (state.Phase != GamePhase.Playing)
-            return new GameActionResult<Unit>.Failure(GameError.InvalidPhase);
+            return Fail<Unit>(GameError.InvalidPhase);
 
         if (!AnnouncementRules.CanAnnounce(command.Player, command.Type, state))
-            return new GameActionResult<Unit>.Failure(GameError.AnnouncementNotAllowed);
+            return Fail<Unit>(GameError.AnnouncementNotAllowed);
 
         int trickNum = state.CompletedTricks.Count;
         int cardIdx = state.CurrentTrick?.Cards.Count ?? 0;
@@ -53,6 +55,6 @@ public sealed class MakeAnnouncementHandler(
             ct
         );
 
-        return new GameActionResult<Unit>.Ok(Unit.Value);
+        return Ok(Unit.Value);
     }
 }

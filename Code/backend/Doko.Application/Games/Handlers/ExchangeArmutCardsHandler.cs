@@ -8,6 +8,7 @@ using Doko.Domain.GameFlow.Events;
 using Doko.Domain.Hands;
 using Doko.Domain.Players;
 using Doko.Domain.Sonderkarten;
+using static Doko.Application.Common.GameActionResultExtensions;
 
 namespace Doko.Application.Games.Handlers;
 
@@ -33,22 +34,23 @@ public sealed class ExchangeArmutCardsHandler(
         CancellationToken ct = default
     )
     {
-        var state = await repository.GetAsync(command.GameId, ct);
-        if (state is null)
-            return new GameActionResult<ExchangeArmutCardsResult>.Failure(GameError.GameNotFound);
+        var loaded = await repository.LoadOrFailAsync<ExchangeArmutCardsResult>(command.GameId, ct);
+        if (loaded.Failure is not null)
+            return loaded.Failure;
+        var state = loaded.State!;
 
         if (state.Phase != GamePhase.ArmutCardExchange)
-            return new GameActionResult<ExchangeArmutCardsResult>.Failure(GameError.InvalidPhase);
+            return Fail<ExchangeArmutCardsResult>(GameError.InvalidPhase);
 
         if (state.ArmutRichPlayer != command.RichPlayer)
-            return new GameActionResult<ExchangeArmutCardsResult>.Failure(GameError.NotYourTurn);
+            return Fail<ExchangeArmutCardsResult>(GameError.NotYourTurn);
 
         if (command.CardIdsToReturn.Count != state.ArmutTransferCount)
-            return new GameActionResult<ExchangeArmutCardsResult>.Failure(GameError.IllegalCard);
+            return Fail<ExchangeArmutCardsResult>(GameError.IllegalCard);
 
         var validCardsResult = ResolveCardsToReturn(state, command);
         if (validCardsResult is null)
-            return new GameActionResult<ExchangeArmutCardsResult>.Failure(GameError.IllegalCard);
+            return Fail<ExchangeArmutCardsResult>(GameError.IllegalCard);
 
         var poorPlayer = state.ArmutPlayer!.Value;
         var (newRichHand, newPoorHand, returnedTrumpCount) = ComputeNewHands(
@@ -83,9 +85,7 @@ public sealed class ExchangeArmutCardsHandler(
 
         await repository.SaveAsync(state, ct);
         await publisher.PublishAsync(state.Id, events, ct);
-        return new GameActionResult<ExchangeArmutCardsResult>.Ok(
-            new ExchangeArmutCardsResult(returnedTrumpCount)
-        );
+        return Ok(new ExchangeArmutCardsResult(returnedTrumpCount));
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────
