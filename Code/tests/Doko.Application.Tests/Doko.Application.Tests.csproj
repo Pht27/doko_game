@@ -32,6 +32,7 @@
     <Using Include="Doko.Domain.Sonderkarten" />
     <Using Include="Doko.Domain.Reservations" />
     <Using Include="Doko.Domain.Announcements" />
+    <Using Include="Doko.Application.Scenarios" />
   </ItemGroup>
 
   <ItemGroup>

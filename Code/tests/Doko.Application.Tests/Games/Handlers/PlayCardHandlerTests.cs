@@ -59,7 +59,7 @@ public class PlayCardHandlerTests
     private static IPlayCardHandler Handler(
         Fakes.InMemoryGameRepository repo,
         Fakes.RecordingGameEventPublisher pub
-    ) => new PlayCardHandler(repo, pub, new GameScorer());
+    ) => new PlayCardHandler(repo, pub, new FinishGameHandler(new GameScorer()));
 
     // ── Tests ─────────────────────────────────────────────────────────────────
 

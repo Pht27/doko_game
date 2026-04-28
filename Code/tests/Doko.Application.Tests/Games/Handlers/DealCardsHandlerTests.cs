@@ -20,7 +20,7 @@ public class DealCardsHandlerTests
     {
         var (repo, pub, shuffler) = AppB.Infrastructure();
         var gameId = await StartedGame(repo, pub);
-        var useCase = new DealCardsHandler(repo, pub, shuffler);
+        var useCase = new DealCardsHandler(repo, pub, shuffler, new ScenarioShufflerFactory());
 
         var result = await useCase.ExecuteAsync(new DealCardsCommand(gameId));
 
@@ -36,7 +36,7 @@ public class DealCardsHandlerTests
     {
         var (repo, pub, shuffler) = AppB.Infrastructure();
         var gameId = await StartedGame(repo, pub);
-        var useCase = new DealCardsHandler(repo, pub, shuffler);
+        var useCase = new DealCardsHandler(repo, pub, shuffler, new ScenarioShufflerFactory());
 
         await useCase.ExecuteAsync(new DealCardsCommand(gameId));
 
@@ -49,7 +49,7 @@ public class DealCardsHandlerTests
     public async Task DealCards_ReturnsGameNotFound_WhenGameDoesNotExist()
     {
         var (repo, pub, shuffler) = AppB.Infrastructure();
-        var useCase = new DealCardsHandler(repo, pub, shuffler);
+        var useCase = new DealCardsHandler(repo, pub, shuffler, new ScenarioShufflerFactory());
 
         var result = await useCase.ExecuteAsync(new DealCardsCommand(GameId.New()));
 
@@ -66,11 +66,16 @@ public class DealCardsHandlerTests
         var (repo, pub, shuffler) = AppB.Infrastructure();
         var gameId = await StartedGame(repo, pub);
         // Deal once to move to Reservations
-        await new DealCardsHandler(repo, pub, shuffler).ExecuteAsync(new DealCardsCommand(gameId));
-
-        var result = await new DealCardsHandler(repo, pub, shuffler).ExecuteAsync(
+        await new DealCardsHandler(repo, pub, shuffler, new ScenarioShufflerFactory()).ExecuteAsync(
             new DealCardsCommand(gameId)
         );
+
+        var result = await new DealCardsHandler(
+            repo,
+            pub,
+            shuffler,
+            new ScenarioShufflerFactory()
+        ).ExecuteAsync(new DealCardsCommand(gameId));
 
         result
             .Should()

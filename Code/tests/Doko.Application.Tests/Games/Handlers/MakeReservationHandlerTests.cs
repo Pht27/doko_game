@@ -43,9 +43,12 @@ public class MakeReservationHandlerTests
         )
             .Value
             .GameId;
-        await new DealCardsHandler(repo, pub, new Fakes.FakeDeckShuffler()).ExecuteAsync(
-            new DealCardsCommand(id)
-        );
+        await new DealCardsHandler(
+            repo,
+            pub,
+            new Fakes.FakeDeckShuffler(),
+            new ScenarioShufflerFactory()
+        ).ExecuteAsync(new DealCardsCommand(id));
         // All players say Gesund to skip health check
         var healthHandler = new DeclareHealthStatusHandler(repo, pub);
         foreach (var player in AppB.FourPlayerSeats)
@@ -74,7 +77,8 @@ public class MakeReservationHandlerTests
         await new DealCardsHandler(
             repo,
             pub,
-            deckShuffler ?? new Fakes.FakeDeckShuffler()
+            deckShuffler ?? new Fakes.FakeDeckShuffler(),
+            new ScenarioShufflerFactory()
         ).ExecuteAsync(new DealCardsCommand(id));
         var healthHandler = new DeclareHealthStatusHandler(repo, pub);
         foreach (var player in AppB.FourPlayerSeats)
@@ -210,9 +214,12 @@ public class MakeReservationHandlerTests
         )
             .Value
             .GameId;
-        await new DealCardsHandler(repo, pub, new Fakes.FakeDeckShuffler()).ExecuteAsync(
-            new DealCardsCommand(gameId)
-        );
+        await new DealCardsHandler(
+            repo,
+            pub,
+            new Fakes.FakeDeckShuffler(),
+            new ScenarioShufflerFactory()
+        ).ExecuteAsync(new DealCardsCommand(gameId));
 
         var healthHandler = new DeclareHealthStatusHandler(repo, pub);
         foreach (var player in AppB.FourPlayerSeats)

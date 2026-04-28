@@ -2,11 +2,9 @@ using Doko.Application.Abstractions;
 using Doko.Application.Common;
 using Doko.Application.Games.Commands;
 using Doko.Application.Games.Results;
-using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
 using Doko.Domain.Players;
 using Doko.Domain.Reservations;
-using Doko.Domain.Scoring;
 using Doko.Domain.Sonderkarten;
 using static Doko.Application.Common.GameActionResultExtensions;
 
@@ -29,11 +27,9 @@ public interface IChooseSchwarzesSauSoloHandler
 public sealed class ChooseSchwarzesSauSoloHandler(
     IGameRepository repository,
     IGameEventPublisher publisher,
-    IGameScorer scorer
+    IFinishGameHandler finisher
 ) : IChooseSchwarzesSauSoloHandler
 {
-    private readonly FinishGameHandler _finisher = new(scorer);
-
     public async Task<GameActionResult<ChooseSchwarzesSauSoloResult>> ExecuteAsync(
         ChooseSchwarzesSauSoloCommand command,
         CancellationToken ct = default
@@ -56,7 +52,7 @@ public sealed class ChooseSchwarzesSauSoloHandler(
         if (!IsEligibleSolo(command.Solo))
             return Fail<ChooseSchwarzesSauSoloResult>(GameError.ReservationNotEligible);
 
-        var reservation = CreateReservation(command.Solo, command.Player);
+        var reservation = ReservationRegistry.CreateForPriority(command.Solo, command.Player);
 
         // Apply the solo's trump evaluator and party resolver.
         state.Apply(new SetGameModeModification(reservation, command.Player));
@@ -85,7 +81,7 @@ public sealed class ChooseSchwarzesSauSoloHandler(
         // Finish the game immediately with the chosen solo for scoring.
         if (state.Players.All(p => p.Hand.Cards.Count == 0))
         {
-            var finished = _finisher.Execute(state);
+            var finished = finisher.Execute(state);
             await repository.SaveAsync(state, ct);
             await publisher.PublishAsync(state.Id, [], ct);
             return Ok(new ChooseSchwarzesSauSoloResult(finished));
@@ -96,29 +92,8 @@ public sealed class ChooseSchwarzesSauSoloHandler(
         return Ok(new ChooseSchwarzesSauSoloResult(null));
     }
 
-    // ── Private helpers ───────────────────────────────────────────────────────
-
     /// <summary>All solo priorities (KaroSolo=0 … SchlankerMartin=8) are eligible.
     /// Armut, Hochzeit, and Schmeißen are not solos and may not be chosen.</summary>
     private static bool IsEligibleSolo(ReservationPriority priority) =>
         (int)priority <= (int)ReservationPriority.SchlankerMartin;
-
-    /// <summary>Constructs the concrete <see cref="IReservation"/> for the chosen priority.</summary>
-    private static IReservation CreateReservation(
-        ReservationPriority priority,
-        PlayerSeat player
-    ) =>
-        priority switch
-        {
-            ReservationPriority.KaroSolo => new FarbsoloReservation(Suit.Karo, player),
-            ReservationPriority.KreuzSolo => new FarbsoloReservation(Suit.Kreuz, player),
-            ReservationPriority.PikSolo => new FarbsoloReservation(Suit.Pik, player),
-            ReservationPriority.HerzSolo => new FarbsoloReservation(Suit.Herz, player),
-            ReservationPriority.Damensolo => new DamensoloReservation(player),
-            ReservationPriority.Bubensolo => new BubensoloReservation(player),
-            ReservationPriority.Fleischloses => new FleischlosesReservation(player),
-            ReservationPriority.Knochenloses => new KnochenlosesReservation(player),
-            ReservationPriority.SchlankerMartin => new SchlankerMartinReservation(player),
-            _ => throw new ArgumentOutOfRangeException(nameof(priority), priority, null),
-        };
 }
