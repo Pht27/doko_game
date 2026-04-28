@@ -6,14 +6,12 @@ public sealed class NormalTrumpEvaluator : ITrumpEvaluator
 {
     public static readonly NormalTrumpEvaluator Instance = new();
 
-    private static readonly CardType DulleType = new(Suit.Herz, Rank.Zehn);
-
     public bool IsTrump(CardType card) =>
-        card.Rank is Rank.Dame or Rank.Bube || card.Suit == Suit.Karo || card == DulleType;
+        card.Rank is Rank.Dame or Rank.Bube || card.Suit == Suit.Karo || card.IsDulle();
 
     public int GetTrumpRank(CardType card)
     {
-        if (card == DulleType)
+        if (card.IsDulle())
             return 26;
 
         return card switch

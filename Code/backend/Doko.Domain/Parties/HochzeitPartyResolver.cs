@@ -25,18 +25,15 @@ public sealed class HochzeitPartyResolver : IPartyResolver
         if (player == _hochzeitPlayer)
             return Party.Re;
 
-        int completedTricks = 0;
-        foreach (var trick in state.CompletedTricks)
+        for (int i = 0; i < state.CompletedTricks.Count; i++)
         {
-            completedTricks++;
-
-            var winner = trick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
-            if (winner != _hochzeitPlayer && Qualifies(trick, state) && completedTricks <= 3)
+            var winner = state.ScoredTricks[i].Winner;
+            if (winner != _hochzeitPlayer && Qualifies(state.CompletedTricks[i], state) && i < 3)
                 return player == winner ? Party.Re : Party.Kontra;
         }
 
         // After 3 tricks with no partner → Stille Hochzeit (solo)
-        if (completedTricks >= 3)
+        if (state.CompletedTricks.Count >= 3)
             return Party.Kontra;
 
         return null; // Still searching for partner
@@ -44,15 +41,13 @@ public sealed class HochzeitPartyResolver : IPartyResolver
 
     public bool IsFullyResolved(GameState state)
     {
-        int completedTricks = 0;
-        foreach (var trick in state.CompletedTricks)
+        for (int i = 0; i < state.CompletedTricks.Count; i++)
         {
-            completedTricks++;
-            var winner = trick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
-            if (winner != _hochzeitPlayer && Qualifies(trick, state) && completedTricks <= 3)
+            var winner = state.ScoredTricks[i].Winner;
+            if (winner != _hochzeitPlayer && Qualifies(state.CompletedTricks[i], state) && i < 3)
                 return true;
         }
-        return completedTricks >= 3;
+        return state.CompletedTricks.Count >= 3;
     }
 
     /// <summary>
@@ -65,10 +60,9 @@ public sealed class HochzeitPartyResolver : IPartyResolver
     {
         for (int i = 0; i < state.CompletedTricks.Count; i++)
         {
-            var trick = state.CompletedTricks[i];
-            if (!Qualifies(trick, state))
+            if (!Qualifies(state.CompletedTricks[i], state))
                 continue;
-            var winner = trick.Winner(state.TrumpEvaluator, state.Rules.DulleRule);
+            var winner = state.ScoredTricks[i].Winner;
             if (winner != _hochzeitPlayer)
                 return i * 4 + 5; // Findungsstich at index i
         }

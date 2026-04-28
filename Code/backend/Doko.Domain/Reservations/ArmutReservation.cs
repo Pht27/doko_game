@@ -35,6 +35,6 @@ public sealed class ArmutReservation : IReservation
 
     private static bool IsArmutTrump(CardType c) =>
         c.Rank is Rank.Dame or Rank.Bube
-        || (c.Suit == Suit.Herz && c.Rank == Rank.Zehn)
+        || c.IsDulle()
         || (c.Suit == Suit.Karo && c.Rank != Rank.Ass); // ♦A excluded
 }

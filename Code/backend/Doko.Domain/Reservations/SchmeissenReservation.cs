@@ -42,9 +42,7 @@ public sealed class SchmeissenReservation : IReservation
     }
 
     private static bool IsNormalTrump(CardType c) =>
-        c.Rank is Rank.Dame or Rank.Bube
-        || (c.Suit == Suit.Herz && c.Rank == Rank.Zehn)
-        || c.Suit == Suit.Karo;
+        c.Rank is Rank.Dame or Rank.Bube || c.IsDulle() || c.Suit == Suit.Karo;
 
     private static bool HighestTrumpIsKaroBube(Hand hand)
     {

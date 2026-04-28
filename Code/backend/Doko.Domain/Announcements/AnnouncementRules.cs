@@ -115,11 +115,8 @@ public static class AnnouncementRules
         if (loserAugen < 30 && !winnerAnnounced.Contains(AnnouncementType.Keine30))
             missing++;
 
-        bool loserWonNoTricks = !state.CompletedTricks.Any(t =>
-            state.PartyResolver.ResolveParty(
-                t.Winner(state.TrumpEvaluator, state.Rules.DulleRule),
-                state
-            ) != winner
+        bool loserWonNoTricks = !state.ScoredTricks.Any(tr =>
+            state.PartyResolver.ResolveParty(tr.Winner, state) != winner
         );
 
         if (loserWonNoTricks && !winnerAnnounced.Contains(AnnouncementType.Schwarz))
