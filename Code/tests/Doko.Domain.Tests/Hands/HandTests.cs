@@ -1,4 +1,5 @@
 using Doko.Domain.Tests.Helpers;
+using Doko.Domain.Trump;
 
 namespace Doko.Domain.Tests.Hands;
 
@@ -48,5 +49,61 @@ public class HandTests
         var result = hand.Remove(KreuzAss);
         result.Contains(KreuzAss).Should().BeFalse();
         result.Contains(KreuzAss2).Should().BeTrue();
+    }
+
+    // ── SortedFor ─────────────────────────────────────────────────────────────
+
+    private static readonly ITrumpEvaluator Trump = NormalTrumpEvaluator.Instance;
+
+    [Fact]
+    public void SortedFor_TrumpCardsSortBeforeNonTrumpCards()
+    {
+        var trump = B.Card(0, Suit.Karo, Rank.Ass); // Karo-Ass is trump
+        var fehl = B.Card(1, Suit.Kreuz, Rank.Ass); // Kreuz-Ass is Fehl
+        var hand = B.HandOf(fehl, trump);
+
+        var sorted = hand.SortedFor(Trump);
+
+        sorted[0].Should().Be(trump);
+        sorted[1].Should().Be(fehl);
+    }
+
+    [Fact]
+    public void SortedFor_HigherTrumpRankSortsFirstWithinTrumps()
+    {
+        var kreuzDame = B.Card(0, Suit.Kreuz, Rank.Dame); // rank 24
+        var karoBube = B.Card(1, Suit.Karo, Rank.Bube); // rank 10
+        var hand = B.HandOf(karoBube, kreuzDame);
+
+        var sorted = hand.SortedFor(Trump);
+
+        sorted[0].Should().Be(kreuzDame);
+        sorted[1].Should().Be(karoBube);
+    }
+
+    [Fact]
+    public void SortedFor_FehlCardsGroupBySuitInSuitOrder()
+    {
+        var kreuzAss = B.Card(0, Suit.Kreuz, Rank.Ass);
+        var pikAss = B.Card(1, Suit.Pik, Rank.Ass);
+        var herzAss = B.Card(2, Suit.Herz, Rank.Ass);
+        var hand = B.HandOf(herzAss, pikAss, kreuzAss);
+
+        var sorted = hand.SortedFor(Trump);
+
+        sorted.Select(c => c.Type.Suit).Should().Equal(Suit.Kreuz, Suit.Pik, Suit.Herz);
+    }
+
+    [Fact]
+    public void SortedFor_HigherPlainRankSortsFirstWithinSameSuit()
+    {
+        var kreuzAss = B.Card(0, Suit.Kreuz, Rank.Ass); // plain rank 4
+        var kreuzNeun = B.Card(1, Suit.Kreuz, Rank.Neun); // plain rank 1
+        var kreuzZehn = B.Card(2, Suit.Kreuz, Rank.Zehn); // plain rank 3
+        var hand = B.HandOf(kreuzNeun, kreuzAss, kreuzZehn);
+
+        var sorted = hand.SortedFor(Trump);
+
+        sorted.Select(c => c.Type.Rank).Should().Equal(Rank.Ass, Rank.Zehn, Rank.Neun);
     }
 }

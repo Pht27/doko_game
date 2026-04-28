@@ -1,4 +1,5 @@
 using Doko.Domain.Cards;
+using Doko.Domain.Trump;
 
 namespace Doko.Domain.Hands;
 
@@ -19,6 +20,18 @@ public sealed class Hand
             throw new InvalidOperationException($"Card {card} is not in the hand.");
         return new Hand(newCards);
     }
+
+    public IReadOnlyList<Card> SortedFor(ITrumpEvaluator trumpEvaluator) =>
+        Cards
+            .OrderByDescending(c => trumpEvaluator.IsTrump(c.Type))
+            .ThenByDescending(c =>
+                trumpEvaluator.IsTrump(c.Type) ? trumpEvaluator.GetTrumpRank(c.Type) : 0
+            )
+            .ThenBy(c => (int)c.Type.Suit)
+            .ThenByDescending(c =>
+                trumpEvaluator.IsTrump(c.Type) ? 0 : trumpEvaluator.GetPlainRank(c.Type)
+            )
+            .ToList();
 
     public static Hand Empty => new(Array.Empty<Card>());
 }
