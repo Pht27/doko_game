@@ -77,7 +77,5 @@ If confirmed:
 git checkout develop
 git merge --squash refactor/<slug>
 git commit -m "refactor: <one-line summary>"
-git push origin develop
-git branch -d refactor/<slug>
-git push origin --delete refactor/<slug>
+git branch -D refactor/<slug>
 ```

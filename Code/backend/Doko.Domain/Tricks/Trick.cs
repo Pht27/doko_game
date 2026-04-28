@@ -70,7 +70,7 @@ public sealed class Trick
             }
 
             // Both trump: handle Dulle tie-break then normal comparison
-            if (IsDulle(tc.Card.Type) && IsDulle(winnerType))
+            if (tc.Card.Type.IsDulle() && winnerType.IsDulle())
             {
                 if (dulleRule == Rules.DulleRule.SecondBeatsFirst)
                 {
@@ -89,6 +89,4 @@ public sealed class Trick
 
         return winner;
     }
-
-    private static bool IsDulle(CardType card) => card.Suit == Suit.Herz && card.Rank == Rank.Zehn;
 }

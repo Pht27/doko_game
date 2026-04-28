@@ -178,6 +178,7 @@ public sealed class GameState
         PlayDirection direction = PlayDirection.Counterclockwise,
         IReservation? activeReservation = null,
         IReadOnlyList<Trick>? completedTricks = null,
+        IReadOnlyList<TrickResult>? scoredTricks = null,
         Trick? currentTrick = null,
         IReadOnlyList<Announcement>? announcements = null,
         IReadOnlyList<SonderkarteType>? activeSonderkarten = null,
@@ -185,25 +186,40 @@ public sealed class GameState
         GamePhase phase = GamePhase.Dealing,
         GameId id = default,
         ITrumpEvaluatorFactory? factory = null
-    ) =>
-        new GameState
+    )
+    {
+        var resolvedRules = rules ?? RuleSet.Default();
+        var resolvedEvaluator = trumpEvaluator ?? NormalTrumpEvaluator.Instance;
+        var resolvedTricks = completedTricks ?? [];
+        var resolvedScored =
+            scoredTricks
+            ?? resolvedTricks
+                .Select(t => new TrickResult(
+                    t,
+                    t.Winner(resolvedEvaluator, resolvedRules.DulleRule),
+                    []
+                ))
+                .ToList();
+        return new GameState
         {
             Id = id.Value == Guid.Empty ? GameId.New() : id,
             Phase = phase,
-            Rules = rules ?? RuleSet.Default(),
+            Rules = resolvedRules,
             Players = players ?? [],
             CurrentTurn = currentTurn,
             Direction = direction,
             ActiveReservation = activeReservation,
-            CompletedTricks = completedTricks ?? [],
+            CompletedTricks = resolvedTricks,
+            ScoredTricks = resolvedScored,
             CurrentTrick = currentTrick,
             Announcements = announcements ?? [],
             ActiveSonderkarten = activeSonderkarten ?? [],
-            TrumpEvaluator = trumpEvaluator ?? NormalTrumpEvaluator.Instance,
+            TrumpEvaluator = resolvedEvaluator,
             PartyResolver = partyResolver ?? NormalPartyResolver.Instance,
             InitialHands = initialHands,
             Factory = factory ?? TrumpEvaluatorFactory.Instance,
         };
+    }
 
     /// <summary>Determines the next player in the given play direction.</summary>
     public PlayerSeat NextPlayer(PlayerSeat current, PlayDirection direction)

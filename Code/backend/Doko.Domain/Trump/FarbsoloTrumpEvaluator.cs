@@ -6,16 +6,15 @@ namespace Doko.Domain.Trump;
 public sealed class FarbsoloTrumpEvaluator : ITrumpEvaluator
 {
     private readonly Suit _chosenSuit;
-    private static readonly CardType DulleType = new(Suit.Herz, Rank.Zehn);
 
     public FarbsoloTrumpEvaluator(Suit chosenSuit) => _chosenSuit = chosenSuit;
 
     public bool IsTrump(CardType card) =>
-        card.Rank is Rank.Dame or Rank.Bube || card == DulleType || card.Suit == _chosenSuit;
+        card.Rank is Rank.Dame or Rank.Bube || card.IsDulle() || card.Suit == _chosenSuit;
 
     public int GetTrumpRank(CardType card)
     {
-        if (card == DulleType)
+        if (card.IsDulle())
             return 26;
 
         if (card.Rank is Rank.Dame or Rank.Bube)
