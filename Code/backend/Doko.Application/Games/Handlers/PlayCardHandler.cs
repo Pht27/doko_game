@@ -14,6 +14,7 @@ using Doko.Domain.Rules;
 using Doko.Domain.Scoring;
 using Doko.Domain.Sonderkarten;
 using Doko.Domain.Tricks;
+using static Doko.Application.Common.GameActionResultExtensions;
 
 namespace Doko.Application.Games.Handlers;
 
@@ -38,18 +39,20 @@ public sealed class PlayCardHandler(
         CancellationToken ct = default
     )
     {
-        var state = await repository.GetAsync(command.GameId, ct);
-        if (state is null)
-            return Fail(GameError.GameNotFound);
+        var loaded = await repository.LoadOrFailAsync<PlayCardResult>(command.GameId, ct);
+        if (loaded.Failure is not null)
+            return loaded.Failure;
+        var state = loaded.State!;
+
         if (state.Phase != GamePhase.Playing)
-            return Fail(GameError.InvalidPhase);
+            return Fail<PlayCardResult>(GameError.InvalidPhase);
         if (state.CurrentTurn != command.Player)
-            return Fail(GameError.NotYourTurn);
+            return Fail<PlayCardResult>(GameError.NotYourTurn);
 
         var playerState = state.Players.First(p => p.Seat == command.Player);
         var card = playerState.Hand.Cards.FirstOrDefault(c => c.Id == command.Card);
         if (card is null)
-            return Fail(GameError.IllegalCard);
+            return Fail<PlayCardResult>(GameError.IllegalCard);
 
         BeginTrickIfNeeded(state);
 
@@ -61,11 +64,11 @@ public sealed class PlayCardHandler(
                 state.TrumpEvaluator
             )
         )
-            return Fail(GameError.IllegalCard);
+            return Fail<PlayCardResult>(GameError.IllegalCard);
 
         var sonderkarteError = ApplySonderkarten(state, card, command, out var sonderkarteEvents);
         if (sonderkarteError.HasValue)
-            return Fail(sonderkarteError.Value);
+            return Fail<PlayCardResult>(sonderkarteError.Value);
 
         PlayCardIntoTrick(state, command.Player, playerState, card);
 
@@ -324,12 +327,6 @@ public sealed class PlayCardHandler(
         await repository.SaveAsync(state, ct);
         await publisher.PublishAsync(state.Id, events, ct);
     }
-
-    private static GameActionResult<PlayCardResult> Ok(PlayCardResult value) =>
-        new GameActionResult<PlayCardResult>.Ok(value);
-
-    private static GameActionResult<PlayCardResult> Fail(GameError error) =>
-        new GameActionResult<PlayCardResult>.Failure(error);
 
     private static bool ForceIntoSolo(GameState state) =>
         !state.HochzeitBecameForcedSolo

@@ -8,6 +8,7 @@ using Doko.Domain.Players;
 using Doko.Domain.Reservations;
 using Doko.Domain.Scoring;
 using Doko.Domain.Sonderkarten;
+using static Doko.Application.Common.GameActionResultExtensions;
 
 namespace Doko.Application.Games.Handlers;
 
@@ -38,18 +39,22 @@ public sealed class ChooseSchwarzesSauSoloHandler(
         CancellationToken ct = default
     )
     {
-        var state = await repository.GetAsync(command.GameId, ct);
-        if (state is null)
-            return Fail(GameError.GameNotFound);
+        var loaded = await repository.LoadOrFailAsync<ChooseSchwarzesSauSoloResult>(
+            command.GameId,
+            ct
+        );
+        if (loaded.Failure is not null)
+            return loaded.Failure;
+        var state = loaded.State!;
 
         if (state.Phase != GamePhase.SchwarzesSauSoloSelect)
-            return Fail(GameError.InvalidPhase);
+            return Fail<ChooseSchwarzesSauSoloResult>(GameError.InvalidPhase);
 
         if (state.CurrentTurn != command.Player)
-            return Fail(GameError.NotYourTurn);
+            return Fail<ChooseSchwarzesSauSoloResult>(GameError.NotYourTurn);
 
         if (!IsEligibleSolo(command.Solo))
-            return Fail(GameError.ReservationNotEligible);
+            return Fail<ChooseSchwarzesSauSoloResult>(GameError.ReservationNotEligible);
 
         var reservation = CreateReservation(command.Solo, command.Player);
 
@@ -116,11 +121,4 @@ public sealed class ChooseSchwarzesSauSoloHandler(
             ReservationPriority.SchlankerMartin => new SchlankerMartinReservation(player),
             _ => throw new ArgumentOutOfRangeException(nameof(priority), priority, null),
         };
-
-    private static GameActionResult<ChooseSchwarzesSauSoloResult> Ok(
-        ChooseSchwarzesSauSoloResult value
-    ) => new GameActionResult<ChooseSchwarzesSauSoloResult>.Ok(value);
-
-    private static GameActionResult<ChooseSchwarzesSauSoloResult> Fail(GameError error) =>
-        new GameActionResult<ChooseSchwarzesSauSoloResult>.Failure(error);
 }

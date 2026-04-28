@@ -7,6 +7,7 @@ using Doko.Domain.GameFlow;
 using Doko.Domain.GameFlow.Events;
 using Doko.Domain.Players;
 using Doko.Domain.Sonderkarten;
+using static Doko.Application.Common.GameActionResultExtensions;
 
 namespace Doko.Application.Games.Handlers;
 
@@ -28,24 +29,26 @@ public sealed class DeclareHealthStatusHandler(
         CancellationToken ct = default
     )
     {
-        var state = await repository.GetAsync(command.GameId, ct);
-        if (state is null)
-            return new GameActionResult<DeclareHealthStatusResult>.Failure(GameError.GameNotFound);
+        var loaded = await repository.LoadOrFailAsync<DeclareHealthStatusResult>(
+            command.GameId,
+            ct
+        );
+        if (loaded.Failure is not null)
+            return loaded.Failure;
+        var state = loaded.State!;
 
         if (state.Phase != GamePhase.ReservationHealthCheck)
-            return new GameActionResult<DeclareHealthStatusResult>.Failure(GameError.InvalidPhase);
+            return Fail<DeclareHealthStatusResult>(GameError.InvalidPhase);
 
         // Must be the player's turn (first in pending queue)
         if (
             state.PendingReservationResponders.Count == 0
             || state.PendingReservationResponders[0] != command.Player
         )
-            return new GameActionResult<DeclareHealthStatusResult>.Failure(GameError.NotYourTurn);
+            return Fail<DeclareHealthStatusResult>(GameError.NotYourTurn);
 
         if (state.HealthDeclarations.ContainsKey(command.Player))
-            return new GameActionResult<DeclareHealthStatusResult>.Failure(
-                GameError.AlreadyDeclared
-            );
+            return Fail<DeclareHealthStatusResult>(GameError.AlreadyDeclared);
 
         var events = new List<IDomainEvent>
         {
@@ -147,6 +150,6 @@ public sealed class DeclareHealthStatusHandler(
     {
         await repository.SaveAsync(state, ct);
         await publisher.PublishAsync(state.Id, events, ct);
-        return new GameActionResult<DeclareHealthStatusResult>.Ok(result);
+        return Ok(result);
     }
 }

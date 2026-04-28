@@ -7,6 +7,7 @@ using Doko.Domain.GameFlow.Events;
 using Doko.Domain.Players;
 using Doko.Domain.Reservations;
 using Doko.Domain.Sonderkarten;
+using static Doko.Application.Common.GameActionResultExtensions;
 
 namespace Doko.Application.Games.Handlers;
 
@@ -30,18 +31,19 @@ public sealed class AcceptArmutHandler(IGameRepository repository, IGameEventPub
         CancellationToken ct = default
     )
     {
-        var state = await repository.GetAsync(command.GameId, ct);
-        if (state is null)
-            return new GameActionResult<AcceptArmutResult>.Failure(GameError.GameNotFound);
+        var loaded = await repository.LoadOrFailAsync<AcceptArmutResult>(command.GameId, ct);
+        if (loaded.Failure is not null)
+            return loaded.Failure;
+        var state = loaded.State!;
 
         if (state.Phase != GamePhase.ArmutPartnerFinding)
-            return new GameActionResult<AcceptArmutResult>.Failure(GameError.InvalidPhase);
+            return Fail<AcceptArmutResult>(GameError.InvalidPhase);
 
         if (
             state.PendingReservationResponders.Count == 0
             || state.PendingReservationResponders[0] != command.Player
         )
-            return new GameActionResult<AcceptArmutResult>.Failure(GameError.NotYourTurn);
+            return Fail<AcceptArmutResult>(GameError.NotYourTurn);
 
         var events = new List<IDomainEvent>
         {
@@ -81,7 +83,7 @@ public sealed class AcceptArmutHandler(IGameRepository repository, IGameEventPub
 
         await repository.SaveAsync(state, ct);
         await publisher.PublishAsync(state.Id, events, ct);
-        return new GameActionResult<AcceptArmutResult>.Ok(new AcceptArmutResult(true));
+        return Ok(new AcceptArmutResult(true));
     }
 
     private async Task<GameActionResult<AcceptArmutResult>> HandleDeclineAsync(
@@ -100,7 +102,7 @@ public sealed class AcceptArmutHandler(IGameRepository repository, IGameEventPub
             state.Apply(new SetCurrentTurnModification(remaining[0]));
             await repository.SaveAsync(state, ct);
             await publisher.PublishAsync(state.Id, events, ct);
-            return new GameActionResult<AcceptArmutResult>.Ok(new AcceptArmutResult(false));
+            return Ok(new AcceptArmutResult(false));
         }
 
         // Nobody accepted — Schwarze Sau
@@ -112,8 +114,6 @@ public sealed class AcceptArmutHandler(IGameRepository repository, IGameEventPub
 
         await repository.SaveAsync(state, ct);
         await publisher.PublishAsync(state.Id, events, ct);
-        return new GameActionResult<AcceptArmutResult>.Ok(
-            new AcceptArmutResult(false, SchwarzesSau: true)
-        );
+        return Ok(new AcceptArmutResult(false, SchwarzesSau: true));
     }
 }

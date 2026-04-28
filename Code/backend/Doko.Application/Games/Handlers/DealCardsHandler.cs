@@ -7,6 +7,7 @@ using Doko.Domain.GameFlow;
 using Doko.Domain.Hands;
 using Doko.Domain.Players;
 using Doko.Domain.Sonderkarten;
+using static Doko.Application.Common.GameActionResultExtensions;
 
 namespace Doko.Application.Games.Handlers;
 
@@ -29,12 +30,13 @@ public sealed class DealCardsHandler(
         CancellationToken ct = default
     )
     {
-        var state = await repository.GetAsync(command.GameId, ct);
-        if (state is null)
-            return new GameActionResult<Unit>.Failure(GameError.GameNotFound);
+        var loaded = await repository.LoadOrFailAsync<Unit>(command.GameId, ct);
+        if (loaded.Failure is not null)
+            return loaded.Failure;
+        var state = loaded.State!;
 
         if (state.Phase != GamePhase.Dealing)
-            return new GameActionResult<Unit>.Failure(GameError.InvalidPhase);
+            return Fail<Unit>(GameError.InvalidPhase);
 
         var deck = state.Rules.PlayWithNines ? Deck.Standard48() : Deck.Standard40();
         var activeShuffler = ResolveShuffler(command.ScenarioName);
@@ -64,7 +66,7 @@ public sealed class DealCardsHandler(
         await repository.SaveAsync(state, ct);
         await publisher.PublishAsync(state.Id, [], ct);
 
-        return new GameActionResult<Unit>.Ok(Unit.Value);
+        return Ok(Unit.Value);
     }
 
     private IDeckShuffler ResolveShuffler(string? scenarioName)
