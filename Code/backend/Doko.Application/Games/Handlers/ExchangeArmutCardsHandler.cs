@@ -29,64 +29,57 @@ public sealed class ExchangeArmutCardsHandler(
     IGameEventPublisher publisher
 ) : IExchangeArmutCardsHandler
 {
-    public async Task<GameActionResult<ExchangeArmutCardsResult>> ExecuteAsync(
+    public Task<GameActionResult<ExchangeArmutCardsResult>> ExecuteAsync(
         ExchangeArmutCardsCommand command,
         CancellationToken ct = default
-    )
-    {
-        var loaded = await repository.LoadOrFailAsync<ExchangeArmutCardsResult>(command.GameId, ct);
-        if (loaded.Failure is not null)
-            return loaded.Failure;
-        var state = loaded.State!;
+    ) =>
+        GameCommandPipeline.RunAsync<ExchangeArmutCardsResult>(
+            repository,
+            publisher,
+            command.GameId,
+            GamePhase.ArmutCardExchange,
+            execute: state =>
+            {
+                if (state.ArmutRichPlayer != command.RichPlayer)
+                    return (Fail<ExchangeArmutCardsResult>(GameError.NotYourTurn), []);
 
-        if (state.Phase != GamePhase.ArmutCardExchange)
-            return Fail<ExchangeArmutCardsResult>(GameError.InvalidPhase);
+                if (command.CardIdsToReturn.Count != state.ArmutTransferCount)
+                    return (Fail<ExchangeArmutCardsResult>(GameError.IllegalCard), []);
 
-        if (state.ArmutRichPlayer != command.RichPlayer)
-            return Fail<ExchangeArmutCardsResult>(GameError.NotYourTurn);
+                var cardsToReturn = ResolveCardsToReturn(state, command);
+                if (cardsToReturn is null)
+                    return (Fail<ExchangeArmutCardsResult>(GameError.IllegalCard), []);
 
-        if (command.CardIdsToReturn.Count != state.ArmutTransferCount)
-            return Fail<ExchangeArmutCardsResult>(GameError.IllegalCard);
+                var poorPlayer = state.ArmutPlayer!.Value;
+                var (newRichHand, newPoorHand, returnedTrumpCount) = ComputeNewHands(
+                    state,
+                    command,
+                    poorPlayer,
+                    cardsToReturn
+                );
 
-        var validCardsResult = ResolveCardsToReturn(state, command);
-        if (validCardsResult is null)
-            return Fail<ExchangeArmutCardsResult>(GameError.IllegalCard);
+                state.Apply(new UpdatePlayerHandModification(command.RichPlayer, newRichHand));
+                state.Apply(new UpdatePlayerHandModification(poorPlayer, newPoorHand));
+                state.Apply(new SetArmutReturnedTrumpModification(returnedTrumpCount > 0));
 
-        var poorPlayer = state.ArmutPlayer!.Value;
-        var (newRichHand, newPoorHand, returnedTrumpCount) = ComputeNewHands(
-            state,
-            command,
-            poorPlayer,
-            validCardsResult
+                var startingPlayer = FindStartingPlayer(state, command.RichPlayer, poorPlayer);
+                state.Apply(new AdvancePhaseModification(GamePhase.Playing));
+                state.Apply(new SetCurrentTurnModification(startingPlayer));
+
+                return (
+                    Ok(new ExchangeArmutCardsResult(returnedTrumpCount)),
+                    [
+                        new ArmutCardsExchangedEvent(
+                            state.Id,
+                            command.RichPlayer,
+                            cardsToReturn.Count,
+                            returnedTrumpCount > 0
+                        ),
+                    ]
+                );
+            },
+            ct
         );
-
-        ApplyHandUpdates(
-            state,
-            command.RichPlayer,
-            poorPlayer,
-            newRichHand,
-            newPoorHand,
-            returnedTrumpCount
-        );
-
-        var startingPlayer = FindStartingPlayer(state, command.RichPlayer, poorPlayer);
-        state.Apply(new AdvancePhaseModification(GamePhase.Playing));
-        state.Apply(new SetCurrentTurnModification(startingPlayer));
-
-        var events = new List<IDomainEvent>
-        {
-            new ArmutCardsExchangedEvent(
-                state.Id,
-                command.RichPlayer,
-                validCardsResult.Count,
-                returnedTrumpCount > 0
-            ),
-        };
-
-        await repository.SaveAsync(state, ct);
-        await publisher.PublishAsync(state.Id, events, ct);
-        return Ok(new ExchangeArmutCardsResult(returnedTrumpCount));
-    }
 
     // ── Private helpers ───────────────────────────────────────────────────────
 
@@ -110,9 +103,6 @@ public sealed class ExchangeArmutCardsHandler(
         return cards.Select(c => c!).ToList();
     }
 
-    /// <summary>
-    /// Computes the new hands for both players and counts returned trumps.
-    /// </summary>
     private static (Hand newRichHand, Hand newPoorHand, int returnedTrumpCount) ComputeNewHands(
         GameState state,
         ExchangeArmutCardsCommand command,
@@ -128,20 +118,6 @@ public sealed class ExchangeArmutCardsHandler(
         var newPoorHand = new Hand(poorHand.Cards.Concat(validCards).ToList());
 
         return (newRichHand, newPoorHand, returnedTrumpCount);
-    }
-
-    private static void ApplyHandUpdates(
-        GameState state,
-        PlayerSeat richPlayer,
-        PlayerSeat poorPlayer,
-        Hand newRichHand,
-        Hand newPoorHand,
-        int returnedTrumpCount
-    )
-    {
-        state.Apply(new UpdatePlayerHandModification(richPlayer, newRichHand));
-        state.Apply(new UpdatePlayerHandModification(poorPlayer, newPoorHand));
-        state.Apply(new SetArmutReturnedTrumpModification(returnedTrumpCount > 0));
     }
 
     /// <summary>
