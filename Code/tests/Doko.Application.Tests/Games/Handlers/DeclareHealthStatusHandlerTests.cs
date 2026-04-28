@@ -13,9 +13,12 @@ public class DeclareHealthStatusHandlerTests
             new StartGameCommand(AppB.FourPlayerSeats, RuleSet.Minimal())
         );
         var id = ((GameActionResult<StartGameResult>.Ok)startResult).Value.GameId;
-        await new DealCardsHandler(repo, pub, new Fakes.FakeDeckShuffler()).ExecuteAsync(
-            new DealCardsCommand(id)
-        );
+        await new DealCardsHandler(
+            repo,
+            pub,
+            new Fakes.FakeDeckShuffler(),
+            new ScenarioShufflerFactory()
+        ).ExecuteAsync(new DealCardsCommand(id));
         return id;
     }
 
@@ -138,9 +141,12 @@ public class DeclareHealthStatusHandlerTests
         );
         var gameId = ((GameActionResult<StartGameResult>.Ok)startResult).Value.GameId;
         // P2 is the VorbehaltRauskommer — health check starts from P2, P3, P0, P1
-        await new DealCardsHandler(repo, pub, new Fakes.FakeDeckShuffler()).ExecuteAsync(
-            new DealCardsCommand(gameId, AppB.P2)
-        );
+        await new DealCardsHandler(
+            repo,
+            pub,
+            new Fakes.FakeDeckShuffler(),
+            new ScenarioShufflerFactory()
+        ).ExecuteAsync(new DealCardsCommand(gameId, AppB.P2));
         var useCase = new DeclareHealthStatusHandler(repo, pub);
 
         await useCase.ExecuteAsync(new DeclareHealthStatusCommand(gameId, AppB.P2, false));
@@ -163,9 +169,12 @@ public class DeclareHealthStatusHandlerTests
         var gameId = ((GameActionResult<StartGameResult>.Ok)startResult).Value.GameId;
         // VorbehaltRauskommer = P2, health check order: P2, P3, P0, P1
         // P3 and P1 have Vorbehalt; relative to P2: P3 (rank 1) before P1 (rank 3)
-        await new DealCardsHandler(repo, pub, new Fakes.FakeDeckShuffler()).ExecuteAsync(
-            new DealCardsCommand(gameId, AppB.P2)
-        );
+        await new DealCardsHandler(
+            repo,
+            pub,
+            new Fakes.FakeDeckShuffler(),
+            new ScenarioShufflerFactory()
+        ).ExecuteAsync(new DealCardsCommand(gameId, AppB.P2));
         var useCase = new DeclareHealthStatusHandler(repo, pub);
 
         await useCase.ExecuteAsync(new DeclareHealthStatusCommand(gameId, AppB.P2, false));
@@ -197,9 +206,12 @@ public class DeclareHealthStatusHandlerTests
             new StartGameCommand(AppB.FourPlayerSeats, rules)
         );
         var id = ((GameActionResult<StartGameResult>.Ok)startResult).Value.GameId;
-        await new DealCardsHandler(repo, pub, new Fakes.FakeDeckShuffler()).ExecuteAsync(
-            new DealCardsCommand(id)
-        );
+        await new DealCardsHandler(
+            repo,
+            pub,
+            new Fakes.FakeDeckShuffler(),
+            new ScenarioShufflerFactory()
+        ).ExecuteAsync(new DealCardsCommand(id));
         return id;
     }
 

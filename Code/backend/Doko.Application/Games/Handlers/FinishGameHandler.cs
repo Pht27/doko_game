@@ -6,11 +6,12 @@ using Doko.Domain.Sonderkarten;
 
 namespace Doko.Application.Games.Handlers;
 
-/// <summary>
-/// Internal handler — called by <see cref="PlayCardHandler"/> when the last trick completes.
-/// Not exposed as a public interface to the Api layer.
-/// </summary>
-internal sealed class FinishGameHandler(IGameScorer scorer)
+public interface IFinishGameHandler
+{
+    GameFinishedResult Execute(GameState state);
+}
+
+public sealed class FinishGameHandler(IGameScorer scorer) : IFinishGameHandler
 {
     public GameFinishedResult Execute(GameState state)
     {

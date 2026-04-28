@@ -29,11 +29,9 @@ public interface IPlayCardHandler
 public sealed class PlayCardHandler(
     IGameRepository repository,
     IGameEventPublisher publisher,
-    IGameScorer scorer
+    IFinishGameHandler finisher
 ) : IPlayCardHandler
 {
-    private readonly FinishGameHandler _finisher = new(scorer);
-
     public async Task<GameActionResult<PlayCardResult>> ExecuteAsync(
         PlayCardCommand command,
         CancellationToken ct = default
@@ -277,7 +275,7 @@ public sealed class PlayCardHandler(
         if (
             state.IsSchwarzesSau
             && !state.Players.All(p => p.Hand.Cards.Count == 0)
-            && IsSecondPikDameTrick(state)
+            && SchwarzesSauTrigger.IsSecondPikDameTrick(state)
         )
         {
             state.Apply(new AdvancePhaseModification(GamePhase.SchwarzesSauSoloSelect));
@@ -288,7 +286,7 @@ public sealed class PlayCardHandler(
 
         if (state.Players.All(p => p.Hand.Cards.Count == 0))
         {
-            var finished = _finisher.Execute(state);
+            var finished = finisher.Execute(state);
             await SaveAndPublishAsync(state, events, ct);
             return Ok(new PlayCardResult(true, effectiveWinner, true, finished));
         }
@@ -296,26 +294,6 @@ public sealed class PlayCardHandler(
         state.Apply(new SetCurrentTurnModification(effectiveWinner));
         await SaveAndPublishAsync(state, events, ct);
         return Ok(new PlayCardResult(true, effectiveWinner, false, null));
-    }
-
-    /// <summary>
-    /// Returns true when the just-completed trick (last entry of
-    /// <see cref="GameState.CompletedTricks"/>) pushed the running ♠Q count from &lt;2 to ≥2.
-    /// Handles the case where both Pik Damen appear in the same trick.
-    /// </summary>
-    private static bool IsSecondPikDameTrick(GameState state)
-    {
-        var pikDame = new CardType(Suit.Pik, Rank.Dame);
-        var justCompleted = state.CompletedTricks.Last();
-
-        int inThisTrick = justCompleted.Cards.Count(c => c.Card.Type == pikDame);
-        if (inThisTrick == 0)
-            return false;
-
-        int totalSoFar = state.CompletedTricks.Sum(t => t.Cards.Count(c => c.Card.Type == pikDame));
-        int beforeThisTrick = totalSoFar - inThisTrick;
-
-        return beforeThisTrick < 2 && totalSoFar >= 2;
     }
 
     private async Task SaveAndPublishAsync(

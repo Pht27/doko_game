@@ -99,4 +99,20 @@ public static class ReservationRegistry
         var hochzeit = new HochzeitReservation(player, HochzeitCondition.FirstTrick);
         return hochzeit.IsEligible(hand, rules) ? [ReservationPriority.Hochzeit] : [];
     }
+
+    /// <summary>Constructs the concrete <see cref="IReservation"/> for the given priority and player.</summary>
+    public static IReservation CreateForPriority(ReservationPriority priority, PlayerSeat player) =>
+        priority switch
+        {
+            ReservationPriority.KaroSolo => new FarbsoloReservation(Suit.Karo, player),
+            ReservationPriority.KreuzSolo => new FarbsoloReservation(Suit.Kreuz, player),
+            ReservationPriority.PikSolo => new FarbsoloReservation(Suit.Pik, player),
+            ReservationPriority.HerzSolo => new FarbsoloReservation(Suit.Herz, player),
+            ReservationPriority.Damensolo => new DamensoloReservation(player),
+            ReservationPriority.Bubensolo => new BubensoloReservation(player),
+            ReservationPriority.Fleischloses => new FleischlosesReservation(player),
+            ReservationPriority.Knochenloses => new KnochenlosesReservation(player),
+            ReservationPriority.SchlankerMartin => new SchlankerMartinReservation(player),
+            _ => throw new ArgumentOutOfRangeException(nameof(priority), priority, null),
+        };
 }

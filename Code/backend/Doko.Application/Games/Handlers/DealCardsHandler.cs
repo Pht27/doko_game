@@ -22,7 +22,8 @@ public interface IDealCardsHandler
 public sealed class DealCardsHandler(
     IGameRepository repository,
     IGameEventPublisher publisher,
-    IDeckShuffler shuffler
+    IDeckShuffler shuffler,
+    IScenarioShufflerFactory scenarioShufflerFactory
 ) : IDealCardsHandler
 {
     public async Task<GameActionResult<Unit>> ExecuteAsync(
@@ -39,7 +40,7 @@ public sealed class DealCardsHandler(
             return Fail<Unit>(GameError.InvalidPhase);
 
         var deck = state.Rules.PlayWithNines ? Deck.Standard48() : Deck.Standard40();
-        var activeShuffler = ResolveShuffler(command.ScenarioName);
+        var activeShuffler = scenarioShufflerFactory.TryCreate(command.ScenarioName) ?? shuffler;
         var shuffled = activeShuffler.Shuffle(deck);
         var cardsPerPlayer = shuffled.Count / 4;
 
@@ -67,13 +68,5 @@ public sealed class DealCardsHandler(
         await publisher.PublishAsync(state.Id, [], ct);
 
         return Ok(Unit.Value);
-    }
-
-    private IDeckShuffler ResolveShuffler(string? scenarioName)
-    {
-        if (scenarioName is null)
-            return shuffler;
-        var config = Scenarios.Scenarios.All.FirstOrDefault(s => s.Name == scenarioName);
-        return config is not null ? new ScenarioShuffler(config) : shuffler;
     }
 }

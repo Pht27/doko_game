@@ -137,14 +137,11 @@ public class LobbyState
         return true;
     }
 
-    /// <summary>
-    /// Removes the player from their seat. Returns true if the lobby is now completely empty.
-    /// </summary>
-    public bool TryRemovePlayer(PlayerSeat seat)
+    /// <summary>Removes the player from their seat.</summary>
+    public void RemovePlayer(PlayerSeat seat)
     {
         _opaSeats.Remove((int)seat);
         _seats[(int)seat] = null;
-        return _seats.All(s => s == null);
     }
 
     /// <summary>Returns true if the given seat is currently occupied.</summary>

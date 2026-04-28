@@ -2,6 +2,7 @@ using Doko.Application.Abstractions;
 using Doko.Application.Games;
 using Doko.Application.Games.Handlers;
 using Doko.Application.Lobbies.Handlers;
+using Doko.Application.Scenarios;
 using Doko.Domain.Scoring;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,6 +17,8 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection AddDokoApplication(this IServiceCollection services)
     {
+        services.AddScoped<IFinishGameHandler, FinishGameHandler>();
+        services.AddSingleton<IScenarioShufflerFactory, ScenarioShufflerFactory>();
         services.AddScoped<IStartGameHandler, StartGameHandler>();
         services.AddScoped<IDealCardsHandler, DealCardsHandler>();
         services.AddScoped<IDeclareHealthStatusHandler, DeclareHealthStatusHandler>();

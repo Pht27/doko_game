@@ -30,7 +30,7 @@ public sealed class SwapSeatHandler(ILobbyRepository repository) : ISwapSeatHand
             return new LobbyActionResult<SwapSeatResult>.Failure(LobbyError.PlayerNotInLobby);
 
         // Remove old seat then occupy new seat without ever persisting an empty lobby
-        lobby.TryRemovePlayer(command.FromSeat);
+        lobby.RemovePlayer(command.FromSeat);
 
         if (!lobby.TryOccupySeat(command.ToSeatIndex, out var newSeat))
         {
