@@ -12,6 +12,7 @@ using Doko.Domain.Rules;
 using Doko.Domain.Scoring;
 using Doko.Domain.Sonderkarten;
 using Doko.Domain.Tricks;
+using Doko.Domain.Trump;
 
 namespace Doko.Application.Games;
 
@@ -45,7 +46,11 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             BuildEligibleSonderkarten(hand, isMyTurn, state),
             BuildOtherPlayers(requestingPlayer, state),
             BuildCurrentTrickSummary(state),
-            state.ScoredTricks.Select((r, i) => ToCompletedTrickSummary(i, r)).ToList(),
+            [
+                .. state.ScoredTricks.Select(
+                    (r, i) => ToCompletedTrickSummary(i, r, state.TrumpEvaluator)
+                ),
+            ],
             state.CurrentTurn,
             isMyTurn
         )
@@ -297,16 +302,28 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
         return state.PartyResolver.ResolveParty(player, state);
     }
 
-    private static TrickSummary ToCompletedTrickSummary(int trickNumber, TrickResult result)
+    private static TrickSummary ToCompletedTrickSummary(
+        int trickNumber,
+        TrickResult result,
+        ITrumpEvaluator trumpEvaluator
+    )
     {
         bool hasFischauge = result.Awards.Any(a => a.Type == ExtrapunktType.Fischauge);
 
         var cards = result
-            .Trick.Cards.Select(tc =>
-            {
-                bool faceDown = hasFischauge && tc.Card.Type == KaroNeun;
-                return new TrickCardSummary(tc.Player, tc.Card, faceDown);
-            })
+            .Trick.Cards.Select(
+                (tc, index) =>
+                {
+                    bool faceDown = IsFischaugeFaceDown(
+                        tc.Card,
+                        index,
+                        result.Trick.Cards,
+                        hasFischauge,
+                        trumpEvaluator
+                    );
+                    return new TrickCardSummary(tc.Player, tc.Card, faceDown);
+                }
+            )
             .ToList();
 
         return new TrickSummary(trickNumber, cards, result.Winner);
@@ -333,11 +350,18 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
 
     private static readonly CardType KaroNeun = new(Suit.Karo, Rank.Neun);
 
-    /// <summary>
-    /// Builds a TrickSummary for the current (incomplete) trick, computing per-card FaceDown flags.
-    /// A ♦9 is shown face-down when: Fischauge is active, it is not the first card in the trick,
-    /// and all previously played cards in the trick are Fehl (not trump).
-    /// </summary>
+    private static bool IsFischaugeFaceDown(
+        Card card,
+        int index,
+        IReadOnlyList<TrickCard> cards,
+        bool fischaugeActive,
+        ITrumpEvaluator trumpEvaluator
+    ) =>
+        fischaugeActive
+        && card.Type == KaroNeun
+        && index > 0
+        && cards.Take(index).All(prev => !trumpEvaluator.IsTrump(prev.Card.Type));
+
     private static TrickSummary ToCurrentTrickSummary(int trickNumber, Trick trick, GameState state)
     {
         bool fischaugeActive = state.CompletedTricks.Any(t =>
@@ -347,17 +371,17 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
         var cards = trick
             .Cards.Select(
                 (tc, index) =>
-                {
-                    bool faceDown =
-                        fischaugeActive
-                        && tc.Card.Type == KaroNeun
-                        && index > 0
-                        && trick
-                            .Cards.Take(index)
-                            .All(prev => !state.TrumpEvaluator.IsTrump(prev.Card.Type));
-
-                    return new TrickCardSummary(tc.Player, tc.Card, faceDown);
-                }
+                    new TrickCardSummary(
+                        tc.Player,
+                        tc.Card,
+                        IsFischaugeFaceDown(
+                            tc.Card,
+                            index,
+                            trick.Cards,
+                            fischaugeActive,
+                            state.TrumpEvaluator
+                        )
+                    )
             )
             .ToList();
 
