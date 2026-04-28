@@ -11,5 +11,5 @@ public interface IReservation
     bool IsSolo => Priority <= ReservationPriority.SchlankerMartin;
 
     bool IsEligible(Hand hand, RuleSet rules);
-    GameModeContext Apply();
+    GameModeContext BuildContext();
 }

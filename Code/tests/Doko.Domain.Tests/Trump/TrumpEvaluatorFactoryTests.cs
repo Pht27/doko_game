@@ -34,7 +34,7 @@ public class TrumpEvaluatorFactoryTests
     public void SoloReservation_ReturnsReservationTrumpEvaluator_WithoutDecorator()
     {
         var reservation = new DamensoloReservation(PlayerSeat.First);
-        var expected = reservation.Apply().TrumpEvaluator;
+        var expected = reservation.BuildContext().TrumpEvaluator;
 
         var result = Sut.Build(reservation, null, [], DefaultRules);
 

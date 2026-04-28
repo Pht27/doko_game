@@ -1,6 +1,7 @@
 using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
 using Doko.Domain.Players;
+using Doko.Domain.Rules;
 
 namespace Doko.Domain.Tricks;
 
@@ -12,6 +13,9 @@ namespace Doko.Domain.Tricks;
 public sealed class MeutereiTrickWinnerRule : ITrickWinnerRule
 {
     private static readonly CardType PikKoenig = new(Suit.Pik, Rank.Koenig);
+
+    public bool IsEnabledBy(RuleSet rules) => rules.EnableMeuterei;
+
     private static readonly CardType PikDame = new(Suit.Pik, Rank.Dame);
 
     public PlayerSeat? TryGetOverride(

@@ -8,7 +8,7 @@ namespace Doko.Domain.Reservations;
 
 /// <summary>
 /// Schmeißen: player may force a redeal if their hand meets any qualifying condition.
-/// Apply() returns a normal-game context; the actual redeal is handled by the game engine.
+/// BuildContext() returns a normal-game context; the actual redeal is handled by the game engine.
 /// </summary>
 public sealed class SchmeissenReservation : IReservation
 {
@@ -17,7 +17,7 @@ public sealed class SchmeissenReservation : IReservation
     public bool IsEligible(Hand hand, RuleSet rules) =>
         rules.AllowSchmeissen && QualifiesForSchmeissen(hand);
 
-    public GameModeContext Apply() =>
+    public GameModeContext BuildContext() =>
         new(NormalTrumpEvaluator.Instance, NormalPartyResolver.Instance);
 
     private static bool QualifiesForSchmeissen(Hand hand)

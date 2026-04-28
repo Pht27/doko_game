@@ -17,6 +17,6 @@ public sealed class DamensoloReservation : IReservation
 
     public bool IsEligible(Hand hand, RuleSet rules) => rules.AllowDamensolo;
 
-    public GameModeContext Apply() =>
+    public GameModeContext BuildContext() =>
         new(DamensoloTrumpEvaluator.Instance, new SoloPartyResolver(_soloPlayer));
 }

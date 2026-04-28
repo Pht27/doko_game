@@ -20,6 +20,6 @@ public sealed class KnochenlosesReservation : IReservation
 
     public bool IsEligible(Hand hand, RuleSet rules) => rules.AllowKnochenloses;
 
-    public GameModeContext Apply() =>
+    public GameModeContext BuildContext() =>
         new(KnochenloseTrumpEvaluator.Instance, new SoloPartyResolver(_soloPlayer));
 }

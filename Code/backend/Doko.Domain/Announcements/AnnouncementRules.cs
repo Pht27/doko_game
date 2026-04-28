@@ -105,6 +105,29 @@ public static class AnnouncementRules
         var loserAugen = winner == Party.Re ? result.KontraAugen : result.ReAugen;
         var winnerAnnounced = EffectiveAnnouncementsFor(winner, state);
 
+        bool loserWonNoTricks = !state.ScoredTricks.Any(tr =>
+            state.PartyResolver.ResolveParty(tr.Winner, state) != winner
+        );
+
+        return CountMissingFeigheitAnnouncements(
+                winner,
+                loserAugen,
+                loserWonNoTricks,
+                winnerAnnounced
+            ) > 2;
+    }
+
+    /// <summary>
+    /// Counts how many Feigheit announcements were missing for the winning party.
+    /// Each threshold not announced counts as one missing announcement.
+    /// </summary>
+    internal static int CountMissingFeigheitAnnouncements(
+        Party winner,
+        int loserAugen,
+        bool loserWonNoTricks,
+        ISet<AnnouncementType> winnerAnnounced
+    )
+    {
         int missing = 0;
         if (loserAugen < 120 && !winnerAnnounced.Contains(AnnouncementType.Win))
             missing++;
@@ -114,15 +137,9 @@ public static class AnnouncementRules
             missing++;
         if (loserAugen < 30 && !winnerAnnounced.Contains(AnnouncementType.Keine30))
             missing++;
-
-        bool loserWonNoTricks = !state.ScoredTricks.Any(tr =>
-            state.PartyResolver.ResolveParty(tr.Winner, state) != winner
-        );
-
         if (loserWonNoTricks && !winnerAnnounced.Contains(AnnouncementType.Schwarz))
             missing++;
-
-        return missing > 2;
+        return missing;
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────

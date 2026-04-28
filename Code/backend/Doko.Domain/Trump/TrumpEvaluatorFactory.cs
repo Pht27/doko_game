@@ -19,7 +19,7 @@ public sealed class TrumpEvaluatorFactory : ITrumpEvaluatorFactory
     )
     {
         var baseEvaluator =
-            activeReservation?.Apply().TrumpEvaluator
+            activeReservation?.BuildContext().TrumpEvaluator
             ?? (
                 silentMode?.Type == SilentGameModeType.KontraSolo
                     ? (ITrumpEvaluator)KontraSoloTrumpEvaluator.Instance

@@ -1,5 +1,6 @@
 using Doko.Domain.GameFlow;
 using Doko.Domain.Players;
+using Doko.Domain.Rules;
 
 namespace Doko.Domain.Tricks;
 
@@ -10,6 +11,8 @@ namespace Doko.Domain.Tricks;
 /// </summary>
 public sealed class BlutbadTrickWinnerRule : ITrickWinnerRule
 {
+    public bool IsEnabledBy(RuleSet rules) => rules.EnableBlutbad;
+
     public PlayerSeat? TryGetOverride(
         Trick completedTrick,
         GameState state,

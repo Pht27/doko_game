@@ -17,6 +17,6 @@ public sealed class BubensoloReservation : IReservation
 
     public bool IsEligible(Hand hand, RuleSet rules) => rules.AllowBubensolo;
 
-    public GameModeContext Apply() =>
+    public GameModeContext BuildContext() =>
         new(BubensoloTrumpEvaluator.Instance, new SoloPartyResolver(_soloPlayer));
 }

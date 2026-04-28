@@ -27,7 +27,7 @@ public sealed class ArmutReservation : IReservation
     public bool IsEligible(Hand hand, RuleSet rules) =>
         rules.AllowArmut && CountArmutTrump(hand) <= 3;
 
-    public GameModeContext Apply() =>
+    public GameModeContext BuildContext() =>
         new(NormalTrumpEvaluator.Instance, new ArmutPartyResolver(_poorPlayer, _richPlayer));
 
     /// <summary>Counts trump for Armut eligibility: excludes ♦ Aces (Füchse).</summary>

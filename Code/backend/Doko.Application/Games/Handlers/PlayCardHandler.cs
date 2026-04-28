@@ -202,7 +202,7 @@ public sealed class PlayCardHandler(
         CancellationToken ct
     )
     {
-        state.Apply(new SetCurrentTurnModification(state.NextPlayer(player, state.Direction)));
+        state.Apply(new SetCurrentTurnModification(player.Next(state.Direction)));
         await SaveAndPublishAsync(state, events, ct);
         return Ok(new PlayCardResult(false, null, false, null));
     }

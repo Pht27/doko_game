@@ -222,15 +222,6 @@ public sealed class GameState
         };
     }
 
-    /// <summary>Determines the next player in the given play direction.</summary>
-    public PlayerSeat NextPlayer(PlayerSeat current, PlayDirection direction)
-    {
-        int seatIndex = (int)current;
-        int nextIndex =
-            direction == PlayDirection.Counterclockwise ? (seatIndex + 1) % 4 : (seatIndex + 3) % 4;
-        return (PlayerSeat)nextIndex;
-    }
-
     /// <summary>Applies a state modification. The only place mutations occur.</summary>
     public void Apply(GameStateModification modification)
     {
@@ -278,7 +269,7 @@ public sealed class GameState
             case SetGameModeModification m:
                 ActiveReservation = m.Reservation;
                 GameModePlayerSeat = m.Player;
-                var ctx = m.Reservation?.Apply();
+                var ctx = m.Reservation?.BuildContext();
                 TrumpEvaluator = ctx?.TrumpEvaluator ?? NormalTrumpEvaluator.Instance;
                 PartyResolver = ctx?.PartyResolver ?? NormalPartyResolver.Instance;
                 break;

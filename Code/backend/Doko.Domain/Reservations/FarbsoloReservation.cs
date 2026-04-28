@@ -33,6 +33,6 @@ public sealed class FarbsoloReservation : IReservation
 
     public bool IsEligible(Hand hand, RuleSet rules) => rules.AllowFarbsoli;
 
-    public GameModeContext Apply() =>
+    public GameModeContext BuildContext() =>
         new(new FarbsoloTrumpEvaluator(_suit), new SoloPartyResolver(_soloPlayer));
 }
