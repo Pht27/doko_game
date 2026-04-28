@@ -159,6 +159,8 @@ public sealed class GameState
     /// </summary>
     public bool IsSchwarzesSau { get; private set; }
 
+    private ITrumpEvaluatorFactory Factory { get; init; } = TrumpEvaluatorFactory.Instance;
+
 #pragma warning disable CS8618 // Non-nullable fields initialized via factory/Apply
     private GameState() { }
 #pragma warning restore CS8618
@@ -181,7 +183,8 @@ public sealed class GameState
         IReadOnlyList<SonderkarteType>? activeSonderkarten = null,
         IReadOnlyDictionary<PlayerSeat, Hand>? initialHands = null,
         GamePhase phase = GamePhase.Dealing,
-        GameId id = default
+        GameId id = default,
+        ITrumpEvaluatorFactory? factory = null
     ) =>
         new GameState
         {
@@ -199,6 +202,7 @@ public sealed class GameState
             TrumpEvaluator = trumpEvaluator ?? NormalTrumpEvaluator.Instance,
             PartyResolver = partyResolver ?? NormalPartyResolver.Instance,
             InitialHands = initialHands,
+            Factory = factory ?? TrumpEvaluatorFactory.Instance,
         };
 
     /// <summary>Determines the next player in the given play direction.</summary>
@@ -238,7 +242,12 @@ public sealed class GameState
                 break;
 
             case RebuildTrumpEvaluatorModification:
-                RebuildTrumpEvaluator();
+                TrumpEvaluator = Factory.Build(
+                    ActiveReservation,
+                    SilentMode,
+                    ActiveSonderkarten,
+                    Rules
+                );
                 break;
 
             case CloseActivationWindowModification m:
@@ -259,21 +268,15 @@ public sealed class GameState
 
             case SetSilentGameModeModification m:
                 SilentMode = m.Mode;
-                switch (m.Mode?.Type)
+                TrumpEvaluator = Factory.Build(null, m.Mode, ActiveSonderkarten, Rules);
+                PartyResolver = m.Mode?.Type switch
                 {
-                    case SilentGameModeType.KontraSolo:
-                        TrumpEvaluator = KontraSoloTrumpEvaluator.Instance;
-                        PartyResolver = new KontraSoloPartyResolver(m.Mode.Player);
-                        break;
-                    case SilentGameModeType.StilleHochzeit:
-                        TrumpEvaluator = NormalTrumpEvaluator.Instance;
-                        PartyResolver = new StilleHochzeitPartyResolver(m.Mode.Player);
-                        break;
-                    default:
-                        TrumpEvaluator = NormalTrumpEvaluator.Instance;
-                        PartyResolver = NormalPartyResolver.Instance;
-                        break;
-                }
+                    SilentGameModeType.KontraSolo => new KontraSoloPartyResolver(m.Mode.Player),
+                    SilentGameModeType.StilleHochzeit => new StilleHochzeitPartyResolver(
+                        m.Mode.Player
+                    ),
+                    _ => NormalPartyResolver.Instance,
+                };
                 break;
 
             case SetCurrentTurnModification m:
@@ -449,38 +452,5 @@ public sealed class GameState
                     $"Unknown modification type: {modification.GetType().Name}"
                 );
         }
-    }
-
-    private void RebuildTrumpEvaluator()
-    {
-        var baseEvaluator =
-            ActiveReservation?.Apply().TrumpEvaluator
-            ?? (
-                SilentMode?.Type == SilentGameModeType.KontraSolo
-                    ? (ITrumpEvaluator)KontraSoloTrumpEvaluator.Instance
-                    : NormalTrumpEvaluator.Instance
-            );
-
-        var activeSet = ActiveSonderkarten.ToHashSet();
-        var suppressed = SonderkarteRegistry
-            .GetEnabled(Rules)
-            .Where(s => activeSet.Contains(s.Type) && s.Suppresses.HasValue)
-            .Select(s => s.Suppresses!.Value)
-            .ToHashSet();
-
-        var modifiers = SonderkarteRegistry
-            .GetEnabled(Rules)
-            .Where(s =>
-                activeSet.Contains(s.Type)
-                && !suppressed.Contains(s.Type)
-                && s.RankingModifier is not null
-            )
-            .Select(s => s.RankingModifier!)
-            .ToList();
-
-        TrumpEvaluator =
-            modifiers.Count > 0
-                ? new StandardSonderkarteDecorator(baseEvaluator, modifiers)
-                : baseEvaluator;
     }
 }
