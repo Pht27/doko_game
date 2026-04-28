@@ -3,9 +3,8 @@ using Doko.Application.Common;
 using Doko.Application.Games.Commands;
 using Doko.Application.Games.Results;
 using Doko.Domain.GameFlow;
-using Doko.Domain.Players;
+using Doko.Domain.GameFlow.Modifications;
 using Doko.Domain.Reservations;
-using Doko.Domain.Sonderkarten;
 using static Doko.Application.Common.GameActionResultExtensions;
 
 namespace Doko.Application.Games.Handlers;

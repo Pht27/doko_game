@@ -4,7 +4,7 @@ using Doko.Application.Games.Commands;
 using Doko.Domain.Announcements;
 using Doko.Domain.GameFlow;
 using Doko.Domain.GameFlow.Events;
-using Doko.Domain.Sonderkarten;
+using Doko.Domain.GameFlow.Modifications;
 using static Doko.Application.Common.GameActionResultExtensions;
 
 namespace Doko.Application.Games.Handlers;

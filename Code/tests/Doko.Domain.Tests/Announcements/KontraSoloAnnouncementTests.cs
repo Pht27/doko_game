@@ -1,3 +1,4 @@
+using Doko.Domain.GameFlow.Modifications;
 using Doko.Domain.Tests.Helpers;
 
 namespace Doko.Domain.Tests.Announcements;

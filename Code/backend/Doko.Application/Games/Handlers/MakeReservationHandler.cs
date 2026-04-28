@@ -4,10 +4,10 @@ using Doko.Application.Games.Commands;
 using Doko.Application.Games.Results;
 using Doko.Domain.GameFlow;
 using Doko.Domain.GameFlow.Events;
+using Doko.Domain.GameFlow.Modifications;
 using Doko.Domain.Parties;
 using Doko.Domain.Players;
 using Doko.Domain.Reservations;
-using Doko.Domain.Sonderkarten;
 using static Doko.Application.Common.GameActionResultExtensions;
 
 namespace Doko.Application.Games.Handlers;

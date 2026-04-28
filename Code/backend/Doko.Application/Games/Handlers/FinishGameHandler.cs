@@ -1,8 +1,8 @@
 using Doko.Application.Games.Results;
 using Doko.Domain.GameFlow;
+using Doko.Domain.GameFlow.Modifications;
 using Doko.Domain.Reservations;
 using Doko.Domain.Scoring;
-using Doko.Domain.Sonderkarten;
 
 namespace Doko.Application.Games.Handlers;
 

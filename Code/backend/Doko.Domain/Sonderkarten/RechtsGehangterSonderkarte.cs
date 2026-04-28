@@ -1,5 +1,6 @@
 using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
+using Doko.Domain.GameFlow.Modifications;
 
 namespace Doko.Domain.Sonderkarten;
 

@@ -7,6 +7,7 @@ using Doko.Domain.Cards;
 using Doko.Domain.Extrapunkte;
 using Doko.Domain.GameFlow;
 using Doko.Domain.GameFlow.Events;
+using Doko.Domain.GameFlow.Modifications;
 using Doko.Domain.Parties;
 using Doko.Domain.Players;
 using Doko.Domain.Reservations;
