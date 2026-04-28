@@ -25,12 +25,11 @@ public sealed class HochzeitPartyResolver : IPartyResolver
         if (player == _hochzeitPlayer)
             return Party.Re;
 
-        for (int i = 0; i < state.CompletedTricks.Count; i++)
-        {
-            var winner = state.ScoredTricks[i].Winner;
-            if (winner != _hochzeitPlayer && Qualifies(state.CompletedTricks[i], state) && i < 3)
-                return player == winner ? Party.Re : Party.Kontra;
-        }
+        int? findungsstich = FindFindungstrickIndex(state);
+        if (findungsstich.HasValue)
+            return player == state.ScoredTricks[findungsstich.Value].Winner
+                ? Party.Re
+                : Party.Kontra;
 
         // After 3 tricks with no partner → Stille Hochzeit (solo)
         if (state.CompletedTricks.Count >= 3)
@@ -39,16 +38,8 @@ public sealed class HochzeitPartyResolver : IPartyResolver
         return null; // Still searching for partner
     }
 
-    public bool IsFullyResolved(GameState state)
-    {
-        for (int i = 0; i < state.CompletedTricks.Count; i++)
-        {
-            var winner = state.ScoredTricks[i].Winner;
-            if (winner != _hochzeitPlayer && Qualifies(state.CompletedTricks[i], state) && i < 3)
-                return true;
-        }
-        return state.CompletedTricks.Count >= 3;
-    }
+    public bool IsFullyResolved(GameState state) =>
+        FindFindungstrickIndex(state).HasValue || state.CompletedTricks.Count >= 3;
 
     /// <summary>
     /// Returns the announcement deadline relative to the Findungsstich.
@@ -58,15 +49,19 @@ public sealed class HochzeitPartyResolver : IPartyResolver
     /// </summary>
     public int? AnnouncementBaseDeadline(GameState state)
     {
-        for (int i = 0; i < state.CompletedTricks.Count; i++)
+        int? i = FindFindungstrickIndex(state);
+        return i.HasValue ? i.Value * 4 + 5 : null;
+    }
+
+    private int? FindFindungstrickIndex(GameState state)
+    {
+        for (int i = 0; i < state.CompletedTricks.Count && i < 3; i++)
         {
-            if (!Qualifies(state.CompletedTricks[i], state))
-                continue;
             var winner = state.ScoredTricks[i].Winner;
-            if (winner != _hochzeitPlayer)
-                return i * 4 + 5; // Findungsstich at index i
+            if (winner != _hochzeitPlayer && Qualifies(state.CompletedTricks[i], state))
+                return i;
         }
-        return null; // Findungsstich not yet found
+        return null;
     }
 
     private bool Qualifies(Tricks.Trick trick, GameState state) =>

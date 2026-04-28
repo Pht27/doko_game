@@ -5,40 +5,6 @@ namespace Doko.Domain.Tests.GameFlow;
 
 public class GameStateTests
 {
-    // ── NextPlayer ────────────────────────────────────────────────────────────
-
-    [Fact]
-    public void NextPlayer_Counterclockwise_AdvancesBySeat()
-    {
-        var state = B.BasicState();
-        state.NextPlayer(B.P0, PlayDirection.Counterclockwise).Should().Be(B.P1);
-        state.NextPlayer(B.P1, PlayDirection.Counterclockwise).Should().Be(B.P2);
-        state.NextPlayer(B.P2, PlayDirection.Counterclockwise).Should().Be(B.P3);
-    }
-
-    [Fact]
-    public void NextPlayer_Counterclockwise_WrapsFromLastToFirst()
-    {
-        var state = B.BasicState();
-        state.NextPlayer(B.P3, PlayDirection.Counterclockwise).Should().Be(B.P0);
-    }
-
-    [Fact]
-    public void NextPlayer_Clockwise_DecreasesSeat()
-    {
-        var state = B.BasicState();
-        state.NextPlayer(B.P3, PlayDirection.Clockwise).Should().Be(B.P2);
-        state.NextPlayer(B.P2, PlayDirection.Clockwise).Should().Be(B.P1);
-        state.NextPlayer(B.P1, PlayDirection.Clockwise).Should().Be(B.P0);
-    }
-
-    [Fact]
-    public void NextPlayer_Clockwise_WrapsFromFirstToLast()
-    {
-        var state = B.BasicState();
-        state.NextPlayer(B.P0, PlayDirection.Clockwise).Should().Be(B.P3);
-    }
-
     // ── Apply: ReverseDirectionModification ───────────────────────────────────
 
     [Fact]

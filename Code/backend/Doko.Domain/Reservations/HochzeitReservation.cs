@@ -30,6 +30,6 @@ public sealed class HochzeitReservation : IReservation
     public bool IsEligible(Hand hand, RuleSet rules) =>
         rules.AllowHochzeit && hand.Cards.Count(c => c.Type == KreuzDame) >= 2;
 
-    public GameModeContext Apply() =>
+    public GameModeContext BuildContext() =>
         new(NormalTrumpEvaluator.Instance, new HochzeitPartyResolver(_hochzeitPlayer, _condition));
 }

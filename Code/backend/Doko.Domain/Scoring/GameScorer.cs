@@ -356,7 +356,6 @@ public sealed class GameScorer : IGameScorer
         GameFlow.GameState state
     )
     {
-        // Count how many announcements were missing beyond the threshold
         var provisionalWinner = provisionalResult.Winner;
         int loserAugen =
             provisionalWinner == Party.Re
@@ -371,23 +370,18 @@ public sealed class GameScorer : IGameScorer
             .Select(a => a.Type)
             .ToHashSet();
 
-        int missing = 0;
-        if (loserAugen < 120 && !winnerAnnounced.Contains(AnnouncementType.Win))
-            missing++;
-        if (loserAugen < 90 && !winnerAnnounced.Contains(AnnouncementType.Keine90))
-            missing++;
-        if (loserAugen < 60 && !winnerAnnounced.Contains(AnnouncementType.Keine60))
-            missing++;
-        if (loserAugen < 30 && !winnerAnnounced.Contains(AnnouncementType.Keine30))
-            missing++;
-
         // Use stored effective winners (ScoredTricks) so Festmahl/Blutbad/Meuterei overrides
         // are accounted for when checking whether the loser won any tricks.
         bool loserWonNoTricks = !state.ScoredTricks.Any(tr =>
             state.PartyResolver.ResolveParty(tr.Winner, state) != provisionalWinner
         );
-        if (loserWonNoTricks && !winnerAnnounced.Contains(AnnouncementType.Schwarz))
-            missing++;
+
+        int missing = AnnouncementRules.CountMissingFeigheitAnnouncements(
+            provisionalWinner,
+            loserAugen,
+            loserWonNoTricks,
+            winnerAnnounced
+        );
 
         // Each missing beyond 2 adds an extra penalty point
         return Math.Max(0, missing - 2);

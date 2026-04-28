@@ -7,9 +7,12 @@ namespace Doko.Domain.Tricks;
 
 public static class TrickWinnerRuleRegistry
 {
-    private static readonly BlutbadTrickWinnerRule BlutbadRule = new();
-    private static readonly FestmahlTrickWinnerRule FestmahlRule = new();
-    private static readonly MeutereiTrickWinnerRule MeutereiRule = new();
+    private static readonly ITrickWinnerRule[] Rules =
+    [
+        new BlutbadTrickWinnerRule(),
+        new FestmahlTrickWinnerRule(),
+        new MeutereiTrickWinnerRule(),
+    ];
 
     /// <summary>
     /// Returns the effective trick winner after applying all active trick-winner override rules.
@@ -25,23 +28,9 @@ public static class TrickWinnerRuleRegistry
         if (state.ActiveReservation?.IsSolo == true)
             return normalWinner;
 
-        if (state.Rules.EnableBlutbad)
+        foreach (var rule in Rules.Where(r => r.IsEnabledBy(state.Rules)))
         {
-            var w = BlutbadRule.TryGetOverride(trick, state, normalWinner);
-            if (w.HasValue)
-                return w.Value;
-        }
-
-        if (state.Rules.EnableFestmahl)
-        {
-            var w = FestmahlRule.TryGetOverride(trick, state, normalWinner);
-            if (w.HasValue)
-                return w.Value;
-        }
-
-        if (state.Rules.EnableMeuterei)
-        {
-            var w = MeutereiRule.TryGetOverride(trick, state, normalWinner);
+            var w = rule.TryGetOverride(trick, state, normalWinner);
             if (w.HasValue)
                 return w.Value;
         }

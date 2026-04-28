@@ -1,5 +1,6 @@
 using Doko.Domain.GameFlow;
 using Doko.Domain.Players;
+using Doko.Domain.Rules;
 
 namespace Doko.Domain.Tricks;
 
@@ -11,6 +12,8 @@ namespace Doko.Domain.Tricks;
 /// </summary>
 public sealed class FestmahlTrickWinnerRule : ITrickWinnerRule
 {
+    public bool IsEnabledBy(RuleSet rules) => rules.EnableFestmahl;
+
     public PlayerSeat? TryGetOverride(
         Trick completedTrick,
         GameState state,
