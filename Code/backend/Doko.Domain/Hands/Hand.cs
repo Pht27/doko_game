@@ -3,11 +3,9 @@ using Doko.Domain.Trump;
 
 namespace Doko.Domain.Hands;
 
-public sealed class Hand
+public sealed class Hand(IReadOnlyList<Card> cards)
 {
-    public IReadOnlyList<Card> Cards { get; }
-
-    public Hand(IReadOnlyList<Card> cards) => Cards = cards;
+    public IReadOnlyList<Card> Cards { get; } = cards;
 
     public bool Contains(Card card) => Cards.Contains(card);
 
