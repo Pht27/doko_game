@@ -4,7 +4,6 @@ using Doko.Domain.Announcements;
 using Doko.Domain.Cards;
 using Doko.Domain.Extrapunkte;
 using Doko.Domain.GameFlow;
-using Doko.Domain.Hands;
 using Doko.Domain.Parties;
 using Doko.Domain.Players;
 using Doko.Domain.Reservations;
@@ -55,7 +54,7 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             isMyTurn
         )
         {
-            HandSorted = BuildHandSorted(hand, state),
+            HandSorted = playerState.Hand.SortedFor(state.TrumpEvaluator),
             ShouldDeclareHealth = BuildShouldDeclareHealth(requestingPlayer, state),
             ShouldDeclareReservation = IsCheckPhaseTurn(requestingPlayer, state),
             EligibleReservations = BuildEligibleReservations(requestingPlayer, playerState, state),
@@ -185,17 +184,6 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
         state.CurrentTrick is { Cards.Count: > 0 }
             ? ToCurrentTrickSummary(state.CompletedTricks.Count, state.CurrentTrick, state)
             : null;
-
-    private static IReadOnlyList<Card> BuildHandSorted(IReadOnlyList<Card> hand, GameState state) =>
-        hand.OrderByDescending(c => state.TrumpEvaluator.IsTrump(c.Type))
-            .ThenByDescending(c =>
-                state.TrumpEvaluator.IsTrump(c.Type) ? state.TrumpEvaluator.GetTrumpRank(c.Type) : 0
-            )
-            .ThenBy(c => (int)c.Type.Suit)
-            .ThenByDescending(c =>
-                state.TrumpEvaluator.IsTrump(c.Type) ? 0 : state.TrumpEvaluator.GetPlainRank(c.Type)
-            )
-            .ToList();
 
     private static bool BuildShouldDeclareHealth(PlayerSeat player, GameState state) =>
         state.Phase == GamePhase.ReservationHealthCheck
