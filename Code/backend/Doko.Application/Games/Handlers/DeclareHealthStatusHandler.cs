@@ -23,47 +23,44 @@ public sealed class DeclareHealthStatusHandler(
     IGameEventPublisher publisher
 ) : IDeclareHealthStatusHandler
 {
-    public async Task<GameActionResult<DeclareHealthStatusResult>> ExecuteAsync(
+    public Task<GameActionResult<DeclareHealthStatusResult>> ExecuteAsync(
         DeclareHealthStatusCommand command,
         CancellationToken ct = default
-    )
-    {
-        var loaded = await repository.LoadOrFailAsync<DeclareHealthStatusResult>(
+    ) =>
+        GameCommandPipeline.RunAsync<DeclareHealthStatusResult>(
+            repository,
+            publisher,
             command.GameId,
+            GamePhase.ReservationHealthCheck,
+            execute: state =>
+            {
+                if (
+                    state.PendingReservationResponders.Count == 0
+                    || state.PendingReservationResponders[0] != command.Player
+                )
+                    return (Fail<DeclareHealthStatusResult>(GameError.NotYourTurn), []);
+
+                if (state.HealthDeclarations.ContainsKey(command.Player))
+                    return (Fail<DeclareHealthStatusResult>(GameError.AlreadyDeclared), []);
+
+                IReadOnlyList<IDomainEvent> events =
+                [
+                    new HealthDeclaredEvent(state.Id, command.Player, command.HasVorbehalt),
+                ];
+
+                state.Apply(
+                    new RecordHealthDeclarationModification(command.Player, command.HasVorbehalt)
+                );
+
+                var remaining = AdvancePendingQueue(state);
+                if (remaining.Count > 0)
+                    return (Ok(new DeclareHealthStatusResult(false)), events);
+
+                ResolveNextPhaseAfterAllDeclared(state);
+                return (Ok(new DeclareHealthStatusResult(true)), events);
+            },
             ct
         );
-        if (loaded.Failure is not null)
-            return loaded.Failure;
-        var state = loaded.State!;
-
-        if (state.Phase != GamePhase.ReservationHealthCheck)
-            return Fail<DeclareHealthStatusResult>(GameError.InvalidPhase);
-
-        // Must be the player's turn (first in pending queue)
-        if (
-            state.PendingReservationResponders.Count == 0
-            || state.PendingReservationResponders[0] != command.Player
-        )
-            return Fail<DeclareHealthStatusResult>(GameError.NotYourTurn);
-
-        if (state.HealthDeclarations.ContainsKey(command.Player))
-            return Fail<DeclareHealthStatusResult>(GameError.AlreadyDeclared);
-
-        var events = new List<IDomainEvent>
-        {
-            new HealthDeclaredEvent(state.Id, command.Player, command.HasVorbehalt),
-        };
-
-        state.Apply(new RecordHealthDeclarationModification(command.Player, command.HasVorbehalt));
-
-        var remaining = AdvancePendingQueue(state);
-
-        if (remaining.Count > 0)
-            return await SaveAndReturn(state, events, new DeclareHealthStatusResult(false), ct);
-
-        ResolveNextPhaseAfterAllDeclared(state);
-        return await SaveAndReturn(state, events, new DeclareHealthStatusResult(true), ct);
-    }
 
     // ── Private helpers ───────────────────────────────────────────────────────
 
@@ -87,7 +84,6 @@ public sealed class DeclareHealthStatusHandler(
 
         if (vorbehaltPlayers.Count == 0)
         {
-            // No declared reservation — detect silent game modes or fall back to normal game
             var silentMode = SilentModeDetector.Detect(state);
             if (silentMode is not null)
                 state.Apply(new SetSilentGameModeModification(silentMode));
@@ -98,22 +94,9 @@ public sealed class DeclareHealthStatusHandler(
         }
         else
         {
-            // One or more Vorbehalt players → move to Solo check, ordered from VorbehaltRauskommer
             state.Apply(new SetPendingRespondersModification(vorbehaltPlayers));
             state.Apply(new AdvancePhaseModification(GamePhase.ReservationSoloCheck));
             state.Apply(new SetCurrentTurnModification(vorbehaltPlayers[0]));
         }
-    }
-
-    private async Task<GameActionResult<DeclareHealthStatusResult>> SaveAndReturn(
-        GameState state,
-        List<IDomainEvent> events,
-        DeclareHealthStatusResult result,
-        CancellationToken ct
-    )
-    {
-        await repository.SaveAsync(state, ct);
-        await publisher.PublishAsync(state.Id, events, ct);
-        return Ok(result);
     }
 }

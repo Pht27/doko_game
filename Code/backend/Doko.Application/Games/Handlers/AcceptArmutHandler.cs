@@ -5,7 +5,6 @@ using Doko.Application.Games.Results;
 using Doko.Domain.GameFlow;
 using Doko.Domain.GameFlow.Events;
 using Doko.Domain.GameFlow.Modifications;
-using Doko.Domain.Players;
 using Doko.Domain.Reservations;
 using static Doko.Application.Common.GameActionResultExtensions;
 
@@ -26,94 +25,77 @@ public interface IAcceptArmutHandler
 public sealed class AcceptArmutHandler(IGameRepository repository, IGameEventPublisher publisher)
     : IAcceptArmutHandler
 {
-    public async Task<GameActionResult<AcceptArmutResult>> ExecuteAsync(
+    public Task<GameActionResult<AcceptArmutResult>> ExecuteAsync(
         AcceptArmutCommand command,
         CancellationToken ct = default
-    )
-    {
-        var loaded = await repository.LoadOrFailAsync<AcceptArmutResult>(command.GameId, ct);
-        if (loaded.Failure is not null)
-            return loaded.Failure;
-        var state = loaded.State!;
+    ) =>
+        GameCommandPipeline.RunAsync<AcceptArmutResult>(
+            repository,
+            publisher,
+            command.GameId,
+            GamePhase.ArmutPartnerFinding,
+            execute: state =>
+            {
+                if (
+                    state.PendingReservationResponders.Count == 0
+                    || state.PendingReservationResponders[0] != command.Player
+                )
+                    return (Fail<AcceptArmutResult>(GameError.NotYourTurn), []);
 
-        if (state.Phase != GamePhase.ArmutPartnerFinding)
-            return Fail<AcceptArmutResult>(GameError.InvalidPhase);
+                IReadOnlyList<IDomainEvent> events =
+                [
+                    new ArmutResponseEvent(state.Id, command.Player, command.Accepts),
+                ];
 
-        if (
-            state.PendingReservationResponders.Count == 0
-            || state.PendingReservationResponders[0] != command.Player
-        )
-            return Fail<AcceptArmutResult>(GameError.NotYourTurn);
-
-        var events = new List<IDomainEvent>
-        {
-            new ArmutResponseEvent(state.Id, command.Player, command.Accepts),
-        };
-
-        if (command.Accepts)
-            return await HandleAcceptanceAsync(state, command, events, ct);
-
-        return await HandleDeclineAsync(state, command, events, ct);
-    }
+                return command.Accepts
+                    ? (HandleAcceptance(state, command), events)
+                    : (HandleDecline(state, command), events);
+            },
+            ct
+        );
 
     // ── Private helpers ───────────────────────────────────────────────────────
 
-    private async Task<GameActionResult<AcceptArmutResult>> HandleAcceptanceAsync(
+    private static GameActionResult<AcceptArmutResult> HandleAcceptance(
         GameState state,
-        AcceptArmutCommand command,
-        List<IDomainEvent> events,
-        CancellationToken ct
+        AcceptArmutCommand command
     )
     {
-        // Partner found — enter card exchange phase
         state.Apply(new SetArmutRichPlayerModification(command.Player));
         state.Apply(new SetPendingRespondersModification([]));
 
-        // Automatically transfer poor player's trumps to rich player
         var poorPlayer = state.ArmutPlayer!.Value;
         state.Apply(new ArmutGiveTrumpsModification(poorPlayer, command.Player));
 
-        // Set game mode now that both players are known
         var reservation = new ArmutReservation(poorPlayer, command.Player);
         state.Apply(new SetGameModeModification(reservation, poorPlayer));
 
         state.Apply(new AdvancePhaseModification(GamePhase.ArmutCardExchange));
-        // Rich player exchanges the cards
         state.Apply(new SetCurrentTurnModification(command.Player));
 
-        await repository.SaveAsync(state, ct);
-        await publisher.PublishAsync(state.Id, events, ct);
         return Ok(new AcceptArmutResult(true));
     }
 
-    private async Task<GameActionResult<AcceptArmutResult>> HandleDeclineAsync(
+    private static GameActionResult<AcceptArmutResult> HandleDecline(
         GameState state,
-        AcceptArmutCommand command,
-        List<IDomainEvent> events,
-        CancellationToken ct
+        AcceptArmutCommand command
     )
     {
-        // Declined — move to next candidate
         var remaining = state.PendingReservationResponders.Skip(1).ToList();
         state.Apply(new SetPendingRespondersModification(remaining));
 
         if (remaining.Count > 0)
         {
             state.Apply(new SetCurrentTurnModification(remaining[0]));
-            await repository.SaveAsync(state, ct);
-            await publisher.PublishAsync(state.Id, events, ct);
             return Ok(new AcceptArmutResult(false));
         }
 
         // Nobody accepted — Schwarze Sau
-        // Poor player starts; normal game mode (no partner resolution yet)
         state.Apply(new SetGameModeModification(null, null));
         state.Apply(new SetSchwarzesSauModification());
         state.Apply(new AdvancePhaseModification(GamePhase.Playing));
         state.Apply(new SetCurrentTurnModification(state.ArmutPlayer!.Value));
 
-        await repository.SaveAsync(state, ct);
-        await publisher.PublishAsync(state.Id, events, ct);
         return Ok(new AcceptArmutResult(false, SchwarzesSau: true));
     }
 }

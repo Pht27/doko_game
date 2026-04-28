@@ -33,51 +33,56 @@ public sealed class PlayCardHandler(
     IFinishGameHandler finisher
 ) : IPlayCardHandler
 {
-    public async Task<GameActionResult<PlayCardResult>> ExecuteAsync(
+    public Task<GameActionResult<PlayCardResult>> ExecuteAsync(
         PlayCardCommand command,
         CancellationToken ct = default
-    )
-    {
-        var loaded = await repository.LoadOrFailAsync<PlayCardResult>(command.GameId, ct);
-        if (loaded.Failure is not null)
-            return loaded.Failure;
-        var state = loaded.State!;
+    ) =>
+        GameCommandPipeline.RunAsync<PlayCardResult>(
+            repository,
+            publisher,
+            command.GameId,
+            GamePhase.Playing,
+            execute: state =>
+            {
+                if (state.CurrentTurn != command.Player)
+                    return (Fail<PlayCardResult>(GameError.NotYourTurn), []);
 
-        if (state.Phase != GamePhase.Playing)
-            return Fail<PlayCardResult>(GameError.InvalidPhase);
-        if (state.CurrentTurn != command.Player)
-            return Fail<PlayCardResult>(GameError.NotYourTurn);
+                var playerState = state.Players.First(p => p.Seat == command.Player);
+                var card = playerState.Hand.Cards.FirstOrDefault(c => c.Id == command.Card);
+                if (card is null)
+                    return (Fail<PlayCardResult>(GameError.IllegalCard), []);
 
-        var playerState = state.Players.First(p => p.Seat == command.Player);
-        var card = playerState.Hand.Cards.FirstOrDefault(c => c.Id == command.Card);
-        if (card is null)
-            return Fail<PlayCardResult>(GameError.IllegalCard);
+                BeginTrickIfNeeded(state);
 
-        BeginTrickIfNeeded(state);
+                if (
+                    !CardPlayValidator.CanPlay(
+                        card,
+                        playerState.Hand,
+                        state.CurrentTrick!,
+                        state.TrumpEvaluator
+                    )
+                )
+                    return (Fail<PlayCardResult>(GameError.IllegalCard), []);
 
-        if (
-            !CardPlayValidator.CanPlay(
-                card,
-                playerState.Hand,
-                state.CurrentTrick!,
-                state.TrumpEvaluator
-            )
-        )
-            return Fail<PlayCardResult>(GameError.IllegalCard);
+                var sonderkarteError = ApplySonderkarten(
+                    state,
+                    card,
+                    command,
+                    out var sonderkarteEvents
+                );
+                if (sonderkarteError.HasValue)
+                    return (Fail<PlayCardResult>(sonderkarteError.Value), []);
 
-        var sonderkarteError = ApplySonderkarten(state, card, command, out var sonderkarteEvents);
-        if (sonderkarteError.HasValue)
-            return Fail<PlayCardResult>(sonderkarteError.Value);
+                PlayCardIntoTrick(state, command.Player, playerState, card);
 
-        PlayCardIntoTrick(state, command.Player, playerState, card);
+                var events = BuildEvents(state, command.Player, card, sonderkarteEvents);
 
-        var events = BuildEvents(state, command.Player, card, sonderkarteEvents);
-
-        if (!state.CurrentTrick!.IsComplete)
-            return await AdvanceTurnAsync(state, command.Player, events, ct);
-
-        return await CompleteTrickAsync(state, events, ct);
-    }
+                return !state.CurrentTrick!.IsComplete
+                    ? AdvanceTurn(state, command.Player, events)
+                    : CompleteTrick(state, events);
+            },
+            ct
+        );
 
     // ── Private helpers ───────────────────────────────────────────────────────
 
@@ -195,22 +200,19 @@ public sealed class PlayCardHandler(
             new CardPlayedEvent(state.Id, player, card, state.CompletedTricks.Count),
         ];
 
-    private async Task<GameActionResult<PlayCardResult>> AdvanceTurnAsync(
+    private static (GameActionResult<PlayCardResult>, IReadOnlyList<IDomainEvent>) AdvanceTurn(
         GameState state,
         PlayerSeat player,
-        List<IDomainEvent> events,
-        CancellationToken ct
+        List<IDomainEvent> events
     )
     {
         state.Apply(new SetCurrentTurnModification(player.Next(state.Direction)));
-        await SaveAndPublishAsync(state, events, ct);
-        return Ok(new PlayCardResult(false, null, false, null));
+        return (Ok(new PlayCardResult(false, null, false, null)), events);
     }
 
-    private async Task<GameActionResult<PlayCardResult>> CompleteTrickAsync(
+    private (GameActionResult<PlayCardResult>, IReadOnlyList<IDomainEvent>) CompleteTrick(
         GameState state,
-        List<IDomainEvent> events,
-        CancellationToken ct
+        List<IDomainEvent> events
     )
     {
         var trick = state.CurrentTrick!;
@@ -281,30 +283,17 @@ public sealed class PlayCardHandler(
         {
             state.Apply(new AdvancePhaseModification(GamePhase.SchwarzesSauSoloSelect));
             state.Apply(new SetCurrentTurnModification(effectiveWinner));
-            await SaveAndPublishAsync(state, events, ct);
-            return Ok(new PlayCardResult(true, effectiveWinner, false, null));
+            return (Ok(new PlayCardResult(true, effectiveWinner, false, null)), events);
         }
 
         if (state.Players.All(p => p.Hand.Cards.Count == 0))
         {
             var finished = finisher.Execute(state);
-            await SaveAndPublishAsync(state, events, ct);
-            return Ok(new PlayCardResult(true, effectiveWinner, true, finished));
+            return (Ok(new PlayCardResult(true, effectiveWinner, true, finished)), events);
         }
 
         state.Apply(new SetCurrentTurnModification(effectiveWinner));
-        await SaveAndPublishAsync(state, events, ct);
-        return Ok(new PlayCardResult(true, effectiveWinner, false, null));
-    }
-
-    private async Task SaveAndPublishAsync(
-        GameState state,
-        List<IDomainEvent> events,
-        CancellationToken ct
-    )
-    {
-        await repository.SaveAsync(state, ct);
-        await publisher.PublishAsync(state.Id, events, ct);
+        return (Ok(new PlayCardResult(true, effectiveWinner, false, null)), events);
     }
 
     private static bool ForceIntoSolo(GameState state) =>

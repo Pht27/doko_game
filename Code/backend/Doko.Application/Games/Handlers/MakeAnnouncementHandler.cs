@@ -22,39 +22,45 @@ public sealed class MakeAnnouncementHandler(
     IGameEventPublisher publisher
 ) : IMakeAnnouncementHandler
 {
-    public async Task<GameActionResult<Unit>> ExecuteAsync(
+    public Task<GameActionResult<Unit>> ExecuteAsync(
         MakeAnnouncementCommand command,
         CancellationToken ct = default
-    )
-    {
-        var loaded = await repository.LoadOrFailAsync<Unit>(command.GameId, ct);
-        if (loaded.Failure is not null)
-            return loaded.Failure;
-        var state = loaded.State!;
+    ) =>
+        GameCommandPipeline.RunAsync<Unit>(
+            repository,
+            publisher,
+            command.GameId,
+            GamePhase.Playing,
+            execute: state =>
+            {
+                if (!AnnouncementRules.CanAnnounce(command.Player, command.Type, state))
+                    return (Fail<Unit>(GameError.AnnouncementNotAllowed), []);
 
-        if (state.Phase != GamePhase.Playing)
-            return Fail<Unit>(GameError.InvalidPhase);
+                int trickNum = state.CompletedTricks.Count;
+                int cardIdx = state.CurrentTrick?.Cards.Count ?? 0;
+                bool isEffective = state.PartyResolver.IsAnnouncementEffective(
+                    command.Player,
+                    state
+                );
+                var announcement = new Announcement(command.Player, command.Type, trickNum, cardIdx)
+                {
+                    IsEffective = isEffective,
+                };
+                state.Apply(new AddAnnouncementModification(announcement));
 
-        if (!AnnouncementRules.CanAnnounce(command.Player, command.Type, state))
-            return Fail<Unit>(GameError.AnnouncementNotAllowed);
-
-        int trickNum = state.CompletedTricks.Count;
-        int cardIdx = state.CurrentTrick?.Cards.Count ?? 0;
-
-        bool isEffective = state.PartyResolver.IsAnnouncementEffective(command.Player, state);
-        var announcement = new Announcement(command.Player, command.Type, trickNum, cardIdx)
-        {
-            IsEffective = isEffective,
-        };
-        state.Apply(new AddAnnouncementModification(announcement));
-
-        await repository.SaveAsync(state, ct);
-        await publisher.PublishAsync(
-            state.Id,
-            [new AnnouncementMadeEvent(state.Id, command.Player, command.Type, trickNum, cardIdx)],
+                return (
+                    Ok(Unit.Value),
+                    [
+                        new AnnouncementMadeEvent(
+                            state.Id,
+                            command.Player,
+                            command.Type,
+                            trickNum,
+                            cardIdx
+                        ),
+                    ]
+                );
+            },
             ct
         );
-
-        return Ok(Unit.Value);
-    }
 }
