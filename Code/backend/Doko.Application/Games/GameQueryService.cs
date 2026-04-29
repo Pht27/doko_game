@@ -62,12 +62,11 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             ShouldRespondToArmut = BuildShouldRespondToArmut(requestingPlayer, state),
             ShouldReturnArmutCards =
                 state.Phase == GamePhase.ArmutCardExchange
-                && state.ArmutRichPlayer == requestingPlayer,
+                && state.Armut?.RichPlayer == requestingPlayer,
             ArmutCardReturnCount = BuildArmutCardReturnCount(requestingPlayer, state),
-            ArmutExchangeCardCount = state.ArmutReturnedTrump.HasValue
-                ? state.ArmutTransferCount
-                : null,
-            ArmutReturnedTrump = state.ArmutReturnedTrump,
+            ArmutExchangeCardCount =
+                state.Armut?.ReturnedTrump.HasValue == true ? state.Armut.TransferCount : null,
+            ArmutReturnedTrump = state.Armut?.ReturnedTrump,
             ActiveGameMode = state.ActiveReservation?.Priority.ToString(),
             GameModePlayerSeat = (int?)state.GameModePlayerSeat,
             ShouldChooseSchwarzesSauSolo = BuildShouldChooseSchwarzesSauSolo(
@@ -254,8 +253,8 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
         && state.PendingReservationResponders[0] == player;
 
     private static int? BuildArmutCardReturnCount(PlayerSeat player, GameState state) =>
-        state.Phase == GamePhase.ArmutCardExchange && state.ArmutRichPlayer == player
-            ? state.ArmutTransferCount
+        state.Phase == GamePhase.ArmutCardExchange && state.Armut?.RichPlayer == player
+            ? state.Armut.TransferCount
             : null;
 
     private static bool BuildShouldChooseSchwarzesSauSolo(PlayerSeat player, GameState state) =>

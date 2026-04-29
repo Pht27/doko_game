@@ -149,8 +149,8 @@ public class GameStateTests
 
         state.Apply(new SetGenscherPartnerModification(B.P0, B.P1));
 
-        state
-            .GenscherTeamsChanged.Should()
+        (state.Genscher?.TeamsChanged ?? false)
+            .Should()
             .BeFalse(because: "all Genscher side effects are suppressed in silent solos");
     }
 

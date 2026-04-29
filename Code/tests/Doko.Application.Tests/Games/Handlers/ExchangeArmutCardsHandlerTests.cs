@@ -57,7 +57,6 @@ public class ExchangeArmutCardsHandlerTests
     {
         var (repo, pub, _) = AppB.Infrastructure();
         var state = GameState.Create(phase: GamePhase.Playing, currentTurn: AppB.P1);
-        state.Apply(new SetArmutRichPlayerModification(AppB.P1));
         await repo.SaveAsync(state);
         var useCase = new ExchangeArmutCardsHandler(repo, pub);
 
