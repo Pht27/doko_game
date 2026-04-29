@@ -85,26 +85,11 @@ public sealed class GameState
     /// <summary>The player who declared the active game mode (Solo, Hochzeit, Armut player). Null for Normalspiel.</summary>
     public PlayerSeat? GameModePlayerSeat { get; private set; }
 
-    /// <summary>The player who declared Armut. Set when Armut wins the reservation check.</summary>
-    public PlayerSeat? ArmutPlayer { get; private set; }
-
     /// <summary>
-    /// The rich player who accepted the Armut. Set during <see cref="GamePhase.ArmutPartnerFinding"/>.
-    /// Null if nobody has accepted yet.
+    /// Armut-phase state. Non-null iff an Armut game mode is active.
+    /// Initialized when the Armut player is set; updated through the card-exchange phase.
     /// </summary>
-    public PlayerSeat? ArmutRichPlayer { get; private set; }
-
-    /// <summary>
-    /// How many cards the poor player gave to the rich player in the Armut exchange.
-    /// Used to validate the number of cards returned.
-    /// </summary>
-    public int ArmutTransferCount { get; private set; }
-
-    /// <summary>
-    /// Whether the cards returned by the rich player during <see cref="GamePhase.ArmutCardExchange"/>
-    /// included any trump. Null before the exchange completes.
-    /// </summary>
-    public bool? ArmutReturnedTrump { get; private set; }
+    public ArmutState? Armut { get; private set; }
 
     /// <summary>
     /// Pre-computed trick results (winner + extrapunkt awards) appended at trick completion time.
@@ -114,25 +99,11 @@ public sealed class GameState
     public IReadOnlyList<TrickResult> ScoredTricks { get; private set; } = [];
 
     /// <summary>
-    /// True once a Genscher (or Gegengenscher) changed the actual team composition.
-    /// Set to false again only if Gegengenscherdamen restores the exact original Re pair.
-    /// When true, Feigheit does not apply at scoring time.
+    /// Genscher-phase state. Non-null once a team-changing Genscher has fired.
+    /// Null again only if Gegengenscherdamen fully restores the original Re pair.
+    /// When non-null and <see cref="GenscherState.TeamsChanged"/> is true, Feigheit does not apply.
     /// </summary>
-    public bool GenscherTeamsChanged { get; private set; }
-
-    /// <summary>
-    /// The two Re players before the first team-changing Genscher fired.
-    /// Used by Gegengenscherdamen to detect whether the original teams are restored.
-    /// Null until a team-changing Genscher fires; cleared on full restoration.
-    /// </summary>
-    public (PlayerSeat First, PlayerSeat Second)? PreGenscherRePlayers { get; private set; }
-
-    /// <summary>
-    /// Announcements saved when a team-changing Genscherdamen fired and cleared <see cref="Announcements"/>.
-    /// Restored if Gegengenscherdamen subsequently recreates the original teams.
-    /// Null when no saved announcements exist.
-    /// </summary>
-    public IReadOnlyList<Announcement>? SavedGenscherAnnouncements { get; private set; }
+    public GenscherState? Genscher { get; private set; }
 
     /// <summary>
     /// The player who leads the reservation-check ordering for this round.
@@ -312,11 +283,11 @@ public sealed class GameState
                 break;
 
             case SetArmutPlayerModification m:
-                ArmutPlayer = m.ArmutPlayer;
+                Armut = new ArmutState(m.ArmutPlayer, null, 0, null);
                 break;
 
             case SetArmutRichPlayerModification m:
-                ArmutRichPlayer = m.RichPlayer;
+                Armut = Armut! with { RichPlayer = m.RichPlayer };
                 break;
 
             case ArmutGiveTrumpsModification m:
@@ -326,7 +297,7 @@ public sealed class GameState
                 var trumps = poorState
                     .Hand.Cards.Where(c => TrumpEvaluator.IsTrump(c.Type))
                     .ToList();
-                ArmutTransferCount = trumps.Count;
+                Armut = Armut! with { TransferCount = trumps.Count };
                 var poorNewHand = new Hands.Hand(poorState.Hand.Cards.Except(trumps).ToList());
                 var richNewHand = new Hands.Hand(richState.Hand.Cards.Concat(trumps).ToList());
                 Players =
@@ -341,7 +312,7 @@ public sealed class GameState
             }
 
             case SetArmutReturnedTrumpModification m:
-                ArmutReturnedTrump = m.IncludedTrump;
+                Armut = Armut! with { ReturnedTrump = m.IncludedTrump };
                 break;
 
             case RecordDeclarationModification m:
@@ -386,36 +357,39 @@ public sealed class GameState
 
                 if (teamsChanged)
                 {
-                    if (PreGenscherRePlayers is null)
+                    if (Genscher is null)
                     {
                         // First team-changing Genscher: save original Re pair and announcements.
                         var rePlayers = Players
                             .Where(p => PartyResolver.ResolveParty(p.Seat, this) == Party.Re)
                             .Select(p => p.Seat)
                             .ToArray();
-                        PreGenscherRePlayers = (rePlayers[0], rePlayers[1]);
-                        SavedGenscherAnnouncements = Announcements;
+                        Genscher = new GenscherState(
+                            TeamsChanged: true,
+                            PreRePlayers: (rePlayers[0], rePlayers[1]),
+                            SavedAnnouncements: Announcements
+                        );
                         Announcements = [];
-                        GenscherTeamsChanged = true;
                     }
                     else
                     {
                         // Subsequent Genscher (Gegengenscher): check for original team restoration.
-                        var (orig1, orig2) = PreGenscherRePlayers.Value;
+                        var (orig1, orig2) = Genscher.PreRePlayers!.Value;
                         bool restored =
                             (m.Genscher == orig1 || m.Genscher == orig2)
                             && (m.Partner == orig1 || m.Partner == orig2);
-                        if (restored && SavedGenscherAnnouncements is not null)
+                        if (restored && Genscher.SavedAnnouncements is not null)
                         {
-                            Announcements = SavedGenscherAnnouncements;
-                            SavedGenscherAnnouncements = null;
-                            PreGenscherRePlayers = null;
-                            GenscherTeamsChanged = false;
+                            Announcements = Genscher.SavedAnnouncements;
+                            Genscher = null;
                         }
                         else
                         {
                             // Different Gegengenscher outcome — saved announcements are lost.
-                            SavedGenscherAnnouncements = null;
+                            Genscher = Genscher with
+                            {
+                                SavedAnnouncements = null,
+                            };
                         }
                     }
                 }

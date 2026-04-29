@@ -98,7 +98,7 @@ public static class AnnouncementRules
             return false;
 
         // Feigheit does not apply when a Genscher changed the teams
-        if (state.GenscherTeamsChanged)
+        if (state.Genscher?.TeamsChanged ?? false)
             return false;
 
         var winner = result.Winner;

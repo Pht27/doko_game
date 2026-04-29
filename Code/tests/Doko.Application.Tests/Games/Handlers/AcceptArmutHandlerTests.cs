@@ -88,7 +88,7 @@ public class AcceptArmutHandlerTests
 
         var state = await repo.GetAsync(id);
         state!.Phase.Should().Be(GamePhase.ArmutCardExchange);
-        state.ArmutRichPlayer.Should().Be(AppB.P1);
+        state.Armut?.RichPlayer.Should().Be(AppB.P1);
         state.CurrentTurn.Should().Be(AppB.P1);
     }
 
@@ -107,7 +107,7 @@ public class AcceptArmutHandlerTests
         // Poor player's trumps moved to rich player
         poorHand.Cards.Should().NotContain(Trump1).And.NotContain(Trump2);
         richHand.Cards.Should().Contain(Trump1).And.Contain(Trump2);
-        state.ArmutTransferCount.Should().Be(2);
+        state.Armut?.TransferCount.Should().Be(2);
     }
 
     [Fact]

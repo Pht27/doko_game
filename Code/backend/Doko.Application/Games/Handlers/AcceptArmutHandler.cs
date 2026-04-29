@@ -64,7 +64,7 @@ public sealed class AcceptArmutHandler(IGameRepository repository, IGameEventPub
         state.Apply(new SetArmutRichPlayerModification(command.Player));
         state.Apply(new SetPendingRespondersModification([]));
 
-        var poorPlayer = state.ArmutPlayer!.Value;
+        var poorPlayer = state.Armut!.Player;
         state.Apply(new ArmutGiveTrumpsModification(poorPlayer, command.Player));
 
         var reservation = new ArmutReservation(poorPlayer, command.Player);
@@ -94,7 +94,7 @@ public sealed class AcceptArmutHandler(IGameRepository repository, IGameEventPub
         state.Apply(new SetGameModeModification(null, null));
         state.Apply(new SetSchwarzesSauModification());
         state.Apply(new AdvancePhaseModification(GamePhase.Playing));
-        state.Apply(new SetCurrentTurnModification(state.ArmutPlayer!.Value));
+        state.Apply(new SetCurrentTurnModification(state.Armut!.Player));
 
         return Ok(new AcceptArmutResult(false, SchwarzesSau: true));
     }

@@ -40,17 +40,17 @@ public sealed class ExchangeArmutCardsHandler(
             GamePhase.ArmutCardExchange,
             execute: state =>
             {
-                if (state.ArmutRichPlayer != command.RichPlayer)
+                if (state.Armut?.RichPlayer != command.RichPlayer)
                     return (Fail<ExchangeArmutCardsResult>(GameError.NotYourTurn), []);
 
-                if (command.CardIdsToReturn.Count != state.ArmutTransferCount)
+                if (command.CardIdsToReturn.Count != state.Armut!.TransferCount)
                     return (Fail<ExchangeArmutCardsResult>(GameError.IllegalCard), []);
 
                 var cardsToReturn = ResolveCardsToReturn(state, command);
                 if (cardsToReturn is null)
                     return (Fail<ExchangeArmutCardsResult>(GameError.IllegalCard), []);
 
-                var poorPlayer = state.ArmutPlayer!.Value;
+                var poorPlayer = state.Armut.Player;
                 var (newRichHand, newPoorHand, returnedTrumpCount) = ComputeNewHands(
                     state,
                     command,
