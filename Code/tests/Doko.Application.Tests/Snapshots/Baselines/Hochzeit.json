@@ -1,0 +1,168 @@
+{
+  "GameId": {
+    "Value": "00000000-0000-0000-0000-000000000000"
+  },
+  "Phase": "Finished",
+  "RequestingPlayer": "First",
+  "OwnParty": "Re",
+  "Hand": [],
+  "LegalCards": [],
+  "LegalAnnouncements": [],
+  "EligibleSonderkartenPerCard": {},
+  "OtherPlayers": [
+    {
+      "Seat": "Second",
+      "KnownParty": null,
+      "HandCardCount": 0,
+      "HighestAnnouncement": null
+    },
+    {
+      "Seat": "Third",
+      "KnownParty": null,
+      "HandCardCount": 0,
+      "HighestAnnouncement": null
+    },
+    {
+      "Seat": "Fourth",
+      "KnownParty": null,
+      "HandCardCount": 0,
+      "HighestAnnouncement": null
+    }
+  ],
+  "CurrentTrick": null,
+  "CompletedTricks": [
+    {
+      "TrickNumber": 0,
+      "Cards": [
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 0
+            },
+            "Type": {
+              "Suit": "Kreuz",
+              "Rank": "Dame"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 10
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 20
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 30
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "First"
+    },
+    {
+      "TrickNumber": 1,
+      "Cards": [
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 1
+            },
+            "Type": {
+              "Suit": "Kreuz",
+              "Rank": "Dame"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 11
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 21
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 31
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "First"
+    }
+  ],
+  "CurrentTurn": "Fourth",
+  "IsMyTurn": false,
+  "HandSorted": [],
+  "ShouldDeclareHealth": false,
+  "EligibleReservations": [],
+  "ShouldDeclareReservation": false,
+  "MustDeclareReservation": false,
+  "ShouldRespondToArmut": false,
+  "ShouldReturnArmutCards": false,
+  "ArmutCardReturnCount": null,
+  "ArmutExchangeCardCount": null,
+  "ArmutReturnedTrump": null,
+  "ActiveGameMode": "Hochzeit",
+  "ShouldChooseSchwarzesSauSolo": false,
+  "EligibleSchwarzesSauSolos": [],
+  "OwnHighestAnnouncement": null,
+  "GameModePlayerSeat": null
+}

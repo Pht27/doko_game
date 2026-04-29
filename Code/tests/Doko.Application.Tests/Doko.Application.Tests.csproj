@@ -39,4 +39,8 @@
     <ProjectReference Include="..\..\backend\Doko.Application\Doko.Application.csproj" />
     <ProjectReference Include="..\..\backend\Doko.Domain\Doko.Domain.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Snapshots\Baselines\*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

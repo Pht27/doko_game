@@ -1,0 +1,748 @@
+{
+  "GameId": {
+    "Value": "00000000-0000-0000-0000-000000000000"
+  },
+  "Phase": "Finished",
+  "RequestingPlayer": "First",
+  "OwnParty": "Re",
+  "Hand": [],
+  "LegalCards": [],
+  "LegalAnnouncements": [],
+  "EligibleSonderkartenPerCard": {},
+  "OtherPlayers": [
+    {
+      "Seat": "Second",
+      "KnownParty": null,
+      "HandCardCount": 0,
+      "HighestAnnouncement": null
+    },
+    {
+      "Seat": "Third",
+      "KnownParty": null,
+      "HandCardCount": 0,
+      "HighestAnnouncement": null
+    },
+    {
+      "Seat": "Fourth",
+      "KnownParty": null,
+      "HandCardCount": 0,
+      "HighestAnnouncement": null
+    }
+  ],
+  "CurrentTrick": null,
+  "CompletedTricks": [
+    {
+      "TrickNumber": 0,
+      "Cards": [
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 0
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 12
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 24
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 36
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "First"
+    },
+    {
+      "TrickNumber": 1,
+      "Cards": [
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 1
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 13
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 25
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 37
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "First"
+    },
+    {
+      "TrickNumber": 2,
+      "Cards": [
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 2
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 14
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 26
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 38
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "First"
+    },
+    {
+      "TrickNumber": 3,
+      "Cards": [
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 3
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 15
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 27
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 39
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "First"
+    },
+    {
+      "TrickNumber": 4,
+      "Cards": [
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 4
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 16
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 28
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 40
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "First"
+    },
+    {
+      "TrickNumber": 5,
+      "Cards": [
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 5
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 17
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 29
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 41
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "First"
+    },
+    {
+      "TrickNumber": 6,
+      "Cards": [
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 6
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 18
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 30
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 42
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "First"
+    },
+    {
+      "TrickNumber": 7,
+      "Cards": [
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 7
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 19
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 31
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 43
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "First"
+    },
+    {
+      "TrickNumber": 8,
+      "Cards": [
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 8
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 20
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 32
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 44
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "First"
+    },
+    {
+      "TrickNumber": 9,
+      "Cards": [
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 9
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 21
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 33
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 45
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "First"
+    },
+    {
+      "TrickNumber": 10,
+      "Cards": [
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 10
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 22
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 34
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 46
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "First"
+    },
+    {
+      "TrickNumber": 11,
+      "Cards": [
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 11
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 23
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 35
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 47
+            },
+            "Type": {
+              "Suit": "Karo",
+              "Rank": "Neun"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "First"
+    }
+  ],
+  "CurrentTurn": "Fourth",
+  "IsMyTurn": false,
+  "HandSorted": [],
+  "ShouldDeclareHealth": false,
+  "EligibleReservations": [],
+  "ShouldDeclareReservation": false,
+  "MustDeclareReservation": false,
+  "ShouldRespondToArmut": false,
+  "ShouldReturnArmutCards": false,
+  "ArmutCardReturnCount": null,
+  "ArmutExchangeCardCount": null,
+  "ArmutReturnedTrump": null,
+  "ActiveGameMode": null,
+  "ShouldChooseSchwarzesSauSolo": false,
+  "EligibleSchwarzesSauSolos": [],
+  "OwnHighestAnnouncement": null,
+  "GameModePlayerSeat": null
+}

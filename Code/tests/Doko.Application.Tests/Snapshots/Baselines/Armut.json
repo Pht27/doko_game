@@ -1,0 +1,632 @@
+{
+  "GameId": {
+    "Value": "00000000-0000-0000-0000-000000000000"
+  },
+  "Phase": "Finished",
+  "RequestingPlayer": "First",
+  "OwnParty": "Re",
+  "Hand": [],
+  "LegalCards": [],
+  "LegalAnnouncements": [],
+  "EligibleSonderkartenPerCard": {},
+  "OtherPlayers": [
+    {
+      "Seat": "Second",
+      "KnownParty": "Re",
+      "HandCardCount": 0,
+      "HighestAnnouncement": null
+    },
+    {
+      "Seat": "Third",
+      "KnownParty": "Kontra",
+      "HandCardCount": 0,
+      "HighestAnnouncement": null
+    },
+    {
+      "Seat": "Fourth",
+      "KnownParty": "Kontra",
+      "HandCardCount": 0,
+      "HighestAnnouncement": null
+    }
+  ],
+  "CurrentTrick": null,
+  "CompletedTricks": [
+    {
+      "TrickNumber": 0,
+      "Cards": [
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 40
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 60
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 2
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 22
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "Third"
+    },
+    {
+      "TrickNumber": 1,
+      "Cards": [
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 41
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 61
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 3
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 23
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "Third"
+    },
+    {
+      "TrickNumber": 2,
+      "Cards": [
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 42
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 62
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 4
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 24
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "Third"
+    },
+    {
+      "TrickNumber": 3,
+      "Cards": [
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 43
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 63
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 5
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 25
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "Third"
+    },
+    {
+      "TrickNumber": 4,
+      "Cards": [
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 44
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 64
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 6
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 26
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "Third"
+    },
+    {
+      "TrickNumber": 5,
+      "Cards": [
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 45
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 65
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 7
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 27
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "Third"
+    },
+    {
+      "TrickNumber": 6,
+      "Cards": [
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 46
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 66
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 8
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 28
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "Third"
+    },
+    {
+      "TrickNumber": 7,
+      "Cards": [
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 47
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 67
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 9
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 29
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "Third"
+    },
+    {
+      "TrickNumber": 8,
+      "Cards": [
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 48
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 68
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 20
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 0
+            },
+            "Type": {
+              "Suit": "Kreuz",
+              "Rank": "Bube"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "Second"
+    },
+    {
+      "TrickNumber": 9,
+      "Cards": [
+        {
+          "Player": "Second",
+          "Card": {
+            "Id": {
+              "Value": 1
+            },
+            "Type": {
+              "Suit": "Kreuz",
+              "Rank": "Dame"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Third",
+          "Card": {
+            "Id": {
+              "Value": 49
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "Fourth",
+          "Card": {
+            "Id": {
+              "Value": 69
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        },
+        {
+          "Player": "First",
+          "Card": {
+            "Id": {
+              "Value": 21
+            },
+            "Type": {
+              "Suit": "Pik",
+              "Rank": "Ass"
+            }
+          },
+          "FaceDown": false
+        }
+      ],
+      "Winner": "Second"
+    }
+  ],
+  "CurrentTurn": "First",
+  "IsMyTurn": false,
+  "HandSorted": [],
+  "ShouldDeclareHealth": false,
+  "EligibleReservations": [],
+  "ShouldDeclareReservation": false,
+  "MustDeclareReservation": false,
+  "ShouldRespondToArmut": false,
+  "ShouldReturnArmutCards": false,
+  "ArmutCardReturnCount": null,
+  "ArmutExchangeCardCount": 2,
+  "ArmutReturnedTrump": false,
+  "ActiveGameMode": "Armut",
+  "ShouldChooseSchwarzesSauSolo": false,
+  "EligibleSchwarzesSauSolos": [],
+  "OwnHighestAnnouncement": null,
+  "GameModePlayerSeat": 0
+}
