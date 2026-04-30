@@ -15,7 +15,7 @@ public sealed class BlutbadTrickWinnerRule : ITrickWinnerRule
 
     public PlayerSeat? TryGetOverride(
         Trick completedTrick,
-        GameState state,
+        PlayingState state,
         PlayerSeat normalWinner
     )
     {

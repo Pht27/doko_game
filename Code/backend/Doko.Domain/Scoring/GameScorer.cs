@@ -1,6 +1,7 @@
 using Doko.Domain.Announcements;
 using Doko.Domain.Cards;
 using Doko.Domain.Extrapunkte;
+using Doko.Domain.GameFlow;
 using Doko.Domain.Parties;
 using Doko.Domain.Reservations;
 
@@ -100,7 +101,7 @@ public sealed class GameScorer : IGameScorer
         int kontraStiche,
         int[] stichePerSeat,
         int[] augenPerSeat
-    ) SumTrickResults(CompletedGame game, GameFlow.GameState state)
+    ) SumTrickResults(CompletedGame game, GameFlow.ScoringState state)
     {
         int reAugen = 0;
         int kontraAugen = 0;
@@ -135,7 +136,7 @@ public sealed class GameScorer : IGameScorer
         List<ExtrapunktAward> allAwards,
         int reExtra,
         int kontraExtra
-    ) CollectExtrapunkteAwards(CompletedGame game, GameFlow.GameState state)
+    ) CollectExtrapunkteAwards(CompletedGame game, GameFlow.ScoringState state)
     {
         var activeExtrapunkte = ExtrapunktRegistry.GetActive(state.Rules, state.ActiveReservation);
 
@@ -164,7 +165,7 @@ public sealed class GameScorer : IGameScorer
     private static int SumExtraForParty(
         List<ExtrapunktAward> awards,
         Party party,
-        GameFlow.GameState state
+        GameFlow.ScoringState state
     ) =>
         awards
             .Where(a => state.PartyResolver.ResolveParty(a.BenefittingPlayer, state) == party)
@@ -174,7 +175,7 @@ public sealed class GameScorer : IGameScorer
         int gameValue,
         List<GameValueComponent> components,
         List<AnnouncementRecord> announcementRecords
-    ) BuildBaseValue(GameFlow.GameState state, Party winner, int loserAugen)
+    ) BuildBaseValue(GameFlow.ScoringState state, Party winner, int loserAugen)
     {
         int gameValue = 0;
         var components = new List<GameValueComponent>();
@@ -232,14 +233,14 @@ public sealed class GameScorer : IGameScorer
         }
     }
 
-    private static int GetSoloFactor(GameFlow.GameState state) =>
+    private static int GetSoloFactor(GameFlow.ScoringState state) =>
         state.ActiveReservation?.IsSolo == true
         || state.SilentMode is not null
         || state.HochzeitBecameForcedSolo
             ? 3
             : 1;
 
-    private static Party DetermineWinner(GameFlow.GameState state, int reAugen, int kontraAugen)
+    private static Party DetermineWinner(GameFlow.ScoringState state, int reAugen, int kontraAugen)
     {
         bool reFailedAbsagen = HasUnfulfilledAbsagen(Party.Re, kontraAugen, state);
         bool kontraFailedAbsagen = HasUnfulfilledAbsagen(Party.Kontra, reAugen, state);
@@ -255,7 +256,7 @@ public sealed class GameScorer : IGameScorer
     private static bool HasUnfulfilledAbsagen(
         Party party,
         int opponentAugen,
-        GameFlow.GameState state
+        GameFlow.ScoringState state
     )
     {
         var absagen = state
@@ -353,7 +354,7 @@ public sealed class GameScorer : IGameScorer
 
     private static int ComputeFeigheitPenalty(
         GameResult provisionalResult,
-        GameFlow.GameState state
+        GameFlow.ScoringState state
     )
     {
         var provisionalWinner = provisionalResult.Winner;

@@ -29,11 +29,11 @@ public interface ISonderkarte
 
     /// <summary>
     /// Returns true if the player may claim this sonderkarte right now.
-    /// Called before the triggering card is removed from <see cref="GameState.Players"/>,
-    /// so the current hand still contains it. Use <see cref="GameState.InitialHands"/> to check
+    /// Called before the triggering card is removed from the player's hand,
+    /// so the current hand still contains it. Use <see cref="PlayingState.InitialHands"/> to check
     /// original holding (e.g. Superschweinchen: originally held both ♦10 even if first already played).
     /// </summary>
-    bool AreConditionsMet(GameState state);
+    bool AreConditionsMet(PlayingState state);
 
     IReadOnlyList<GameStateModification> Apply(GameState state, ISonderkarteInputProvider inputs);
 

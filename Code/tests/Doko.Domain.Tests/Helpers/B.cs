@@ -131,7 +131,7 @@ internal static class B
     /// <summary>
     /// Minimal 4-player state ready for play. P0 = Re (SoloPartyResolver).
     /// </summary>
-    public static GameState BasicState(
+    public static PlayingState BasicState(
         RuleSet? rules = null,
         IReadOnlyList<Announcement>? announcements = null,
         IReadOnlyList<Trick>? completedTricks = null,
@@ -139,7 +139,7 @@ internal static class B
         IPartyResolver? partyResolver = null,
         IReadOnlyDictionary<PlayerSeat, Hand>? initialHands = null
     ) =>
-        GameState.Create(
+        (PlayingState)GameState.Create(
             rules: rules,
             players: FourPlayers(),
             currentTurn: P0,

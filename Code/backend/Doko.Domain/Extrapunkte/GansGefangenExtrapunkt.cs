@@ -27,7 +27,7 @@ public sealed class GansGefangenExtrapunkt : IExtrapunkt
         if (!AnimalHelpers.FischaugeActive(state))
             return [];
         // ♦A are Schweinchen when active — no Füchse to catch Gänse
-        if (state.ActiveSonderkarten.Contains(SonderkarteType.Schweinchen))
+        if (state.GetActiveSonderkarten().Contains(SonderkarteType.Schweinchen))
             return [];
 
         var fishes = completedTrick.Cards.Where(tc => tc.Card.Type == KaroNeun).ToList();

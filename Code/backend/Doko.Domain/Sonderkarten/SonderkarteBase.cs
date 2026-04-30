@@ -12,7 +12,7 @@ public abstract class SonderkarteBase : ISonderkarte
     public virtual ISonderkarteRankingModifier? RankingModifier => null;
     public virtual SonderkarteType? Suppresses => null;
     public virtual bool WindowClosesWhenDeclined => true;
-    public abstract bool AreConditionsMet(GameState state);
+    public abstract bool AreConditionsMet(PlayingState state);
 
     /// <summary>
     /// Always emits <see cref="ActivateSonderkarteModification"/> first, then appends the
@@ -45,14 +45,14 @@ public abstract class SonderkarteBase : ISonderkarte
     /// Returns true if the current player's initial hand contained at least two copies of
     /// <paramref name="cardType"/>. Call before the triggering card is removed from the hand.
     /// </summary>
-    protected static bool OriginallyHeldBoth(GameState state, CardType cardType) =>
+    protected static bool OriginallyHeldBoth(PlayingState state, CardType cardType) =>
         state.InitialHands is not null
         && state.InitialHands[state.CurrentTurn].Cards.Count(c => c.Type == cardType) >= 2;
 
-    protected static bool IsActive(GameState state, SonderkarteType type) =>
+    protected static bool IsActive(PlayingState state, SonderkarteType type) =>
         state.ActiveSonderkarten.Contains(type);
 
-    protected static bool IsWindowClosed(GameState state, SonderkarteType type) =>
+    protected static bool IsWindowClosed(PlayingState state, SonderkarteType type) =>
         state.ClosedWindows.Contains(type);
 
     /// <summary>
@@ -60,7 +60,7 @@ public abstract class SonderkarteBase : ISonderkarte
     /// across all completed tricks and the current trick. Used to allow chain activations
     /// (e.g. Superschweinchen) even when the prerequisite sonderkarte was never announced.
     /// </summary>
-    protected static bool BothPlayedBySamePlayer(GameState state, CardType cardType)
+    protected static bool BothPlayedBySamePlayer(PlayingState state, CardType cardType)
     {
         var played = state
             .CompletedTricks.SelectMany(t => t.Cards)

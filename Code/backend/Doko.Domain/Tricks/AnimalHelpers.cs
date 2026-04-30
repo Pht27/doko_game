@@ -25,7 +25,7 @@ internal static class AnimalHelpers
     private static readonly CardType KaroZehn = new(Suit.Karo, Rank.Zehn);
     private static readonly CardType KaroKoenig = new(Suit.Karo, Rank.Koenig);
 
-    internal static AnimalKind? GetAnimalKind(TrickCard tc, GameState state)
+    internal static AnimalKind? GetAnimalKind(TrickCard tc, PlayingState state)
     {
         var type = tc.Card.Type;
         if (type == KaroNeun && FischaugeActive(state))
@@ -45,14 +45,32 @@ internal static class AnimalHelpers
     }
 
     /// <summary>True once any trump card has been played in a completed trick.</summary>
-    internal static bool FischaugeActive(GameState state) =>
+    internal static bool FischaugeActive(PlayingState state) =>
         state.CompletedTricks.Any(t =>
             t.Cards.Any(tc => state.TrumpEvaluator.IsTrump(tc.Card.Type))
         );
 
+    /// <summary>True once any trump card has been played in a completed trick. Works with ScoringState.</summary>
+    internal static bool FischaugeActive(ScoringState state) =>
+        state.CompletedTricks.Any(t =>
+            t.Cards.Any(tc => state.TrumpEvaluator.IsTrump(tc.Card.Type))
+        );
+
+    /// <summary>
+    /// Overload for callers that hold a base <see cref="GameState"/> (e.g. extrapunkt evaluation
+    /// in the scorer). Returns false for state types that carry no completed tricks.
+    /// </summary>
+    internal static bool FischaugeActive(GameState state) =>
+        state switch
+        {
+            PlayingState p => FischaugeActive(p),
+            ScoringState s => FischaugeActive(s),
+            _ => false,
+        };
+
     internal static List<(TrickCard Card, AnimalKind Kind)> GetAnimals(
         Trick trick,
-        GameState state
+        PlayingState state
     ) =>
         trick
             .Cards.Select(tc => (Card: tc, Kind: GetAnimalKind(tc, state)))

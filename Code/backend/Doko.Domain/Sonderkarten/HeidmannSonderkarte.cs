@@ -19,7 +19,7 @@ public sealed class HeidmannSonderkarte : SonderkarteBase
     public override CardType TriggeringCard => PikBube;
     public override ISonderkarteRankingModifier RankingModifier => HeidmannModifier.Instance;
 
-    public override bool AreConditionsMet(GameState state)
+    public override bool AreConditionsMet(PlayingState state)
     {
         if (IsActive(state, SonderkarteType.Heidmann))
             return false;

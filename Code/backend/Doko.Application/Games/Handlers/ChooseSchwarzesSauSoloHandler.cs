@@ -46,9 +46,10 @@ public sealed class ChooseSchwarzesSauSoloHandler(
                         typedState
                     );
 
+                if (typedState.CurrentTurn != command.Player)
+                    return (Fail<ChooseSchwarzesSauSoloResult>(GameError.NotYourTurn), [], typedState);
+
                 GameState state = typedState;
-                if (state.CurrentTurn != command.Player)
-                    return (Fail<ChooseSchwarzesSauSoloResult>(GameError.NotYourTurn), [], state);
 
                 if (!IsEligibleSolo(command.Solo))
                     return (
@@ -87,7 +88,7 @@ public sealed class ChooseSchwarzesSauSoloHandler(
                 // Finish the game immediately with the chosen solo for scoring.
                 if (state.Players.All(p => p.Hand.Cards.Count == 0))
                 {
-                    var (finished, nextState) = finisher.Execute(state);
+                    var (finished, nextState) = finisher.Execute((PlayingState)state);
                     return (Ok(new ChooseSchwarzesSauSoloResult(finished)), [], nextState);
                 }
 

@@ -1,4 +1,5 @@
 using Doko.Application.Tests.Helpers;
+using Doko.Domain.GameFlow;
 using Doko.Domain.GameFlow.Modifications;
 
 namespace Doko.Application.Tests.Games.Handlers;
@@ -86,8 +87,8 @@ public class AcceptArmutHandlerTests
 
         await useCase.ExecuteAsync(new AcceptArmutCommand(id, AppB.P1, true));
 
-        var state = await repo.GetAsync(id);
-        state!.Phase.Should().Be(GamePhase.ArmutCardExchange);
+        var state = (ArmutFlowState)(await repo.GetAsync(id))!;
+        state.Phase.Should().Be(GamePhase.ArmutCardExchange);
         state.Armut?.RichPlayer.Should().Be(AppB.P1);
         state.CurrentTurn.Should().Be(AppB.P1);
     }
@@ -100,8 +101,8 @@ public class AcceptArmutHandlerTests
 
         await useCase.ExecuteAsync(new AcceptArmutCommand(id, AppB.P1, true));
 
-        var state = await repo.GetAsync(id);
-        var poorHand = state!.Players.First(p => p.Seat == AppB.P0).Hand;
+        var state = (ArmutFlowState)(await repo.GetAsync(id))!;
+        var poorHand = state.Players.First(p => p.Seat == AppB.P0).Hand;
         var richHand = state.Players.First(p => p.Seat == AppB.P1).Hand;
 
         // Poor player's trumps moved to rich player
@@ -123,8 +124,8 @@ public class AcceptArmutHandlerTests
             .BeOfType<GameActionResult<AcceptArmutResult>.Ok>()
             .Which.Value.Accepted.Should()
             .BeFalse();
-        var state = await repo.GetAsync(id);
-        state!.Phase.Should().Be(GamePhase.ArmutPartnerFinding);
+        var state = (ArmutFlowState)(await repo.GetAsync(id))!;
+        state.Phase.Should().Be(GamePhase.ArmutPartnerFinding);
         state.CurrentTurn.Should().Be(AppB.P2);
         state.PendingReservationResponders.Should().BeEquivalentTo([AppB.P2, AppB.P3]);
     }

@@ -47,29 +47,28 @@ public sealed class MakeReservationHandler(
             return loaded.Failure;
         if (loaded.State is not ReservationState reservationState)
             return Fail<MakeReservationResult>(GameError.InvalidPhase);
-        GameState state = reservationState;
 
-        var validationError = Validate(command, state);
+        var validationError = Validate(command, reservationState);
         if (validationError is not null)
             return Fail<MakeReservationResult>(validationError.Value);
 
         var events = new List<IDomainEvent>
         {
-            new ReservationMadeEvent(state.Id, command.Player, command.Reservation),
+            new ReservationMadeEvent(reservationState.Id, command.Player, command.Reservation),
         };
 
-        state = RecordAndAdvanceQueue(command, state);
+        reservationState = RecordAndAdvanceQueue(command, reservationState);
 
-        if (state.PendingReservationResponders.Count > 0)
-            return await SaveAndReturnOk(state, events, new MakeReservationResult(false, null), ct);
+        if (reservationState.PendingReservationResponders.Count > 0)
+            return await SaveAndReturnOk(reservationState, events, new MakeReservationResult(false, null), ct);
 
-        return await ResolvePhaseAsync(state, events, ct);
+        return await ResolvePhaseAsync(reservationState, events, ct);
     }
 
     // ── Validation ────────────────────────────────────────────────────────────
 
     /// <summary>Returns the first validation error for the command, or null if valid.</summary>
-    private static GameError? Validate(MakeReservationCommand command, GameState state)
+    private static GameError? Validate(MakeReservationCommand command, ReservationState state)
     {
         if (!CheckPhases.Contains(state.Phase))
             return GameError.InvalidPhase;
@@ -97,13 +96,13 @@ public sealed class MakeReservationHandler(
     }
 
     /// <summary>Records the declaration and removes the player from the pending queue.</summary>
-    private static GameState RecordAndAdvanceQueue(MakeReservationCommand command, GameState state)
+    private static ReservationState RecordAndAdvanceQueue(MakeReservationCommand command, ReservationState state)
     {
-        state = state.Apply(new RecordDeclarationModification(command.Player, command.Reservation));
+        state = (ReservationState)state.Apply(new RecordDeclarationModification(command.Player, command.Reservation));
         var remaining = state.PendingReservationResponders.Skip(1).ToList();
-        state = state.Apply(new SetPendingRespondersModification(remaining));
+        state = (ReservationState)state.Apply(new SetPendingRespondersModification(remaining));
         if (remaining.Count > 0)
-            state = state.Apply(new SetCurrentTurnModification(remaining[0]));
+            state = (ReservationState)state.Apply(new SetCurrentTurnModification(remaining[0]));
         return state;
     }
 
@@ -112,7 +111,7 @@ public sealed class MakeReservationHandler(
     private static bool IsAllowedInPhase(
         IReservation? reservation,
         GamePhase phase,
-        GameState state
+        ReservationState state
     )
     {
         // Single-Vorbehalt player must declare something — passing is not allowed.
@@ -146,7 +145,7 @@ public sealed class MakeReservationHandler(
     // ── Phase resolution ──────────────────────────────────────────────────────
 
     private async Task<GameActionResult<MakeReservationResult>> ResolvePhaseAsync(
-        GameState state,
+        ReservationState state,
         List<IDomainEvent> events,
         CancellationToken ct
     )
@@ -171,7 +170,7 @@ public sealed class MakeReservationHandler(
     }
 
     private async Task<GameActionResult<MakeReservationResult>> ResolveSoloCheckAsync(
-        GameState state,
+        ReservationState state,
         List<IDomainEvent> events,
         CancellationToken ct
     )
@@ -187,9 +186,9 @@ public sealed class MakeReservationHandler(
         if (winner is not null)
         {
             // A Solo (or single-Vorbehalt free choice: Hochzeit, Schlanker Martin) won
-            state = ApplyWinnerAndStartPlaying(state, winner);
+            var playingState = ApplyWinnerAndStartPlaying(state, winner);
             return await SaveAndReturnOk(
-                state,
+                playingState,
                 events,
                 new MakeReservationResult(true, winner),
                 ct
@@ -206,7 +205,7 @@ public sealed class MakeReservationHandler(
     }
 
     private async Task<GameActionResult<MakeReservationResult>> ResolveArmutCheckAsync(
-        GameState state,
+        ReservationState state,
         List<IDomainEvent> events,
         CancellationToken ct
     )
@@ -217,16 +216,16 @@ public sealed class MakeReservationHandler(
         {
             // Find which player declared Armut (first in order = lowest seat)
             var armutPlayerSeat = FirstDeclarantId(state, winner);
-            state = state.Apply(new SetArmutPlayerModification(armutPlayerSeat));
+            GameState nextState = state.Apply(new SetArmutPlayerModification(armutPlayerSeat));
 
             // Determine partner-finding queue: players after poor player in seat order
             var partnerCandidates = PlayersAfter(state, armutPlayerSeat);
-            state = state.Apply(new SetPendingRespondersModification(partnerCandidates));
-            state = state.Apply(new AdvancePhaseModification(GamePhase.ArmutPartnerFinding));
-            state = state.Apply(new SetCurrentTurnModification(partnerCandidates[0]));
+            nextState = nextState.Apply(new SetPendingRespondersModification(partnerCandidates));
+            nextState = nextState.Apply(new AdvancePhaseModification(GamePhase.ArmutPartnerFinding));
+            nextState = nextState.Apply(new SetCurrentTurnModification(partnerCandidates[0]));
 
             return await SaveAndReturnOk(
-                state,
+                nextState,
                 events,
                 new MakeReservationResult(true, winner),
                 ct
@@ -243,7 +242,7 @@ public sealed class MakeReservationHandler(
     }
 
     private async Task<GameActionResult<MakeReservationResult>> ResolveSchmeissenCheckAsync(
-        GameState state,
+        ReservationState state,
         List<IDomainEvent> events,
         CancellationToken ct
     )
@@ -252,9 +251,9 @@ public sealed class MakeReservationHandler(
 
         if (winner is SchmeissenReservation)
         {
-            state = state.Apply(new AdvancePhaseModification(GamePhase.Geschmissen));
+            GameState nextState = state.Apply(new AdvancePhaseModification(GamePhase.Geschmissen));
             return await SaveAndReturnOk(
-                state,
+                nextState,
                 events,
                 new MakeReservationResult(true, winner, Geschmissen: true),
                 ct
@@ -271,7 +270,7 @@ public sealed class MakeReservationHandler(
     }
 
     private async Task<GameActionResult<MakeReservationResult>> ResolveHochzeitCheckAsync(
-        GameState state,
+        ReservationState state,
         List<IDomainEvent> events,
         CancellationToken ct
     )
@@ -280,9 +279,9 @@ public sealed class MakeReservationHandler(
 
         if (winner is HochzeitReservation hochzeit)
         {
-            state = ApplyWinnerAndStartPlaying(state, hochzeit);
+            var playingState = ApplyWinnerAndStartPlaying(state, hochzeit);
             return await SaveAndReturnOk(
-                state,
+                playingState,
                 events,
                 new MakeReservationResult(true, hochzeit),
                 ct
@@ -290,11 +289,12 @@ public sealed class MakeReservationHandler(
         }
 
         // No Hochzeit — force Schlanker Martin for the first Vorbehalt player, or normal game
-        state = ApplyFallbackGameMode(state, VorbehaltPlayers(state)[0]);
+        var martinPlayer = VorbehaltPlayers(state)[0];
+        var (fallbackMode, fallbackState) = ApplyFallbackGameMode(state, martinPlayer);
         return await SaveAndReturnOk(
-            state,
+            fallbackState,
             events,
-            new MakeReservationResult(true, state.ActiveReservation),
+            new MakeReservationResult(true, fallbackMode),
             ct
         );
     }
@@ -315,41 +315,43 @@ public sealed class MakeReservationHandler(
     }
 
     /// <summary>Sets the winning reservation as game mode and transitions to Playing.</summary>
-    private static GameState ApplyWinnerAndStartPlaying(GameState state, IReservation winner)
+    private static GameState ApplyWinnerAndStartPlaying(ReservationState state, IReservation winner)
     {
         var declarant = FirstDeclarantId(state, winner);
-        state = state.Apply(new SetGameModeModification(winner, declarant));
-        state = state.Apply(new AdvancePhaseModification(GamePhase.Playing));
+        // Read VorbehaltRauskommer before phase transition (it won't be on PlayingState)
+        var vorbehaltRauskommer = state.VorbehaltRauskommer;
+        GameState nextState = state.Apply(new SetGameModeModification(winner, declarant));
+        nextState = nextState.Apply(new AdvancePhaseModification(GamePhase.Playing));
         // Solo declarer leads in Solo games; VorbehaltRauskommer leads otherwise.
-        var spieleRauskommer = IsSoloReservation(winner) ? declarant : state.VorbehaltRauskommer;
-        state = state.Apply(new SetCurrentTurnModification(spieleRauskommer));
-        return state;
+        var spieleRauskommer = IsSoloReservation(winner) ? declarant : vorbehaltRauskommer;
+        nextState = nextState.Apply(new SetCurrentTurnModification(spieleRauskommer));
+        return nextState;
     }
 
     /// <summary>
     /// Attempts to set Schlanker Martin as the game mode for the given player;
     /// falls back to normal game if the rules or hand do not allow it.
     /// </summary>
-    private static GameState ApplyFallbackGameMode(GameState state, PlayerSeat martinPlayer)
+    private static (IReservation? gameMode, GameState nextState) ApplyFallbackGameMode(ReservationState state, PlayerSeat martinPlayer)
     {
         var playerState = state.Players.First(p => p.Seat == martinPlayer);
         var schlankerMartin = new SchlankerMartinReservation(martinPlayer);
         var gameMode = schlankerMartin.IsEligible(playerState.Hand, state.Rules)
             ? (IReservation?)schlankerMartin
             : null;
-        state = state.Apply(
+        GameState nextState = state.Apply(
             new SetGameModeModification(gameMode, gameMode != null ? martinPlayer : null)
         );
-        state = state.Apply(new AdvancePhaseModification(GamePhase.Playing));
-        state = state.Apply(new SetCurrentTurnModification(martinPlayer));
-        return state;
+        nextState = nextState.Apply(new AdvancePhaseModification(GamePhase.Playing));
+        nextState = nextState.Apply(new SetCurrentTurnModification(martinPlayer));
+        return (gameMode, nextState);
     }
 
     /// <summary>
     /// Picks the highest-priority winner from current declarations (lowest Priority value).
     /// Tie-breaks by the first player in seat order.
     /// </summary>
-    private static IReservation? PickWinner(GameState state) =>
+    private static IReservation? PickWinner(ReservationState state) =>
         state
             .ReservationDeclarations.Where(kv => kv.Value is not null)
             .OrderBy(kv => kv.Value!.Priority)
@@ -358,7 +360,7 @@ public sealed class MakeReservationHandler(
             .FirstOrDefault();
 
     /// <summary>Returns the player ID of the first declarant of the given reservation (by seat order).</summary>
-    private static PlayerSeat FirstDeclarantId(GameState state, IReservation target) =>
+    private static PlayerSeat FirstDeclarantId(ReservationState state, IReservation target) =>
         state
             .ReservationDeclarations.Where(kv => kv.Value?.Priority == target.Priority)
             .OrderBy(kv => (int)kv.Key)
@@ -366,7 +368,7 @@ public sealed class MakeReservationHandler(
             .Key;
 
     /// <summary>Returns Vorbehalt players in seat order.</summary>
-    private static IReadOnlyList<PlayerSeat> VorbehaltPlayers(GameState state) =>
+    private static IReadOnlyList<PlayerSeat> VorbehaltPlayers(ReservationState state) =>
         state
             .Players.Where(p => state.HealthDeclarations.TryGetValue(p.Seat, out var hasV) && hasV)
             .Select(p => p.Seat)
@@ -391,26 +393,26 @@ public sealed class MakeReservationHandler(
     private async Task<
         GameActionResult<MakeReservationResult>
     > AdvanceToNextCheckPhaseOrResolveAsync(
-        GameState state,
+        ReservationState state,
         List<IDomainEvent> events,
         GamePhase next,
         CancellationToken ct
     )
     {
         var eligible = EligiblePlayersForPhase(state, next);
-        state = state.Apply(new ClearReservationDeclarationsModification());
-        state = state.Apply(new AdvancePhaseModification(next));
+        ReservationState nextState = (ReservationState)state.Apply(new ClearReservationDeclarationsModification());
+        nextState = (ReservationState)nextState.Apply(new AdvancePhaseModification(next));
 
         if (eligible.Count > 0)
         {
-            state = state.Apply(new SetPendingRespondersModification(eligible));
-            state = state.Apply(new SetCurrentTurnModification(eligible[0]));
-            return await SaveAndReturnOk(state, events, new MakeReservationResult(false, null), ct);
+            nextState = (ReservationState)nextState.Apply(new SetPendingRespondersModification(eligible));
+            nextState = (ReservationState)nextState.Apply(new SetCurrentTurnModification(eligible[0]));
+            return await SaveAndReturnOk(nextState, events, new MakeReservationResult(false, null), ct);
         }
 
         // No eligible players — resolve the phase immediately with empty declarations
-        state = state.Apply(new SetPendingRespondersModification([]));
-        return await ResolvePhaseAsync(state, events, ct);
+        nextState = (ReservationState)nextState.Apply(new SetPendingRespondersModification([]));
+        return await ResolvePhaseAsync(nextState, events, ct);
     }
 
     /// <summary>
@@ -418,7 +420,7 @@ public sealed class MakeReservationHandler(
     /// the given phase. For SoloCheck the full Vorbehalt list is returned (no filtering).
     /// </summary>
     private static IReadOnlyList<PlayerSeat> EligiblePlayersForPhase(
-        GameState state,
+        ReservationState state,
         GamePhase phase
     )
     {

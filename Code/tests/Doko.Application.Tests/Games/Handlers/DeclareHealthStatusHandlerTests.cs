@@ -1,4 +1,5 @@
 using Doko.Application.Tests.Helpers;
+using Doko.Domain.GameFlow;
 
 namespace Doko.Application.Tests.Games.Handlers;
 
@@ -89,8 +90,8 @@ public class DeclareHealthStatusHandlerTests
         foreach (var player in AppB.FourPlayerSeats)
             await useCase.ExecuteAsync(new DeclareHealthStatusCommand(gameId, player, true));
 
-        var state = await repo.GetAsync(gameId);
-        state!.Phase.Should().Be(GamePhase.ReservationSoloCheck);
+        var state = (ReservationState)(await repo.GetAsync(gameId))!;
+        state.Phase.Should().Be(GamePhase.ReservationSoloCheck);
         state.PendingReservationResponders.Should().BeEquivalentTo(AppB.FourPlayerSeats);
     }
 
@@ -107,8 +108,8 @@ public class DeclareHealthStatusHandlerTests
         await useCase.ExecuteAsync(new DeclareHealthStatusCommand(gameId, AppB.P2, true));
         await useCase.ExecuteAsync(new DeclareHealthStatusCommand(gameId, AppB.P3, false));
 
-        var state = await repo.GetAsync(gameId);
-        state!.Phase.Should().Be(GamePhase.ReservationSoloCheck);
+        var state = (ReservationState)(await repo.GetAsync(gameId))!;
+        state.Phase.Should().Be(GamePhase.ReservationSoloCheck);
         state.PendingReservationResponders.Should().ContainSingle().Which.Should().Be(AppB.P2);
     }
 
@@ -182,8 +183,8 @@ public class DeclareHealthStatusHandlerTests
         await useCase.ExecuteAsync(new DeclareHealthStatusCommand(gameId, AppB.P0, false));
         await useCase.ExecuteAsync(new DeclareHealthStatusCommand(gameId, AppB.P1, true));
 
-        var state = await repo.GetAsync(gameId);
-        state!.Phase.Should().Be(GamePhase.ReservationSoloCheck);
+        var state = (ReservationState)(await repo.GetAsync(gameId))!;
+        state.Phase.Should().Be(GamePhase.ReservationSoloCheck);
         state.PendingReservationResponders.Should().ContainInOrder(AppB.P3, AppB.P1);
         state.CurrentTurn.Should().Be(AppB.P3);
     }
@@ -235,8 +236,8 @@ public class DeclareHealthStatusHandlerTests
 
         await DeclareAllGesund(repo, pub, gameId);
 
-        var state = await repo.GetAsync(gameId);
-        state!.Phase.Should().Be(GamePhase.Playing);
+        var state = (PlayingState)(await repo.GetAsync(gameId))!;
+        state.Phase.Should().Be(GamePhase.Playing);
         state.SilentMode.Should().NotBeNull();
         state.SilentMode!.Type.Should().Be(SilentGameModeType.KontraSolo);
         state.SilentMode.Player.Should().Be(AppB.P1); // P1 has all ♠ cards
@@ -269,8 +270,8 @@ public class DeclareHealthStatusHandlerTests
 
         await DeclareAllGesund(repo, pub, gameId);
 
-        var state = await repo.GetAsync(gameId);
-        state!.Phase.Should().Be(GamePhase.Playing);
+        var state = (PlayingState)(await repo.GetAsync(gameId))!;
+        state.Phase.Should().Be(GamePhase.Playing);
         state.SilentMode.Should().NotBeNull();
         state.SilentMode!.Type.Should().Be(SilentGameModeType.StilleHochzeit);
         state.SilentMode.Player.Should().Be(AppB.P0); // P0 has all ♣ cards (2× ♣Q)
@@ -285,8 +286,8 @@ public class DeclareHealthStatusHandlerTests
 
         await DeclareAllGesund(repo, pub, gameId);
 
-        var state = await repo.GetAsync(gameId);
-        state!.Phase.Should().Be(GamePhase.Playing);
+        var state = (PlayingState)(await repo.GetAsync(gameId))!;
+        state.Phase.Should().Be(GamePhase.Playing);
         state.SilentMode.Should().BeNull();
         state.ActiveReservation.Should().BeNull();
     }
@@ -302,8 +303,8 @@ public class DeclareHealthStatusHandlerTests
 
         await DeclareAllGesund(repo, pub, gameId);
 
-        var state = await repo.GetAsync(gameId);
-        state!.SilentMode!.Type.Should().Be(SilentGameModeType.KontraSolo);
+        var state = (PlayingState)(await repo.GetAsync(gameId))!;
+        state.SilentMode!.Type.Should().Be(SilentGameModeType.KontraSolo);
         state.SilentMode.Player.Should().Be(AppB.P1); // P1 wins, P0's StilleHochzeit is ignored
     }
 
@@ -324,6 +325,6 @@ public class DeclareHealthStatusHandlerTests
 
         var state = await repo.GetAsync(gameId);
         state!.Phase.Should().Be(GamePhase.ReservationSoloCheck);
-        state.SilentMode.Should().BeNull();
+        state.GetSilentMode().Should().BeNull();
     }
 }

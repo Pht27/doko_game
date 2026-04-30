@@ -41,12 +41,11 @@ public sealed class PlayCardHandler(
             repository,
             publisher,
             command.GameId,
-            execute: (PlayingState typedState) =>
+            execute: (PlayingState state) =>
             {
-                if (typedState.Phase != GamePhase.Playing)
-                    return (Fail<PlayCardResult>(GameError.InvalidPhase), [], typedState);
+                if (state.Phase != GamePhase.Playing)
+                    return (Fail<PlayCardResult>(GameError.InvalidPhase), [], state);
 
-                GameState state = typedState;
                 if (state.CurrentTurn != command.Player)
                     return (Fail<PlayCardResult>(GameError.NotYourTurn), [], state);
 
@@ -90,13 +89,13 @@ public sealed class PlayCardHandler(
     /// Opens a new trick if none is in progress.
     /// Applies any pending direction flip first, so it takes effect on the lead card.
     /// </summary>
-    private static GameState BeginTrickIfNeeded(GameState state)
+    private static PlayingState BeginTrickIfNeeded(PlayingState state)
     {
         if (state.CurrentTrick is not null)
             return state;
         if (state.DirectionFlipPending)
-            state = state.Apply(new ReverseDirectionModification());
-        return state.Apply(new SetCurrentTrickModification(new Trick()));
+            state = (PlayingState)state.Apply(new ReverseDirectionModification());
+        return (PlayingState)state.Apply(new SetCurrentTrickModification(new Trick()));
     }
 
     /// <summary>
@@ -107,8 +106,8 @@ public sealed class PlayCardHandler(
     private static (
         GameError? error,
         List<IDomainEvent> events,
-        GameState nextState
-    ) ApplySonderkarten(GameState state, Card card, PlayCardCommand command)
+        PlayingState nextState
+    ) ApplySonderkarten(PlayingState state, Card card, PlayCardCommand command)
     {
         var eligible = SonderkarteRegistry.GetEligibleForCard(card, state, state.Rules);
         var eligibleSet = eligible.Select(s => s.Type).ToHashSet();
@@ -129,7 +128,7 @@ public sealed class PlayCardHandler(
         {
             var mods = sonderkarte.Apply(state, inputs);
             foreach (var mod in mods)
-                state = state.Apply(mod);
+                state = (PlayingState)state.Apply(mod);
             events.Add(
                 new SonderkarteTriggeredEvent(state.Id, command.Player, sonderkarte.Type, mods)
             );
@@ -140,7 +139,7 @@ public sealed class PlayCardHandler(
                 s.WindowClosesWhenDeclined && !activateSet.Contains(s.Type)
             )
         )
-            state = state.Apply(new CloseActivationWindowModification(sonderkarte.Type));
+            state = (PlayingState)state.Apply(new CloseActivationWindowModification(sonderkarte.Type));
 
         return (null, events, state);
     }
@@ -177,21 +176,21 @@ public sealed class PlayCardHandler(
         public PlayerSeat GetGenscherPartner() => command.GenscherPartner!.Value;
     }
 
-    private static GameState PlayCardIntoTrick(
-        GameState state,
+    private static PlayingState PlayCardIntoTrick(
+        PlayingState state,
         PlayerSeat player,
         PlayerState playerState,
         Card card
     )
     {
-        state = state.Apply(
+        state = (PlayingState)state.Apply(
             new UpdatePlayerHandModification(player, playerState.Hand.Remove(card))
         );
-        return state.Apply(new AddCardToTrickModification(player, card));
+        return (PlayingState)state.Apply(new AddCardToTrickModification(player, card));
     }
 
     private static List<IDomainEvent> BuildEvents(
-        GameState state,
+        PlayingState state,
         PlayerSeat player,
         Card card,
         List<IDomainEvent> sonderkarteEvents
@@ -205,9 +204,9 @@ public sealed class PlayCardHandler(
         GameActionResult<PlayCardResult>,
         IReadOnlyList<IDomainEvent>,
         GameState
-    ) AdvanceTurn(GameState state, PlayerSeat player, List<IDomainEvent> events)
+    ) AdvanceTurn(PlayingState state, PlayerSeat player, List<IDomainEvent> events)
     {
-        state = state.Apply(new SetCurrentTurnModification(player.Next(state.Direction)));
+        state = (PlayingState)state.Apply(new SetCurrentTurnModification(player.Next(state.Direction)));
         return (Ok(new PlayCardResult(false, null, false, null)), events, state);
     }
 
@@ -215,7 +214,7 @@ public sealed class PlayCardHandler(
         GameActionResult<PlayCardResult>,
         IReadOnlyList<IDomainEvent>,
         GameState
-    ) CompleteTrick(GameState state, List<IDomainEvent> events)
+    ) CompleteTrick(PlayingState state, List<IDomainEvent> events)
     {
         var trick = state.CurrentTrick!;
         var isLastTrick = state.CompletedTricks.Count == state.Rules.LastTrickIndex;
@@ -241,7 +240,7 @@ public sealed class PlayCardHandler(
             .ToList();
         var result = new TrickResult(trick, effectiveWinner, awards);
 
-        state = state.Apply(new AddCompletedTrickModification(trick, result));
+        state = (PlayingState)state.Apply(new AddCompletedTrickModification(trick, result));
         events.Add(
             new TrickCompletedEvent(
                 state.Id,
@@ -253,7 +252,7 @@ public sealed class PlayCardHandler(
 
         // Detect Hochzeit forced solo: partner not found after 3 qualifying tricks
         if (ForceIntoSolo(state))
-            state = state.Apply(new SetHochzeitForcedSoloModification());
+            state = (PlayingState)state.Apply(new SetHochzeitForcedSoloModification());
 
         // Auto-make Pflichtansage if the completed trick triggers one
         var pflichtAnnouncement = AnnouncementRules.GetMandatoryAnnouncement(
@@ -262,7 +261,7 @@ public sealed class PlayCardHandler(
         );
         if (pflichtAnnouncement is not null)
         {
-            state = state.Apply(new AddAnnouncementModification(pflichtAnnouncement));
+            state = (PlayingState)state.Apply(new AddAnnouncementModification(pflichtAnnouncement));
             events.Add(
                 new AnnouncementMadeEvent(
                     state.Id,
@@ -283,9 +282,9 @@ public sealed class PlayCardHandler(
             && SchwarzesSauTrigger.IsSecondPikDameTrick(state)
         )
         {
-            state = state.Apply(new AdvancePhaseModification(GamePhase.SchwarzesSauSoloSelect));
-            state = state.Apply(new SetCurrentTurnModification(effectiveWinner));
-            return (Ok(new PlayCardResult(true, effectiveWinner, false, null)), events, state);
+            GameState nextState = state.Apply(new AdvancePhaseModification(GamePhase.SchwarzesSauSoloSelect));
+            nextState = nextState.Apply(new SetCurrentTurnModification(effectiveWinner));
+            return (Ok(new PlayCardResult(true, effectiveWinner, false, null)), events, nextState);
         }
 
         if (state.Players.All(p => p.Hand.Cards.Count == 0))
@@ -298,11 +297,11 @@ public sealed class PlayCardHandler(
             );
         }
 
-        state = state.Apply(new SetCurrentTurnModification(effectiveWinner));
+        state = (PlayingState)state.Apply(new SetCurrentTurnModification(effectiveWinner));
         return (Ok(new PlayCardResult(true, effectiveWinner, false, null)), events, state);
     }
 
-    private static bool ForceIntoSolo(GameState state) =>
+    private static bool ForceIntoSolo(PlayingState state) =>
         !state.HochzeitBecameForcedSolo
         && state.ActiveReservation is HochzeitReservation
         && state.PartyResolver.IsFullyResolved(state)

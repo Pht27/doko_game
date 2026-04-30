@@ -96,11 +96,12 @@ public class GameScorerTests(ITestOutputHelper output)
     public void Score_GegenDieAlten_NotAdded_WhenSoloAndKontraWins()
     {
         // Solo game (BubensoloReservation active) → Kontra wins but no "Gegen die Alten"
-        var state = GameState.Create(
+        var state = (ScoringState)GameState.Create(
             rules: NoFeigheit,
             players: B.FourPlayers(),
             partyResolver: B.SoloResolver(),
-            activeReservation: new BubensoloReservation(B.P0)
+            activeReservation: new BubensoloReservation(B.P0),
+            phase: GamePhase.Scoring
         );
         // Re (solo, P0) wins only 1 trick = 44 Augen; Kontra wins 3 tricks = 132 Augen → Kontra wins
         var tricks = new List<TrickResult>
@@ -357,11 +358,12 @@ public class GameScorerTests(ITestOutputHelper output)
             (53, Suit.Herz, Rank.Neun, B.P3)
         );
 
-        var state = GameState.Create(
+        var state = (ScoringState)GameState.Create(
             rules: RuleSet.Default(),
             players: B.FourPlayers(),
             partyResolver: B.SoloResolver(),
-            completedTricks: [kontraTrickInState]
+            completedTricks: [kontraTrickInState],
+            phase: GamePhase.Scoring
         );
 
         var tricks = new List<TrickResult>
@@ -475,11 +477,12 @@ public class GameScorerTests(ITestOutputHelper output)
     public void Score_SoloFactor_IsThree_WhenSoloReservationActive()
     {
         // ActiveReservation = Bubensolo → IsSolo = true → SoloFactor = 3
-        var state = GameState.Create(
+        var state = (ScoringState)GameState.Create(
             rules: NoFeigheit,
             players: B.FourPlayers(),
             partyResolver: B.SoloResolver(),
-            activeReservation: new BubensoloReservation(B.P0)
+            activeReservation: new BubensoloReservation(B.P0),
+            phase: GamePhase.Scoring
         );
         // Re=132, Kontra=132 → GameValue=1 (only Gewonnen); TotalScore = 1 × 3 = 3
         var tricks = new List<TrickResult>
@@ -525,11 +528,12 @@ public class GameScorerTests(ITestOutputHelper output)
     {
         // Solo game: Re wins; Re gets +1 Extrapunkt.
         // GameValue = 1 (Gewonnen); TotalScore = 1 × 3 + 1 = 4.
-        var state = GameState.Create(
+        var state = (ScoringState)GameState.Create(
             rules: NoFeigheit,
             players: B.FourPlayers(),
             partyResolver: B.SoloResolver(),
-            activeReservation: new BubensoloReservation(B.P0)
+            activeReservation: new BubensoloReservation(B.P0),
+            phase: GamePhase.Scoring
         );
         var award = new ExtrapunktAward(ExtrapunktType.Doppelkopf, B.P0, 1); // Re benefits
         var tricks = new List<TrickResult>
@@ -555,7 +559,7 @@ public class GameScorerTests(ITestOutputHelper output)
     {
         // SilentMode = KontraSolo → soloFactor = 3 even without an ActiveReservation
         var state = SoloState(rules: NoFeigheit);
-        state = state.Apply(
+        state = (ScoringState)state.Apply(
             new SetSilentGameModeModification(
                 new SilentGameMode(SilentGameModeType.KontraSolo, B.P0)
             )
@@ -579,7 +583,7 @@ public class GameScorerTests(ITestOutputHelper output)
     {
         // HochzeitBecameForcedSolo=true → soloFactor=3 even though ActiveReservation.IsSolo=false
         var state = SoloState(rules: NoFeigheit);
-        state = state.Apply(new SetHochzeitForcedSoloModification());
+        state = (ScoringState)state.Apply(new SetHochzeitForcedSoloModification());
         var tricks = new List<TrickResult>
         {
             B.HighValueTrick(B.P0, 0),
@@ -605,12 +609,13 @@ public class GameScorerTests(ITestOutputHelper output)
         {
             IsEffective = false,
         };
-        var state = GameState.Create(
+        var state = (ScoringState)GameState.Create(
             rules: NoFeigheit,
             players: B.FourPlayers(),
             partyResolver: resolver,
             initialHands: hands,
-            announcements: [buttonOnlyWin]
+            announcements: [buttonOnlyWin],
+            phase: GamePhase.Scoring
         );
         // P1+P2 (Re, effective) win enough tricks.
         var tricks = new List<TrickResult>
@@ -641,12 +646,13 @@ public class GameScorerTests(ITestOutputHelper output)
         {
             IsEffective = false,
         };
-        var state = GameState.Create(
+        var state = (ScoringState)GameState.Create(
             rules: NoFeigheit,
             players: B.FourPlayers(),
             partyResolver: resolver,
             initialHands: hands,
-            announcements: [buttonOnlyWin, buttonOnlyKeine90]
+            announcements: [buttonOnlyWin, buttonOnlyKeine90],
+            phase: GamePhase.Scoring
         );
         // Re wins (≥121 Augen) but Kontra gets 90+ Augen.
         var tricks = new List<TrickResult>
@@ -670,12 +676,13 @@ public class GameScorerTests(ITestOutputHelper output)
         // Effective Win by P1 (has ♣Q) must add +1 to game value.
         var (resolver, hands) = B.KontraSoloResolver();
         var effectiveWin = B.Ann(B.P1, AnnouncementType.Win);
-        var state = GameState.Create(
+        var state = (ScoringState)GameState.Create(
             rules: NoFeigheit,
             players: B.FourPlayers(),
             partyResolver: resolver,
             initialHands: hands,
-            announcements: [effectiveWin]
+            announcements: [effectiveWin],
+            phase: GamePhase.Scoring
         );
         var tricks = new List<TrickResult>
         {
@@ -691,15 +698,16 @@ public class GameScorerTests(ITestOutputHelper output)
         result.AnnouncementRecords.Should().HaveCount(1);
     }
 
-    private static GameState SoloState(
+    private static ScoringState SoloState(
         RuleSet? rules = null,
         IReadOnlyList<Announcement>? announcements = null
     ) =>
-        GameState.Create(
+        (ScoringState)GameState.Create(
             rules: rules ?? RuleSet.Default(),
             players: B.FourPlayers(),
             partyResolver: B.SoloResolver(), // P0=Re, P1/P2/P3=Kontra
-            announcements: announcements
+            announcements: announcements,
+            phase: GamePhase.Scoring
         );
 
     // ── Schlanker Martin ──────────────────────────────────────────────────────
@@ -831,11 +839,12 @@ public class GameScorerTests(ITestOutputHelper output)
         result.Feigheit.Should().BeFalse();
     }
 
-    private static GameState SchlankerMartinState() =>
-        GameState.Create(
+    private static ScoringState SchlankerMartinState() =>
+        (ScoringState)GameState.Create(
             rules: RuleSet.Default(),
             players: B.FourPlayers(),
             partyResolver: B.SoloResolver(),
-            activeReservation: new SchlankerMartinReservation(B.P0)
+            activeReservation: new SchlankerMartinReservation(B.P0),
+            phase: GamePhase.Scoring
         );
 }

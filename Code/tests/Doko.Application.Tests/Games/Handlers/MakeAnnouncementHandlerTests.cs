@@ -1,4 +1,5 @@
 using Doko.Application.Tests.Helpers;
+using Doko.Domain.GameFlow;
 using Doko.Domain.Parties;
 using Doko.Domain.Trump;
 
@@ -47,8 +48,8 @@ public class MakeAnnouncementHandlerTests
 
         result.Should().BeOfType<GameActionResult<Unit>.Ok>();
 
-        var state = await repo.GetAsync(id);
-        state!.Announcements.Should().HaveCount(1);
+        var state = (PlayingState)(await repo.GetAsync(id))!;
+        state.Announcements.Should().HaveCount(1);
         state.Announcements[0].Type.Should().Be(AnnouncementType.Win);
     }
 

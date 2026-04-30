@@ -40,7 +40,7 @@ public static class SonderkarteRegistry
     /// </summary>
     public static IReadOnlyList<ISonderkarte> GetEligibleForCard(
         Card playedCard,
-        GameState state,
+        PlayingState state,
         RuleSet rules
     )
     {

@@ -1,5 +1,6 @@
 using Doko.Application.Tests.Helpers;
 using Doko.Domain.Announcements;
+using Doko.Domain.GameFlow;
 using Doko.Domain.GameFlow.Events;
 using Doko.Domain.Parties;
 using Doko.Domain.Scoring;
@@ -85,8 +86,8 @@ public class PlayCardHandlerTests
 
         await uc.ExecuteAsync(new PlayCardCommand(id, AppB.P0, card.Id, []));
 
-        var state = await repo.GetAsync(id);
-        state!.CurrentTrick.Should().NotBeNull();
+        var state = (PlayingState)(await repo.GetAsync(id))!;
+        state.CurrentTrick.Should().NotBeNull();
         state.CurrentTrick!.Cards.Should().HaveCount(1);
         state.CurrentTrick.Cards[0].Card.Should().Be(card);
     }
@@ -176,8 +177,8 @@ public class PlayCardHandlerTests
         // P0 and P1 tied ♦A — first played wins; P0 wins
         ok.TrickWinner.Should().Be(AppB.P0);
 
-        var saved = await repo.GetAsync(id);
-        saved!.CompletedTricks.Should().HaveCount(1);
+        var saved = (PlayingState)(await repo.GetAsync(id))!;
+        saved.CompletedTricks.Should().HaveCount(1);
     }
 
     [Fact]
@@ -222,8 +223,8 @@ public class PlayCardHandlerTests
             .ContainSingle(e => e.Player == AppB.P0 && e.Type == AnnouncementType.Win);
 
         // State should also have the announcement recorded
-        var saved = await repo.GetAsync(id);
-        saved!
+        var saved = (PlayingState)(await repo.GetAsync(id))!;
+        saved
             .Announcements.Should()
             .ContainSingle(a => a.Player == AppB.P0 && a.Type == AnnouncementType.Win);
     }
@@ -308,8 +309,8 @@ public class PlayCardHandlerTests
             await uc.ExecuteAsync(new PlayCardCommand(gameState.Id, AppB.P3, P3Card(p3id).Id, []));
         }
 
-        var saved = await repo.GetAsync(gameState.Id);
-        saved!.HochzeitBecameForcedSolo.Should().BeTrue();
+        var saved = (PlayingState)(await repo.GetAsync(gameState.Id))!;
+        saved.HochzeitBecameForcedSolo.Should().BeTrue();
     }
 
     [Fact]

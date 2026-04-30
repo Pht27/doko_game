@@ -13,13 +13,13 @@ namespace Doko.Domain.Tests.Announcements;
 /// </summary>
 public class KontraSoloAnnouncementTests
 {
-    private static GameState KontraSoloState(
+    private static PlayingState KontraSoloState(
         IReadOnlyList<Announcement>? announcements = null,
         IReadOnlyList<Trick>? completedTricks = null
     )
     {
         var (resolver, hands) = B.KontraSoloResolver();
-        var state = GameState.Create(
+        var state = (PlayingState)GameState.Create(
             rules: RuleSet.Default(),
             players: B.FourPlayers(),
             currentTurn: B.P0,
@@ -29,7 +29,7 @@ public class KontraSoloAnnouncementTests
             initialHands: hands,
             phase: GamePhase.Playing
         );
-        state = state.Apply(
+        state = (PlayingState)state.Apply(
             new SetSilentGameModeModification(
                 new SilentGameMode(SilentGameModeType.KontraSolo, B.P0)
             )

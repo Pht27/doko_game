@@ -11,5 +11,5 @@ namespace Doko.Domain.Tricks;
 public interface ITrickWinnerRule
 {
     bool IsEnabledBy(RuleSet rules);
-    PlayerSeat? TryGetOverride(Trick completedTrick, GameState state, PlayerSeat normalWinner);
+    PlayerSeat? TryGetOverride(Trick completedTrick, PlayingState state, PlayerSeat normalWinner);
 }

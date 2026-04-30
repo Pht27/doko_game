@@ -18,7 +18,7 @@ public sealed class SchweinSonderkarte : SonderkarteBase
     public override CardType TriggeringCard => KaroAss;
     public override ISonderkarteRankingModifier RankingModifier => SchweinchenModifier.Instance;
 
-    public override bool AreConditionsMet(GameState state) =>
+    public override bool AreConditionsMet(PlayingState state) =>
         !IsActive(state, SonderkarteType.Schweinchen)
         && !IsWindowClosed(state, SonderkarteType.Schweinchen)
         && OriginallyHeldBoth(state, KaroAss);

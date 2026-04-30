@@ -21,7 +21,7 @@ public static class TrickWinnerRuleRegistry
     /// </summary>
     public static PlayerSeat GetEffectiveWinner(
         Trick trick,
-        GameState state,
+        PlayingState state,
         PlayerSeat normalWinner
     )
     {

@@ -23,7 +23,7 @@ public sealed class AgatheExtrapunkt : IExtrapunkt
         PlayerSeat effectiveTrickWinner
     )
     {
-        if (state.CompletedTricks.Count != state.Rules.LastTrickIndex)
+        if (state.GetCompletedTricks().Count != state.Rules.LastTrickIndex)
             return [];
 
         var winnerParty = state.PartyResolver.ResolveParty(effectiveTrickWinner, state);

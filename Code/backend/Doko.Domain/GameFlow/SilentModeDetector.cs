@@ -4,7 +4,7 @@ namespace Doko.Domain.GameFlow;
 
 public static class SilentModeDetector
 {
-    public static SilentGameMode? Detect(GameState state)
+    public static SilentGameMode? Detect(ReservationState state)
     {
         if (state.InitialHands is null)
             return null;

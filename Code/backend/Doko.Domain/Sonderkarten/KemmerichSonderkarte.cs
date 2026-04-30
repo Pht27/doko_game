@@ -18,7 +18,7 @@ public sealed class KemmerichSonderkarte : SonderkarteBase
 
     public override bool WindowClosesWhenDeclined => false;
 
-    public override bool AreConditionsMet(GameState state)
+    public override bool AreConditionsMet(PlayingState state)
     {
         if (IsActive(state, SonderkarteType.Kemmerich))
             return false;

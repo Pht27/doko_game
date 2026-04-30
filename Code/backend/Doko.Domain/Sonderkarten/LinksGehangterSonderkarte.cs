@@ -18,14 +18,17 @@ public sealed class LinksGehangterSonderkarte : SonderkarteBase
 
     public override bool WindowClosesWhenDeclined => false;
 
-    public override bool AreConditionsMet(GameState state) =>
+    public override bool AreConditionsMet(PlayingState state) =>
         !IsActive(state, SonderkarteType.LinksGehangter) && OriginallyHeldBoth(state, KaroBube);
 
     protected override GameStateModification? ExtraEffects(
         GameState state,
         ISonderkarteInputProvider inputs
-    ) =>
-        state.CurrentTrick is null || state.CurrentTrick.Cards.Count == 0
+    )
+    {
+        var currentTrick = state is PlayingState p ? p.CurrentTrick : null;
+        return currentTrick is null || currentTrick.Cards.Count == 0
             ? new ReverseDirectionModification()
             : new ScheduleDirectionFlipModification();
+    }
 }

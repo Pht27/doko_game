@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using Doko.Application.Tests.Fakes;
 using Doko.Application.Tests.Helpers;
+using Doko.Domain.GameFlow;
 using Doko.Domain.GameFlow.Modifications;
 using Doko.Domain.Scoring;
 
@@ -213,8 +214,8 @@ public partial class GameFlowSnapshotTests
             new AcceptArmutCommand(id, AppB.P1, true)
         );
 
-        var afterAccept = await repo.GetAsync(id);
-        var richHand = afterAccept!.Players.First(p => p.Seat == AppB.P1).Hand.Cards;
+        var afterAccept = (ArmutFlowState)(await repo.GetAsync(id))!;
+        var richHand = afterAccept.Players.First(p => p.Seat == AppB.P1).Hand.Cards;
         var cardsToReturn = richHand
             .Take(afterAccept.Armut!.TransferCount)
             .Select(c => c.Id)

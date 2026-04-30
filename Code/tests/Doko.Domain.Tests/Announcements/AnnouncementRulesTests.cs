@@ -42,12 +42,13 @@ public class AnnouncementRulesTests
         current.Add(new TrickCard(B.Card(99, Suit.Kreuz, Rank.Neun), B.P0));
         current.Add(new TrickCard(B.Card(100, Suit.Kreuz, Rank.Zehn), B.P1));
 
-        var state = GameState.Create(
+        var state = (PlayingState)GameState.Create(
             rules: RuleSet.Default(),
             players: B.FourPlayers(),
             partyResolver: B.SoloResolver(),
             completedTricks: [completed],
-            currentTrick: current
+            currentTrick: current,
+            phase: GamePhase.Playing
         );
 
         AnnouncementRules.CanAnnounce(B.P0, AnnouncementType.Win, state).Should().BeFalse();
@@ -62,13 +63,14 @@ public class AnnouncementRulesTests
         current.Add(new TrickCard(B.Card(99, Suit.Kreuz, Rank.Neun), B.P0));
 
         var win = B.Ann(B.P0, AnnouncementType.Win);
-        var state = GameState.Create(
+        var state = (PlayingState)GameState.Create(
             rules: RuleSet.Default(),
             players: B.FourPlayers(),
             partyResolver: B.SoloResolver(),
             completedTricks: [completed],
             currentTrick: current,
-            announcements: [win]
+            announcements: [win],
+            phase: GamePhase.Playing
         );
 
         // P1=Kontra, deadline = 9, cards = 5 → allowed to announce Win
@@ -215,7 +217,7 @@ public class AnnouncementRulesTests
     [Fact]
     public void ViolatesFeigheit_ReturnsFalse_WhenFeigheitDisabled()
     {
-        var state = B.BasicState(rules: RuleSet.Minimal()); // EnforceFeigheit=false
+        var state = (ScoringState)GameState.Create(rules: RuleSet.Minimal(), players: B.FourPlayers(), partyResolver: B.SoloResolver(), phase: GamePhase.Scoring);
         var result = new GameResult(
             Winner: Party.Re,
             ReAugen: 180,
@@ -239,11 +241,12 @@ public class AnnouncementRulesTests
     public void ViolatesFeigheit_ReturnsFalse_InSoloGame()
     {
         // ActiveReservation != null → skip Feigheit check
-        var state = GameState.Create(
+        var state = (ScoringState)GameState.Create(
             rules: RuleSet.Default(),
             players: B.FourPlayers(),
             partyResolver: B.SoloResolver(),
-            activeReservation: new DamensoloReservation(B.P0)
+            activeReservation: new DamensoloReservation(B.P0),
+            phase: GamePhase.Scoring
         );
         var result = new GameResult(
             Winner: Party.Re,
@@ -278,11 +281,12 @@ public class AnnouncementRulesTests
             (33, Suit.Herz, Rank.Neun, B.P3)
         );
 
-        var state = GameState.Create(
+        var state = (ScoringState)GameState.Create(
             rules: RuleSet.Default(),
             players: B.FourPlayers(),
             partyResolver: B.SoloResolver(),
-            completedTricks: [kontraTrick]
+            completedTricks: [kontraTrick],
+            phase: GamePhase.Scoring
         );
 
         var result = new GameResult(
@@ -308,10 +312,11 @@ public class AnnouncementRulesTests
     public void ViolatesFeigheit_ReturnsTrue_WhenThreeMissing()
     {
         // Winner=Re, loserAugen=44: missing Win + Keine90 + Keine60 = 3 → Feigheit
-        var state = GameState.Create(
+        var state = (ScoringState)GameState.Create(
             rules: RuleSet.Default(),
             players: B.FourPlayers(),
-            partyResolver: B.SoloResolver()
+            partyResolver: B.SoloResolver(),
+            phase: GamePhase.Scoring
         );
 
         var result = new GameResult(
@@ -337,7 +342,7 @@ public class AnnouncementRulesTests
     public void ViolatesFeigheit_ReturnsFalse_WhenWinnerAnnouncedEnough()
     {
         // Winner=Re, loserAugen=44, but Re announced Win+Keine90+Keine60 → missing=0
-        var state = GameState.Create(
+        var state = (ScoringState)GameState.Create(
             rules: RuleSet.Default(),
             players: B.FourPlayers(),
             partyResolver: B.SoloResolver(),
@@ -346,7 +351,8 @@ public class AnnouncementRulesTests
                 B.Ann(B.P0, AnnouncementType.Win),
                 B.Ann(B.P0, AnnouncementType.Keine90),
                 B.Ann(B.P0, AnnouncementType.Keine60),
-            ]
+            ],
+            phase: GamePhase.Scoring
         );
 
         var result = new GameResult(
@@ -373,12 +379,13 @@ public class AnnouncementRulesTests
     {
         // Same conditions as ViolatesFeigheit_ReturnsTrue_WhenThreeMissing, but
         // HochzeitBecameForcedSolo=true exempts the game from Feigheit.
-        var state = GameState.Create(
+        var state = (ScoringState)GameState.Create(
             rules: RuleSet.Default(),
             players: B.FourPlayers(),
-            partyResolver: B.SoloResolver()
+            partyResolver: B.SoloResolver(),
+            phase: GamePhase.Scoring
         );
-        state = state.Apply(new SetHochzeitForcedSoloModification());
+        state = (ScoringState)state.Apply(new SetHochzeitForcedSoloModification());
 
         var result = new GameResult(
             Winner: Party.Re,
@@ -403,12 +410,13 @@ public class AnnouncementRulesTests
     public void ViolatesFeigheit_ReturnsFalse_WhenSilentModeActive()
     {
         // Silent modes (Kontrasolo, Stille Hochzeit) also exempt from Feigheit.
-        var state = GameState.Create(
+        var state = (ScoringState)GameState.Create(
             rules: RuleSet.Default(),
             players: B.FourPlayers(),
-            partyResolver: B.SoloResolver()
+            partyResolver: B.SoloResolver(),
+            phase: GamePhase.Scoring
         );
-        state = state.Apply(
+        state = (ScoringState)state.Apply(
             new SetSilentGameModeModification(
                 new SilentGameMode(SilentGameModeType.KontraSolo, B.P0)
             )
@@ -545,7 +553,7 @@ public class AnnouncementRulesTests
         current.Add(new TrickCard(B.Card(99, Suit.Pik, Rank.Neun), B.P0));
         current.Add(new TrickCard(B.Card(100, Suit.Herz, Rank.Neun), B.P1));
 
-        var state = GameState.Create(
+        var state = (PlayingState)GameState.Create(
             rules: RuleSet.Default(),
             players: B.FourPlayers(),
             partyResolver: resolver,
@@ -555,7 +563,8 @@ public class AnnouncementRulesTests
                 HochzeitP0WinsTrick(4),
                 HochzeitFindungsstichP1(8),
             ],
-            currentTrick: current
+            currentTrick: current,
+            phase: GamePhase.Playing
         );
 
         AnnouncementRules.CanAnnounce(B.P1, AnnouncementType.Win, state).Should().BeFalse();
@@ -570,7 +579,7 @@ public class AnnouncementRulesTests
         var current = new Trick();
         current.Add(new TrickCard(B.Card(99, Suit.Pik, Rank.Neun), B.P0));
 
-        var state = GameState.Create(
+        var state = (PlayingState)GameState.Create(
             rules: RuleSet.Default(),
             players: B.FourPlayers(),
             partyResolver: resolver,
@@ -581,7 +590,8 @@ public class AnnouncementRulesTests
                 HochzeitFindungsstichP1(8),
             ],
             currentTrick: current,
-            announcements: [B.Ann(B.P1, AnnouncementType.Win)]
+            announcements: [B.Ann(B.P1, AnnouncementType.Win)],
+            phase: GamePhase.Playing
         );
 
         // P1 already announced Win; now Keine90 is next. Deadline=17, 13 cards → allowed.

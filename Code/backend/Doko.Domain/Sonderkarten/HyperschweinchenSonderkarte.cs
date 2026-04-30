@@ -19,7 +19,7 @@ public sealed class HyperschweinchenSonderkarte : SonderkarteBase
     public override ISonderkarteRankingModifier RankingModifier =>
         HyperschweinchenModifier.Instance;
 
-    public override bool AreConditionsMet(GameState state) =>
+    public override bool AreConditionsMet(PlayingState state) =>
         (
             IsActive(state, SonderkarteType.Superschweinchen)
             || BothPlayedBySamePlayer(state, KaroZehn)

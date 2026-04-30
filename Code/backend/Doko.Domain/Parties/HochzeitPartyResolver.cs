@@ -1,5 +1,6 @@
 using Doko.Domain.GameFlow;
 using Doko.Domain.Players;
+using Doko.Domain.Scoring;
 
 namespace Doko.Domain.Parties;
 
@@ -27,19 +28,27 @@ public sealed class HochzeitPartyResolver : IPartyResolver
 
         int? findungsstich = FindFindungstrickIndex(state);
         if (findungsstich.HasValue)
-            return player == state.ScoredTricks[findungsstich.Value].Winner
+        {
+            var scored = GetScoredTricks(state);
+            return player == scored![findungsstich.Value].Winner
                 ? Party.Re
                 : Party.Kontra;
+        }
 
         // After 3 tricks with no partner → Stille Hochzeit (solo)
-        if (state.CompletedTricks.Count >= 3)
+        var completed = GetCompletedTricks(state);
+        if (completed is not null && completed.Count >= 3)
             return Party.Kontra;
 
         return null; // Still searching for partner
     }
 
-    public bool IsFullyResolved(GameState state) =>
-        FindFindungstrickIndex(state).HasValue || state.CompletedTricks.Count >= 3;
+    public bool IsFullyResolved(GameState state)
+    {
+        var completed = GetCompletedTricks(state);
+        return FindFindungstrickIndex(state).HasValue
+            || (completed is not null && completed.Count >= 3);
+    }
 
     /// <summary>
     /// Returns the announcement deadline relative to the Findungsstich.
@@ -55,10 +64,15 @@ public sealed class HochzeitPartyResolver : IPartyResolver
 
     private int? FindFindungstrickIndex(GameState state)
     {
-        for (int i = 0; i < state.CompletedTricks.Count && i < 3; i++)
+        var completed = GetCompletedTricks(state);
+        var scored = GetScoredTricks(state);
+        if (completed is null || scored is null)
+            return null;
+
+        for (int i = 0; i < completed.Count && i < 3; i++)
         {
-            var winner = state.ScoredTricks[i].Winner;
-            if (winner != _hochzeitPlayer && Qualifies(state.CompletedTricks[i], state))
+            var winner = scored[i].Winner;
+            if (winner != _hochzeitPlayer && Qualifies(completed[i], state))
                 return i;
         }
         return null;
@@ -75,5 +89,23 @@ public sealed class HochzeitPartyResolver : IPartyResolver
                 trick.Cards[0].Card.Type
             ),
             _ => false,
+        };
+
+    private static IReadOnlyList<Tricks.Trick>? GetCompletedTricks(GameState state) =>
+        state switch
+        {
+            PlayingState p => p.CompletedTricks,
+            ScoringState s => s.CompletedTricks,
+            FinishedState f => f.CompletedTricks,
+            _ => null,
+        };
+
+    private static IReadOnlyList<Scoring.TrickResult>? GetScoredTricks(GameState state) =>
+        state switch
+        {
+            PlayingState p => p.ScoredTricks,
+            ScoringState s => s.ScoredTricks,
+            FinishedState f => f.ScoredTricks,
+            _ => null,
         };
 }

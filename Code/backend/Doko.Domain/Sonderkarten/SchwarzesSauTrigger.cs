@@ -9,7 +9,7 @@ public static class SchwarzesSauTrigger
     /// Returns true when the just-completed trick pushed the running ♠Q count from &lt;2 to ≥2.
     /// Handles the case where both Pik Damen appear in the same trick.
     /// </summary>
-    public static bool IsSecondPikDameTrick(GameState state)
+    public static bool IsSecondPikDameTrick(PlayingState state)
     {
         var pikDame = new CardType(Suit.Pik, Rank.Dame);
         var justCompleted = state.CompletedTricks.Last();

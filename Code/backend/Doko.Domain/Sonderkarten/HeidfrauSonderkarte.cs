@@ -17,7 +17,7 @@ public sealed class HeidfrauSonderkarte : SonderkarteBase
     public override CardType TriggeringCard => PikDame;
     public override SonderkarteType? Suppresses => SonderkarteType.Heidmann;
 
-    public override bool AreConditionsMet(GameState state) =>
+    public override bool AreConditionsMet(PlayingState state) =>
         IsActive(state, SonderkarteType.Heidmann)
         && !IsActive(state, SonderkarteType.Heidfrau)
         && !IsWindowClosed(state, SonderkarteType.Heidfrau)

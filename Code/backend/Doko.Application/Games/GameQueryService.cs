@@ -46,7 +46,7 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             BuildOtherPlayers(requestingPlayer, state),
             BuildCurrentTrickSummary(state),
             [
-                .. state.ScoredTricks.Select(
+                .. state.GetScoredTricks().Select(
                     (r, i) => ToCompletedTrickSummary(i, r, state.TrumpEvaluator)
                 ),
             ],
@@ -62,13 +62,13 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             ShouldRespondToArmut = BuildShouldRespondToArmut(requestingPlayer, state),
             ShouldReturnArmutCards =
                 state.Phase == GamePhase.ArmutCardExchange
-                && state.Armut?.RichPlayer == requestingPlayer,
+                && state.GetArmut()?.RichPlayer == requestingPlayer,
             ArmutCardReturnCount = BuildArmutCardReturnCount(requestingPlayer, state),
             ArmutExchangeCardCount =
-                state.Armut?.ReturnedTrump.HasValue == true ? state.Armut.TransferCount : null,
-            ArmutReturnedTrump = state.Armut?.ReturnedTrump,
-            ActiveGameMode = state.ActiveReservation?.Priority.ToString(),
-            GameModePlayerSeat = (int?)state.GameModePlayerSeat,
+                state.GetArmut()?.ReturnedTrump.HasValue == true ? state.GetArmut()!.TransferCount : null,
+            ArmutReturnedTrump = state.GetArmut()?.ReturnedTrump,
+            ActiveGameMode = state.GetActiveReservation()?.Priority.ToString(),
+            GameModePlayerSeat = (int?)state.GetGameModePlayerSeat(),
             ShouldChooseSchwarzesSauSolo = BuildShouldChooseSchwarzesSauSolo(
                 requestingPlayer,
                 state
@@ -87,13 +87,13 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
     {
         if (!isMyTurn)
             return [];
-        if (state.CurrentTrick is null)
+        if (state is not PlayingState playing || playing.CurrentTrick is null)
             return hand.ToList();
         return hand.Where(c =>
                 CardPlayValidator.CanPlay(
                     c,
                     playerState.Hand,
-                    state.CurrentTrick,
+                    playing.CurrentTrick,
                     state.TrumpEvaluator
                 )
             )
@@ -105,10 +105,10 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
         GameState state
     )
     {
-        if (state.Phase != GamePhase.Playing)
+        if (state is not PlayingState playing)
             return [];
         return Enum.GetValues<AnnouncementType>()
-            .Where(t => AnnouncementRules.CanAnnounce(player, t, state))
+            .Where(t => AnnouncementRules.CanAnnounce(player, t, playing))
             .ToList();
     }
 
@@ -118,13 +118,13 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
         GameState state
     )
     {
-        if (!isMyTurn)
+        if (!isMyTurn || state is not PlayingState playing)
             return [];
         var result = new Dictionary<CardId, IReadOnlyList<SonderkarteInfo>>();
         foreach (var card in hand)
         {
             var eligible = SonderkarteRegistry
-                .GetEligibleForCard(card, state, state.Rules)
+                .GetEligibleForCard(card, playing, playing.Rules)
                 .Select(s => SonderkarteInfo.For(s.Type))
                 .ToList();
             if (eligible.Count > 0)
@@ -140,22 +140,24 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
     {
         // Parties are revealed immediately in solos, Armut, and Hochzeit once partner found.
         // In Normalspiel and pre-Findungsstich Hochzeit parties stay hidden until announced.
+        var activeReservation = state.GetActiveReservation();
         bool revealParties =
-            state.ActiveReservation is not null
-            && (state.ActiveReservation.IsSolo || state.PartyResolver.IsFullyResolved(state));
+            activeReservation is not null
+            && (activeReservation.IsSolo || state.PartyResolver.IsFullyResolved(state));
 
+        var announcements = state.GetAnnouncements();
         return state
             .Players.Where(p => p.Seat != requestingPlayer)
             .Select(p =>
             {
-                var hasAnnounced = state.Announcements.Any(a => a.Player == p.Seat);
+                var hasAnnounced = announcements.Any(a => a.Player == p.Seat);
                 var displayParty = GetAnnouncementDisplayParty(p.Seat, state);
                 var knownParty = revealParties
                     ? displayParty
                     : p.KnownParty ?? (hasAnnounced ? displayParty : null);
 
-                var highestAnn = state
-                    .Announcements.Where(a => a.Player == p.Seat)
+                var highestAnn = announcements
+                    .Where(a => a.Player == p.Seat)
                     .MaxBy(a => a.Type);
                 string? announcementLabel = highestAnn?.Type switch
                 {
@@ -179,28 +181,38 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             .ToList();
     }
 
-    private static TrickSummary? BuildCurrentTrickSummary(GameState state) =>
-        state.CurrentTrick is { Cards.Count: > 0 }
-            ? ToCurrentTrickSummary(state.CompletedTricks.Count, state.CurrentTrick, state)
+    private static TrickSummary? BuildCurrentTrickSummary(GameState state)
+    {
+        var currentTrick = state.GetCurrentTrick();
+        return currentTrick is { Cards.Count: > 0 }
+            ? ToCurrentTrickSummary(state.GetCompletedTricksCount(), currentTrick, state)
             : null;
+    }
 
-    private static bool BuildShouldDeclareHealth(PlayerSeat player, GameState state) =>
-        state.Phase == GamePhase.ReservationHealthCheck
-        && state.PendingReservationResponders.Count > 0
-        && state.PendingReservationResponders[0] == player;
+    private static bool BuildShouldDeclareHealth(PlayerSeat player, GameState state)
+    {
+        var pending = state.GetPendingReservationResponders();
+        return state.Phase == GamePhase.ReservationHealthCheck
+            && pending.Count > 0
+            && pending[0] == player;
+    }
 
-    private static bool IsCheckPhaseTurn(PlayerSeat player, GameState state) =>
-        state.Phase
+    private static bool IsCheckPhaseTurn(PlayerSeat player, GameState state)
+    {
+        var pending = state.GetPendingReservationResponders();
+        return state.Phase
             is GamePhase.ReservationSoloCheck
                 or GamePhase.ReservationArmutCheck
                 or GamePhase.ReservationSchmeissenCheck
                 or GamePhase.ReservationHochzeitCheck
-        && state.PendingReservationResponders.Count > 0
-        && state.PendingReservationResponders[0] == player;
+            && pending.Count > 0
+            && pending[0] == player;
+    }
 
     private static bool BuildMustDeclareReservation(PlayerSeat player, GameState state)
     {
-        bool singleVorbehalt = state.HealthDeclarations.Count(kv => kv.Value) == 1;
+        var healthDeclarations = state.GetHealthDeclarations();
+        bool singleVorbehalt = healthDeclarations?.Count(kv => kv.Value) == 1;
         return IsCheckPhaseTurn(player, state)
             && state.Phase == GamePhase.ReservationSoloCheck
             && singleVorbehalt;
@@ -215,7 +227,8 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
         if (!IsCheckPhaseTurn(player, state))
             return [];
 
-        bool singleVorbehalt = state.HealthDeclarations.Count(kv => kv.Value) == 1;
+        var healthDeclarations = state.GetHealthDeclarations();
+        bool singleVorbehalt = healthDeclarations?.Count(kv => kv.Value) == 1;
         return state.Phase switch
         {
             GamePhase.ReservationSoloCheck when singleVorbehalt => ReservationRegistry.GetEligible(
@@ -247,15 +260,21 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
         };
     }
 
-    private static bool BuildShouldRespondToArmut(PlayerSeat player, GameState state) =>
-        state.Phase == GamePhase.ArmutPartnerFinding
-        && state.PendingReservationResponders.Count > 0
-        && state.PendingReservationResponders[0] == player;
+    private static bool BuildShouldRespondToArmut(PlayerSeat player, GameState state)
+    {
+        var pending = state.GetPendingReservationResponders();
+        return state.Phase == GamePhase.ArmutPartnerFinding
+            && pending.Count > 0
+            && pending[0] == player;
+    }
 
-    private static int? BuildArmutCardReturnCount(PlayerSeat player, GameState state) =>
-        state.Phase == GamePhase.ArmutCardExchange && state.Armut?.RichPlayer == player
-            ? state.Armut.TransferCount
+    private static int? BuildArmutCardReturnCount(PlayerSeat player, GameState state)
+    {
+        var armut = state.GetArmut();
+        return state.Phase == GamePhase.ArmutCardExchange && armut?.RichPlayer == player
+            ? armut.TransferCount
             : null;
+    }
 
     private static bool BuildShouldChooseSchwarzesSauSolo(PlayerSeat player, GameState state) =>
         state.Phase == GamePhase.SchwarzesSauSoloSelect && state.CurrentTurn == player;
@@ -281,9 +300,10 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
     /// They don't know they're "Re" in the Kontrasolo sense; the button should reflect normal rules.
     private static Party? GetAnnouncementDisplayParty(PlayerSeat player, GameState state)
     {
+        var silentMode = state.GetSilentMode();
         if (
-            state.SilentMode?.Type == SilentGameModeType.KontraSolo
-            && state.SilentMode.Player != player
+            silentMode?.Type == SilentGameModeType.KontraSolo
+            && silentMode.Player != player
         )
             return NormalPartyResolver.Instance.ResolveParty(player, state);
         return state.PartyResolver.ResolveParty(player, state);
@@ -318,7 +338,7 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
 
     private static string? BuildOwnHighestAnnouncement(PlayerSeat player, GameState state)
     {
-        var highestAnn = state.Announcements.Where(a => a.Player == player).MaxBy(a => a.Type);
+        var highestAnn = state.GetAnnouncements().Where(a => a.Player == player).MaxBy(a => a.Type);
         if (highestAnn is null)
             return null;
 
@@ -351,7 +371,7 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
 
     private static TrickSummary ToCurrentTrickSummary(int trickNumber, Trick trick, GameState state)
     {
-        bool fischaugeActive = state.CompletedTricks.Any(t =>
+        bool fischaugeActive = state.GetCompletedTricks().Any(t =>
             t.Cards.Any(tc => state.TrumpEvaluator.IsTrump(tc.Card.Type))
         );
 

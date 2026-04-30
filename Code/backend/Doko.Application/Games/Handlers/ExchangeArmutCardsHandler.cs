@@ -37,12 +37,11 @@ public sealed class ExchangeArmutCardsHandler(
             repository,
             publisher,
             command.GameId,
-            execute: (ArmutFlowState typedState) =>
+            execute: (ArmutFlowState state) =>
             {
-                if (typedState.Phase != GamePhase.ArmutCardExchange)
-                    return (Fail<ExchangeArmutCardsResult>(GameError.InvalidPhase), [], typedState);
+                if (state.Phase != GamePhase.ArmutCardExchange)
+                    return (Fail<ExchangeArmutCardsResult>(GameError.InvalidPhase), [], state);
 
-                GameState state = typedState;
                 if (state.Armut?.RichPlayer != command.RichPlayer)
                     return (Fail<ExchangeArmutCardsResult>(GameError.NotYourTurn), [], state);
 
@@ -55,33 +54,34 @@ public sealed class ExchangeArmutCardsHandler(
 
                 var poorPlayer = state.Armut.Player;
                 var (newRichHand, newPoorHand, returnedTrumpCount) = ComputeNewHands(
-                    state,
+                    (GameState)state,
                     command,
                     poorPlayer,
                     cardsToReturn
                 );
 
-                state = state.Apply(
+                GameState nextState = state;
+                nextState = nextState.Apply(
                     new UpdatePlayerHandModification(command.RichPlayer, newRichHand)
                 );
-                state = state.Apply(new UpdatePlayerHandModification(poorPlayer, newPoorHand));
-                state = state.Apply(new SetArmutReturnedTrumpModification(returnedTrumpCount > 0));
+                nextState = nextState.Apply(new UpdatePlayerHandModification(poorPlayer, newPoorHand));
+                nextState = nextState.Apply(new SetArmutReturnedTrumpModification(returnedTrumpCount > 0));
 
-                var startingPlayer = FindStartingPlayer(state, command.RichPlayer, poorPlayer);
-                state = state.Apply(new AdvancePhaseModification(GamePhase.Playing));
-                state = state.Apply(new SetCurrentTurnModification(startingPlayer));
+                var startingPlayer = FindStartingPlayer(nextState, command.RichPlayer, poorPlayer);
+                nextState = nextState.Apply(new AdvancePhaseModification(GamePhase.Playing));
+                nextState = nextState.Apply(new SetCurrentTurnModification(startingPlayer));
 
                 return (
                     Ok(new ExchangeArmutCardsResult(returnedTrumpCount)),
                     [
                         new ArmutCardsExchangedEvent(
-                            state.Id,
+                            nextState.Id,
                             command.RichPlayer,
                             cardsToReturn.Count,
                             returnedTrumpCount > 0
                         ),
                     ],
-                    state
+                    nextState
                 );
             },
             ct

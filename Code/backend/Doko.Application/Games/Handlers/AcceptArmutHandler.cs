@@ -33,12 +33,11 @@ public sealed class AcceptArmutHandler(IGameRepository repository, IGameEventPub
             repository,
             publisher,
             command.GameId,
-            execute: (ArmutFlowState typedState) =>
+            execute: (ArmutFlowState state) =>
             {
-                if (typedState.Phase != GamePhase.ArmutPartnerFinding)
-                    return (Fail<AcceptArmutResult>(GameError.InvalidPhase), [], typedState);
+                if (state.Phase != GamePhase.ArmutPartnerFinding)
+                    return (Fail<AcceptArmutResult>(GameError.InvalidPhase), [], state);
 
-                GameState state = typedState;
                 if (
                     state.PendingReservationResponders.Count == 0
                     || state.PendingReservationResponders[0] != command.Player
@@ -64,15 +63,16 @@ public sealed class AcceptArmutHandler(IGameRepository repository, IGameEventPub
         IReadOnlyList<IDomainEvent>,
         GameState
     ) HandleAcceptance(
-        GameState state,
+        ArmutFlowState initialState,
         AcceptArmutCommand command,
         IReadOnlyList<IDomainEvent> events
     )
     {
+        GameState state = initialState;
         state = state.Apply(new SetArmutRichPlayerModification(command.Player));
         state = state.Apply(new SetPendingRespondersModification([]));
 
-        var poorPlayer = state.Armut!.Player;
+        var poorPlayer = ((ArmutFlowState)state).Armut!.Player;
         state = state.Apply(new ArmutGiveTrumpsModification(poorPlayer, command.Player));
 
         var reservation = new ArmutReservation(poorPlayer, command.Player);
@@ -88,9 +88,10 @@ public sealed class AcceptArmutHandler(IGameRepository repository, IGameEventPub
         GameActionResult<AcceptArmutResult>,
         IReadOnlyList<IDomainEvent>,
         GameState
-    ) HandleDecline(GameState state, AcceptArmutCommand command, IReadOnlyList<IDomainEvent> events)
+    ) HandleDecline(ArmutFlowState initialState, AcceptArmutCommand command, IReadOnlyList<IDomainEvent> events)
     {
-        var remaining = state.PendingReservationResponders.Skip(1).ToList();
+        GameState state = initialState;
+        var remaining = initialState.PendingReservationResponders.Skip(1).ToList();
         state = state.Apply(new SetPendingRespondersModification(remaining));
 
         if (remaining.Count > 0)
@@ -101,9 +102,10 @@ public sealed class AcceptArmutHandler(IGameRepository repository, IGameEventPub
 
         // Nobody accepted — Schwarze Sau
         state = state.Apply(new SetGameModeModification(null, null));
-        state = state.Apply(new SetSchwarzesSauModification());
+        // Advance to Playing before setting IsSchwarzesSau (which lives only on PlayingState)
         state = state.Apply(new AdvancePhaseModification(GamePhase.Playing));
-        state = state.Apply(new SetCurrentTurnModification(state.Armut!.Player));
+        state = state.Apply(new SetSchwarzesSauModification());
+        state = state.Apply(new SetCurrentTurnModification(((PlayingState)state).Armut!.Player));
 
         return (Ok(new AcceptArmutResult(false, SchwarzesSau: true)), events, state);
     }

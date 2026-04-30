@@ -24,109 +24,8 @@ public abstract record GameState
     public PlayerSeat CurrentTurn { get; init; }
     public PlayDirection Direction { get; init; }
 
-    public IReservation? ActiveReservation { get; init; }
-    public IReadOnlyList<Trick> CompletedTricks { get; init; } = [];
-    public Trick? CurrentTrick { get; init; }
-
-    public IReadOnlyList<Announcement> Announcements { get; init; } = [];
-    public IReadOnlyList<SonderkarteType> ActiveSonderkarten { get; init; } = [];
-
-    /// <summary>
-    /// Sonderkarten whose activation window has permanently closed: the triggering card was played
-    /// but the player chose not to activate. Checked by <see cref="ISonderkarte.AreConditionsMet"/>.
-    /// </summary>
-    public IReadOnlySet<SonderkarteType> ClosedWindows { get; init; } =
-        new HashSet<SonderkarteType>();
-
     public ITrumpEvaluator TrumpEvaluator { get; init; } = null!;
     public IPartyResolver PartyResolver { get; init; } = null!;
-
-    /// <summary>
-    /// True when a direction reversal (LinksGehangter/RechtsGehangter) was activated mid-trick
-    /// and should take effect at the start of the next trick.
-    /// Cleared automatically when <see cref="ReverseDirectionModification"/> is applied.
-    /// </summary>
-    public bool DirectionFlipPending { get; init; }
-
-    /// <summary>
-    /// Each player's hand as originally dealt. Set once when dealing completes, never mutated.
-    /// Used by sonderkarte eligibility checks that need to know what a player originally held
-    /// (e.g. Superschweinchen: player originally held both ♦10, but may have already played the first).
-    /// Null before dealing phase completes.
-    /// </summary>
-    public IReadOnlyDictionary<PlayerSeat, Hand>? InitialHands { get; init; }
-
-    /// <summary>
-    /// Round 1 of reservation discovery: each player's health declaration.
-    /// True = Vorbehalt (has a reservation), false = Gesund (none).
-    /// Null means the player has not yet been asked.
-    /// </summary>
-    public IReadOnlyDictionary<PlayerSeat, bool> HealthDeclarations { get; init; } =
-        new Dictionary<PlayerSeat, bool>();
-
-    /// <summary>
-    /// Players still awaiting a declaration in the current reservation check phase
-    /// (SoloCheck, ArmutCheck, …). <see cref="CurrentTurn"/> equals the first entry.
-    /// Empty outside reservation check phases.
-    /// </summary>
-    public IReadOnlyList<PlayerSeat> PendingReservationResponders { get; init; } = [];
-
-    /// <summary>
-    /// Tracks each player's reservation declaration during a check phase.
-    /// Populated by <see cref="RecordDeclarationModification"/>; null means the player passed.
-    /// Cleared between check phases by <see cref="ClearReservationDeclarationsModification"/>.
-    /// </summary>
-    public IReadOnlyDictionary<PlayerSeat, IReservation?> ReservationDeclarations { get; init; } =
-        new Dictionary<PlayerSeat, IReservation?>();
-
-    /// <summary>The player who declared the active game mode (Solo, Hochzeit, Armut player). Null for Normalspiel.</summary>
-    public PlayerSeat? GameModePlayerSeat { get; init; }
-
-    /// <summary>
-    /// Armut-phase state. Non-null iff an Armut game mode is active.
-    /// Initialized when the Armut player is set; updated through the card-exchange phase.
-    /// </summary>
-    public ArmutState? Armut { get; init; }
-
-    /// <summary>
-    /// Pre-computed trick results (winner + extrapunkt awards) appended at trick completion time.
-    /// Parallel to <see cref="CompletedTricks"/>; used by <c>FinishGameHandler</c> to build
-    /// <c>CompletedGame</c> for the scorer.
-    /// </summary>
-    public IReadOnlyList<TrickResult> ScoredTricks { get; init; } = [];
-
-    /// <summary>
-    /// Genscher-phase state. Non-null once a team-changing Genscher has fired.
-    /// Null again only if Gegengenscherdamen fully restores the original Re pair.
-    /// When non-null and <see cref="GenscherState.TeamsChanged"/> is true, Feigheit does not apply.
-    /// </summary>
-    public GenscherState? Genscher { get; init; }
-
-    /// <summary>
-    /// The player who leads the reservation-check ordering for this round.
-    /// Rotates counter-clockwise each game. Always rotates; SpieleRauskommer
-    /// (who actually plays first) may differ for Solo/Armut.
-    /// </summary>
-    public PlayerSeat VorbehaltRauskommer { get; init; }
-
-    /// <summary>
-    /// Active silent (undeclared) game mode, set when all players declare Gesund and a player's
-    /// hand qualifies for Kontrasolo or Stille Hochzeit. Null in all other game modes.
-    /// </summary>
-    public SilentGameMode? SilentMode { get; init; }
-
-    /// <summary>
-    /// True once a Hochzeit failed to find a partner in 3 qualifying tricks and became a
-    /// forced solo. Affects scoring (soloFactor=3), Feigheit exemption, and Rauskommer advance.
-    /// </summary>
-    public bool HochzeitBecameForcedSolo { get; init; }
-
-    /// <summary>
-    /// True when the game is running as Schwarze Sau (Armut with no partner found).
-    /// The game watches for the second ♠Q trick and then interrupts with
-    /// <see cref="GamePhase.SchwarzesSauSoloSelect"/>.
-    /// </summary>
-    public bool IsSchwarzesSau { get; init; }
 
     private ITrumpEvaluatorFactory Factory { get; init; } = TrumpEvaluatorFactory.Instance;
 
@@ -168,47 +67,23 @@ public abstract record GameState
                 .ToList();
         var resolvedFactory = factory ?? TrumpEvaluatorFactory.Instance;
         var resolvedId = id.Value == Guid.Empty ? GameId.New() : id;
-
-        var common = new
-        {
-            Id = resolvedId,
-            Phase = phase,
-            Rules = resolvedRules,
-            Players = players ?? (IReadOnlyList<PlayerState>)[],
-            CurrentTurn = currentTurn,
-            Direction = direction,
-            ActiveReservation = activeReservation,
-            CompletedTricks = resolvedTricks,
-            ScoredTricks = resolvedScored,
-            CurrentTrick = currentTrick,
-            Announcements = announcements ?? (IReadOnlyList<Announcement>)[],
-            ActiveSonderkarten = activeSonderkarten ?? (IReadOnlyList<SonderkarteType>)[],
-            TrumpEvaluator = resolvedEvaluator,
-            PartyResolver = partyResolver ?? NormalPartyResolver.Instance,
-            InitialHands = initialHands,
-            Factory = resolvedFactory,
-        };
+        var resolvedAnnouncements = announcements ?? (IReadOnlyList<Announcement>)[];
+        var resolvedSonderkarten = activeSonderkarten ?? (IReadOnlyList<SonderkarteType>)[];
+        var resolvedResolver = partyResolver ?? NormalPartyResolver.Instance;
 
         return phase switch
         {
             GamePhase.Dealing => new DealingState
             {
-                Id = common.Id,
-                Phase = common.Phase,
-                Rules = common.Rules,
-                Players = common.Players,
-                CurrentTurn = common.CurrentTurn,
-                Direction = common.Direction,
-                ActiveReservation = common.ActiveReservation,
-                CompletedTricks = common.CompletedTricks,
-                ScoredTricks = common.ScoredTricks,
-                CurrentTrick = common.CurrentTrick,
-                Announcements = common.Announcements,
-                ActiveSonderkarten = common.ActiveSonderkarten,
-                TrumpEvaluator = common.TrumpEvaluator,
-                PartyResolver = common.PartyResolver,
-                InitialHands = common.InitialHands,
-                Factory = common.Factory,
+                Id = resolvedId,
+                Phase = phase,
+                Rules = resolvedRules,
+                Players = players ?? (IReadOnlyList<PlayerState>)[],
+                CurrentTurn = currentTurn,
+                Direction = direction,
+                TrumpEvaluator = resolvedEvaluator,
+                PartyResolver = resolvedResolver,
+                Factory = resolvedFactory,
             },
             GamePhase.ReservationHealthCheck
             or GamePhase.ReservationSoloCheck
@@ -216,117 +91,98 @@ public abstract record GameState
             or GamePhase.ReservationSchmeissenCheck
             or GamePhase.ReservationHochzeitCheck => new ReservationState
             {
-                Id = common.Id,
-                Phase = common.Phase,
-                Rules = common.Rules,
-                Players = common.Players,
-                CurrentTurn = common.CurrentTurn,
-                Direction = common.Direction,
-                ActiveReservation = common.ActiveReservation,
-                CompletedTricks = common.CompletedTricks,
-                ScoredTricks = common.ScoredTricks,
-                CurrentTrick = common.CurrentTrick,
-                Announcements = common.Announcements,
-                ActiveSonderkarten = common.ActiveSonderkarten,
-                TrumpEvaluator = common.TrumpEvaluator,
-                PartyResolver = common.PartyResolver,
-                InitialHands = common.InitialHands,
-                Factory = common.Factory,
+                Id = resolvedId,
+                Phase = phase,
+                Rules = resolvedRules,
+                Players = players ?? (IReadOnlyList<PlayerState>)[],
+                CurrentTurn = currentTurn,
+                Direction = direction,
+                TrumpEvaluator = resolvedEvaluator,
+                PartyResolver = resolvedResolver,
+                Factory = resolvedFactory,
+                InitialHands = initialHands,
+                ActiveReservation = activeReservation,
             },
             GamePhase.ArmutPartnerFinding or GamePhase.ArmutCardExchange => new ArmutFlowState
             {
-                Id = common.Id,
-                Phase = common.Phase,
-                Rules = common.Rules,
-                Players = common.Players,
-                CurrentTurn = common.CurrentTurn,
-                Direction = common.Direction,
-                ActiveReservation = common.ActiveReservation,
-                CompletedTricks = common.CompletedTricks,
-                ScoredTricks = common.ScoredTricks,
-                CurrentTrick = common.CurrentTrick,
-                Announcements = common.Announcements,
-                ActiveSonderkarten = common.ActiveSonderkarten,
-                TrumpEvaluator = common.TrumpEvaluator,
-                PartyResolver = common.PartyResolver,
-                InitialHands = common.InitialHands,
-                Factory = common.Factory,
+                Id = resolvedId,
+                Phase = phase,
+                Rules = resolvedRules,
+                Players = players ?? (IReadOnlyList<PlayerState>)[],
+                CurrentTurn = currentTurn,
+                Direction = direction,
+                TrumpEvaluator = resolvedEvaluator,
+                PartyResolver = resolvedResolver,
+                Factory = resolvedFactory,
+                InitialHands = initialHands,
+                ActiveReservation = activeReservation,
             },
             GamePhase.Playing or GamePhase.SchwarzesSauSoloSelect => new PlayingState
             {
-                Id = common.Id,
-                Phase = common.Phase,
-                Rules = common.Rules,
-                Players = common.Players,
-                CurrentTurn = common.CurrentTurn,
-                Direction = common.Direction,
-                ActiveReservation = common.ActiveReservation,
-                CompletedTricks = common.CompletedTricks,
-                ScoredTricks = common.ScoredTricks,
-                CurrentTrick = common.CurrentTrick,
-                Announcements = common.Announcements,
-                ActiveSonderkarten = common.ActiveSonderkarten,
-                TrumpEvaluator = common.TrumpEvaluator,
-                PartyResolver = common.PartyResolver,
-                InitialHands = common.InitialHands,
-                Factory = common.Factory,
+                Id = resolvedId,
+                Phase = phase,
+                Rules = resolvedRules,
+                Players = players ?? (IReadOnlyList<PlayerState>)[],
+                CurrentTurn = currentTurn,
+                Direction = direction,
+                TrumpEvaluator = resolvedEvaluator,
+                PartyResolver = resolvedResolver,
+                Factory = resolvedFactory,
+                InitialHands = initialHands,
+                ActiveReservation = activeReservation,
+                CompletedTricks = resolvedTricks,
+                ScoredTricks = resolvedScored,
+                CurrentTrick = currentTrick,
+                Announcements = resolvedAnnouncements,
+                ActiveSonderkarten = resolvedSonderkarten,
             },
             GamePhase.Scoring => new ScoringState
             {
-                Id = common.Id,
-                Phase = common.Phase,
-                Rules = common.Rules,
-                Players = common.Players,
-                CurrentTurn = common.CurrentTurn,
-                Direction = common.Direction,
-                ActiveReservation = common.ActiveReservation,
-                CompletedTricks = common.CompletedTricks,
-                ScoredTricks = common.ScoredTricks,
-                CurrentTrick = common.CurrentTrick,
-                Announcements = common.Announcements,
-                ActiveSonderkarten = common.ActiveSonderkarten,
-                TrumpEvaluator = common.TrumpEvaluator,
-                PartyResolver = common.PartyResolver,
-                InitialHands = common.InitialHands,
-                Factory = common.Factory,
+                Id = resolvedId,
+                Phase = phase,
+                Rules = resolvedRules,
+                Players = players ?? (IReadOnlyList<PlayerState>)[],
+                CurrentTurn = currentTurn,
+                Direction = direction,
+                TrumpEvaluator = resolvedEvaluator,
+                PartyResolver = resolvedResolver,
+                Factory = resolvedFactory,
+                InitialHands = initialHands,
+                ActiveReservation = activeReservation,
+                CompletedTricks = resolvedTricks,
+                ScoredTricks = resolvedScored,
+                Announcements = resolvedAnnouncements,
+                ActiveSonderkarten = resolvedSonderkarten,
             },
             GamePhase.Finished => new FinishedState
             {
-                Id = common.Id,
-                Phase = common.Phase,
-                Rules = common.Rules,
-                Players = common.Players,
-                CurrentTurn = common.CurrentTurn,
-                Direction = common.Direction,
-                ActiveReservation = common.ActiveReservation,
-                CompletedTricks = common.CompletedTricks,
-                ScoredTricks = common.ScoredTricks,
-                CurrentTrick = common.CurrentTrick,
-                Announcements = common.Announcements,
-                ActiveSonderkarten = common.ActiveSonderkarten,
-                TrumpEvaluator = common.TrumpEvaluator,
-                PartyResolver = common.PartyResolver,
-                InitialHands = common.InitialHands,
-                Factory = common.Factory,
+                Id = resolvedId,
+                Phase = phase,
+                Rules = resolvedRules,
+                Players = players ?? (IReadOnlyList<PlayerState>)[],
+                CurrentTurn = currentTurn,
+                Direction = direction,
+                TrumpEvaluator = resolvedEvaluator,
+                PartyResolver = resolvedResolver,
+                Factory = resolvedFactory,
+                InitialHands = initialHands,
+                ActiveReservation = activeReservation,
+                CompletedTricks = resolvedTricks,
+                ScoredTricks = resolvedScored,
+                Announcements = resolvedAnnouncements,
+                ActiveSonderkarten = resolvedSonderkarten,
             },
             GamePhase.Geschmissen => new GeschmissenState
             {
-                Id = common.Id,
-                Phase = common.Phase,
-                Rules = common.Rules,
-                Players = common.Players,
-                CurrentTurn = common.CurrentTurn,
-                Direction = common.Direction,
-                ActiveReservation = common.ActiveReservation,
-                CompletedTricks = common.CompletedTricks,
-                ScoredTricks = common.ScoredTricks,
-                CurrentTrick = common.CurrentTrick,
-                Announcements = common.Announcements,
-                ActiveSonderkarten = common.ActiveSonderkarten,
-                TrumpEvaluator = common.TrumpEvaluator,
-                PartyResolver = common.PartyResolver,
-                InitialHands = common.InitialHands,
-                Factory = common.Factory,
+                Id = resolvedId,
+                Phase = phase,
+                Rules = resolvedRules,
+                Players = players ?? (IReadOnlyList<PlayerState>)[],
+                CurrentTurn = currentTurn,
+                Direction = direction,
+                TrumpEvaluator = resolvedEvaluator,
+                PartyResolver = resolvedResolver,
+                Factory = resolvedFactory,
             },
             _ => throw new ArgumentOutOfRangeException(nameof(phase), phase, null),
         };
@@ -342,37 +198,18 @@ public abstract record GameState
                     Direction == PlayDirection.Counterclockwise
                         ? PlayDirection.Clockwise
                         : PlayDirection.Counterclockwise,
-                DirectionFlipPending = false,
+                // DirectionFlipPending cleared — only lives on PlayingState
             },
 
-            ScheduleDirectionFlipModification => this with { DirectionFlipPending = true },
+            ScheduleDirectionFlipModification => ApplyScheduleDirectionFlip(),
 
-            WithdrawAnnouncementModification m => this with
-            {
-                Announcements = Announcements
-                    .Where(a => !(a.Player == m.Player && a.Type == m.Type))
-                    .ToList(),
-            },
+            WithdrawAnnouncementModification m => ApplyWithdrawAnnouncement(m),
 
-            ActivateSonderkarteModification m => this with
-            {
-                ActiveSonderkarten = ActiveSonderkarten.Append(m.Type).ToList(),
-            },
+            ActivateSonderkarteModification m => ApplyActivateSonderkarte(m),
 
-            RebuildTrumpEvaluatorModification => this with
-            {
-                TrumpEvaluator = Factory.Build(
-                    ActiveReservation,
-                    SilentMode,
-                    ActiveSonderkarten,
-                    Rules
-                ),
-            },
+            RebuildTrumpEvaluatorModification => ApplyRebuildTrumpEvaluator(),
 
-            CloseActivationWindowModification m => this with
-            {
-                ClosedWindows = new HashSet<SonderkarteType>(ClosedWindows) { m.Type },
-            },
+            CloseActivationWindowModification m => ApplyCloseActivationWindow(m),
 
             AdvancePhaseModification m => TransitionToPhase(m.NewPhase),
 
@@ -385,53 +222,23 @@ public abstract record GameState
             DealHandsModification m => this with
             {
                 Players = [.. Players.Select(p => p with { Hand = m.Hands[p.Seat] })],
-                InitialHands = m.Hands,
             },
 
-            RecordHealthDeclarationModification m => this with
-            {
-                HealthDeclarations = new Dictionary<PlayerSeat, bool>(HealthDeclarations)
-                {
-                    [m.Player] = m.HasVorbehalt,
-                },
-            },
+            RecordHealthDeclarationModification m => ApplyRecordHealthDeclaration(m),
 
-            SetPendingRespondersModification m => this with
-            {
-                PendingReservationResponders = m.Responders,
-            },
+            SetPendingRespondersModification m => ApplySetPendingResponders(m),
 
-            ClearReservationDeclarationsModification => this with
-            {
-                ReservationDeclarations = new Dictionary<PlayerSeat, IReservation?>(),
-            },
+            ClearReservationDeclarationsModification => ApplyClearReservationDeclarations(),
 
-            SetArmutPlayerModification m => this with
-            {
-                Armut = new ArmutState(m.ArmutPlayer, null, 0, null),
-            },
+            SetArmutPlayerModification m => ApplySetArmutPlayer(m),
 
-            SetArmutRichPlayerModification m => this with
-            {
-                Armut = Armut! with { RichPlayer = m.RichPlayer },
-            },
+            SetArmutRichPlayerModification m => ApplySetArmutRichPlayer(m),
 
             ArmutGiveTrumpsModification m => ApplyArmutGiveTrumps(m),
 
-            SetArmutReturnedTrumpModification m => this with
-            {
-                Armut = Armut! with { ReturnedTrump = m.IncludedTrump },
-            },
+            SetArmutReturnedTrumpModification m => ApplySetArmutReturnedTrump(m),
 
-            RecordDeclarationModification m => this with
-            {
-                ReservationDeclarations = new Dictionary<PlayerSeat, IReservation?>(
-                    ReservationDeclarations
-                )
-                {
-                    [m.Player] = m.Declaration,
-                },
-            },
+            RecordDeclarationModification m => ApplyRecordDeclaration(m),
 
             UpdatePlayerHandModification m => this with
             {
@@ -441,47 +248,27 @@ public abstract record GameState
                 ],
             },
 
-            SetCurrentTrickModification m => this with { CurrentTrick = m.Trick },
+            SetCurrentTrickModification m => ApplySetCurrentTrick(m),
 
-            AddCardToTrickModification m => this with
-            {
-                CurrentTrick = new Trick(
-                    CurrentTrick!.Cards.Append(new TrickCard(m.Card, m.Player))
-                ),
-            },
+            AddCardToTrickModification m => ApplyAddCardToTrick(m),
 
-            AddCompletedTrickModification m => this with
-            {
-                CompletedTricks = [.. CompletedTricks, m.Trick],
-                ScoredTricks = [.. ScoredTricks, m.Result],
-                CurrentTrick = null,
-            },
+            AddCompletedTrickModification m => ApplyAddCompletedTrick(m),
 
             SetGenscherPartnerModification m => ApplySetGenscherPartner(m),
 
-            AddAnnouncementModification m => this with
-            {
-                Announcements = [.. Announcements, m.Announcement],
-            },
+            AddAnnouncementModification m => ApplyAddAnnouncement(m),
 
-            SetVorbehaltRauskommerModification m => this with { VorbehaltRauskommer = m.Player },
+            SetVorbehaltRauskommerModification m => ApplySetVorbehaltRauskommer(m),
 
-            SetHochzeitForcedSoloModification => this with { HochzeitBecameForcedSolo = true },
+            SetHochzeitForcedSoloModification => ApplySetHochzeitForcedSolo(),
 
-            SetSchwarzesSauModification => this with { IsSchwarzesSau = true },
+            SetSchwarzesSauModification => ApplySetSchwarzesSau(),
 
-            ClearActiveSonderkartenModification => this with
-            {
-                ActiveSonderkarten = [],
-                ClosedWindows = new HashSet<SonderkarteType>(),
-            },
+            ClearActiveSonderkartenModification => ApplyClearActiveSonderkarten(),
 
-            ClearAnnouncementsModification => this with { Announcements = [] },
+            ClearAnnouncementsModification => ApplyClearAnnouncements(),
 
-            ClearScoredTrickAwardsModification => this with
-            {
-                ScoredTricks = ScoredTricks.Select(r => r with { Awards = [] }).ToList(),
-            },
+            ClearScoredTrickAwardsModification => ApplyClearScoredTrickAwards(),
 
             _ => throw new ArgumentOutOfRangeException(
                 nameof(modification),
@@ -489,17 +276,158 @@ public abstract record GameState
             ),
         };
 
-    // ── Complex Apply helpers ─────────────────────────────────────────────────
+    // ── Apply helpers — modifications that read/write phase-locked fields ────
+
+    private GameState ApplyScheduleDirectionFlip()
+    {
+        if (this is PlayingState p)
+            return p with { DirectionFlipPending = true };
+        throw new InvalidOperationException(
+            $"ScheduleDirectionFlipModification requires PlayingState, got {GetType().Name}"
+        );
+    }
+
+    private GameState ApplyWithdrawAnnouncement(WithdrawAnnouncementModification m)
+    {
+        return this switch
+        {
+            PlayingState p => p with
+            {
+                Announcements = p
+                    .Announcements.Where(a => !(a.Player == m.Player && a.Type == m.Type))
+                    .ToList(),
+            },
+            ScoringState s => s with
+            {
+                Announcements = s
+                    .Announcements.Where(a => !(a.Player == m.Player && a.Type == m.Type))
+                    .ToList(),
+            },
+            _ => throw new InvalidOperationException(
+                $"WithdrawAnnouncementModification requires PlayingState or ScoringState, got {GetType().Name}"
+            ),
+        };
+    }
+
+    private GameState ApplyActivateSonderkarte(ActivateSonderkarteModification m)
+    {
+        return this switch
+        {
+            PlayingState p => p with
+            {
+                ActiveSonderkarten = p.ActiveSonderkarten.Append(m.Type).ToList(),
+            },
+            ScoringState s => s with
+            {
+                ActiveSonderkarten = s.ActiveSonderkarten.Append(m.Type).ToList(),
+            },
+            _ => throw new InvalidOperationException(
+                $"ActivateSonderkarteModification requires PlayingState or ScoringState, got {GetType().Name}"
+            ),
+        };
+    }
+
+    private GameState ApplyRebuildTrumpEvaluator()
+    {
+        return this switch
+        {
+            PlayingState p => p with
+            {
+                TrumpEvaluator = Factory.Build(
+                    p.ActiveReservation,
+                    p.SilentMode,
+                    p.ActiveSonderkarten,
+                    Rules
+                ),
+            },
+            ScoringState s => s with
+            {
+                TrumpEvaluator = Factory.Build(
+                    s.ActiveReservation,
+                    s.SilentMode,
+                    s.ActiveSonderkarten,
+                    Rules
+                ),
+            },
+            ReservationState r => r with
+            {
+                TrumpEvaluator = Factory.Build(r.ActiveReservation, null, [], Rules),
+            },
+            ArmutFlowState a => a with
+            {
+                TrumpEvaluator = Factory.Build(a.ActiveReservation, null, [], Rules),
+            },
+            _ => this with
+            {
+                TrumpEvaluator = Factory.Build(null, null, [], Rules),
+            },
+        };
+    }
+
+    private GameState ApplyCloseActivationWindow(CloseActivationWindowModification m)
+    {
+        return this switch
+        {
+            PlayingState p => p with
+            {
+                ClosedWindows = new HashSet<SonderkarteType>(p.ClosedWindows) { m.Type },
+            },
+            ScoringState s => s with
+            {
+                ClosedWindows = new HashSet<SonderkarteType>(s.ClosedWindows) { m.Type },
+            },
+            _ => throw new InvalidOperationException(
+                $"CloseActivationWindowModification requires PlayingState or ScoringState, got {GetType().Name}"
+            ),
+        };
+    }
 
     private GameState ApplySetGameMode(SetGameModeModification m)
     {
         var ctx = m.Reservation?.BuildContext();
-        return this with
+        var evaluator = ctx?.TrumpEvaluator ?? NormalTrumpEvaluator.Instance;
+        var resolver = ctx?.PartyResolver ?? NormalPartyResolver.Instance;
+
+        return this switch
         {
-            ActiveReservation = m.Reservation,
-            GameModePlayerSeat = m.Player,
-            TrumpEvaluator = ctx?.TrumpEvaluator ?? NormalTrumpEvaluator.Instance,
-            PartyResolver = ctx?.PartyResolver ?? NormalPartyResolver.Instance,
+            ReservationState r => r with
+            {
+                ActiveReservation = m.Reservation,
+                GameModePlayerSeat = m.Player,
+                TrumpEvaluator = evaluator,
+                PartyResolver = resolver,
+            },
+            ArmutFlowState a => a with
+            {
+                ActiveReservation = m.Reservation,
+                GameModePlayerSeat = m.Player,
+                TrumpEvaluator = evaluator,
+                PartyResolver = resolver,
+            },
+            PlayingState p => p with
+            {
+                ActiveReservation = m.Reservation,
+                GameModePlayerSeat = m.Player,
+                TrumpEvaluator = evaluator,
+                PartyResolver = resolver,
+            },
+            ScoringState s => s with
+            {
+                ActiveReservation = m.Reservation,
+                GameModePlayerSeat = m.Player,
+                TrumpEvaluator = evaluator,
+                PartyResolver = resolver,
+            },
+            FinishedState f => f with
+            {
+                ActiveReservation = m.Reservation,
+                GameModePlayerSeat = m.Player,
+                TrumpEvaluator = evaluator,
+                PartyResolver = resolver,
+            },
+            _ => throw new InvalidOperationException(
+                $"SetGameModeModification requires a state that carries ActiveReservation, got {GetType().Name}"
+            ),
         };
     }
 
@@ -512,11 +440,105 @@ public abstract record GameState
             SilentGameModeType.StilleHochzeit => new StilleHochzeitPartyResolver(m.Mode.Player),
             _ => NormalPartyResolver.Instance,
         };
-        return this with
+
+        return this switch
         {
-            SilentMode = m.Mode,
-            TrumpEvaluator = Factory.Build(null, m.Mode, ActiveSonderkarten, Rules),
-            PartyResolver = resolver,
+            ReservationState r => r with
+            {
+                TrumpEvaluator = Factory.Build(null, m.Mode, [], Rules),
+                PartyResolver = resolver,
+            },
+            PlayingState p => p with
+            {
+                SilentMode = m.Mode,
+                TrumpEvaluator = Factory.Build(null, m.Mode, p.ActiveSonderkarten, Rules),
+                PartyResolver = resolver,
+            },
+            ScoringState s => s with
+            {
+                SilentMode = m.Mode,
+                TrumpEvaluator = Factory.Build(null, m.Mode, s.ActiveSonderkarten, Rules),
+                PartyResolver = resolver,
+            },
+            _ => throw new InvalidOperationException(
+                $"SetSilentGameModeModification requires ReservationState, PlayingState, or ScoringState, got {GetType().Name}"
+            ),
+        };
+    }
+
+    private GameState ApplyRecordHealthDeclaration(RecordHealthDeclarationModification m)
+    {
+        if (this is not ReservationState r)
+            throw new InvalidOperationException(
+                $"RecordHealthDeclarationModification requires ReservationState, got {GetType().Name}"
+            );
+        return r with
+        {
+            HealthDeclarations = new Dictionary<PlayerSeat, bool>(r.HealthDeclarations)
+            {
+                [m.Player] = m.HasVorbehalt,
+            },
+        };
+    }
+
+    private GameState ApplySetPendingResponders(SetPendingRespondersModification m)
+    {
+        return this switch
+        {
+            ReservationState r => r with { PendingReservationResponders = m.Responders },
+            ArmutFlowState a => a with { PendingReservationResponders = m.Responders },
+            _ => throw new InvalidOperationException(
+                $"SetPendingRespondersModification requires ReservationState or ArmutFlowState, got {GetType().Name}"
+            ),
+        };
+    }
+
+    private GameState ApplyClearReservationDeclarations()
+    {
+        if (this is not ReservationState r)
+            throw new InvalidOperationException(
+                $"ClearReservationDeclarationsModification requires ReservationState, got {GetType().Name}"
+            );
+        return r with
+        {
+            ReservationDeclarations = new Dictionary<PlayerSeat, IReservation?>(),
+        };
+    }
+
+    private GameState ApplySetArmutPlayer(SetArmutPlayerModification m)
+    {
+        return this switch
+        {
+            ReservationState r => r with { },
+            ArmutFlowState a => a with
+            {
+                Armut = new ArmutState(m.ArmutPlayer, null, 0, null),
+            },
+            PlayingState p => p with
+            {
+                Armut = new ArmutState(m.ArmutPlayer, null, 0, null),
+            },
+            _ => throw new InvalidOperationException(
+                $"SetArmutPlayerModification requires ArmutFlowState or PlayingState, got {GetType().Name}"
+            ),
+        };
+    }
+
+    private GameState ApplySetArmutRichPlayer(SetArmutRichPlayerModification m)
+    {
+        return this switch
+        {
+            ArmutFlowState a => a with
+            {
+                Armut = a.Armut! with { RichPlayer = m.RichPlayer },
+            },
+            PlayingState p => p with
+            {
+                Armut = p.Armut! with { RichPlayer = m.RichPlayer },
+            },
+            _ => throw new InvalidOperationException(
+                $"SetArmutRichPlayerModification requires ArmutFlowState or PlayingState, got {GetType().Name}"
+            ),
         };
     }
 
@@ -527,66 +549,156 @@ public abstract record GameState
         var trumps = poorState.Hand.Cards.Where(c => TrumpEvaluator.IsTrump(c.Type)).ToList();
         var poorNewHand = new Hands.Hand(poorState.Hand.Cards.Except(trumps).ToList());
         var richNewHand = new Hands.Hand(richState.Hand.Cards.Concat(trumps).ToList());
-        return this with
+
+        var newPlayers = Players
+            .Select(p =>
+                p.Seat == m.PoorPlayer ? p with { Hand = poorNewHand }
+                : p.Seat == m.RichPlayer ? p with { Hand = richNewHand }
+                : p
+            )
+            .ToList();
+
+        return this switch
         {
-            Armut = Armut! with { TransferCount = trumps.Count },
-            Players =
-            [
-                .. Players.Select(p =>
-                    p.Seat == m.PoorPlayer ? p with { Hand = poorNewHand }
-                    : p.Seat == m.RichPlayer ? p with { Hand = richNewHand }
-                    : p
-                ),
-            ],
+            ArmutFlowState a => a with
+            {
+                Armut = a.Armut! with { TransferCount = trumps.Count },
+                Players = [.. newPlayers],
+            },
+            PlayingState p => p with
+            {
+                Armut = p.Armut! with { TransferCount = trumps.Count },
+                Players = [.. newPlayers],
+            },
+            _ => throw new InvalidOperationException(
+                $"ArmutGiveTrumpsModification requires ArmutFlowState or PlayingState, got {GetType().Name}"
+            ),
+        };
+    }
+
+    private GameState ApplySetArmutReturnedTrump(SetArmutReturnedTrumpModification m)
+    {
+        return this switch
+        {
+            ArmutFlowState a => a with
+            {
+                Armut = a.Armut! with { ReturnedTrump = m.IncludedTrump },
+            },
+            PlayingState p => p with
+            {
+                Armut = p.Armut! with { ReturnedTrump = m.IncludedTrump },
+            },
+            _ => throw new InvalidOperationException(
+                $"SetArmutReturnedTrumpModification requires ArmutFlowState or PlayingState, got {GetType().Name}"
+            ),
+        };
+    }
+
+    private GameState ApplyRecordDeclaration(RecordDeclarationModification m)
+    {
+        if (this is not ReservationState r)
+            throw new InvalidOperationException(
+                $"RecordDeclarationModification requires ReservationState, got {GetType().Name}"
+            );
+        return r with
+        {
+            ReservationDeclarations = new Dictionary<PlayerSeat, IReservation?>(
+                r.ReservationDeclarations
+            )
+            {
+                [m.Player] = m.Declaration,
+            },
+        };
+    }
+
+    private GameState ApplySetCurrentTrick(SetCurrentTrickModification m)
+    {
+        if (this is not PlayingState p)
+            throw new InvalidOperationException(
+                $"SetCurrentTrickModification requires PlayingState, got {GetType().Name}"
+            );
+        return p with { CurrentTrick = m.Trick };
+    }
+
+    private GameState ApplyAddCardToTrick(AddCardToTrickModification m)
+    {
+        if (this is not PlayingState p)
+            throw new InvalidOperationException(
+                $"AddCardToTrickModification requires PlayingState, got {GetType().Name}"
+            );
+        return p with
+        {
+            CurrentTrick = new Trick(
+                p.CurrentTrick!.Cards.Append(new TrickCard(m.Card, m.Player))
+            ),
+        };
+    }
+
+    private GameState ApplyAddCompletedTrick(AddCompletedTrickModification m)
+    {
+        if (this is not PlayingState p)
+            throw new InvalidOperationException(
+                $"AddCompletedTrickModification requires PlayingState, got {GetType().Name}"
+            );
+        return p with
+        {
+            CompletedTricks = [.. p.CompletedTricks, m.Trick],
+            ScoredTricks = [.. p.ScoredTricks, m.Result],
+            CurrentTrick = null,
         };
     }
 
     private GameState ApplySetGenscherPartner(SetGenscherPartnerModification m)
     {
-        if (SilentMode is not null)
+        if (this is not PlayingState p)
+            throw new InvalidOperationException(
+                $"SetGenscherPartnerModification requires PlayingState, got {GetType().Name}"
+            );
+
+        if (p.SilentMode is not null)
             return this;
 
         bool teamsChanged =
             PartyResolver.ResolveParty(m.Genscher, this)
             != PartyResolver.ResolveParty(m.Partner, this);
 
-        GenscherState? newGenscher = Genscher;
-        IReadOnlyList<Announcement> newAnnouncements = Announcements;
+        GenscherState? newGenscher = p.Genscher;
+        IReadOnlyList<Announcement> newAnnouncements = p.Announcements;
 
         if (teamsChanged)
         {
-            if (Genscher is null)
+            if (p.Genscher is null)
             {
                 var rePlayers = Players
-                    .Where(p => PartyResolver.ResolveParty(p.Seat, this) == Party.Re)
-                    .Select(p => p.Seat)
+                    .Where(player => PartyResolver.ResolveParty(player.Seat, this) == Party.Re)
+                    .Select(player => player.Seat)
                     .ToArray();
                 newGenscher = new GenscherState(
                     TeamsChanged: true,
                     PreRePlayers: (rePlayers[0], rePlayers[1]),
-                    SavedAnnouncements: Announcements
+                    SavedAnnouncements: p.Announcements
                 );
                 newAnnouncements = [];
             }
             else
             {
-                var (orig1, orig2) = Genscher.PreRePlayers!.Value;
+                var (orig1, orig2) = p.Genscher.PreRePlayers!.Value;
                 bool restored =
                     (m.Genscher == orig1 || m.Genscher == orig2)
                     && (m.Partner == orig1 || m.Partner == orig2);
-                if (restored && Genscher.SavedAnnouncements is not null)
+                if (restored && p.Genscher.SavedAnnouncements is not null)
                 {
-                    newAnnouncements = Genscher.SavedAnnouncements;
+                    newAnnouncements = p.Genscher.SavedAnnouncements;
                     newGenscher = null;
                 }
                 else
                 {
-                    newGenscher = Genscher with { SavedAnnouncements = null };
+                    newGenscher = p.Genscher with { SavedAnnouncements = null };
                 }
             }
         }
 
-        return this with
+        return p with
         {
             Genscher = newGenscher,
             Announcements = newAnnouncements,
@@ -594,15 +706,205 @@ public abstract record GameState
         };
     }
 
+    private GameState ApplyAddAnnouncement(AddAnnouncementModification m)
+    {
+        return this switch
+        {
+            PlayingState p => p with
+            {
+                Announcements = [.. p.Announcements, m.Announcement],
+            },
+            ScoringState s => s with
+            {
+                Announcements = [.. s.Announcements, m.Announcement],
+            },
+            _ => throw new InvalidOperationException(
+                $"AddAnnouncementModification requires PlayingState or ScoringState, got {GetType().Name}"
+            ),
+        };
+    }
+
+    private GameState ApplySetVorbehaltRauskommer(SetVorbehaltRauskommerModification m)
+    {
+        return this switch
+        {
+            ReservationState r => r with { VorbehaltRauskommer = m.Player },
+            ArmutFlowState a => a with { VorbehaltRauskommer = m.Player },
+            _ => throw new InvalidOperationException(
+                $"SetVorbehaltRauskommerModification requires ReservationState or ArmutFlowState, got {GetType().Name}"
+            ),
+        };
+    }
+
+    private GameState ApplySetHochzeitForcedSolo()
+    {
+        return this switch
+        {
+            PlayingState p => p with { HochzeitBecameForcedSolo = true },
+            ScoringState s => s with { HochzeitBecameForcedSolo = true },
+            _ => throw new InvalidOperationException(
+                $"SetHochzeitForcedSoloModification requires PlayingState or ScoringState, got {GetType().Name}"
+            ),
+        };
+    }
+
+    private GameState ApplySetSchwarzesSau()
+    {
+        if (this is not PlayingState p)
+            throw new InvalidOperationException(
+                $"SetSchwarzesSauModification requires PlayingState, got {GetType().Name}"
+            );
+        return p with { IsSchwarzesSau = true };
+    }
+
+    private GameState ApplyClearActiveSonderkarten()
+    {
+        return this switch
+        {
+            PlayingState p => p with
+            {
+                ActiveSonderkarten = [],
+                ClosedWindows = new HashSet<SonderkarteType>(),
+            },
+            ScoringState s => s with
+            {
+                ActiveSonderkarten = [],
+                ClosedWindows = new HashSet<SonderkarteType>(),
+            },
+            _ => throw new InvalidOperationException(
+                $"ClearActiveSonderkartenModification requires PlayingState or ScoringState, got {GetType().Name}"
+            ),
+        };
+    }
+
+    private GameState ApplyClearAnnouncements()
+    {
+        return this switch
+        {
+            PlayingState p => p with { Announcements = [] },
+            ScoringState s => s with { Announcements = [] },
+            _ => throw new InvalidOperationException(
+                $"ClearAnnouncementsModification requires PlayingState or ScoringState, got {GetType().Name}"
+            ),
+        };
+    }
+
+    private GameState ApplyClearScoredTrickAwards()
+    {
+        return this switch
+        {
+            PlayingState p => p with
+            {
+                ScoredTricks = p.ScoredTricks.Select(r => r with { Awards = [] }).ToList(),
+            },
+            ScoringState s => s with
+            {
+                ScoredTricks = s.ScoredTricks.Select(r => r with { Awards = [] }).ToList(),
+            },
+            _ => throw new InvalidOperationException(
+                $"ClearScoredTrickAwardsModification requires PlayingState or ScoringState, got {GetType().Name}"
+            ),
+        };
+    }
+
     // ── Phase transition ──────────────────────────────────────────────────────
 
     /// <summary>
     /// Creates a new state of the subtype that corresponds to <paramref name="phase"/>,
-    /// copying all current fields except <see cref="Phase"/> which is set to
-    /// <paramref name="phase"/>. Called only by the <see cref="AdvancePhaseModification"/> arm.
+    /// copying all applicable fields from the current state.
     /// </summary>
-    private GameState TransitionToPhase(GamePhase phase) =>
-        phase switch
+    private GameState TransitionToPhase(GamePhase phase)
+    {
+        // Extract fields from the current subtype where available
+        IReservation? activeReservation = null;
+        PlayerSeat? gameModePlayerSeat = null;
+        IReadOnlyDictionary<PlayerSeat, Hand>? initialHands = null;
+        ArmutState? armut = null;
+        IReadOnlyList<PlayerSeat> pendingResponders = [];
+        PlayerSeat vorbehaltRauskommer = default;
+        IReadOnlyDictionary<PlayerSeat, bool> healthDeclarations =
+            new Dictionary<PlayerSeat, bool>();
+        IReadOnlyDictionary<PlayerSeat, IReservation?> reservationDeclarations =
+            new Dictionary<PlayerSeat, IReservation?>();
+        IReadOnlyList<Trick> completedTricks = [];
+        IReadOnlyList<TrickResult> scoredTricks = [];
+        IReadOnlyList<Announcement> announcements = [];
+        IReadOnlyList<SonderkarteType> activeSonderkarten = [];
+        IReadOnlySet<SonderkarteType> closedWindows = new HashSet<SonderkarteType>();
+        Trick? currentTrick = null;
+        bool directionFlipPending = false;
+        GenscherState? genscher = null;
+        SilentGameMode? silentMode = null;
+        bool hochzeitBecameForcedSolo = false;
+        bool isSchwarzesSau = false;
+
+        switch (this)
+        {
+            case ReservationState r:
+                activeReservation = r.ActiveReservation;
+                gameModePlayerSeat = r.GameModePlayerSeat;
+                initialHands = r.InitialHands;
+                pendingResponders = r.PendingReservationResponders;
+                vorbehaltRauskommer = r.VorbehaltRauskommer;
+                healthDeclarations = r.HealthDeclarations;
+                reservationDeclarations = r.ReservationDeclarations;
+                break;
+            case ArmutFlowState a:
+                activeReservation = a.ActiveReservation;
+                gameModePlayerSeat = a.GameModePlayerSeat;
+                initialHands = a.InitialHands;
+                pendingResponders = a.PendingReservationResponders;
+                vorbehaltRauskommer = a.VorbehaltRauskommer;
+                armut = a.Armut;
+                break;
+            case PlayingState p:
+                activeReservation = p.ActiveReservation;
+                gameModePlayerSeat = p.GameModePlayerSeat;
+                initialHands = p.InitialHands;
+                armut = p.Armut;
+                completedTricks = p.CompletedTricks;
+                scoredTricks = p.ScoredTricks;
+                currentTrick = p.CurrentTrick;
+                announcements = p.Announcements;
+                activeSonderkarten = p.ActiveSonderkarten;
+                closedWindows = p.ClosedWindows;
+                directionFlipPending = p.DirectionFlipPending;
+                genscher = p.Genscher;
+                silentMode = p.SilentMode;
+                hochzeitBecameForcedSolo = p.HochzeitBecameForcedSolo;
+                isSchwarzesSau = p.IsSchwarzesSau;
+                break;
+            case ScoringState s:
+                activeReservation = s.ActiveReservation;
+                gameModePlayerSeat = s.GameModePlayerSeat;
+                initialHands = s.InitialHands;
+                armut = s.Armut;
+                completedTricks = s.CompletedTricks;
+                scoredTricks = s.ScoredTricks;
+                announcements = s.Announcements;
+                activeSonderkarten = s.ActiveSonderkarten;
+                closedWindows = s.ClosedWindows;
+                genscher = s.Genscher;
+                silentMode = s.SilentMode;
+                hochzeitBecameForcedSolo = s.HochzeitBecameForcedSolo;
+                break;
+            case FinishedState f:
+                activeReservation = f.ActiveReservation;
+                gameModePlayerSeat = f.GameModePlayerSeat;
+                initialHands = f.InitialHands;
+                armut = f.Armut;
+                completedTricks = f.CompletedTricks;
+                scoredTricks = f.ScoredTricks;
+                announcements = f.Announcements;
+                activeSonderkarten = f.ActiveSonderkarten;
+                closedWindows = f.ClosedWindows;
+                genscher = f.Genscher;
+                silentMode = f.SilentMode;
+                hochzeitBecameForcedSolo = f.HochzeitBecameForcedSolo;
+                break;
+        }
+
+        return phase switch
         {
             GamePhase.Dealing => new DealingState
             {
@@ -612,27 +914,8 @@ public abstract record GameState
                 Players = Players,
                 CurrentTurn = CurrentTurn,
                 Direction = Direction,
-                ActiveReservation = ActiveReservation,
-                CompletedTricks = CompletedTricks,
-                ScoredTricks = ScoredTricks,
-                CurrentTrick = CurrentTrick,
-                Announcements = Announcements,
-                ActiveSonderkarten = ActiveSonderkarten,
-                ClosedWindows = ClosedWindows,
                 TrumpEvaluator = TrumpEvaluator,
                 PartyResolver = PartyResolver,
-                DirectionFlipPending = DirectionFlipPending,
-                InitialHands = InitialHands,
-                HealthDeclarations = HealthDeclarations,
-                PendingReservationResponders = PendingReservationResponders,
-                ReservationDeclarations = ReservationDeclarations,
-                GameModePlayerSeat = GameModePlayerSeat,
-                Armut = Armut,
-                Genscher = Genscher,
-                VorbehaltRauskommer = VorbehaltRauskommer,
-                SilentMode = SilentMode,
-                HochzeitBecameForcedSolo = HochzeitBecameForcedSolo,
-                IsSchwarzesSau = IsSchwarzesSau,
                 Factory = Factory,
             },
             GamePhase.ReservationHealthCheck
@@ -647,28 +930,16 @@ public abstract record GameState
                 Players = Players,
                 CurrentTurn = CurrentTurn,
                 Direction = Direction,
-                ActiveReservation = ActiveReservation,
-                CompletedTricks = CompletedTricks,
-                ScoredTricks = ScoredTricks,
-                CurrentTrick = CurrentTrick,
-                Announcements = Announcements,
-                ActiveSonderkarten = ActiveSonderkarten,
-                ClosedWindows = ClosedWindows,
                 TrumpEvaluator = TrumpEvaluator,
                 PartyResolver = PartyResolver,
-                DirectionFlipPending = DirectionFlipPending,
-                InitialHands = InitialHands,
-                HealthDeclarations = HealthDeclarations,
-                PendingReservationResponders = PendingReservationResponders,
-                ReservationDeclarations = ReservationDeclarations,
-                GameModePlayerSeat = GameModePlayerSeat,
-                Armut = Armut,
-                Genscher = Genscher,
-                VorbehaltRauskommer = VorbehaltRauskommer,
-                SilentMode = SilentMode,
-                HochzeitBecameForcedSolo = HochzeitBecameForcedSolo,
-                IsSchwarzesSau = IsSchwarzesSau,
                 Factory = Factory,
+                ActiveReservation = activeReservation,
+                GameModePlayerSeat = gameModePlayerSeat,
+                InitialHands = initialHands,
+                PendingReservationResponders = pendingResponders,
+                VorbehaltRauskommer = vorbehaltRauskommer,
+                HealthDeclarations = healthDeclarations,
+                ReservationDeclarations = reservationDeclarations,
             },
             GamePhase.ArmutPartnerFinding or GamePhase.ArmutCardExchange => new ArmutFlowState
             {
@@ -678,28 +949,15 @@ public abstract record GameState
                 Players = Players,
                 CurrentTurn = CurrentTurn,
                 Direction = Direction,
-                ActiveReservation = ActiveReservation,
-                CompletedTricks = CompletedTricks,
-                ScoredTricks = ScoredTricks,
-                CurrentTrick = CurrentTrick,
-                Announcements = Announcements,
-                ActiveSonderkarten = ActiveSonderkarten,
-                ClosedWindows = ClosedWindows,
                 TrumpEvaluator = TrumpEvaluator,
                 PartyResolver = PartyResolver,
-                DirectionFlipPending = DirectionFlipPending,
-                InitialHands = InitialHands,
-                HealthDeclarations = HealthDeclarations,
-                PendingReservationResponders = PendingReservationResponders,
-                ReservationDeclarations = ReservationDeclarations,
-                GameModePlayerSeat = GameModePlayerSeat,
-                Armut = Armut,
-                Genscher = Genscher,
-                VorbehaltRauskommer = VorbehaltRauskommer,
-                SilentMode = SilentMode,
-                HochzeitBecameForcedSolo = HochzeitBecameForcedSolo,
-                IsSchwarzesSau = IsSchwarzesSau,
                 Factory = Factory,
+                ActiveReservation = activeReservation,
+                GameModePlayerSeat = gameModePlayerSeat,
+                InitialHands = initialHands,
+                PendingReservationResponders = pendingResponders,
+                VorbehaltRauskommer = vorbehaltRauskommer,
+                Armut = armut,
             },
             GamePhase.Playing or GamePhase.SchwarzesSauSoloSelect => new PlayingState
             {
@@ -709,28 +967,24 @@ public abstract record GameState
                 Players = Players,
                 CurrentTurn = CurrentTurn,
                 Direction = Direction,
-                ActiveReservation = ActiveReservation,
-                CompletedTricks = CompletedTricks,
-                ScoredTricks = ScoredTricks,
-                CurrentTrick = CurrentTrick,
-                Announcements = Announcements,
-                ActiveSonderkarten = ActiveSonderkarten,
-                ClosedWindows = ClosedWindows,
                 TrumpEvaluator = TrumpEvaluator,
                 PartyResolver = PartyResolver,
-                DirectionFlipPending = DirectionFlipPending,
-                InitialHands = InitialHands,
-                HealthDeclarations = HealthDeclarations,
-                PendingReservationResponders = PendingReservationResponders,
-                ReservationDeclarations = ReservationDeclarations,
-                GameModePlayerSeat = GameModePlayerSeat,
-                Armut = Armut,
-                Genscher = Genscher,
-                VorbehaltRauskommer = VorbehaltRauskommer,
-                SilentMode = SilentMode,
-                HochzeitBecameForcedSolo = HochzeitBecameForcedSolo,
-                IsSchwarzesSau = IsSchwarzesSau,
                 Factory = Factory,
+                ActiveReservation = activeReservation,
+                GameModePlayerSeat = gameModePlayerSeat,
+                InitialHands = initialHands,
+                Armut = armut,
+                CompletedTricks = completedTricks,
+                ScoredTricks = scoredTricks,
+                CurrentTrick = currentTrick,
+                Announcements = announcements,
+                ActiveSonderkarten = activeSonderkarten,
+                ClosedWindows = closedWindows,
+                DirectionFlipPending = directionFlipPending,
+                Genscher = genscher,
+                SilentMode = silentMode,
+                HochzeitBecameForcedSolo = hochzeitBecameForcedSolo,
+                IsSchwarzesSau = isSchwarzesSau,
             },
             GamePhase.Scoring => new ScoringState
             {
@@ -740,28 +994,21 @@ public abstract record GameState
                 Players = Players,
                 CurrentTurn = CurrentTurn,
                 Direction = Direction,
-                ActiveReservation = ActiveReservation,
-                CompletedTricks = CompletedTricks,
-                ScoredTricks = ScoredTricks,
-                CurrentTrick = CurrentTrick,
-                Announcements = Announcements,
-                ActiveSonderkarten = ActiveSonderkarten,
-                ClosedWindows = ClosedWindows,
                 TrumpEvaluator = TrumpEvaluator,
                 PartyResolver = PartyResolver,
-                DirectionFlipPending = DirectionFlipPending,
-                InitialHands = InitialHands,
-                HealthDeclarations = HealthDeclarations,
-                PendingReservationResponders = PendingReservationResponders,
-                ReservationDeclarations = ReservationDeclarations,
-                GameModePlayerSeat = GameModePlayerSeat,
-                Armut = Armut,
-                Genscher = Genscher,
-                VorbehaltRauskommer = VorbehaltRauskommer,
-                SilentMode = SilentMode,
-                HochzeitBecameForcedSolo = HochzeitBecameForcedSolo,
-                IsSchwarzesSau = IsSchwarzesSau,
                 Factory = Factory,
+                ActiveReservation = activeReservation,
+                GameModePlayerSeat = gameModePlayerSeat,
+                InitialHands = initialHands,
+                Armut = armut,
+                CompletedTricks = completedTricks,
+                ScoredTricks = scoredTricks,
+                Announcements = announcements,
+                ActiveSonderkarten = activeSonderkarten,
+                ClosedWindows = closedWindows,
+                Genscher = genscher,
+                SilentMode = silentMode,
+                HochzeitBecameForcedSolo = hochzeitBecameForcedSolo,
             },
             GamePhase.Finished => new FinishedState
             {
@@ -771,28 +1018,21 @@ public abstract record GameState
                 Players = Players,
                 CurrentTurn = CurrentTurn,
                 Direction = Direction,
-                ActiveReservation = ActiveReservation,
-                CompletedTricks = CompletedTricks,
-                ScoredTricks = ScoredTricks,
-                CurrentTrick = CurrentTrick,
-                Announcements = Announcements,
-                ActiveSonderkarten = ActiveSonderkarten,
-                ClosedWindows = ClosedWindows,
                 TrumpEvaluator = TrumpEvaluator,
                 PartyResolver = PartyResolver,
-                DirectionFlipPending = DirectionFlipPending,
-                InitialHands = InitialHands,
-                HealthDeclarations = HealthDeclarations,
-                PendingReservationResponders = PendingReservationResponders,
-                ReservationDeclarations = ReservationDeclarations,
-                GameModePlayerSeat = GameModePlayerSeat,
-                Armut = Armut,
-                Genscher = Genscher,
-                VorbehaltRauskommer = VorbehaltRauskommer,
-                SilentMode = SilentMode,
-                HochzeitBecameForcedSolo = HochzeitBecameForcedSolo,
-                IsSchwarzesSau = IsSchwarzesSau,
                 Factory = Factory,
+                ActiveReservation = activeReservation,
+                GameModePlayerSeat = gameModePlayerSeat,
+                InitialHands = initialHands,
+                Armut = armut,
+                CompletedTricks = completedTricks,
+                ScoredTricks = scoredTricks,
+                Announcements = announcements,
+                ActiveSonderkarten = activeSonderkarten,
+                ClosedWindows = closedWindows,
+                Genscher = genscher,
+                SilentMode = silentMode,
+                HochzeitBecameForcedSolo = hochzeitBecameForcedSolo,
             },
             GamePhase.Geschmissen => new GeschmissenState
             {
@@ -802,29 +1042,11 @@ public abstract record GameState
                 Players = Players,
                 CurrentTurn = CurrentTurn,
                 Direction = Direction,
-                ActiveReservation = ActiveReservation,
-                CompletedTricks = CompletedTricks,
-                ScoredTricks = ScoredTricks,
-                CurrentTrick = CurrentTrick,
-                Announcements = Announcements,
-                ActiveSonderkarten = ActiveSonderkarten,
-                ClosedWindows = ClosedWindows,
                 TrumpEvaluator = TrumpEvaluator,
                 PartyResolver = PartyResolver,
-                DirectionFlipPending = DirectionFlipPending,
-                InitialHands = InitialHands,
-                HealthDeclarations = HealthDeclarations,
-                PendingReservationResponders = PendingReservationResponders,
-                ReservationDeclarations = ReservationDeclarations,
-                GameModePlayerSeat = GameModePlayerSeat,
-                Armut = Armut,
-                Genscher = Genscher,
-                VorbehaltRauskommer = VorbehaltRauskommer,
-                SilentMode = SilentMode,
-                HochzeitBecameForcedSolo = HochzeitBecameForcedSolo,
-                IsSchwarzesSau = IsSchwarzesSau,
                 Factory = Factory,
             },
             _ => throw new ArgumentOutOfRangeException(nameof(phase), phase, null),
         };
+    }
 }

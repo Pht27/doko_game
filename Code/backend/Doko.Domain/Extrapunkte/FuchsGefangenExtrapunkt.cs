@@ -24,7 +24,7 @@ public sealed class FuchsGefangenExtrapunkt : IExtrapunkt
     )
     {
         // ♦A are Schweinchen when that sonderkarte is active — not Füchse
-        if (state.ActiveSonderkarten.Contains(SonderkarteType.Schweinchen))
+        if (state.GetActiveSonderkarten().Contains(SonderkarteType.Schweinchen))
             return [];
 
         var winnerParty = state.PartyResolver.ResolveParty(effectiveTrickWinner, state);

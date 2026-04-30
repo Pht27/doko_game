@@ -16,7 +16,7 @@ public sealed class FestmahlTrickWinnerRule : ITrickWinnerRule
 
     public PlayerSeat? TryGetOverride(
         Trick completedTrick,
-        GameState state,
+        PlayingState state,
         PlayerSeat normalWinner
     )
     {

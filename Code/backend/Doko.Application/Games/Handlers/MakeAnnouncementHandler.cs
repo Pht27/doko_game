@@ -30,12 +30,11 @@ public sealed class MakeAnnouncementHandler(
             repository,
             publisher,
             command.GameId,
-            execute: (PlayingState typedState) =>
+            execute: (PlayingState state) =>
             {
-                if (typedState.Phase != GamePhase.Playing)
-                    return (Fail<Unit>(GameError.InvalidPhase), [], typedState);
+                if (state.Phase != GamePhase.Playing)
+                    return (Fail<Unit>(GameError.InvalidPhase), [], state);
 
-                GameState state = typedState;
                 if (!AnnouncementRules.CanAnnounce(command.Player, command.Type, state))
                     return (Fail<Unit>(GameError.AnnouncementNotAllowed), [], state);
 
@@ -49,20 +48,20 @@ public sealed class MakeAnnouncementHandler(
                 {
                     IsEffective = isEffective,
                 };
-                state = state.Apply(new AddAnnouncementModification(announcement));
+                GameState nextState = state.Apply(new AddAnnouncementModification(announcement));
 
                 return (
                     Ok(Unit.Value),
                     [
                         new AnnouncementMadeEvent(
-                            state.Id,
+                            nextState.Id,
                             command.Player,
                             command.Type,
                             trickNum,
                             cardIdx
                         ),
                     ],
-                    state
+                    nextState
                 );
             },
             ct

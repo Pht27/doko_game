@@ -1,5 +1,6 @@
 using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
+using Doko.Domain.Hands;
 using Doko.Domain.Players;
 
 namespace Doko.Domain.Parties;
@@ -13,14 +14,26 @@ public sealed class NormalPartyResolver : IPartyResolver
 
     public Party? ResolveParty(PlayerSeat player, GameState state)
     {
-        if (state.InitialHands is null)
+        var hands = GetInitialHands(state);
+        if (hands is null)
             return null;
-        return state.InitialHands[player].Cards.Any(c => c.Type == KreuzDame)
+        return hands[player].Cards.Any(c => c.Type == KreuzDame)
             ? Party.Re
             : Party.Kontra;
     }
 
-    public bool IsFullyResolved(GameState state) => state.InitialHands is not null;
+    public bool IsFullyResolved(GameState state) => GetInitialHands(state) is not null;
+
+    private static IReadOnlyDictionary<PlayerSeat, Hands.Hand>? GetInitialHands(GameState state) =>
+        state switch
+        {
+            ReservationState r => r.InitialHands,
+            ArmutFlowState a => a.InitialHands,
+            PlayingState p => p.InitialHands,
+            ScoringState s => s.InitialHands,
+            FinishedState f => f.InitialHands,
+            _ => null,
+        };
 
     public int? AnnouncementBaseDeadline(GameState state) => 5;
 }

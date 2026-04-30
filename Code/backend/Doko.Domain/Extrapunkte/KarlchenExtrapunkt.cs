@@ -22,12 +22,13 @@ public sealed class KarlchenExtrapunkt : IExtrapunkt
         PlayerSeat effectiveTrickWinner
     )
     {
-        bool heidmannActive = state.ActiveSonderkarten.Contains(SonderkarteType.Heidmann);
-        bool heidfrauActive = state.ActiveSonderkarten.Contains(SonderkarteType.Heidfrau);
+        var activeSonderkarten = state.GetActiveSonderkarten();
+        bool heidmannActive = activeSonderkarten.Contains(SonderkarteType.Heidmann);
+        bool heidfrauActive = activeSonderkarten.Contains(SonderkarteType.Heidfrau);
         if (heidmannActive && !heidfrauActive)
             return [];
 
-        if (state.CompletedTricks.Count != state.Rules.LastTrickIndex)
+        if (state.GetCompletedTricks().Count != state.Rules.LastTrickIndex)
             return [];
 
         bool winnerPlayedKarlchen = completedTrick.Cards.Any(tc =>

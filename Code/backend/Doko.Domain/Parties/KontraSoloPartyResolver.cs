@@ -1,5 +1,6 @@
 using Doko.Domain.Cards;
 using Doko.Domain.GameFlow;
+using Doko.Domain.Hands;
 using Doko.Domain.Players;
 
 namespace Doko.Domain.Parties;
@@ -24,8 +25,20 @@ public sealed class KontraSoloPartyResolver(PlayerSeat kontraSoloPlayer) : IPart
     {
         if (player == kontraSoloPlayer)
             return false;
-        if (state.InitialHands is null)
+        var hands = GetInitialHands(state);
+        if (hands is null)
             return true;
-        return state.InitialHands[player].Cards.Any(c => c.Type == KreuzDame);
+        return hands[player].Cards.Any(c => c.Type == KreuzDame);
     }
+
+    private static IReadOnlyDictionary<PlayerSeat, Hands.Hand>? GetInitialHands(GameState state) =>
+        state switch
+        {
+            ReservationState r => r.InitialHands,
+            ArmutFlowState a => a.InitialHands,
+            PlayingState p => p.InitialHands,
+            ScoringState s => s.InitialHands,
+            FinishedState f => f.InitialHands,
+            _ => null,
+        };
 }

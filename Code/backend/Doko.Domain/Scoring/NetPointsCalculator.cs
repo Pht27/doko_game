@@ -13,7 +13,7 @@ public static class NetPointsCalculator
     /// </summary>
     public static (int[] NetPoints, Party?[] PartyPerSeat) Calculate(
         GameResult result,
-        GameState state
+        FinishedState state
     )
     {
         var soloParty =

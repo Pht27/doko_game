@@ -104,14 +104,15 @@ public sealed class OpaService(
     {
         var playerState = state.Players.First(p => p.Seat == state.CurrentTurn);
 
+        var currentTrick = state.GetCurrentTrick();
         var card =
-            state.CurrentTrick is null || state.CurrentTrick.Cards.Count == 0
+            currentTrick is null || currentTrick.Cards.Count == 0
                 ? playerState.Hand.Cards[0]
                 : playerState.Hand.Cards.First(c =>
                     CardPlayValidator.CanPlay(
                         c,
                         playerState.Hand,
-                        state.CurrentTrick!,
+                        currentTrick,
                         state.TrumpEvaluator
                     )
                 );
