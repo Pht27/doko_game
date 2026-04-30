@@ -29,7 +29,7 @@ public class KontraSoloAnnouncementTests
             initialHands: hands,
             phase: GamePhase.Playing
         );
-        state.Apply(
+        state = state.Apply(
             new SetSilentGameModeModification(
                 new SilentGameMode(SilentGameModeType.KontraSolo, B.P0)
             )

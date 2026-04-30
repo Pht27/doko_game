@@ -30,13 +30,13 @@ public sealed class DealCardsHandler(
         DealCardsCommand command,
         CancellationToken ct = default
     ) =>
-        GameCommandPipeline.RunAsync<Unit>(
+        GameCommandPipeline.RunAsync<Unit, DealingState>(
             repository,
             publisher,
             command.GameId,
-            GamePhase.Dealing,
-            execute: state =>
+            execute: (DealingState typedState) =>
             {
+                GameState state = typedState;
                 var deck = state.Rules.PlayWithNines ? Deck.Standard48() : Deck.Standard40();
                 var activeShuffler =
                     scenarioShufflerFactory.TryCreate(command.ScenarioName) ?? shuffler;

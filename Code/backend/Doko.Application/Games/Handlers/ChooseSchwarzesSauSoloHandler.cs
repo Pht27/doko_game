@@ -33,13 +33,20 @@ public sealed class ChooseSchwarzesSauSoloHandler(
         ChooseSchwarzesSauSoloCommand command,
         CancellationToken ct = default
     ) =>
-        GameCommandPipeline.RunAsync<ChooseSchwarzesSauSoloResult>(
+        GameCommandPipeline.RunAsync<ChooseSchwarzesSauSoloResult, PlayingState>(
             repository,
             publisher,
             command.GameId,
-            GamePhase.SchwarzesSauSoloSelect,
-            execute: state =>
+            execute: (PlayingState typedState) =>
             {
+                if (typedState.Phase != GamePhase.SchwarzesSauSoloSelect)
+                    return (
+                        Fail<ChooseSchwarzesSauSoloResult>(GameError.InvalidPhase),
+                        [],
+                        typedState
+                    );
+
+                GameState state = typedState;
                 if (state.CurrentTurn != command.Player)
                     return (Fail<ChooseSchwarzesSauSoloResult>(GameError.NotYourTurn), [], state);
 

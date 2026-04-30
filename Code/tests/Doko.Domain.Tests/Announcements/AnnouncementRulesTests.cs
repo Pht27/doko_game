@@ -378,7 +378,7 @@ public class AnnouncementRulesTests
             players: B.FourPlayers(),
             partyResolver: B.SoloResolver()
         );
-        state.Apply(new SetHochzeitForcedSoloModification());
+        state = state.Apply(new SetHochzeitForcedSoloModification());
 
         var result = new GameResult(
             Winner: Party.Re,
@@ -408,7 +408,7 @@ public class AnnouncementRulesTests
             players: B.FourPlayers(),
             partyResolver: B.SoloResolver()
         );
-        state.Apply(
+        state = state.Apply(
             new SetSilentGameModeModification(
                 new SilentGameMode(SilentGameModeType.KontraSolo, B.P0)
             )

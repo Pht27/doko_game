@@ -33,13 +33,16 @@ public sealed class ExchangeArmutCardsHandler(
         ExchangeArmutCardsCommand command,
         CancellationToken ct = default
     ) =>
-        GameCommandPipeline.RunAsync<ExchangeArmutCardsResult>(
+        GameCommandPipeline.RunAsync<ExchangeArmutCardsResult, ArmutFlowState>(
             repository,
             publisher,
             command.GameId,
-            GamePhase.ArmutCardExchange,
-            execute: state =>
+            execute: (ArmutFlowState typedState) =>
             {
+                if (typedState.Phase != GamePhase.ArmutCardExchange)
+                    return (Fail<ExchangeArmutCardsResult>(GameError.InvalidPhase), [], typedState);
+
+                GameState state = typedState;
                 if (state.Armut?.RichPlayer != command.RichPlayer)
                     return (Fail<ExchangeArmutCardsResult>(GameError.NotYourTurn), [], state);
 

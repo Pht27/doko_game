@@ -27,13 +27,20 @@ public sealed class DeclareHealthStatusHandler(
         DeclareHealthStatusCommand command,
         CancellationToken ct = default
     ) =>
-        GameCommandPipeline.RunAsync<DeclareHealthStatusResult>(
+        GameCommandPipeline.RunAsync<DeclareHealthStatusResult, ReservationState>(
             repository,
             publisher,
             command.GameId,
-            GamePhase.ReservationHealthCheck,
-            execute: state =>
+            execute: (ReservationState typedState) =>
             {
+                if (typedState.Phase != GamePhase.ReservationHealthCheck)
+                    return (
+                        Fail<DeclareHealthStatusResult>(GameError.InvalidPhase),
+                        [],
+                        typedState
+                    );
+
+                GameState state = typedState;
                 if (
                     state.PendingReservationResponders.Count == 0
                     || state.PendingReservationResponders[0] != command.Player

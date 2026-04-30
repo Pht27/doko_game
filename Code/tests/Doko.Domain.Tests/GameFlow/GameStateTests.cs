@@ -11,7 +11,7 @@ public class GameStateTests
     public void Apply_ReverseDirection_FlipsCounterclockwiseToClockwise()
     {
         var state = GameState.Create(direction: PlayDirection.Counterclockwise);
-        state.Apply(new ReverseDirectionModification());
+        state = state.Apply(new ReverseDirectionModification());
         state.Direction.Should().Be(PlayDirection.Clockwise);
     }
 
@@ -19,7 +19,7 @@ public class GameStateTests
     public void Apply_ReverseDirection_FlipsClockwiseToCounterclockwise()
     {
         var state = GameState.Create(direction: PlayDirection.Clockwise);
-        state.Apply(new ReverseDirectionModification());
+        state = state.Apply(new ReverseDirectionModification());
         state.Direction.Should().Be(PlayDirection.Counterclockwise);
     }
 
@@ -27,8 +27,8 @@ public class GameStateTests
     public void Apply_ReverseDirection_TwiceRestoresOriginal()
     {
         var state = GameState.Create(direction: PlayDirection.Counterclockwise);
-        state.Apply(new ReverseDirectionModification());
-        state.Apply(new ReverseDirectionModification());
+        state = state.Apply(new ReverseDirectionModification());
+        state = state.Apply(new ReverseDirectionModification());
         state.Direction.Should().Be(PlayDirection.Counterclockwise);
     }
 
@@ -40,7 +40,7 @@ public class GameStateTests
         var ann = B.Ann(B.P0, AnnouncementType.Win);
         var state = GameState.Create(announcements: [ann]);
 
-        state.Apply(new WithdrawAnnouncementModification(B.P0, AnnouncementType.Win));
+        state = state.Apply(new WithdrawAnnouncementModification(B.P0, AnnouncementType.Win));
 
         state.Announcements.Should().BeEmpty();
     }
@@ -52,7 +52,7 @@ public class GameStateTests
         var kontra = B.Ann(B.P1, AnnouncementType.Win);
         var state = GameState.Create(announcements: [re, kontra]);
 
-        state.Apply(new WithdrawAnnouncementModification(B.P0, AnnouncementType.Win));
+        state = state.Apply(new WithdrawAnnouncementModification(B.P0, AnnouncementType.Win));
 
         state.Announcements.Should().ContainSingle().Which.Should().Be(kontra);
     }
@@ -63,7 +63,7 @@ public class GameStateTests
     public void Apply_ActivateSonderkarte_AddsToActiveList()
     {
         var state = GameState.Create(rules: RuleSet.Default());
-        state.Apply(new ActivateSonderkarteModification(SonderkarteType.Schweinchen));
+        state = state.Apply(new ActivateSonderkarteModification(SonderkarteType.Schweinchen));
         state.ActiveSonderkarten.Should().Contain(SonderkarteType.Schweinchen);
     }
 
@@ -71,8 +71,8 @@ public class GameStateTests
     public void Apply_ActivateSchweinchen_RebuildsTrumpEvaluator_KaroAssAboveDulle()
     {
         var state = GameState.Create(rules: RuleSet.Default());
-        state.Apply(new ActivateSonderkarteModification(SonderkarteType.Schweinchen));
-        state.Apply(new RebuildTrumpEvaluatorModification());
+        state = state.Apply(new ActivateSonderkarteModification(SonderkarteType.Schweinchen));
+        state = state.Apply(new RebuildTrumpEvaluatorModification());
 
         var karoAss = new CardType(Suit.Karo, Rank.Ass);
         var dulle = new CardType(Suit.Herz, Rank.Zehn);
@@ -88,8 +88,8 @@ public class GameStateTests
     {
         var state = GameState.Create(rules: RuleSet.Default());
 
-        state.Apply(new ActivateSonderkarteModification(SonderkarteType.Heidmann));
-        state.Apply(new RebuildTrumpEvaluatorModification());
+        state = state.Apply(new ActivateSonderkarteModification(SonderkarteType.Heidmann));
+        state = state.Apply(new RebuildTrumpEvaluatorModification());
 
         // After Heidmann: Jacks above Queens
         var kreuzDame = new CardType(Suit.Kreuz, Rank.Dame);
@@ -102,8 +102,8 @@ public class GameStateTests
                 because: "Heidmann makes Jacks outrank Queens"
             );
 
-        state.Apply(new ActivateSonderkarteModification(SonderkarteType.Heidfrau));
-        state.Apply(new RebuildTrumpEvaluatorModification());
+        state = state.Apply(new ActivateSonderkarteModification(SonderkarteType.Heidfrau));
+        state = state.Apply(new RebuildTrumpEvaluatorModification());
 
         // After Heidfrau suppresses Heidmann: Queens back above Jacks
         state
@@ -121,7 +121,7 @@ public class GameStateTests
     public void Apply_Genscher_InKontraSolo_DoesNotReplacePartyResolver()
     {
         var state = B.BasicState();
-        state.Apply(
+        state = state.Apply(
             new SetSilentGameModeModification(
                 new SilentGameMode(SilentGameModeType.KontraSolo, B.P0)
             )
@@ -129,7 +129,7 @@ public class GameStateTests
         var resolverBefore = state.PartyResolver;
 
         // P0 is Kontra, P1 is Re — teams would change in a normal game
-        state.Apply(new SetGenscherPartnerModification(B.P0, B.P1));
+        state = state.Apply(new SetGenscherPartnerModification(B.P0, B.P1));
 
         state
             .PartyResolver.Should()
@@ -141,13 +141,13 @@ public class GameStateTests
     public void Apply_Genscher_InKontraSolo_DoesNotSetGenscherTeamsChanged()
     {
         var state = B.BasicState();
-        state.Apply(
+        state = state.Apply(
             new SetSilentGameModeModification(
                 new SilentGameMode(SilentGameModeType.KontraSolo, B.P0)
             )
         );
 
-        state.Apply(new SetGenscherPartnerModification(B.P0, B.P1));
+        state = state.Apply(new SetGenscherPartnerModification(B.P0, B.P1));
 
         (state.Genscher?.TeamsChanged ?? false)
             .Should()
@@ -158,7 +158,7 @@ public class GameStateTests
     public void Apply_Genscher_InStilleHochzeit_DoesNotReplacePartyResolver()
     {
         var state = B.BasicState();
-        state.Apply(
+        state = state.Apply(
             new SetSilentGameModeModification(
                 new SilentGameMode(SilentGameModeType.StilleHochzeit, B.P0)
             )
@@ -166,7 +166,7 @@ public class GameStateTests
         var resolverBefore = state.PartyResolver;
 
         // P0 is Re (solo), P1 is Kontra — teams would change in a normal game
-        state.Apply(new SetGenscherPartnerModification(B.P1, B.P0));
+        state = state.Apply(new SetGenscherPartnerModification(B.P1, B.P0));
 
         state
             .PartyResolver.Should()

@@ -5,13 +5,12 @@ namespace Doko.Application.Common;
 
 internal static class GameCommandPipeline
 {
-    internal static async Task<GameActionResult<TResult>> RunAsync<TResult>(
+    internal static async Task<GameActionResult<TResult>> RunAsync<TResult, TRequiredState>(
         IGameRepository repo,
         IGameEventPublisher publisher,
         GameId gameId,
-        GamePhase requiredPhase,
         Func<
-            GameState,
+            TRequiredState,
             (
                 GameActionResult<TResult> result,
                 IReadOnlyList<IDomainEvent> events,
@@ -20,16 +19,17 @@ internal static class GameCommandPipeline
         > execute,
         CancellationToken ct
     )
+        where TRequiredState : GameState
     {
         var loaded = await repo.LoadOrFailAsync<TResult>(gameId, ct);
         if (loaded.Failure is not null)
             return loaded.Failure;
         var state = loaded.State!;
 
-        if (state.Phase != requiredPhase)
+        if (state is not TRequiredState typedState)
             return GameActionResultExtensions.Fail<TResult>(GameError.InvalidPhase);
 
-        var (result, events, nextState) = execute(state);
+        var (result, events, nextState) = execute(typedState);
         if (result is GameActionResult<TResult>.Failure)
             return result;
 

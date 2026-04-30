@@ -29,13 +29,16 @@ public sealed class AcceptArmutHandler(IGameRepository repository, IGameEventPub
         AcceptArmutCommand command,
         CancellationToken ct = default
     ) =>
-        GameCommandPipeline.RunAsync<AcceptArmutResult>(
+        GameCommandPipeline.RunAsync<AcceptArmutResult, ArmutFlowState>(
             repository,
             publisher,
             command.GameId,
-            GamePhase.ArmutPartnerFinding,
-            execute: state =>
+            execute: (ArmutFlowState typedState) =>
             {
+                if (typedState.Phase != GamePhase.ArmutPartnerFinding)
+                    return (Fail<AcceptArmutResult>(GameError.InvalidPhase), [], typedState);
+
+                GameState state = typedState;
                 if (
                     state.PendingReservationResponders.Count == 0
                     || state.PendingReservationResponders[0] != command.Player

@@ -555,7 +555,7 @@ public class GameScorerTests(ITestOutputHelper output)
     {
         // SilentMode = KontraSolo → soloFactor = 3 even without an ActiveReservation
         var state = SoloState(rules: NoFeigheit);
-        state.Apply(
+        state = state.Apply(
             new SetSilentGameModeModification(
                 new SilentGameMode(SilentGameModeType.KontraSolo, B.P0)
             )
@@ -579,7 +579,7 @@ public class GameScorerTests(ITestOutputHelper output)
     {
         // HochzeitBecameForcedSolo=true → soloFactor=3 even though ActiveReservation.IsSolo=false
         var state = SoloState(rules: NoFeigheit);
-        state.Apply(new SetHochzeitForcedSoloModification());
+        state = state.Apply(new SetHochzeitForcedSoloModification());
         var tricks = new List<TrickResult>
         {
             B.HighValueTrick(B.P0, 0),

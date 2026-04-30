@@ -37,13 +37,16 @@ public sealed class PlayCardHandler(
         PlayCardCommand command,
         CancellationToken ct = default
     ) =>
-        GameCommandPipeline.RunAsync<PlayCardResult>(
+        GameCommandPipeline.RunAsync<PlayCardResult, PlayingState>(
             repository,
             publisher,
             command.GameId,
-            GamePhase.Playing,
-            execute: state =>
+            execute: (PlayingState typedState) =>
             {
+                if (typedState.Phase != GamePhase.Playing)
+                    return (Fail<PlayCardResult>(GameError.InvalidPhase), [], typedState);
+
+                GameState state = typedState;
                 if (state.CurrentTurn != command.Player)
                     return (Fail<PlayCardResult>(GameError.NotYourTurn), [], state);
 

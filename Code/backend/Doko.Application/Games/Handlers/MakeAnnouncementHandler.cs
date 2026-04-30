@@ -26,13 +26,16 @@ public sealed class MakeAnnouncementHandler(
         MakeAnnouncementCommand command,
         CancellationToken ct = default
     ) =>
-        GameCommandPipeline.RunAsync<Unit>(
+        GameCommandPipeline.RunAsync<Unit, PlayingState>(
             repository,
             publisher,
             command.GameId,
-            GamePhase.Playing,
-            execute: state =>
+            execute: (PlayingState typedState) =>
             {
+                if (typedState.Phase != GamePhase.Playing)
+                    return (Fail<Unit>(GameError.InvalidPhase), [], typedState);
+
+                GameState state = typedState;
                 if (!AnnouncementRules.CanAnnounce(command.Player, command.Type, state))
                     return (Fail<Unit>(GameError.AnnouncementNotAllowed), [], state);
 

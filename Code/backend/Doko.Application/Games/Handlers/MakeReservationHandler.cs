@@ -45,7 +45,9 @@ public sealed class MakeReservationHandler(
         var loaded = await repository.LoadOrFailAsync<MakeReservationResult>(command.GameId, ct);
         if (loaded.Failure is not null)
             return loaded.Failure;
-        var state = loaded.State!;
+        if (loaded.State is not ReservationState reservationState)
+            return Fail<MakeReservationResult>(GameError.InvalidPhase);
+        GameState state = reservationState;
 
         var validationError = Validate(command, state);
         if (validationError is not null)
