@@ -53,20 +53,20 @@ public sealed class DealCardsHandler(
                     hands[state.Players[i].Seat] = new Hand(playerCards);
                 }
 
-                state.Apply(new DealHandsModification(hands));
-                state.Apply(new AdvancePhaseModification(GamePhase.ReservationHealthCheck));
+                state = state.Apply(new DealHandsModification(hands));
+                state = state.Apply(new AdvancePhaseModification(GamePhase.ReservationHealthCheck));
 
                 var rauskommer = command.VorbehaltRauskommer ?? state.Players[0].Seat;
-                state.Apply(new SetVorbehaltRauskommerModification(rauskommer));
+                state = state.Apply(new SetVorbehaltRauskommerModification(rauskommer));
                 var rauskommerSeat = (int)rauskommer;
                 var allPlayers = state
                     .Players.OrderBy(p => ((int)p.Seat - rauskommerSeat + 4) % 4)
                     .Select(p => p.Seat)
                     .ToList();
-                state.Apply(new SetPendingRespondersModification(allPlayers));
-                state.Apply(new SetCurrentTurnModification(rauskommer));
+                state = state.Apply(new SetPendingRespondersModification(allPlayers));
+                state = state.Apply(new SetCurrentTurnModification(rauskommer));
 
-                return (Ok(Unit.Value), []);
+                return (Ok(Unit.Value), [], state);
             },
             ct
         );

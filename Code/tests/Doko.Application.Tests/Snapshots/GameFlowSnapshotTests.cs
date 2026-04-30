@@ -34,8 +34,7 @@ public partial class GameFlowSnapshotTests
             "Baselines"
         );
 
-    private static string BaselinePath(string name) =>
-        Path.Combine(BaselineDir, $"{name}.json");
+    private static string BaselinePath(string name) => Path.Combine(BaselineDir, $"{name}.json");
 
     private static bool UpdateMode =>
         Environment.GetEnvironmentVariable("UPDATE_SNAPSHOTS") == "true";
@@ -68,10 +67,7 @@ public partial class GameFlowSnapshotTests
         Assert.Equal(baseline.ReplaceLineEndings("\n"), normalized.ReplaceLineEndings("\n"));
     }
 
-    private static (
-        InMemoryGameRepository repo,
-        RecordingGameEventPublisher pub
-    ) Infra()
+    private static (InMemoryGameRepository repo, RecordingGameEventPublisher pub) Infra()
     {
         var (repo, pub, _) = AppB.Infrastructure();
         return (repo, pub);
@@ -138,15 +134,13 @@ public partial class GameFlowSnapshotTests
         static Card KaroNeun(byte id) => AppB.Card(id, Suit.Karo, Rank.Neun);
         var players = Enumerable
             .Range(0, 4)
-            .Select(seat =>
-                new PlayerState(
-                    (PlayerSeat)seat,
-                    AppB.HandOf(
-                        Enumerable.Range(seat * 12, 12).Select(i => KaroNeun((byte)i)).ToArray()
-                    ),
-                    null
-                )
-            )
+            .Select(seat => new PlayerState(
+                (PlayerSeat)seat,
+                AppB.HandOf(
+                    Enumerable.Range(seat * 12, 12).Select(i => KaroNeun((byte)i)).ToArray()
+                ),
+                null
+            ))
             .ToList();
 
         var state = GameState.Create(
@@ -180,13 +174,11 @@ public partial class GameFlowSnapshotTests
         {
             new PlayerState(
                 AppB.P0,
-                AppB.HandOf(
-                    [
-                        AppB.Card(0, Suit.Kreuz, Rank.Bube),  // trump
-                        AppB.Card(1, Suit.Kreuz, Rank.Dame),  // trump
-                        .. Enumerable.Range(2, 8).Select(i => PikAss((byte)i)),
-                    ]
-                ),
+                AppB.HandOf([
+                    AppB.Card(0, Suit.Kreuz, Rank.Bube), // trump
+                    AppB.Card(1, Suit.Kreuz, Rank.Dame), // trump
+                    .. Enumerable.Range(2, 8).Select(i => PikAss((byte)i)),
+                ]),
                 null
             ),
             new PlayerState(
@@ -212,8 +204,8 @@ public partial class GameFlowSnapshotTests
             currentTurn: AppB.P1,
             rules: RuleSet.Minimal()
         );
-        state.Apply(new SetArmutPlayerModification(AppB.P0));
-        state.Apply(new SetPendingRespondersModification([AppB.P1, AppB.P2, AppB.P3]));
+        state = state.Apply(new SetArmutPlayerModification(AppB.P0));
+        state = state.Apply(new SetPendingRespondersModification([AppB.P1, AppB.P2, AppB.P3]));
         await repo.SaveAsync(state);
         var id = state.Id;
 
@@ -251,15 +243,13 @@ public partial class GameFlowSnapshotTests
         static Card KaroNeun(byte id) => AppB.Card(id, Suit.Karo, Rank.Neun);
         var players = Enumerable
             .Range(0, 4)
-            .Select(seat =>
-                new PlayerState(
-                    (PlayerSeat)seat,
-                    AppB.HandOf(
-                        Enumerable.Range(seat * 12, 12).Select(i => KaroNeun((byte)i)).ToArray()
-                    ),
-                    null
-                )
-            )
+            .Select(seat => new PlayerState(
+                (PlayerSeat)seat,
+                AppB.HandOf(
+                    Enumerable.Range(seat * 12, 12).Select(i => KaroNeun((byte)i)).ToArray()
+                ),
+                null
+            ))
             .ToList();
 
         var soloReservation = new BubensoloReservation(AppB.P0);
@@ -273,7 +263,7 @@ public partial class GameFlowSnapshotTests
             partyResolver: ctx.PartyResolver,
             trumpEvaluator: ctx.TrumpEvaluator
         );
-        state.Apply(new SetGameModeModification(soloReservation, AppB.P0));
+        state = state.Apply(new SetGameModeModification(soloReservation, AppB.P0));
         await repo.SaveAsync(state);
 
         var finalPhase = await PlayToCompletion(repo, pub, state.Id);

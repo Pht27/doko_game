@@ -12,7 +12,11 @@ internal static class GameCommandPipeline
         GamePhase requiredPhase,
         Func<
             GameState,
-            (GameActionResult<TResult> result, IReadOnlyList<IDomainEvent> events)
+            (
+                GameActionResult<TResult> result,
+                IReadOnlyList<IDomainEvent> events,
+                GameState nextState
+            )
         > execute,
         CancellationToken ct
     )
@@ -25,12 +29,12 @@ internal static class GameCommandPipeline
         if (state.Phase != requiredPhase)
             return GameActionResultExtensions.Fail<TResult>(GameError.InvalidPhase);
 
-        var (result, events) = execute(state);
+        var (result, events, nextState) = execute(state);
         if (result is GameActionResult<TResult>.Failure)
             return result;
 
-        await repo.SaveAsync(state, ct);
-        await publisher.PublishAsync(state.Id, events, ct);
+        await repo.SaveAsync(nextState, ct);
+        await publisher.PublishAsync(nextState.Id, events, ct);
         return result;
     }
 }

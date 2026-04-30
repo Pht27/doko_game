@@ -45,14 +45,14 @@ public sealed class PlayCardHandler(
             execute: state =>
             {
                 if (state.CurrentTurn != command.Player)
-                    return (Fail<PlayCardResult>(GameError.NotYourTurn), []);
+                    return (Fail<PlayCardResult>(GameError.NotYourTurn), [], state);
 
                 var playerState = state.Players.First(p => p.Seat == command.Player);
                 var card = playerState.Hand.Cards.FirstOrDefault(c => c.Id == command.Card);
                 if (card is null)
-                    return (Fail<PlayCardResult>(GameError.IllegalCard), []);
+                    return (Fail<PlayCardResult>(GameError.IllegalCard), [], state);
 
-                BeginTrickIfNeeded(state);
+                state = BeginTrickIfNeeded(state);
 
                 if (
                     !CardPlayValidator.CanPlay(
@@ -62,18 +62,15 @@ public sealed class PlayCardHandler(
                         state.TrumpEvaluator
                     )
                 )
-                    return (Fail<PlayCardResult>(GameError.IllegalCard), []);
+                    return (Fail<PlayCardResult>(GameError.IllegalCard), [], state);
 
-                var sonderkarteError = ApplySonderkarten(
-                    state,
-                    card,
-                    command,
-                    out var sonderkarteEvents
-                );
+                var (sonderkarteError, sonderkarteEvents, stateAfterSonderkarten) =
+                    ApplySonderkarten(state, card, command);
                 if (sonderkarteError.HasValue)
-                    return (Fail<PlayCardResult>(sonderkarteError.Value), []);
+                    return (Fail<PlayCardResult>(sonderkarteError.Value), [], state);
+                state = stateAfterSonderkarten;
 
-                PlayCardIntoTrick(state, command.Player, playerState, card);
+                state = PlayCardIntoTrick(state, command.Player, playerState, card);
 
                 var events = BuildEvents(state, command.Player, card, sonderkarteEvents);
 
@@ -90,47 +87,46 @@ public sealed class PlayCardHandler(
     /// Opens a new trick if none is in progress.
     /// Applies any pending direction flip first, so it takes effect on the lead card.
     /// </summary>
-    private static void BeginTrickIfNeeded(GameState state)
+    private static GameState BeginTrickIfNeeded(GameState state)
     {
         if (state.CurrentTrick is not null)
-            return;
+            return state;
         if (state.DirectionFlipPending)
-            state.Apply(new ReverseDirectionModification());
-        state.Apply(new SetCurrentTrickModification(new Trick()));
+            state = state.Apply(new ReverseDirectionModification());
+        return state.Apply(new SetCurrentTrickModification(new Trick()));
     }
 
     /// <summary>
     /// Validates and activates all sonderkarten requested by the command,
     /// and closes declined windows.
-    /// Returns null on success; a <see cref="GameError"/> if validation fails.
+    /// Returns null error on success; a <see cref="GameError"/> if validation fails.
     /// </summary>
-    private static GameError? ApplySonderkarten(
-        GameState state,
-        Card card,
-        PlayCardCommand command,
-        out List<IDomainEvent> events
-    )
+    private static (
+        GameError? error,
+        List<IDomainEvent> events,
+        GameState nextState
+    ) ApplySonderkarten(GameState state, Card card, PlayCardCommand command)
     {
-        events = [];
         var eligible = SonderkarteRegistry.GetEligibleForCard(card, state, state.Rules);
         var eligibleSet = eligible.Select(s => s.Type).ToHashSet();
         var activateSet = command.ActivateSonderkarten.ToHashSet();
 
         foreach (var type in activateSet)
             if (!eligibleSet.Contains(type))
-                return GameError.SonderkarteNotEligible;
+                return (GameError.SonderkarteNotEligible, [], state);
 
         var genscherError = ValidateGenscherIfNeeded(state, command, activateSet);
         if (genscherError.HasValue)
-            return genscherError;
+            return (genscherError, [], state);
 
         var inputs = new CommandInputProvider(command);
+        var events = new List<IDomainEvent>();
 
         foreach (var sonderkarte in eligible.Where(s => activateSet.Contains(s.Type)))
         {
             var mods = sonderkarte.Apply(state, inputs);
             foreach (var mod in mods)
-                state.Apply(mod);
+                state = state.Apply(mod);
             events.Add(
                 new SonderkarteTriggeredEvent(state.Id, command.Player, sonderkarte.Type, mods)
             );
@@ -141,9 +137,9 @@ public sealed class PlayCardHandler(
                 s.WindowClosesWhenDeclined && !activateSet.Contains(s.Type)
             )
         )
-            state.Apply(new CloseActivationWindowModification(sonderkarte.Type));
+            state = state.Apply(new CloseActivationWindowModification(sonderkarte.Type));
 
-        return null;
+        return (null, events, state);
     }
 
     /// <summary>
@@ -178,15 +174,17 @@ public sealed class PlayCardHandler(
         public PlayerSeat GetGenscherPartner() => command.GenscherPartner!.Value;
     }
 
-    private static void PlayCardIntoTrick(
+    private static GameState PlayCardIntoTrick(
         GameState state,
         PlayerSeat player,
         PlayerState playerState,
         Card card
     )
     {
-        state.Apply(new UpdatePlayerHandModification(player, playerState.Hand.Remove(card)));
-        state.Apply(new AddCardToTrickModification(player, card));
+        state = state.Apply(
+            new UpdatePlayerHandModification(player, playerState.Hand.Remove(card))
+        );
+        return state.Apply(new AddCardToTrickModification(player, card));
     }
 
     private static List<IDomainEvent> BuildEvents(
@@ -200,20 +198,21 @@ public sealed class PlayCardHandler(
             new CardPlayedEvent(state.Id, player, card, state.CompletedTricks.Count),
         ];
 
-    private static (GameActionResult<PlayCardResult>, IReadOnlyList<IDomainEvent>) AdvanceTurn(
-        GameState state,
-        PlayerSeat player,
-        List<IDomainEvent> events
-    )
+    private static (
+        GameActionResult<PlayCardResult>,
+        IReadOnlyList<IDomainEvent>,
+        GameState
+    ) AdvanceTurn(GameState state, PlayerSeat player, List<IDomainEvent> events)
     {
-        state.Apply(new SetCurrentTurnModification(player.Next(state.Direction)));
-        return (Ok(new PlayCardResult(false, null, false, null)), events);
+        state = state.Apply(new SetCurrentTurnModification(player.Next(state.Direction)));
+        return (Ok(new PlayCardResult(false, null, false, null)), events, state);
     }
 
-    private (GameActionResult<PlayCardResult>, IReadOnlyList<IDomainEvent>) CompleteTrick(
-        GameState state,
-        List<IDomainEvent> events
-    )
+    private (
+        GameActionResult<PlayCardResult>,
+        IReadOnlyList<IDomainEvent>,
+        GameState
+    ) CompleteTrick(GameState state, List<IDomainEvent> events)
     {
         var trick = state.CurrentTrick!;
         var isLastTrick = state.CompletedTricks.Count == state.Rules.LastTrickIndex;
@@ -239,7 +238,7 @@ public sealed class PlayCardHandler(
             .ToList();
         var result = new TrickResult(trick, effectiveWinner, awards);
 
-        state.Apply(new AddCompletedTrickModification(trick, result));
+        state = state.Apply(new AddCompletedTrickModification(trick, result));
         events.Add(
             new TrickCompletedEvent(
                 state.Id,
@@ -251,7 +250,7 @@ public sealed class PlayCardHandler(
 
         // Detect Hochzeit forced solo: partner not found after 3 qualifying tricks
         if (ForceIntoSolo(state))
-            state.Apply(new SetHochzeitForcedSoloModification());
+            state = state.Apply(new SetHochzeitForcedSoloModification());
 
         // Auto-make Pflichtansage if the completed trick triggers one
         var pflichtAnnouncement = AnnouncementRules.GetMandatoryAnnouncement(
@@ -260,7 +259,7 @@ public sealed class PlayCardHandler(
         );
         if (pflichtAnnouncement is not null)
         {
-            state.Apply(new AddAnnouncementModification(pflichtAnnouncement));
+            state = state.Apply(new AddAnnouncementModification(pflichtAnnouncement));
             events.Add(
                 new AnnouncementMadeEvent(
                     state.Id,
@@ -281,19 +280,23 @@ public sealed class PlayCardHandler(
             && SchwarzesSauTrigger.IsSecondPikDameTrick(state)
         )
         {
-            state.Apply(new AdvancePhaseModification(GamePhase.SchwarzesSauSoloSelect));
-            state.Apply(new SetCurrentTurnModification(effectiveWinner));
-            return (Ok(new PlayCardResult(true, effectiveWinner, false, null)), events);
+            state = state.Apply(new AdvancePhaseModification(GamePhase.SchwarzesSauSoloSelect));
+            state = state.Apply(new SetCurrentTurnModification(effectiveWinner));
+            return (Ok(new PlayCardResult(true, effectiveWinner, false, null)), events, state);
         }
 
         if (state.Players.All(p => p.Hand.Cards.Count == 0))
         {
-            var finished = finisher.Execute(state);
-            return (Ok(new PlayCardResult(true, effectiveWinner, true, finished)), events);
+            var (finished, nextState) = finisher.Execute(state);
+            return (
+                Ok(new PlayCardResult(true, effectiveWinner, true, finished)),
+                events,
+                nextState
+            );
         }
 
-        state.Apply(new SetCurrentTurnModification(effectiveWinner));
-        return (Ok(new PlayCardResult(true, effectiveWinner, false, null)), events);
+        state = state.Apply(new SetCurrentTurnModification(effectiveWinner));
+        return (Ok(new PlayCardResult(true, effectiveWinner, false, null)), events, state);
     }
 
     private static bool ForceIntoSolo(GameState state) =>

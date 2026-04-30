@@ -12,41 +12,41 @@ using Doko.Domain.Trump;
 
 namespace Doko.Domain.GameFlow;
 
-public sealed class GameState
+public sealed record GameState
 {
-    public GameId Id { get; private set; }
-    public GamePhase Phase { get; private set; }
+    public GameId Id { get; init; }
+    public GamePhase Phase { get; init; }
 
     /// <summary>Immutable configuration set once at game creation.</summary>
-    public RuleSet Rules { get; private set; }
+    public RuleSet Rules { get; init; } = null!;
 
-    public IReadOnlyList<PlayerState> Players { get; private set; }
-    public PlayerSeat CurrentTurn { get; private set; }
-    public PlayDirection Direction { get; private set; }
+    public IReadOnlyList<PlayerState> Players { get; init; } = [];
+    public PlayerSeat CurrentTurn { get; init; }
+    public PlayDirection Direction { get; init; }
 
-    public IReservation? ActiveReservation { get; private set; }
-    public IReadOnlyList<Trick> CompletedTricks { get; private set; }
-    public Trick? CurrentTrick { get; private set; }
+    public IReservation? ActiveReservation { get; init; }
+    public IReadOnlyList<Trick> CompletedTricks { get; init; } = [];
+    public Trick? CurrentTrick { get; init; }
 
-    public IReadOnlyList<Announcement> Announcements { get; private set; }
-    public IReadOnlyList<SonderkarteType> ActiveSonderkarten { get; private set; }
+    public IReadOnlyList<Announcement> Announcements { get; init; } = [];
+    public IReadOnlyList<SonderkarteType> ActiveSonderkarten { get; init; } = [];
 
     /// <summary>
     /// Sonderkarten whose activation window has permanently closed: the triggering card was played
     /// but the player chose not to activate. Checked by <see cref="ISonderkarte.AreConditionsMet"/>.
     /// </summary>
-    public IReadOnlySet<SonderkarteType> ClosedWindows { get; private set; } =
+    public IReadOnlySet<SonderkarteType> ClosedWindows { get; init; } =
         new HashSet<SonderkarteType>();
 
-    public ITrumpEvaluator TrumpEvaluator { get; private set; }
-    public IPartyResolver PartyResolver { get; private set; }
+    public ITrumpEvaluator TrumpEvaluator { get; init; } = null!;
+    public IPartyResolver PartyResolver { get; init; } = null!;
 
     /// <summary>
     /// True when a direction reversal (LinksGehangter/RechtsGehangter) was activated mid-trick
     /// and should take effect at the start of the next trick.
     /// Cleared automatically when <see cref="ReverseDirectionModification"/> is applied.
     /// </summary>
-    public bool DirectionFlipPending { get; private set; }
+    public bool DirectionFlipPending { get; init; }
 
     /// <summary>
     /// Each player's hand as originally dealt. Set once when dealing completes, never mutated.
@@ -54,14 +54,14 @@ public sealed class GameState
     /// (e.g. Superschweinchen: player originally held both ♦10, but may have already played the first).
     /// Null before dealing phase completes.
     /// </summary>
-    public IReadOnlyDictionary<PlayerSeat, Hand>? InitialHands { get; private set; }
+    public IReadOnlyDictionary<PlayerSeat, Hand>? InitialHands { get; init; }
 
     /// <summary>
     /// Round 1 of reservation discovery: each player's health declaration.
     /// True = Vorbehalt (has a reservation), false = Gesund (none).
     /// Null means the player has not yet been asked.
     /// </summary>
-    public IReadOnlyDictionary<PlayerSeat, bool> HealthDeclarations { get; private set; } =
+    public IReadOnlyDictionary<PlayerSeat, bool> HealthDeclarations { get; init; } =
         new Dictionary<PlayerSeat, bool>();
 
     /// <summary>
@@ -69,73 +69,66 @@ public sealed class GameState
     /// (SoloCheck, ArmutCheck, …). <see cref="CurrentTurn"/> equals the first entry.
     /// Empty outside reservation check phases.
     /// </summary>
-    public IReadOnlyList<PlayerSeat> PendingReservationResponders { get; private set; } = [];
+    public IReadOnlyList<PlayerSeat> PendingReservationResponders { get; init; } = [];
 
     /// <summary>
     /// Tracks each player's reservation declaration during a check phase.
     /// Populated by <see cref="RecordDeclarationModification"/>; null means the player passed.
     /// Cleared between check phases by <see cref="ClearReservationDeclarationsModification"/>.
     /// </summary>
-    public IReadOnlyDictionary<PlayerSeat, IReservation?> ReservationDeclarations
-    {
-        get;
-        private set;
-    } = new Dictionary<PlayerSeat, IReservation?>();
+    public IReadOnlyDictionary<PlayerSeat, IReservation?> ReservationDeclarations { get; init; } =
+        new Dictionary<PlayerSeat, IReservation?>();
 
     /// <summary>The player who declared the active game mode (Solo, Hochzeit, Armut player). Null for Normalspiel.</summary>
-    public PlayerSeat? GameModePlayerSeat { get; private set; }
+    public PlayerSeat? GameModePlayerSeat { get; init; }
 
     /// <summary>
     /// Armut-phase state. Non-null iff an Armut game mode is active.
     /// Initialized when the Armut player is set; updated through the card-exchange phase.
     /// </summary>
-    public ArmutState? Armut { get; private set; }
+    public ArmutState? Armut { get; init; }
 
     /// <summary>
     /// Pre-computed trick results (winner + extrapunkt awards) appended at trick completion time.
     /// Parallel to <see cref="CompletedTricks"/>; used by <c>FinishGameHandler</c> to build
     /// <c>CompletedGame</c> for the scorer.
     /// </summary>
-    public IReadOnlyList<TrickResult> ScoredTricks { get; private set; } = [];
+    public IReadOnlyList<TrickResult> ScoredTricks { get; init; } = [];
 
     /// <summary>
     /// Genscher-phase state. Non-null once a team-changing Genscher has fired.
     /// Null again only if Gegengenscherdamen fully restores the original Re pair.
     /// When non-null and <see cref="GenscherState.TeamsChanged"/> is true, Feigheit does not apply.
     /// </summary>
-    public GenscherState? Genscher { get; private set; }
+    public GenscherState? Genscher { get; init; }
 
     /// <summary>
     /// The player who leads the reservation-check ordering for this round.
     /// Rotates counter-clockwise each game. Always rotates; SpieleRauskommer
     /// (who actually plays first) may differ for Solo/Armut.
     /// </summary>
-    public PlayerSeat VorbehaltRauskommer { get; private set; }
+    public PlayerSeat VorbehaltRauskommer { get; init; }
 
     /// <summary>
     /// Active silent (undeclared) game mode, set when all players declare Gesund and a player's
     /// hand qualifies for Kontrasolo or Stille Hochzeit. Null in all other game modes.
     /// </summary>
-    public SilentGameMode? SilentMode { get; private set; }
+    public SilentGameMode? SilentMode { get; init; }
 
     /// <summary>
     /// True once a Hochzeit failed to find a partner in 3 qualifying tricks and became a
     /// forced solo. Affects scoring (soloFactor=3), Feigheit exemption, and Rauskommer advance.
     /// </summary>
-    public bool HochzeitBecameForcedSolo { get; private set; }
+    public bool HochzeitBecameForcedSolo { get; init; }
 
     /// <summary>
     /// True when the game is running as Schwarze Sau (Armut with no partner found).
     /// The game watches for the second ♠Q trick and then interrupts with
     /// <see cref="GamePhase.SchwarzesSauSoloSelect"/>.
     /// </summary>
-    public bool IsSchwarzesSau { get; private set; }
+    public bool IsSchwarzesSau { get; init; }
 
     private ITrumpEvaluatorFactory Factory { get; init; } = TrumpEvaluatorFactory.Instance;
-
-#pragma warning disable CS8618 // Non-nullable fields initialized via factory/Apply
-    private GameState() { }
-#pragma warning restore CS8618
 
     /// <summary>
     /// Creates a <see cref="GameState"/> with the given configuration. All parameters are optional
@@ -193,246 +186,265 @@ public sealed class GameState
         };
     }
 
-    /// <summary>Applies a state modification. The only place mutations occur.</summary>
-    public void Apply(GameStateModification modification)
-    {
-        switch (modification)
+    /// <summary>Applies a state modification, returning the resulting state.</summary>
+    public GameState Apply(GameStateModification modification) =>
+        modification switch
         {
-            case ReverseDirectionModification:
+            ReverseDirectionModification => this with
+            {
                 Direction =
                     Direction == PlayDirection.Counterclockwise
                         ? PlayDirection.Clockwise
-                        : PlayDirection.Counterclockwise;
-                DirectionFlipPending = false;
-                break;
+                        : PlayDirection.Counterclockwise,
+                DirectionFlipPending = false,
+            },
 
-            case ScheduleDirectionFlipModification:
-                DirectionFlipPending = true;
-                break;
+            ScheduleDirectionFlipModification => this with { DirectionFlipPending = true },
 
-            case WithdrawAnnouncementModification m:
+            WithdrawAnnouncementModification m => this with
+            {
                 Announcements = Announcements
                     .Where(a => !(a.Player == m.Player && a.Type == m.Type))
-                    .ToList();
-                break;
+                    .ToList(),
+            },
 
-            case ActivateSonderkarteModification m:
-                ActiveSonderkarten = ActiveSonderkarten.Append(m.Type).ToList();
-                break;
+            ActivateSonderkarteModification m => this with
+            {
+                ActiveSonderkarten = ActiveSonderkarten.Append(m.Type).ToList(),
+            },
 
-            case RebuildTrumpEvaluatorModification:
+            RebuildTrumpEvaluatorModification => this with
+            {
                 TrumpEvaluator = Factory.Build(
                     ActiveReservation,
                     SilentMode,
                     ActiveSonderkarten,
                     Rules
-                );
-                break;
+                ),
+            },
 
-            case CloseActivationWindowModification m:
-                ClosedWindows = new HashSet<SonderkarteType>(ClosedWindows) { m.Type };
-                break;
+            CloseActivationWindowModification m => this with
+            {
+                ClosedWindows = new HashSet<SonderkarteType>(ClosedWindows) { m.Type },
+            },
 
-            case AdvancePhaseModification m:
-                Phase = m.NewPhase;
-                break;
+            AdvancePhaseModification m => this with { Phase = m.NewPhase },
 
-            case SetGameModeModification m:
-                ActiveReservation = m.Reservation;
-                GameModePlayerSeat = m.Player;
-                var ctx = m.Reservation?.BuildContext();
-                TrumpEvaluator = ctx?.TrumpEvaluator ?? NormalTrumpEvaluator.Instance;
-                PartyResolver = ctx?.PartyResolver ?? NormalPartyResolver.Instance;
-                break;
+            SetGameModeModification m => ApplySetGameMode(m),
 
-            case SetSilentGameModeModification m:
-                SilentMode = m.Mode;
-                TrumpEvaluator = Factory.Build(null, m.Mode, ActiveSonderkarten, Rules);
-                PartyResolver = m.Mode?.Type switch
-                {
-                    SilentGameModeType.KontraSolo => new KontraSoloPartyResolver(m.Mode.Player),
-                    SilentGameModeType.StilleHochzeit => new StilleHochzeitPartyResolver(
-                        m.Mode.Player
-                    ),
-                    _ => NormalPartyResolver.Instance,
-                };
-                break;
+            SetSilentGameModeModification m => ApplySetSilentGameMode(m),
 
-            case SetCurrentTurnModification m:
-                CurrentTurn = m.Player;
-                break;
+            SetCurrentTurnModification m => this with { CurrentTurn = m.Player },
 
-            case DealHandsModification m:
-                Players = [.. Players.Select(p => p with { Hand = m.Hands[p.Seat] })];
-                InitialHands = m.Hands;
-                break;
+            DealHandsModification m => this with
+            {
+                Players = [.. Players.Select(p => p with { Hand = m.Hands[p.Seat] })],
+                InitialHands = m.Hands,
+            },
 
-            case RecordHealthDeclarationModification m:
+            RecordHealthDeclarationModification m => this with
+            {
                 HealthDeclarations = new Dictionary<PlayerSeat, bool>(HealthDeclarations)
                 {
                     [m.Player] = m.HasVorbehalt,
-                };
-                break;
+                },
+            },
 
-            case SetPendingRespondersModification m:
-                PendingReservationResponders = m.Responders;
-                break;
-
-            case ClearReservationDeclarationsModification:
-                ReservationDeclarations = new Dictionary<PlayerSeat, IReservation?>();
-                break;
-
-            case SetArmutPlayerModification m:
-                Armut = new ArmutState(m.ArmutPlayer, null, 0, null);
-                break;
-
-            case SetArmutRichPlayerModification m:
-                Armut = Armut! with { RichPlayer = m.RichPlayer };
-                break;
-
-            case ArmutGiveTrumpsModification m:
+            SetPendingRespondersModification m => this with
             {
-                var poorState = Players.First(p => p.Seat == m.PoorPlayer);
-                var richState = Players.First(p => p.Seat == m.RichPlayer);
-                var trumps = poorState
-                    .Hand.Cards.Where(c => TrumpEvaluator.IsTrump(c.Type))
-                    .ToList();
-                Armut = Armut! with { TransferCount = trumps.Count };
-                var poorNewHand = new Hands.Hand(poorState.Hand.Cards.Except(trumps).ToList());
-                var richNewHand = new Hands.Hand(richState.Hand.Cards.Concat(trumps).ToList());
-                Players =
-                [
-                    .. Players.Select(p =>
-                        p.Seat == m.PoorPlayer ? p with { Hand = poorNewHand }
-                        : p.Seat == m.RichPlayer ? p with { Hand = richNewHand }
-                        : p
-                    ),
-                ];
-                break;
-            }
+                PendingReservationResponders = m.Responders,
+            },
 
-            case SetArmutReturnedTrumpModification m:
-                Armut = Armut! with { ReturnedTrump = m.IncludedTrump };
-                break;
+            ClearReservationDeclarationsModification => this with
+            {
+                ReservationDeclarations = new Dictionary<PlayerSeat, IReservation?>(),
+            },
 
-            case RecordDeclarationModification m:
-                var updated = new Dictionary<PlayerSeat, IReservation?>(ReservationDeclarations)
+            SetArmutPlayerModification m => this with
+            {
+                Armut = new ArmutState(m.ArmutPlayer, null, 0, null),
+            },
+
+            SetArmutRichPlayerModification m => this with
+            {
+                Armut = Armut! with { RichPlayer = m.RichPlayer },
+            },
+
+            ArmutGiveTrumpsModification m => ApplyArmutGiveTrumps(m),
+
+            SetArmutReturnedTrumpModification m => this with
+            {
+                Armut = Armut! with { ReturnedTrump = m.IncludedTrump },
+            },
+
+            RecordDeclarationModification m => this with
+            {
+                ReservationDeclarations = new Dictionary<PlayerSeat, IReservation?>(
+                    ReservationDeclarations
+                )
                 {
                     [m.Player] = m.Declaration,
-                };
-                ReservationDeclarations = updated;
-                break;
+                },
+            },
 
-            case UpdatePlayerHandModification m:
+            UpdatePlayerHandModification m => this with
+            {
                 Players =
                 [
                     .. Players.Select(p => p.Seat == m.Player ? p with { Hand = m.NewHand } : p),
-                ];
-                break;
+                ],
+            },
 
-            case SetCurrentTrickModification m:
-                CurrentTrick = m.Trick;
-                break;
+            SetCurrentTrickModification m => this with { CurrentTrick = m.Trick },
 
-            case AddCardToTrickModification m:
-                CurrentTrick!.Add(new Tricks.TrickCard(m.Card, m.Player));
-                break;
-
-            case AddCompletedTrickModification m:
-                CompletedTricks = [.. CompletedTricks, m.Trick];
-                ScoredTricks = [.. ScoredTricks, m.Result];
-                CurrentTrick = null;
-                break;
-
-            case SetGenscherPartnerModification m:
+            AddCardToTrickModification m => this with
             {
-                // In silent solos (StilleHochzeit, KontraSolo), Genscher can be announced but
-                // parties are fixed by the solo logic — all side effects are suppressed.
-                if (SilentMode is not null)
-                    break;
+                CurrentTrick = new Trick(
+                    CurrentTrick!.Cards.Append(new TrickCard(m.Card, m.Player))
+                ),
+            },
 
-                bool teamsChanged =
-                    PartyResolver.ResolveParty(m.Genscher, this)
-                    != PartyResolver.ResolveParty(m.Partner, this);
+            AddCompletedTrickModification m => this with
+            {
+                CompletedTricks = [.. CompletedTricks, m.Trick],
+                ScoredTricks = [.. ScoredTricks, m.Result],
+                CurrentTrick = null,
+            },
 
-                if (teamsChanged)
-                {
-                    if (Genscher is null)
-                    {
-                        // First team-changing Genscher: save original Re pair and announcements.
-                        var rePlayers = Players
-                            .Where(p => PartyResolver.ResolveParty(p.Seat, this) == Party.Re)
-                            .Select(p => p.Seat)
-                            .ToArray();
-                        Genscher = new GenscherState(
-                            TeamsChanged: true,
-                            PreRePlayers: (rePlayers[0], rePlayers[1]),
-                            SavedAnnouncements: Announcements
-                        );
-                        Announcements = [];
-                    }
-                    else
-                    {
-                        // Subsequent Genscher (Gegengenscher): check for original team restoration.
-                        var (orig1, orig2) = Genscher.PreRePlayers!.Value;
-                        bool restored =
-                            (m.Genscher == orig1 || m.Genscher == orig2)
-                            && (m.Partner == orig1 || m.Partner == orig2);
-                        if (restored && Genscher.SavedAnnouncements is not null)
-                        {
-                            Announcements = Genscher.SavedAnnouncements;
-                            Genscher = null;
-                        }
-                        else
-                        {
-                            // Different Gegengenscher outcome — saved announcements are lost.
-                            Genscher = Genscher with
-                            {
-                                SavedAnnouncements = null,
-                            };
-                        }
-                    }
-                }
-                // If !teamsChanged (Nicht tauschen): announcements stay as-is.
+            SetGenscherPartnerModification m => ApplySetGenscherPartner(m),
 
-                PartyResolver = new Parties.GenscherPartyResolver(m.Genscher, m.Partner);
-                break;
-            }
+            AddAnnouncementModification m => this with
+            {
+                Announcements = [.. Announcements, m.Announcement],
+            },
 
-            case AddAnnouncementModification m:
-                Announcements = [.. Announcements, m.Announcement];
-                break;
+            SetVorbehaltRauskommerModification m => this with { VorbehaltRauskommer = m.Player },
 
-            case SetVorbehaltRauskommerModification m:
-                VorbehaltRauskommer = m.Player;
-                break;
+            SetHochzeitForcedSoloModification => this with { HochzeitBecameForcedSolo = true },
 
-            case SetHochzeitForcedSoloModification:
-                HochzeitBecameForcedSolo = true;
-                break;
+            SetSchwarzesSauModification => this with { IsSchwarzesSau = true },
 
-            case SetSchwarzesSauModification:
-                IsSchwarzesSau = true;
-                break;
+            ClearActiveSonderkartenModification => this with
+            {
+                ActiveSonderkarten = [],
+                ClosedWindows = new HashSet<SonderkarteType>(),
+            },
 
-            case ClearActiveSonderkartenModification:
-                ActiveSonderkarten = [];
-                ClosedWindows = new HashSet<SonderkarteType>();
-                break;
+            ClearAnnouncementsModification => this with { Announcements = [] },
 
-            case ClearAnnouncementsModification:
-                Announcements = [];
-                break;
+            ClearScoredTrickAwardsModification => this with
+            {
+                ScoredTricks = ScoredTricks.Select(r => r with { Awards = [] }).ToList(),
+            },
 
-            case ClearScoredTrickAwardsModification:
-                ScoredTricks = ScoredTricks.Select(r => r with { Awards = [] }).ToList();
-                break;
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(modification),
+                $"Unknown modification type: {modification.GetType().Name}"
+            ),
+        };
 
-            default:
-                throw new ArgumentOutOfRangeException(
-                    nameof(modification),
-                    $"Unknown modification type: {modification.GetType().Name}"
+    // ── Complex Apply helpers ─────────────────────────────────────────────────
+
+    private GameState ApplySetGameMode(SetGameModeModification m)
+    {
+        var ctx = m.Reservation?.BuildContext();
+        return this with
+        {
+            ActiveReservation = m.Reservation,
+            GameModePlayerSeat = m.Player,
+            TrumpEvaluator = ctx?.TrumpEvaluator ?? NormalTrumpEvaluator.Instance,
+            PartyResolver = ctx?.PartyResolver ?? NormalPartyResolver.Instance,
+        };
+    }
+
+    private GameState ApplySetSilentGameMode(SetSilentGameModeModification m)
+    {
+        var resolver = m.Mode?.Type switch
+        {
+            SilentGameModeType.KontraSolo => (IPartyResolver)
+                new KontraSoloPartyResolver(m.Mode.Player),
+            SilentGameModeType.StilleHochzeit => new StilleHochzeitPartyResolver(m.Mode.Player),
+            _ => NormalPartyResolver.Instance,
+        };
+        return this with
+        {
+            SilentMode = m.Mode,
+            TrumpEvaluator = Factory.Build(null, m.Mode, ActiveSonderkarten, Rules),
+            PartyResolver = resolver,
+        };
+    }
+
+    private GameState ApplyArmutGiveTrumps(ArmutGiveTrumpsModification m)
+    {
+        var poorState = Players.First(p => p.Seat == m.PoorPlayer);
+        var richState = Players.First(p => p.Seat == m.RichPlayer);
+        var trumps = poorState.Hand.Cards.Where(c => TrumpEvaluator.IsTrump(c.Type)).ToList();
+        var poorNewHand = new Hands.Hand(poorState.Hand.Cards.Except(trumps).ToList());
+        var richNewHand = new Hands.Hand(richState.Hand.Cards.Concat(trumps).ToList());
+        return this with
+        {
+            Armut = Armut! with { TransferCount = trumps.Count },
+            Players =
+            [
+                .. Players.Select(p =>
+                    p.Seat == m.PoorPlayer ? p with { Hand = poorNewHand }
+                    : p.Seat == m.RichPlayer ? p with { Hand = richNewHand }
+                    : p
+                ),
+            ],
+        };
+    }
+
+    private GameState ApplySetGenscherPartner(SetGenscherPartnerModification m)
+    {
+        if (SilentMode is not null)
+            return this;
+
+        bool teamsChanged =
+            PartyResolver.ResolveParty(m.Genscher, this)
+            != PartyResolver.ResolveParty(m.Partner, this);
+
+        GenscherState? newGenscher = Genscher;
+        IReadOnlyList<Announcement> newAnnouncements = Announcements;
+
+        if (teamsChanged)
+        {
+            if (Genscher is null)
+            {
+                var rePlayers = Players
+                    .Where(p => PartyResolver.ResolveParty(p.Seat, this) == Party.Re)
+                    .Select(p => p.Seat)
+                    .ToArray();
+                newGenscher = new GenscherState(
+                    TeamsChanged: true,
+                    PreRePlayers: (rePlayers[0], rePlayers[1]),
+                    SavedAnnouncements: Announcements
                 );
+                newAnnouncements = [];
+            }
+            else
+            {
+                var (orig1, orig2) = Genscher.PreRePlayers!.Value;
+                bool restored =
+                    (m.Genscher == orig1 || m.Genscher == orig2)
+                    && (m.Partner == orig1 || m.Partner == orig2);
+                if (restored && Genscher.SavedAnnouncements is not null)
+                {
+                    newAnnouncements = Genscher.SavedAnnouncements;
+                    newGenscher = null;
+                }
+                else
+                {
+                    newGenscher = Genscher with { SavedAnnouncements = null };
+                }
+            }
         }
+
+        return this with
+        {
+            Genscher = newGenscher,
+            Announcements = newAnnouncements,
+            PartyResolver = new Parties.GenscherPartyResolver(m.Genscher, m.Partner),
+        };
     }
 }

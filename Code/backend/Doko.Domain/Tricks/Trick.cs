@@ -8,6 +8,10 @@ public sealed class Trick
 {
     private readonly List<TrickCard> _cards = new();
 
+    public Trick() { }
+
+    public Trick(IEnumerable<TrickCard> cards) => _cards.AddRange(cards);
+
     public IReadOnlyList<TrickCard> Cards => _cards;
 
     public bool IsComplete => _cards.Count == 4;

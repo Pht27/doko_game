@@ -41,14 +41,14 @@ public sealed class ExchangeArmutCardsHandler(
             execute: state =>
             {
                 if (state.Armut?.RichPlayer != command.RichPlayer)
-                    return (Fail<ExchangeArmutCardsResult>(GameError.NotYourTurn), []);
+                    return (Fail<ExchangeArmutCardsResult>(GameError.NotYourTurn), [], state);
 
                 if (command.CardIdsToReturn.Count != state.Armut!.TransferCount)
-                    return (Fail<ExchangeArmutCardsResult>(GameError.IllegalCard), []);
+                    return (Fail<ExchangeArmutCardsResult>(GameError.IllegalCard), [], state);
 
                 var cardsToReturn = ResolveCardsToReturn(state, command);
                 if (cardsToReturn is null)
-                    return (Fail<ExchangeArmutCardsResult>(GameError.IllegalCard), []);
+                    return (Fail<ExchangeArmutCardsResult>(GameError.IllegalCard), [], state);
 
                 var poorPlayer = state.Armut.Player;
                 var (newRichHand, newPoorHand, returnedTrumpCount) = ComputeNewHands(
@@ -58,13 +58,15 @@ public sealed class ExchangeArmutCardsHandler(
                     cardsToReturn
                 );
 
-                state.Apply(new UpdatePlayerHandModification(command.RichPlayer, newRichHand));
-                state.Apply(new UpdatePlayerHandModification(poorPlayer, newPoorHand));
-                state.Apply(new SetArmutReturnedTrumpModification(returnedTrumpCount > 0));
+                state = state.Apply(
+                    new UpdatePlayerHandModification(command.RichPlayer, newRichHand)
+                );
+                state = state.Apply(new UpdatePlayerHandModification(poorPlayer, newPoorHand));
+                state = state.Apply(new SetArmutReturnedTrumpModification(returnedTrumpCount > 0));
 
                 var startingPlayer = FindStartingPlayer(state, command.RichPlayer, poorPlayer);
-                state.Apply(new AdvancePhaseModification(GamePhase.Playing));
-                state.Apply(new SetCurrentTurnModification(startingPlayer));
+                state = state.Apply(new AdvancePhaseModification(GamePhase.Playing));
+                state = state.Apply(new SetCurrentTurnModification(startingPlayer));
 
                 return (
                     Ok(new ExchangeArmutCardsResult(returnedTrumpCount)),
@@ -75,7 +77,8 @@ public sealed class ExchangeArmutCardsHandler(
                             cardsToReturn.Count,
                             returnedTrumpCount > 0
                         ),
-                    ]
+                    ],
+                    state
                 );
             },
             ct

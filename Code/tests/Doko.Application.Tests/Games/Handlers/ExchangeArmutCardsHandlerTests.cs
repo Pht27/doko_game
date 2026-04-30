@@ -40,8 +40,8 @@ public class ExchangeArmutCardsHandlerTests
             players: players,
             currentTurn: AppB.P1
         );
-        state.Apply(new SetArmutPlayerModification(AppB.P0));
-        state.Apply(new SetPendingRespondersModification([AppB.P1, AppB.P2, AppB.P3]));
+        state = state.Apply(new SetArmutPlayerModification(AppB.P0));
+        state = state.Apply(new SetPendingRespondersModification([AppB.P1, AppB.P2, AppB.P3]));
         await repo.SaveAsync(state);
 
         // P1 accepts → game moves to ArmutCardExchange, trumps transferred

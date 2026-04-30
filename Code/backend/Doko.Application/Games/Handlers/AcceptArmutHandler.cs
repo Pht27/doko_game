@@ -40,7 +40,7 @@ public sealed class AcceptArmutHandler(IGameRepository repository, IGameEventPub
                     state.PendingReservationResponders.Count == 0
                     || state.PendingReservationResponders[0] != command.Player
                 )
-                    return (Fail<AcceptArmutResult>(GameError.NotYourTurn), []);
+                    return (Fail<AcceptArmutResult>(GameError.NotYourTurn), [], state);
 
                 IReadOnlyList<IDomainEvent> events =
                 [
@@ -48,54 +48,60 @@ public sealed class AcceptArmutHandler(IGameRepository repository, IGameEventPub
                 ];
 
                 return command.Accepts
-                    ? (HandleAcceptance(state, command), events)
-                    : (HandleDecline(state, command), events);
+                    ? HandleAcceptance(state, command, events)
+                    : HandleDecline(state, command, events);
             },
             ct
         );
 
     // ── Private helpers ───────────────────────────────────────────────────────
 
-    private static GameActionResult<AcceptArmutResult> HandleAcceptance(
+    private static (
+        GameActionResult<AcceptArmutResult>,
+        IReadOnlyList<IDomainEvent>,
+        GameState
+    ) HandleAcceptance(
         GameState state,
-        AcceptArmutCommand command
+        AcceptArmutCommand command,
+        IReadOnlyList<IDomainEvent> events
     )
     {
-        state.Apply(new SetArmutRichPlayerModification(command.Player));
-        state.Apply(new SetPendingRespondersModification([]));
+        state = state.Apply(new SetArmutRichPlayerModification(command.Player));
+        state = state.Apply(new SetPendingRespondersModification([]));
 
         var poorPlayer = state.Armut!.Player;
-        state.Apply(new ArmutGiveTrumpsModification(poorPlayer, command.Player));
+        state = state.Apply(new ArmutGiveTrumpsModification(poorPlayer, command.Player));
 
         var reservation = new ArmutReservation(poorPlayer, command.Player);
-        state.Apply(new SetGameModeModification(reservation, poorPlayer));
+        state = state.Apply(new SetGameModeModification(reservation, poorPlayer));
 
-        state.Apply(new AdvancePhaseModification(GamePhase.ArmutCardExchange));
-        state.Apply(new SetCurrentTurnModification(command.Player));
+        state = state.Apply(new AdvancePhaseModification(GamePhase.ArmutCardExchange));
+        state = state.Apply(new SetCurrentTurnModification(command.Player));
 
-        return Ok(new AcceptArmutResult(true));
+        return (Ok(new AcceptArmutResult(true)), events, state);
     }
 
-    private static GameActionResult<AcceptArmutResult> HandleDecline(
-        GameState state,
-        AcceptArmutCommand command
-    )
+    private static (
+        GameActionResult<AcceptArmutResult>,
+        IReadOnlyList<IDomainEvent>,
+        GameState
+    ) HandleDecline(GameState state, AcceptArmutCommand command, IReadOnlyList<IDomainEvent> events)
     {
         var remaining = state.PendingReservationResponders.Skip(1).ToList();
-        state.Apply(new SetPendingRespondersModification(remaining));
+        state = state.Apply(new SetPendingRespondersModification(remaining));
 
         if (remaining.Count > 0)
         {
-            state.Apply(new SetCurrentTurnModification(remaining[0]));
-            return Ok(new AcceptArmutResult(false));
+            state = state.Apply(new SetCurrentTurnModification(remaining[0]));
+            return (Ok(new AcceptArmutResult(false)), events, state);
         }
 
         // Nobody accepted — Schwarze Sau
-        state.Apply(new SetGameModeModification(null, null));
-        state.Apply(new SetSchwarzesSauModification());
-        state.Apply(new AdvancePhaseModification(GamePhase.Playing));
-        state.Apply(new SetCurrentTurnModification(state.Armut!.Player));
+        state = state.Apply(new SetGameModeModification(null, null));
+        state = state.Apply(new SetSchwarzesSauModification());
+        state = state.Apply(new AdvancePhaseModification(GamePhase.Playing));
+        state = state.Apply(new SetCurrentTurnModification(state.Armut!.Player));
 
-        return Ok(new AcceptArmutResult(false, SchwarzesSau: true));
+        return (Ok(new AcceptArmutResult(false, SchwarzesSau: true)), events, state);
     }
 }

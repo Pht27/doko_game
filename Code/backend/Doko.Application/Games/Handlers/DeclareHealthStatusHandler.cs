@@ -38,42 +38,44 @@ public sealed class DeclareHealthStatusHandler(
                     state.PendingReservationResponders.Count == 0
                     || state.PendingReservationResponders[0] != command.Player
                 )
-                    return (Fail<DeclareHealthStatusResult>(GameError.NotYourTurn), []);
+                    return (Fail<DeclareHealthStatusResult>(GameError.NotYourTurn), [], state);
 
                 if (state.HealthDeclarations.ContainsKey(command.Player))
-                    return (Fail<DeclareHealthStatusResult>(GameError.AlreadyDeclared), []);
+                    return (Fail<DeclareHealthStatusResult>(GameError.AlreadyDeclared), [], state);
 
                 IReadOnlyList<IDomainEvent> events =
                 [
                     new HealthDeclaredEvent(state.Id, command.Player, command.HasVorbehalt),
                 ];
 
-                state.Apply(
+                state = state.Apply(
                     new RecordHealthDeclarationModification(command.Player, command.HasVorbehalt)
                 );
 
-                var remaining = AdvancePendingQueue(state);
+                (var remaining, state) = AdvancePendingQueue(state);
                 if (remaining.Count > 0)
-                    return (Ok(new DeclareHealthStatusResult(false)), events);
+                    return (Ok(new DeclareHealthStatusResult(false)), events, state);
 
-                ResolveNextPhaseAfterAllDeclared(state);
-                return (Ok(new DeclareHealthStatusResult(true)), events);
+                state = ResolveNextPhaseAfterAllDeclared(state);
+                return (Ok(new DeclareHealthStatusResult(true)), events, state);
             },
             ct
         );
 
     // ── Private helpers ───────────────────────────────────────────────────────
 
-    private static IReadOnlyList<PlayerSeat> AdvancePendingQueue(GameState state)
+    private static (IReadOnlyList<PlayerSeat> remaining, GameState nextState) AdvancePendingQueue(
+        GameState state
+    )
     {
         var remaining = state.PendingReservationResponders.Skip(1).ToList();
-        state.Apply(new SetPendingRespondersModification(remaining));
+        state = state.Apply(new SetPendingRespondersModification(remaining));
         if (remaining.Count > 0)
-            state.Apply(new SetCurrentTurnModification(remaining[0]));
-        return remaining;
+            state = state.Apply(new SetCurrentTurnModification(remaining[0]));
+        return (remaining, state);
     }
 
-    private static void ResolveNextPhaseAfterAllDeclared(GameState state)
+    private static GameState ResolveNextPhaseAfterAllDeclared(GameState state)
     {
         var rauskommerSeat = (int)state.VorbehaltRauskommer;
         var vorbehaltPlayers = state
@@ -86,17 +88,19 @@ public sealed class DeclareHealthStatusHandler(
         {
             var silentMode = SilentModeDetector.Detect(state);
             if (silentMode is not null)
-                state.Apply(new SetSilentGameModeModification(silentMode));
+                state = state.Apply(new SetSilentGameModeModification(silentMode));
             else
-                state.Apply(new SetGameModeModification(null, null));
-            state.Apply(new AdvancePhaseModification(GamePhase.Playing));
-            state.Apply(new SetCurrentTurnModification(state.VorbehaltRauskommer));
+                state = state.Apply(new SetGameModeModification(null, null));
+            state = state.Apply(new AdvancePhaseModification(GamePhase.Playing));
+            state = state.Apply(new SetCurrentTurnModification(state.VorbehaltRauskommer));
         }
         else
         {
-            state.Apply(new SetPendingRespondersModification(vorbehaltPlayers));
-            state.Apply(new AdvancePhaseModification(GamePhase.ReservationSoloCheck));
-            state.Apply(new SetCurrentTurnModification(vorbehaltPlayers[0]));
+            state = state.Apply(new SetPendingRespondersModification(vorbehaltPlayers));
+            state = state.Apply(new AdvancePhaseModification(GamePhase.ReservationSoloCheck));
+            state = state.Apply(new SetCurrentTurnModification(vorbehaltPlayers[0]));
         }
+
+        return state;
     }
 }

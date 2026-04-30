@@ -34,7 +34,7 @@ public sealed class MakeAnnouncementHandler(
             execute: state =>
             {
                 if (!AnnouncementRules.CanAnnounce(command.Player, command.Type, state))
-                    return (Fail<Unit>(GameError.AnnouncementNotAllowed), []);
+                    return (Fail<Unit>(GameError.AnnouncementNotAllowed), [], state);
 
                 int trickNum = state.CompletedTricks.Count;
                 int cardIdx = state.CurrentTrick?.Cards.Count ?? 0;
@@ -46,7 +46,7 @@ public sealed class MakeAnnouncementHandler(
                 {
                     IsEffective = isEffective,
                 };
-                state.Apply(new AddAnnouncementModification(announcement));
+                state = state.Apply(new AddAnnouncementModification(announcement));
 
                 return (
                     Ok(Unit.Value),
@@ -58,7 +58,8 @@ public sealed class MakeAnnouncementHandler(
                             trickNum,
                             cardIdx
                         ),
-                    ]
+                    ],
+                    state
                 );
             },
             ct
