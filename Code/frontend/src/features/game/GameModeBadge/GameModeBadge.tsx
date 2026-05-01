@@ -90,7 +90,7 @@ export function GameModeBadge({
 
   const label = phaseInfo ? phaseInfo.label : (isSchwarzesSau ? 'Schwarze Sau' : t.gameModeLabel(gameMode));
   const icon = phaseInfo ? phaseInfo.icon : (isSchwarzesSau ? '♠' : (gameMode ? (MODE_ICONS[gameMode] ?? null) : null));
-  const trickDisplay = totalTricks > 0 ? `${trickNumber}/${totalTricks}` : `${trickNumber}`;
+  const trickDisplay = totalTricks > 0 ? `${trickNumber}` : `${trickNumber}`;
   const skCount = activeSonderkarten.length;
   const partnerFound = partnerSeat !== null;
   useEffect(() => {
