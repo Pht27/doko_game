@@ -9,21 +9,23 @@ interface HealthCheckDialogProps {
 export function HealthCheckDialog({ playerId, onDeclare }: HealthCheckDialogProps) {
   return (
     <div className="health-check-dialog">
-      <h2 className="health-check-title">{t.healthCheckTitle(playerId)}</h2>
+      <div className="health-check-who">
+        <span className="health-check-who-name">{t.playerName(playerId)}</span>
+        <span className="health-check-who-you">Du</span>
+      </div>
 
-      <button
-        onClick={() => onDeclare(false)}
-        className="health-check-btn-gesund"
-      >
-        {t.gesund}
-      </button>
+      <div className="health-check-question">{t.healthCheckTitle}</div>
 
-      <button
-        onClick={() => onDeclare(true)}
-        className="health-check-btn-vorbehalt"
-      >
-        {t.vorbehalt}
-      </button>
+      <div className="health-check-divider" />
+
+      <div className="health-check-actions">
+        <button className="health-check-btn health-check-btn-gesund" onClick={() => onDeclare(false)}>
+          {t.gesund}
+        </button>
+        <button className="health-check-btn health-check-btn-vorbehalt" onClick={() => onDeclare(true)}>
+          {t.vorbehalt}
+        </button>
+      </div>
     </div>
   );
 }

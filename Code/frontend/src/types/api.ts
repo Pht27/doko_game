@@ -20,6 +20,7 @@ export interface PlayerPublicStateDto {
   knownParty: string | null;
   handCardCount: number;
   highestAnnouncement: string | null;
+  healthStatus: string | null;
 }
 
 export interface TrickCardDto {
@@ -59,6 +60,7 @@ export interface PlayerGameViewResponse {
   armutExchangeCardCount: number | null;
   armutReturnedTrump: boolean | null;
   activeGameMode: string | null;
+  isSchwarzesSau: boolean;
   shouldChooseSchwarzesSauSolo: boolean;
   eligibleSchwarzesSauSolos: string[];
   ownHighestAnnouncement: string | null;

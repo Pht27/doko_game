@@ -75,6 +75,7 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
             ),
             EligibleSchwarzesSauSolos = BuildEligibleSchwarzesSauSolos(requestingPlayer, state),
             OwnHighestAnnouncement = BuildOwnHighestAnnouncement(requestingPlayer, state),
+            IsSchwarzesSau = state.IsSchwarzesSau,
         };
     }
 
@@ -169,11 +170,16 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
                     var t => t.ToString(),
                 };
 
+                string? healthStatus = state.HealthDeclarations.TryGetValue(p.Seat, out var hasVorbehalt)
+                    ? (hasVorbehalt ? "Vorbehalt" : "Gesund")
+                    : null;
+
                 return new PlayerPublicState(
                     p.Seat,
                     knownParty,
                     p.Hand.Cards.Count,
-                    announcementLabel
+                    announcementLabel,
+                    healthStatus
                 );
             })
             .ToList();

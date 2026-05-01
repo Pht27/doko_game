@@ -55,7 +55,7 @@
 }
 
 .card-playable {
-  @apply cursor-pointer hover:-translate-y-3 ring-2 ring-indigo-400 transition-transform;
+  @apply cursor-pointer hover:-translate-y-3 transition-transform;
 }
 
 .card-unplayable {
@@ -63,7 +63,6 @@
 }
 
 .card-wrapper-sonderkarte .card {
-  @apply ring-2 ring-orange-400/70;
 }
 
 .card-selectable {

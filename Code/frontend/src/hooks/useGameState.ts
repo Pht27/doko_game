@@ -13,6 +13,8 @@ export interface GameStateResult {
   finishedResult: GameResultDto | null;
   /** Brief notification when a sonderkarte was just triggered; auto-clears after 3 s */
   sonderkarteNotification: SonderkarteNotification | null;
+  /** Accumulated list of all sonderkarten activated in this game */
+  activeSonderkarten: SonderkarteNotification[];
   /** How many players have voted to start a new game */
   newGameVoteCount: number;
   /** Set to the new game's ID when a new-game auto-start fires */
@@ -34,6 +36,7 @@ export function useGameState(
   const [finishedResult, setFinishedResult] = useState<GameResultDto | null>(null);
   const [sonderkarteNotification, setSonderkarteNotification] =
     useState<SonderkarteNotification | null>(null);
+  const [activeSonderkarten, setActiveSonderkarten] = useState<SonderkarteNotification[]>([]);
   const [newGameVoteCount, setNewGameVoteCount] = useState(0);
   const [newGameId, setNewGameId] = useState<string | null>(null);
   const [popupAnnouncement, setPopupAnnouncement] = useState<{ message: string; id: number } | null>(null);
@@ -95,6 +98,7 @@ export function useGameState(
     setFinishedResult(null);
     setNewGameVoteCount(0);
     setNewGameId(null);
+    setActiveSonderkarten([]);
     announcedGameModeRef.current = undefined;
   }, [gameId]);
 
@@ -126,6 +130,7 @@ export function useGameState(
     const handleSonderkarteTriggered = (payload: SonderkarteNotification) => {
       if (notifTimerRef.current) clearTimeout(notifTimerRef.current);
       setSonderkarteNotification(payload);
+      setActiveSonderkarten(prev => [...prev, payload]);
       notifTimerRef.current = setTimeout(() => setSonderkarteNotification(null), 3000);
       showPopupRef.current?.(t.sonderkartePopupMessage(payload.player, payload.type));
       refetchRef.current?.();
@@ -167,5 +172,5 @@ export function useGameState(
     };
   }, [gameId, tokens]);
 
-  return { view, loading, error, finishedResult, sonderkarteNotification, newGameVoteCount, newGameId, refetch, popupAnnouncement, clearPopupAnnouncement };
+  return { view, loading, error, finishedResult, sonderkarteNotification, activeSonderkarten, newGameVoteCount, newGameId, refetch, popupAnnouncement, clearPopupAnnouncement };
 }

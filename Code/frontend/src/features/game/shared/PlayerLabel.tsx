@@ -8,10 +8,11 @@ interface PlayerLabelProps {
   orientation: 'top' | 'left' | 'right';
   sonderkarteNotif?: string | null;
   trickCount?: number;
+  showHealthStatus?: boolean;
   onClick?: () => void;
 }
 
-export function PlayerLabel({ player, isCurrentTurn, orientation, sonderkarteNotif, trickCount, onClick }: PlayerLabelProps) {
+export function PlayerLabel({ player, isCurrentTurn, orientation, sonderkarteNotif, trickCount, showHealthStatus, onClick }: PlayerLabelProps) {
   const active = isCurrentTurn ? 'player-label-active' : 'player-label-inactive';
 
   const nameColor =
@@ -37,6 +38,11 @@ export function PlayerLabel({ player, isCurrentTurn, orientation, sonderkarteNot
         ? 'player-ann-kontra'
         : 'player-ann-other';
 
+  const healthChipClass =
+    player.healthStatus === 'Gesund'    ? 'player-health-gesund'
+    : player.healthStatus === 'Vorbehalt' ? 'player-health-vorbehalt'
+    : 'player-health-pending';
+
   const inner = (
     <>
       <div className="player-label-row">
@@ -45,7 +51,12 @@ export function PlayerLabel({ player, isCurrentTurn, orientation, sonderkarteNot
           <span className="player-trick-count">{trickCount}</span>
         )}
       </div>
-      {player.highestAnnouncement && (
+      {showHealthStatus && (
+        <span className={`player-health-chip ${healthChipClass}`}>
+          {player.healthStatus ?? '···'}
+        </span>
+      )}
+      {!showHealthStatus && player.highestAnnouncement && (
         <span className={`player-ann-badge ${annColor}`}>
           {t.announcementLabel(player.highestAnnouncement)}
         </span>

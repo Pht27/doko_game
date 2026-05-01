@@ -5,5 +5,6 @@ public record PlayerPublicStateDto(
     string Seat,
     string? KnownParty,
     int HandCardCount,
-    string? HighestAnnouncement
+    string? HighestAnnouncement,
+    string? HealthStatus
 );

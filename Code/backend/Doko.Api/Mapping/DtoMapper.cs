@@ -52,6 +52,7 @@ public static class DtoMapper
             ActiveGameMode = view.ActiveGameMode,
             GameModePlayerSeat = view.GameModePlayerSeat,
             ShouldChooseSchwarzesSauSolo = view.ShouldChooseSchwarzesSauSolo,
+            IsSchwarzesSau = view.IsSchwarzesSau,
             EligibleSchwarzesSauSolos = view
                 .EligibleSchwarzesSauSolos.Select(p => p.ToString())
                 .ToList(),
@@ -70,7 +71,8 @@ public static class DtoMapper
             p.Seat.ToString(),
             p.KnownParty?.ToString(),
             p.HandCardCount,
-            p.HighestAnnouncement
+            p.HighestAnnouncement,
+            p.HealthStatus
         );
 
     public static TrickSummaryDto ToDto(TrickSummary t) =>

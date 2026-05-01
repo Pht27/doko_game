@@ -37,7 +37,7 @@ export const t = {
     `Armut: ${count} Karte(n) zurückgegeben${hasTrump ? ' · mit Trumpf' : ' · kein Trumpf'}`,
 
   // ── HealthCheckDialog ──────────────────────────────────────────────────────
-  healthCheckTitle: (playerId: number) => `S${playerId + 1}: Gesund oder Vorbehalt?`,
+  healthCheckTitle: `Gesund oder Vorbehalt?`,
   gesund: 'Gesund',
   vorbehalt: 'Vorbehalt',
 

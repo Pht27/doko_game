@@ -1,52 +1,175 @@
-/* ReservationDialog — two-column reservation declaration dialog */
+/* ReservationDialog — glassmorphic card with colored category pills */
 @reference "../../../styles/index.css";
 
 .rd-dialog {
-  @apply bg-gray-800/95 rounded-2xl shadow-2xl border border-white/10 flex flex-col w-full overflow-hidden;
-  /* Never taller than ~60% of the viewport so it doesn't reach the hand */
+  display: flex;
+  flex-direction: column;
+  background: rgba(22, 22, 40, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  overflow: hidden;
+  width: 100%;
   max-height: 60svh;
 }
 
 .rd-header {
-  @apply flex items-center justify-between px-4 py-3 border-b border-white/10 flex-shrink-0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  flex-shrink: 0;
 }
 
 .rd-title {
-  @apply text-white font-bold text-sm;
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.82);
 }
 
 .rd-pass-btn {
-  @apply bg-white/10 hover:bg-white/20 active:bg-white/25 text-white/70 rounded-lg px-3 py-1 text-xs font-semibold transition-colors;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.45);
+  border-radius: 10px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.rd-pass-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .rd-body {
-  @apply flex min-h-0 flex-1 overflow-hidden;
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
 }
 
 /* Left column: category tabs */
 .rd-left {
-  @apply flex flex-col gap-1 p-2 border-r border-white/10 min-w-[108px] overflow-y-auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 8px;
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  min-width: 116px;
+  overflow-y: auto;
+  flex-shrink: 0;
 }
 
 .rd-cat-btn {
-  @apply w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-colors flex-shrink-0
-    text-white/50 hover:text-white/80 hover:bg-white/8 active:bg-white/12;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  text-align: left;
+  padding: 7px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.45);
 }
 
-.rd-cat-btn-active {
-  @apply bg-indigo-600/30 text-indigo-200 hover:bg-indigo-600/40 hover:text-indigo-100;
+.rd-cat-btn:hover:not(.rd-cat-btn-active) {
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.rd-cat-icon {
+  font-size: 13px;
+  line-height: 1;
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* Active state per category */
+.rd-cat-btn-active.rd-cat-solo {
+  background: oklch(28% 0.09 75);
+  color: oklch(88% 0.15 82);
+  border-color: oklch(60% 0.16 75 / 0.45);
+}
+
+.rd-cat-btn-active.rd-cat-armut {
+  background: oklch(24% 0.09 238);
+  color: oklch(82% 0.13 232);
+  border-color: oklch(55% 0.18 238 / 0.45);
+}
+
+.rd-cat-btn-active.rd-cat-schmeissen {
+  background: oklch(24% 0.08 25);
+  color: oklch(82% 0.12 22);
+  border-color: oklch(55% 0.15 25 / 0.4);
+}
+
+.rd-cat-btn-active.rd-cat-hochzeit {
+  background: oklch(24% 0.09 278);
+  color: oklch(82% 0.13 272);
+  border-color: oklch(55% 0.16 278 / 0.45);
+}
+
+.rd-cat-btn-active.rd-cat-martin {
+  background: oklch(24% 0.08 310);
+  color: oklch(82% 0.11 308);
+  border-color: oklch(55% 0.14 310 / 0.4);
 }
 
 /* Right column: detail options */
 .rd-right {
-  @apply flex flex-col gap-1 p-2 flex-1 overflow-y-auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .rd-detail-btn {
-  @apply w-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white
-    rounded-lg py-1.5 text-sm font-medium transition-colors flex-shrink-0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.75);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
 }
 
+.rd-detail-btn:hover {
+  background: rgba(255, 255, 255, 0.11);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.rd-detail-btn:active {
+  transform: scale(0.98);
+}
+
+/* Confirm button (for single-action categories like Armut, Schmeißen) */
 .rd-detail-btn-confirm {
-  @apply mt-1;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+  padding: 10px 12px;
+  text-align: center;
+}
+
+.rd-detail-btn-confirm:hover {
+  background: rgba(255, 255, 255, 0.13);
 }
