@@ -118,8 +118,7 @@ export function TrickArea({ trick, requestingPlayer, seatOf, animPhase = null, w
 
         const imgClass = [
           'trick-card',
-          isSonderkarte ? 'trick-card-sonderkarte' : '',
-          player === requestingPlayer && !isFlipped ? 'trick-card-mine' : '',
+          isSonderkarte ? 'trick-card-sonderkarte' : 'trick-card-regular',
           animPhase === 'winner' && isWinner ? 'trick-card-winner-pulse' : '',
         ].filter(Boolean).join(' ');
 

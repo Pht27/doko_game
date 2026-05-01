@@ -35,11 +35,6 @@
 }
 
 /* ── Card image (inner — handles face/back and scale animation) ───────────── */
-@keyframes trick-card-fly-in {
-  0%   { transform: translate(var(--fly-from-x, 0px), var(--fly-from-y, 0px)); opacity: 0; }
-  100% { transform: translate(0, 0); opacity: 1; }
-}
-
 .trick-card {
   display: block;
   width:         var(--trick-card-w);
@@ -47,11 +42,24 @@
   border-radius: 0.25rem;
   box-shadow:    0 4px 12px rgba(0, 0, 0, 0.5);
   transform-origin: center;
-  animation: trick-card-fly-in 0.2s ease-out forwards;
 }
 
-.trick-card-mine {
-  @apply ring-2 ring-yellow-400;
+/*
+  @starting-style fires only on first DOM insertion, not on class changes.
+  This prevents the fly-in from re-triggering when the class switches from
+  trick-card-sonderkarte → trick-card-regular after the sonderkarte timeout.
+*/
+.trick-card-regular {
+  transform: translate(0, 0);
+  opacity: 1;
+  transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+}
+
+@starting-style {
+  .trick-card-regular {
+    transform: translate(var(--fly-from-x, 0px), var(--fly-from-y, 0px));
+    opacity: 0;
+  }
 }
 
 /* ── Winner pulse ─────────────────────────────────────────────────────────── */
@@ -90,9 +98,6 @@
   50% { opacity: 1; }
   80% {
     transform: translate(0, 0) scale(1.12);
-  }
-  90% {
-    transform: translate(0, 0) scale(0.96);
   }
   100% {
     transform: translate(0, 0) scale(1);
