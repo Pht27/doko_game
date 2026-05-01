@@ -70,7 +70,9 @@ export function GameModeBadge({
   const isNormal = gameMode === null && !isSchwarzesSau;
 
   // nachdem ein Solo in der Schwarzen Sau gewählt wurde, soll es nicht mehr als Schwarze Sau angezeigt werden, auch wenn die Bedingungen für die Schwarze Sau weiterhin erfüllt sind
-  isSchwarzesSau = isSchwarzesSau && isNormal;
+  if(isSchwarzesSau && isSolo){
+    isSchwarzesSau = false;
+  }
 
   const phaseInfo = phase ? (PHASE_INFO[phase] ?? null) : null;
 
