@@ -8,6 +8,8 @@
 - Beim Ausspielen einer Sonderkarte wird klar angesat, was ausgespielt wurde.
 
 ### Behoben
+- Beim Genschern konnte es passieren, dass der Dialog ohne Auswahl bestätigt wurde und ein Fehler auftrat. Das ist jetzt behoben.
+- Die Auswahl des Genscher-Partners zeigt die Spieler jetzt in ihrer Tisch-Position an (oben, links, rechts). Der Dialog wurde dafür etwas verbreitert. Der Titel lautet jetzt „Wohin genschern?".
 - Die Gesamtstichzahl im Badge bleibt beim Kartenspielen konstant und springt nicht mehr nach unten.
 - Nach dem letzten Stich wird jetzt die Stich-Animation vollständig abgespielt, bevor das Ergebnis erscheint.
 - Opa-Spieler legen ihre Karten jetzt mit kurzer Verzögerung, sodass man sieht, wie die Karten einzeln zugespielt werden.
