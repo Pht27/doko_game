@@ -199,7 +199,7 @@ export function GameBoard({
             declarerSeat={view.gameModePlayerSeat ?? null}
             partnerSeat={view.phase === 'Playing' ? getPartnerSeat(view) : null}
             trickNumber={(view.currentTrick?.trickNumber ?? 0) + 1}
-            totalTricks={view.handSorted.length + view.completedTricks.length}
+            totalTricks={view.handSorted.length + view.completedTricks.length + ((view.currentTrick?.cards.length ?? 0) > 0 ? 1 : 0)}
             activeSonderkarten={activeSonderkarten}
             isSchwarzesSau={view.isSchwarzesSau}
             phase={view.phase}
