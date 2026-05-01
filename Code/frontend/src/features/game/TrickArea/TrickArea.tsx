@@ -22,6 +22,8 @@ interface TrickAreaProps {
   animPhase?: AnimPhase;
   /** Seat of the trick winner — used to determine fly-away direction */
   winnerSeat?: 'bottom' | 'left' | 'top' | 'right';
+  /** Player who just triggered a sonderkarte — their card gets the special fly-in */
+  sonderkartePlayer?: number;
 }
 
 const FLY_FROM: Record<'bottom' | 'left' | 'top' | 'right', { x: string; y: string }> = {
@@ -54,7 +56,7 @@ function stackOffset(index: number, cardId: number): { ox: number; oy: number; r
   };
 }
 
-export function TrickArea({ trick, requestingPlayer, seatOf, animPhase = null, winnerSeat }: TrickAreaProps) {
+export function TrickArea({ trick, requestingPlayer, seatOf, animPhase = null, winnerSeat, sonderkartePlayer }: TrickAreaProps) {
   if (!trick || trick.cards.length === 0) {
     return <div className="trick-pile" />;
   }
@@ -112,8 +114,11 @@ export function TrickArea({ trick, requestingPlayer, seatOf, animPhase = null, w
           isStacked ? 'trick-card-positioner-stacked' : '',
         ].filter(Boolean).join(' ');
 
+        const isSonderkarte = sonderkartePlayer != null && player === sonderkartePlayer && !isFlipped;
+
         const imgClass = [
           'trick-card',
+          isSonderkarte ? 'trick-card-sonderkarte' : '',
           player === requestingPlayer && !isFlipped ? 'trick-card-mine' : '',
           animPhase === 'winner' && isWinner ? 'trick-card-winner-pulse' : '',
         ].filter(Boolean).join(' ');
