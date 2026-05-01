@@ -99,6 +99,32 @@ export function GameBoard({
     return () => clearTimeout(timer);
   }, [sonderkarteNotification]);
 
+  // Track which opponents just made an announcement (for flash animation)
+  const [announcingPlayers, setAnnouncingPlayers] = useState<Set<number>>(new Set());
+  const prevAnnouncementsRef = useRef<Record<number, string | null>>({});
+
+  useEffect(() => {
+    if (!view) return;
+    const newFlashing = new Set<number>();
+    for (const p of view.otherPlayers) {
+      const prev = prevAnnouncementsRef.current[p.id];
+      if (p.highestAnnouncement !== null && p.highestAnnouncement !== prev) {
+        newFlashing.add(p.id);
+      }
+      prevAnnouncementsRef.current[p.id] = p.highestAnnouncement;
+    }
+    if (newFlashing.size === 0) return;
+    setAnnouncingPlayers(prev => new Set([...prev, ...newFlashing]));
+    const timer = setTimeout(() => {
+      setAnnouncingPlayers(prev => {
+        const next = new Set(prev);
+        newFlashing.forEach(id => next.delete(id));
+        return next;
+      });
+    }, 1400);
+    return () => clearTimeout(timer);
+  }, [view?.otherPlayers]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Title card: shown when phase first transitions to Playing
   const [titleCardKey, setTitleCardKey] = useState<number | null>(null);
   const [titleCardData, setTitleCardData] = useState<{
@@ -204,6 +230,7 @@ export function GameBoard({
             sonderkarteNotif={sonderkarteNotification?.player === topOpponent.id ? sonderkarteNotification.type : null}
             trickCount={trickCountByPlayer[topOpponent.id] ?? 0}
             showHealthStatus={showHealthStatus}
+            isFlashing={announcingPlayers.has(topOpponent.id)}
             onClick={allowPlayerSwitching ? () => onPlayerSwitch(topOpponent.id) : undefined}
           />
         )}
@@ -215,6 +242,7 @@ export function GameBoard({
             sonderkarteNotif={sonderkarteNotification?.player === leftOpponent.id ? sonderkarteNotification.type : null}
             trickCount={trickCountByPlayer[leftOpponent.id] ?? 0}
             showHealthStatus={showHealthStatus}
+            isFlashing={announcingPlayers.has(leftOpponent.id)}
             onClick={allowPlayerSwitching ? () => onPlayerSwitch(leftOpponent.id) : undefined}
           />
         ) : <div />}
@@ -236,6 +264,7 @@ export function GameBoard({
             sonderkarteNotif={sonderkarteNotification?.player === rightOpponent.id ? sonderkarteNotification.type : null}
             trickCount={trickCountByPlayer[rightOpponent.id] ?? 0}
             showHealthStatus={showHealthStatus}
+            isFlashing={announcingPlayers.has(rightOpponent.id)}
             onClick={allowPlayerSwitching ? () => onPlayerSwitch(rightOpponent.id) : undefined}
           />
         ) : <div />}

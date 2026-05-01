@@ -9,10 +9,11 @@ interface PlayerLabelProps {
   sonderkarteNotif?: string | null;
   trickCount?: number;
   showHealthStatus?: boolean;
+  isFlashing?: boolean;
   onClick?: () => void;
 }
 
-export function PlayerLabel({ player, isCurrentTurn, orientation, sonderkarteNotif, trickCount, showHealthStatus, onClick }: PlayerLabelProps) {
+export function PlayerLabel({ player, isCurrentTurn, orientation, sonderkarteNotif, trickCount, showHealthStatus, isFlashing, onClick }: PlayerLabelProps) {
   const active = isCurrentTurn ? 'player-label-active' : 'player-label-inactive';
 
   const nameColor =
@@ -67,16 +68,18 @@ export function PlayerLabel({ player, isCurrentTurn, orientation, sonderkarteNot
     </>
   );
 
+  const flashClass = isFlashing ? 'player-label-flashing' : '';
+
   if (onClick) {
     return (
-      <button className={`player-label ${active} ${layout} ${clickable}`} onClick={onClick}>
+      <button className={`player-label ${active} ${layout} ${clickable} ${flashClass}`} onClick={onClick}>
         {inner}
       </button>
     );
   }
 
   return (
-    <div className={`player-label ${active} ${layout}`}>
+    <div className={`player-label ${active} ${layout} ${flashClass}`}>
       {inner}
     </div>
   );

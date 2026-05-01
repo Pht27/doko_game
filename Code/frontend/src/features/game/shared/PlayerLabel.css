@@ -93,6 +93,28 @@
   border-color: oklch(60.282% 0.22545 31.705 / 0.4);
 }
 
+/* Announce flash — a pseudo-element that expands and fades, leaving the label untouched */
+@keyframes announce-ping {
+  0%   { transform: scale(1);    opacity: 0.9; }
+  55%  { transform: scale(1.22); opacity: 0.35; }
+  100% { transform: scale(1.45); opacity: 0; }
+}
+
+.player-label {
+  position: relative;
+}
+
+.player-label-flashing::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1.5px solid rgba(129, 140, 248, 0.65);
+  background: rgba(99, 102, 241, 0.18);
+  pointer-events: none;
+  animation: announce-ping 1.3s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
+}
+
 /* Sonderkarte notification — briefly appears after a sonderkarte is triggered */
 .player-sonderkarte-notif {
   @apply text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-amber-500/80 text-black
