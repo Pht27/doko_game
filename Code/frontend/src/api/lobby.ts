@@ -24,6 +24,7 @@ export interface LobbyViewResponse {
   opaSeats?: number[] | null;
   selectedScenario?: string | null;
   readySeats?: number[] | null;
+  playerNames?: (string | null)[] | null;
 }
 
 export function createLobby(): Promise<LobbyJoinResponse> {
@@ -88,5 +89,13 @@ export function addOpa(token: string, lobbyId: string, seatIndex: number): Promi
 
 export function removeOpa(token: string, lobbyId: string, seatIndex: number): Promise<void> {
   return apiFetch(`/lobbies/${lobbyId}/seats/${seatIndex}/opa`, token, { method: 'DELETE' });
+}
+
+export function setLobbyPlayerName(token: string, lobbyId: string, name: string | null): Promise<void> {
+  return apiFetch(`/lobbies/${lobbyId}/name`, token, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name }),
+  });
 }
 

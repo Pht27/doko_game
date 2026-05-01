@@ -1,5 +1,6 @@
 import type { GameResultDto } from '@/types/api';
 import { t } from '@/utils/translations';
+import { usePlayerNameResolver } from '@/context/PlayerNamesContext';
 import type { Party } from './resultDisplay.utils';
 import { getSeatParty } from './resultDisplay.utils';
 import { ScoreRow } from './ScoreRow';
@@ -11,6 +12,7 @@ interface AwardsTableProps {
 }
 
 export function AwardsTable({ awards, myParty, result }: AwardsTableProps) {
+  const getPlayerName = usePlayerNameResolver();
   return (
     <div className="rd-table">
       {awards.map((award, i) => {
@@ -19,7 +21,7 @@ export function AwardsTable({ awards, myParty, result }: AwardsTableProps) {
         return <ScoreRow
             key={i}
             label={t.extrapunktLabel(award.type)}
-            awardee={{ name: t.seatShort(award.benefittingPlayer), party: awardParty }}
+            awardee={{ name: t.seatShort(award.benefittingPlayer, getPlayerName(award.benefittingPlayer)), party: awardParty }}
             value={awardSign * award.delta}
           />;
       })}

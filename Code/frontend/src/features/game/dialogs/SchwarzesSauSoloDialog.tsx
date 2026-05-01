@@ -1,4 +1,5 @@
 import { t } from '@/utils/translations';
+import { usePlayerName } from '@/context/PlayerNamesContext';
 import './SchwarzesSauSoloDialog.css';
 
 interface SchwarzesSauSoloDialogProps {
@@ -35,10 +36,11 @@ export function SchwarzesSauSoloDialog({
   eligibleSolos,
   onChoose,
 }: SchwarzesSauSoloDialogProps) {
+  const playerName = usePlayerName(playerId);
   return (
     <div className="ssd-dialog">
       <div className="ssd-header">
-        <span className="ssd-title">{t.schwarzesSauSoloTitle(playerId)}</span>
+        <span className="ssd-title">{t.schwarzesSauSoloTitle(playerId, playerName)}</span>
         <span className="ssd-subtitle">{t.schwarzesSauSoloSubtitle}</span>
       </div>
       <SoloPicker eligibleSolos={eligibleSolos} onChoose={onChoose} />

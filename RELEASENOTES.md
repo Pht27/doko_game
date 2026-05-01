@@ -1,5 +1,10 @@
 # Release Notes
 
+## [1.2.2] - 2026-05-02
+
+### Neu
+- Spieler können sich in der Lobby einen eigenen Namen geben (Stift-Symbol auf dem eigenen Sitz). Der Name ist für alle anderen Mitspieler sichtbar und erscheint überall, wo bisher „S1"–„S4" stand: Spielfeld, Dialoge, Ergebnisanzeige.
+
 ## [1.2.1] - 2026-05-01
 
 ### Spielfläche

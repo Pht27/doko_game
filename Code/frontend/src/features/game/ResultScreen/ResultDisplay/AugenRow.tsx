@@ -1,5 +1,6 @@
 import type { GameResultDto } from '@/types/api';
 import { t } from '@/utils/translations';
+import { usePlayerNameResolver } from '@/context/PlayerNamesContext';
 import { type Party, getSeatParty } from './resultDisplay.utils';
 
 interface AugenRowProps {
@@ -12,6 +13,7 @@ interface AugenRowProps {
 }
 
 export function AugenRow({ reAugen, reStiche, kontraAugen, kontraStiche, isReWinner, result }: AugenRowProps) {
+  const getPlayerName = usePlayerNameResolver();
   const reSeats: number[] = [];
   const kontraSeats: number[] = [];
   for (let seat = 0; seat < result.netPointsPerSeat.length; seat++) {
@@ -36,7 +38,7 @@ export function AugenRow({ reAugen, reStiche, kontraAugen, kontraStiche, isReWin
           const seat = reSeats[i];
           return seat !== undefined ? (
             <div key={seat} className={isReWinner ? 'rd-player-row rd-party-re rd-party-winner' : 'rd-player-row rd-party-re rd-party-loser'}>
-              <span className="rd-player-name">{t.seatShort(seat)}</span>
+              <span className="rd-player-name">{t.seatShort(seat, getPlayerName(seat))}</span>
               <span className="rd-player-score">
                 {result.augenPerSeat[seat]}
                 <span className="rd-augen-stiche"> ({result.stichePerSeat[seat]})</span>
@@ -66,7 +68,7 @@ export function AugenRow({ reAugen, reStiche, kontraAugen, kontraStiche, isReWin
                 {result.augenPerSeat[seat]}
                 <span className="rd-augen-stiche"> ({result.stichePerSeat[seat]})</span>
               </span>
-              <span className="rd-player-name">{t.seatShort(seat)}</span>
+              <span className="rd-player-name">{t.seatShort(seat, getPlayerName(seat))}</span>
             </div>
           ) : (
             <div key={`empty-kontra-${i}`} className="rd-player-row rd-player-row-right" />
