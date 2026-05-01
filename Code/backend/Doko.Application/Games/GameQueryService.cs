@@ -170,7 +170,10 @@ public sealed class GameQueryService(IGameRepository repository) : IGameQuerySer
                     var t => t.ToString(),
                 };
 
-                string? healthStatus = state.HealthDeclarations.TryGetValue(p.Seat, out var hasVorbehalt)
+                string? healthStatus = state.HealthDeclarations.TryGetValue(
+                    p.Seat,
+                    out var hasVorbehalt
+                )
                     ? (hasVorbehalt ? "Vorbehalt" : "Gesund")
                     : null;
 

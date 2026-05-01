@@ -7,6 +7,10 @@
 - Aktive Sonderkarten werden angezeigt.
 - Beim Ausspielen einer Sonderkarte wird klar angesat, was ausgespielt wurde.
 
+### Behoben
+- Nach dem letzten Stich wird jetzt die Stich-Animation vollständig abgespielt, bevor das Ergebnis erscheint.
+- Opa-Spieler legen ihre Karten jetzt mit kurzer Verzögerung, sodass man sieht, wie die Karten einzeln zugespielt werden.
+
 ## [1.1.1] - 2026-04-27
 
 ### Verbessert

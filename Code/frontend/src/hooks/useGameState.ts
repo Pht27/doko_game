@@ -123,8 +123,8 @@ export function useGameState(
     };
 
     const handleGameFinished = (payload: { result: GameResultDto }) => {
-      setFinishedResult(payload.result);
       refetchRef.current?.();
+      setTimeout(() => setFinishedResult(payload.result), 4500);
     };
 
     const handleSonderkarteTriggered = (payload: SonderkarteNotification) => {
