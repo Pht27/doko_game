@@ -13,5 +13,10 @@ public record PlayerPublicState(
     /// "Re" or "Kontra" for <see cref="AnnouncementType.Win"/>; enum name otherwise.
     /// Null when the player has not announced.
     /// </summary>
-    string? HighestAnnouncement = null
+    string? HighestAnnouncement = null,
+    /// <summary>
+    /// "Gesund" or "Vorbehalt" once this player has declared during ReservationHealthCheck.
+    /// Null before they have declared or outside reservation phases.
+    /// </summary>
+    string? HealthStatus = null
 );

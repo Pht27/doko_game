@@ -114,4 +114,9 @@ public record PlayerGameView(
     /// Null for Normalspiel or when no explicit declarant exists.
     /// </summary>
     public int? GameModePlayerSeat { get; init; } = null;
+
+    /// <summary>
+    /// True when the game is running in Schwarze-Sau mode (all Armut players declined).
+    /// </summary>
+    public bool IsSchwarzesSau { get; init; } = false;
 }

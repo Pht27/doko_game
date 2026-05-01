@@ -62,4 +62,7 @@ public record PlayerGameViewResponse(
 
     /// <summary>The seat number of the player who declared the active game mode (Solo, Hochzeit, Armut). Null for Normalspiel.</summary>
     public int? GameModePlayerSeat { get; init; } = null;
+
+    /// <summary>True when the game is running in Schwarze-Sau mode (all Armut players declined).</summary>
+    public bool IsSchwarzesSau { get; init; } = false;
 }

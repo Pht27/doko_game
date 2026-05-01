@@ -1,5 +1,11 @@
 # Release Notes
 
+## [1.2.0] - 2026-05-01
+
+### Spielfläche
+- Im Spiel werden jetzt die Vorbehalte und Spielphasen besser angezeigt.
+- Aktive Sonderkarten werden angezeigt.
+
 ## [1.1.1] - 2026-04-27
 
 ### Verbessert

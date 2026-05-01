@@ -1,16 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { PlayerGameViewResponse, GameResultDto, TrickSummaryDto, SonderkarteNotification } from '@/types/api';
 import type { AnimPhase } from '../TrickArea/TrickArea';
 import type { GameActions } from '@/hooks/useGameActions';
 import type { MultiplayerNewGameProps } from '../ResultScreen/ResultScreen';
 import { ResultScreen } from '../ResultScreen/ResultScreen';
-import { GameInfo } from '../shared/GameInfo';
+import { GameModeBadge } from '../GameModeBadge/GameModeBadge';
+import { BurgerMenu } from '../BurgerMenu/BurgerMenu';
+import { TitleCard } from '../TitleCard/TitleCard';
 import { PlayerLabel } from '../shared/PlayerLabel';
 import { SelfPlayerLabel } from '../shared/SelfPlayerLabel';
 import { HandDisplay } from '../HandDisplay/HandDisplay';
 import { AnnouncementButton } from '../AnnouncementButton/AnnouncementButton';
 import { LastTrickOverlay } from '../LastTrickOverlay/LastTrickOverlay';
-import { GameAnnouncePopup } from '../GameAnnouncePopup/GameAnnouncePopup';
 import { cardBackSvgPath } from '@/api/cards';
 import { ArmutBanner } from './subcomponents/ArmutBanner';
 import { CenterArea } from './subcomponents/CenterArea';
@@ -31,8 +32,7 @@ interface GameBoardProps {
   actions: GameActions;
   finishedResult: GameResultDto | null;
   sonderkarteNotification: SonderkarteNotification | null;
-  popupAnnouncement: { message: string; id: number } | null;
-  onClearPopup: () => void;
+  activeSonderkarten: SonderkarteNotification[];
   viewLoading: boolean;
   viewError: string | null;
   allowPlayerSwitching: boolean;
@@ -49,6 +49,18 @@ function seatOf(player: number, activePlayer: number): 'bottom' | 'left' | 'top'
   return seats[(player - activePlayer + 4) % 4];
 }
 
+/** Find the Re partner seat: the Re player who is NOT the declarer. */
+function getPartnerSeat(view: PlayerGameViewResponse): number | null {
+  const declarerSeat = view.gameModePlayerSeat ?? null;
+  if (declarerSeat === null) return null;
+  const reSeats: number[] = [];
+  if (view.ownParty === 'Re') reSeats.push(view.requestingPlayer);
+  for (const p of view.otherPlayers) {
+    if (p.knownParty === 'Re') reSeats.push(p.id);
+  }
+  return reSeats.find(s => s !== declarerSeat) ?? null;
+}
+
 export function GameBoard({
   view,
   activePlayer,
@@ -57,8 +69,7 @@ export function GameBoard({
   actions,
   finishedResult,
   sonderkarteNotification,
-  popupAnnouncement,
-  onClearPopup,
+  activeSonderkarten,
   viewLoading,
   viewError,
   allowPlayerSwitching,
@@ -71,6 +82,33 @@ export function GameBoard({
   const [showInfoOverlay, setShowInfoOverlay] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [showLastTrick, setShowLastTrick] = useState(false);
+
+  // Title card: shown when phase first transitions to Playing
+  const [titleCardKey, setTitleCardKey] = useState<number | null>(null);
+  const [titleCardData, setTitleCardData] = useState<{
+    gameMode: string | null;
+    declarerSeat: number | null;
+    partnerSeat: number | null;
+  } | null>(null);
+  const prevPhaseRef = useRef<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (!view) return;
+    if (
+      view.phase === 'Playing' &&
+      prevPhaseRef.current !== undefined &&
+      prevPhaseRef.current !== 'Playing'
+    ) {
+      setTitleCardData({
+        gameMode: view.activeGameMode,
+        declarerSeat: view.gameModePlayerSeat ?? null,
+        partnerSeat: getPartnerSeat(view),
+      });
+      setTitleCardKey(Date.now());
+    }
+    prevPhaseRef.current = view.phase;
+  }, [view?.phase]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const seatOfPlayer = (player: number) => seatOf(player, activePlayer);
 
   function triggerLeave() {
@@ -91,6 +129,8 @@ export function GameBoard({
   const leftOpponent = opponents.find((p) => seatOfPlayer(p.id) === 'left');
   const rightOpponent = opponents.find((p) => seatOfPlayer(p.id) === 'right');
 
+  const showHealthStatus = view?.phase !== undefined && view.phase !== 'Playing' && view.phase !== 'Scoring' && view.phase !== 'Finished' && view.phase !== 'Geschmissen' && view.phase !== 'Dealing';
+
   const legalCardIds = new Set(view?.legalCards.map((c) => c.id) ?? []);
 
   const trickCountByPlayer = (view?.completedTricks ?? []).reduce<Record<number, number>>((acc, trick) => {
@@ -100,28 +140,36 @@ export function GameBoard({
 
   return (
     <div className="w-full h-full relative flex flex-col bg-[#1a1a2e] select-none overflow-hidden">
-      {/* Floating top-right: game info (clickable when lobby standings available) */}
+      {/* Burger menu — top-left, opens match history overlay */}
+      {view && (
+        <BurgerMenu onClick={() => setShowInfoOverlay(true)} />
+      )}
+
+      {/* Game mode badge — top-right, pill with mode/players/tricks/sonderkarten */}
       {view && (
         <div className="absolute top-2 right-2 z-10">
-          <GameInfo
-            phase={view.phase}
+          <GameModeBadge
             gameMode={view.activeGameMode}
+            declarerSeat={view.gameModePlayerSeat ?? null}
+            partnerSeat={view.phase === 'Playing' ? getPartnerSeat(view) : null}
             trickNumber={(view.currentTrick?.trickNumber ?? 0) + 1}
-            completedTricks={view.completedTricks.length}
-            onClick={() => setShowInfoOverlay(true)}
+            totalTricks={view.handSorted.length + view.completedTricks.length}
+            activeSonderkarten={activeSonderkarten}
+            isSchwarzesSau={view.isSchwarzesSau}
+            phase={view.phase}
           />
         </div>
       )}
 
-      {/* Announce popup: game mode at game start, sonderkarte activations */}
-      {popupAnnouncement && (
-        <div className="absolute top-[8%] left-1/2 -translate-x-1/2 z-25 pointer-events-auto">
-          <GameAnnouncePopup
-            key={popupAnnouncement.id}
-            message={popupAnnouncement.message}
-            onDismiss={onClearPopup}
-          />
-        </div>
+      {/* Title card: animated center announcement when game mode is determined */}
+      {titleCardKey !== null && titleCardData && (
+        <TitleCard
+          key={titleCardKey}
+          gameMode={titleCardData.gameMode}
+          declarerSeat={titleCardData.declarerSeat}
+          partnerSeat={titleCardData.partnerSeat}
+          onDone={() => setTitleCardKey(null)}
+        />
       )}
 
       {/* Armut exchange info banner */}
@@ -141,6 +189,7 @@ export function GameBoard({
             orientation="top"
             sonderkarteNotif={sonderkarteNotification?.player === topOpponent.id ? sonderkarteNotification.type : null}
             trickCount={trickCountByPlayer[topOpponent.id] ?? 0}
+            showHealthStatus={showHealthStatus}
             onClick={allowPlayerSwitching ? () => onPlayerSwitch(topOpponent.id) : undefined}
           />
         )}
@@ -151,6 +200,7 @@ export function GameBoard({
             orientation="left"
             sonderkarteNotif={sonderkarteNotification?.player === leftOpponent.id ? sonderkarteNotification.type : null}
             trickCount={trickCountByPlayer[leftOpponent.id] ?? 0}
+            showHealthStatus={showHealthStatus}
             onClick={allowPlayerSwitching ? () => onPlayerSwitch(leftOpponent.id) : undefined}
           />
         ) : <div />}
@@ -170,6 +220,7 @@ export function GameBoard({
             orientation="right"
             sonderkarteNotif={sonderkarteNotification?.player === rightOpponent.id ? sonderkarteNotification.type : null}
             trickCount={trickCountByPlayer[rightOpponent.id] ?? 0}
+            showHealthStatus={showHealthStatus}
             onClick={allowPlayerSwitching ? () => onPlayerSwitch(rightOpponent.id) : undefined}
           />
         ) : <div />}
@@ -288,7 +339,7 @@ export function GameBoard({
         </div>
       )}
 
-      {/* Game info overlay: match history if available, otherwise empty state */}
+      {/* Game info overlay: match history (opened via burger menu) */}
       {showInfoOverlay && (
         <ResultScreen
           result={lastFinishedResult ?? undefined}

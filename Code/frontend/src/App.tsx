@@ -211,13 +211,12 @@ export default function App() {
     view: gameView,
     loading: viewLoading,
     error: viewError,
+    activeSonderkarten,
     finishedResult,
     sonderkarteNotification,
     newGameVoteCount,
     newGameId,
     refetch,
-    popupAnnouncement,
-    clearPopupAnnouncement,
   } = useGameState(gameSession?.tokens ?? [], gameSession?.gameId ?? null, activePlayer);
 
   // If the game is gone (backend restart), clear stale session and go home
@@ -329,13 +328,12 @@ export default function App() {
       <GameBoard
         view={gameView}
         activePlayer={activePlayer}
+        activeSonderkarten={activeSonderkarten}
         animTrick={animTrick}
         animPhase={animPhase}
         actions={actions}
         finishedResult={finishedResult}
         sonderkarteNotification={sonderkarteNotification}
-        popupAnnouncement={popupAnnouncement}
-        onClearPopup={clearPopupAnnouncement}
         viewLoading={viewLoading}
         viewError={viewError}
         allowPlayerSwitching={isHotSeat}

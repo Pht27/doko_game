@@ -3,15 +3,16 @@
 
 .self-player-label {
   @apply flex flex-row items-center justify-center gap-2.5 px-5 py-1 text-xs
-    rounded-t-xl bg-white/5 border border-white/15 border-b-0 text-white/60;
+    rounded-t-xl border border-white/10 border-b-0 text-white/60;
+  background: rgb(45, 38, 71);
 }
 
 .self-bg-re {
-  @apply bg-re-500/70 border-re-500/40 text-re-300;
+  @apply text-re-300;
 }
 
 .self-bg-kontra {
-  @apply bg-kontra-600/85 border-kontra-500/40 text-kontra-300;
+  @apply text-kontra-300;
 }
 
 /* Active turn: thicker yellow top border */

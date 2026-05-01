@@ -18,6 +18,14 @@ const HOCHZEIT_CONDITIONS = ['FirstTrick', 'FirstFehlTrick', 'FirstTrumpTrick'];
 
 type Category = 'Solo' | 'SchlankerMartin' | 'Armut' | 'Schmeissen' | 'Hochzeit';
 
+const CATEGORY_META: Record<Category, { icon: string; cssClass: string }> = {
+  Solo:          { icon: '♛', cssClass: 'rd-cat-solo' },
+  SchlankerMartin:{ icon: '✦', cssClass: 'rd-cat-martin' },
+  Armut:         { icon: '♦', cssClass: 'rd-cat-armut' },
+  Schmeissen:    { icon: '✕', cssClass: 'rd-cat-schmeissen' },
+  Hochzeit:      { icon: '♣', cssClass: 'rd-cat-hochzeit' },
+};
+
 function getCategories(eligibleReservations: string[]): Category[] {
   const cats: Category[] = [];
   if (eligibleReservations.some((r) => SOLO_RESERVATIONS.has(r))) cats.push('Solo');
@@ -33,6 +41,7 @@ export function ReservationDialog({ playerId, eligibleReservations, mustDeclare 
   const [selectedCategory, setSelectedCategory] = useState<Category>(categories[0] ?? 'Solo');
 
   const eligibleSolos = eligibleReservations.filter((r) => SOLO_RESERVATIONS.has(r));
+  const meta = CATEGORY_META[selectedCategory];
 
   return (
     <div className="rd-dialog">
@@ -47,17 +56,22 @@ export function ReservationDialog({ playerId, eligibleReservations, mustDeclare 
 
       {categories.length > 0 && (
         <div className="rd-body">
-          {/* Left column: categories */}
+          {/* Left column: category tabs */}
           <div className="rd-left">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                className={`rd-cat-btn ${selectedCategory === cat ? 'rd-cat-btn-active' : ''}`}
-                onClick={() => setSelectedCategory(cat)}
-              >
-                {t.reservationCategoryLabel(cat)}
-              </button>
-            ))}
+            {categories.map((cat) => {
+              const catMeta = CATEGORY_META[cat];
+              const isActive = selectedCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  className={`rd-cat-btn ${catMeta.cssClass} ${isActive ? 'rd-cat-btn-active' : ''}`}
+                  onClick={() => setSelectedCategory(cat)}
+                >
+                  <span className="rd-cat-icon">{catMeta.icon}</span>
+                  {t.reservationCategoryLabel(cat)}
+                </button>
+              );
+            })}
           </div>
 
           {/* Right column: detail options */}
@@ -86,9 +100,10 @@ export function ReservationDialog({ playerId, eligibleReservations, mustDeclare 
               selectedCategory === 'Armut' ||
               selectedCategory === 'Schmeissen') && (
               <button
-                className="rd-detail-btn rd-detail-btn-confirm"
+                className={`rd-detail-btn rd-detail-btn-confirm`}
                 onClick={() => onDeclare(selectedCategory, null, null)}
               >
+                <span style={{ marginRight: 6 }}>{meta.icon}</span>
                 {t.bestaetigenSolo}
               </button>
             )}

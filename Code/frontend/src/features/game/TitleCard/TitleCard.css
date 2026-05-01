@@ -1,0 +1,106 @@
+@reference "../../../styles/index.css";
+
+@keyframes titlecard-in {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.88); }
+  18%  { opacity: 1; transform: translate(-50%, -50%) scale(1.03); }
+  30%  { transform: translate(-50%, -50%) scale(1); }
+  72%  { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.96); }
+}
+
+.title-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 50;
+  pointer-events: none;
+  animation: titlecard-in 2.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.title-card-glow {
+  position: absolute;
+  width: 260px;
+  height: 120px;
+  border-radius: 999px;
+  filter: blur(48px);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.title-card-inner {
+  background: rgba(18, 18, 36, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 18px 32px 16px;
+  box-shadow: 0 16px 56px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 200px;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.tc-icon {
+  font-size: 28px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.tc-mode {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.tc-solo    { color: oklch(88% 0.15 82); }
+.tc-armut   { color: oklch(82% 0.13 232); }
+.tc-hochzeit{ color: oklch(82% 0.13 272); }
+.tc-normal  { color: rgba(255, 255, 255, 0.75); }
+
+.tc-line {
+  width: 40px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 2px 0;
+}
+
+.tc-players {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.tc-chip {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 999px;
+  line-height: 1.6;
+}
+
+.tc-chip-re {
+  background: oklch(33% 0.15 238);
+  color: oklch(82% 0.13 232);
+  border: 1px solid oklch(55% 0.18 238 / 0.5);
+}
+
+.tc-chip-solo {
+  background: oklch(33% 0.13 75);
+  color: oklch(88% 0.15 82);
+  border: 1px solid oklch(60% 0.16 75 / 0.5);
+}
+
+.tc-chip-unk {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
