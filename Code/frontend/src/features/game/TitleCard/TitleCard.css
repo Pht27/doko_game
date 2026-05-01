@@ -104,3 +104,10 @@
   color: rgba(255, 255, 255, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
+
+.tc-exchange-info {
+  font-size: 11px;
+  color: oklch(70% 0.10 232);
+  margin-top: 6px;
+  opacity: 0.85;
+}

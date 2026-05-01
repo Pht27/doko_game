@@ -32,9 +32,9 @@ export const t = {
   lobbyFull: 'Lobby ist voll',
   lobbyNotFound: 'Lobby nicht gefunden',
 
-  // ── ArmutInfoBanner ────────────────────────────────────────────────────────
-  armutInfoBanner: (count: number, hasTrump: boolean) =>
-    `Armut: ${count} Karte(n) zurückgegeben${hasTrump ? ' · mit Trumpf' : ' · kein Trumpf'}`,
+  // ── ArmutExchangeInfo (shown in TitleCard) ─────────────────────────────────
+  armutExchangeInfo: (count: number, hasTrump: boolean) =>
+    `${count} Karte(n) getauscht · ${hasTrump ? 'mit Trumpf' : 'kein Trumpf'}`,
 
   // ── HealthCheckDialog ──────────────────────────────────────────────────────
   healthCheckTitle: `Gesund oder Vorbehalt?`,

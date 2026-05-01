@@ -6,6 +6,8 @@ interface TitleCardProps {
   gameMode: string | null;
   declarerSeat: number | null;
   partnerSeat: number | null;
+  exchangeCardCount?: number | null;
+  returnedTrump?: boolean | null;
   onDone: () => void;
 }
 
@@ -30,7 +32,7 @@ const GLOW_COLORS: Record<string, string> = {
   normal: 'transparent',
 };
 
-export function TitleCard({ gameMode, declarerSeat, partnerSeat, onDone }: TitleCardProps) {
+export function TitleCard({ gameMode, declarerSeat, partnerSeat, exchangeCardCount, returnedTrump, onDone }: TitleCardProps) {
   useEffect(() => {
     const id = setTimeout(onDone, 2450);
     return () => clearTimeout(id);
@@ -73,6 +75,9 @@ export function TitleCard({ gameMode, declarerSeat, partnerSeat, onDone }: Title
           <div className="tc-players">
             <span className="tc-chip tc-chip-solo">S{declarerSeat + 1}</span>
           </div>
+        )}
+        {isArmut && exchangeCardCount != null && returnedTrump != null && (
+          <div className="tc-exchange-info">{t.armutExchangeInfo(exchangeCardCount, returnedTrump)}</div>
         )}
       </div>
     </div>
