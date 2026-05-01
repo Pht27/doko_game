@@ -44,13 +44,37 @@
   @apply border-t border-white/10;
 }
 
-/* Partner selection */
-.sk-partner-grid {
-  @apply grid grid-cols-2 gap-2;
+/* Partner selection — compass layout */
+.sk-card-wide {
+  @apply w-96;
+}
+
+.sk-compass {
+  @apply flex flex-col gap-2;
+}
+
+.sk-compass-top {
+  @apply flex justify-center;
+}
+
+.sk-compass-middle {
+  @apply flex items-center gap-2;
+}
+
+.sk-compass-left {
+  @apply flex-1 flex justify-start;
+}
+
+.sk-compass-center {
+  @apply flex-1;
+}
+
+.sk-compass-right {
+  @apply flex-1 flex justify-end;
 }
 
 .sk-partner-btn {
-  @apply px-4 py-3 rounded-xl bg-white/8 hover:bg-white/12 text-white font-semibold text-sm
+  @apply px-6 py-3 rounded-xl bg-white/8 hover:bg-white/12 text-white font-semibold text-sm
     transition-colors active:bg-white/18 border border-transparent;
 }
 

@@ -77,7 +77,7 @@ export const t = {
   genscherBadge: 'Genscher',
   aktivieren: 'Aktivieren',
   nichtAktivieren: 'Nicht aktivieren',
-  genscherPartnerWaehlen: 'Neuen Partner wählen',
+  genscherPartnerWaehlen: 'Wohin genschern?',
   abbrechen: 'Abbrechen',
 
   // ── ResultScreen ───────────────────────────────────────────────────────────

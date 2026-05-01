@@ -25,6 +25,11 @@ export function SonderkarteOverlay({
 
   const sk = sonderkarten[skIdx];
 
+  const others = [0, 1, 2, 3].filter((p) => p !== activePlayer);
+  // position relative to activePlayer: 1=right, 2=top, 3=left
+  const relPos = (p: number) => (p - activePlayer + 4) % 4;
+  const currentPartner = partnerId ?? others[0] ?? null;
+
   function advanceOrFinish(types: string[], genscherPartnerId: number | null) {
     const nextIdx = skIdx + 1;
     if (nextIdx < sonderkarten.length) {
@@ -51,32 +56,57 @@ export function SonderkarteOverlay({
 
   function handlePartnerConfirm() {
     setInPartnerSelect(false);
-    advanceOrFinish(selectedTypes, partnerId);
+    advanceOrFinish(selectedTypes, currentPartner);
   }
 
   // ── Partner selection step ─────────────────────────────────────────────────
   if (inPartnerSelect) {
-    const others = [0, 1, 2, 3].filter((p) => p !== activePlayer);
-    const currentPartner = partnerId ?? others[0] ?? null;
+    const top = others.find((p) => relPos(p) === 2);
+    const right = others.find((p) => relPos(p) === 1);
+    const left = others.find((p) => relPos(p) === 3);
 
     return (
       <div className="sk-overlay">
-        <div className="sk-card">
+        <div className="sk-card sk-card-wide">
           <div>
             <div className="sk-badge">{t.genscherBadge}</div>
             <h2 className="sk-title mt-1">{t.genscherPartnerWaehlen}</h2>
           </div>
           <div className="sk-divider" />
-          <div className="sk-partner-grid">
-            {others.map((p) => (
-              <button
-                key={p}
-                className={`sk-partner-btn ${currentPartner === p ? 'sk-partner-btn-active' : ''}`}
-                onClick={() => setPartnerId(p)}
-              >
-                {t.playerName(p)}
-              </button>
-            ))}
+          <div className="sk-compass">
+            <div className="sk-compass-top">
+              {top !== undefined && (
+                <button
+                  className={`sk-partner-btn ${currentPartner === top ? 'sk-partner-btn-active' : ''}`}
+                  onClick={() => setPartnerId(top)}
+                >
+                  {t.playerName(top)}
+                </button>
+              )}
+            </div>
+            <div className="sk-compass-middle">
+              <div className="sk-compass-left">
+                {left !== undefined && (
+                  <button
+                    className={`sk-partner-btn ${currentPartner === left ? 'sk-partner-btn-active' : ''}`}
+                    onClick={() => setPartnerId(left)}
+                  >
+                    {t.playerName(left)}
+                  </button>
+                )}
+              </div>
+              <div className="sk-compass-center" />
+              <div className="sk-compass-right">
+                {right !== undefined && (
+                  <button
+                    className={`sk-partner-btn ${currentPartner === right ? 'sk-partner-btn-active' : ''}`}
+                    onClick={() => setPartnerId(right)}
+                  >
+                    {t.playerName(right)}
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
           <button
             className="sk-btn-primary"
