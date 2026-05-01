@@ -14,7 +14,6 @@ import { HandDisplay } from '../HandDisplay/HandDisplay';
 import { AnnouncementButton } from '../AnnouncementButton/AnnouncementButton';
 import { LastTrickOverlay } from '../LastTrickOverlay/LastTrickOverlay';
 import { cardBackSvgPath } from '@/api/cards';
-import { ArmutBanner } from './subcomponents/ArmutBanner';
 import { CenterArea } from './subcomponents/CenterArea';
 import { PlayerGrid } from './subcomponents/PlayerGrid';
 import { GameOverlays } from './subcomponents/GameOverlays';
@@ -106,6 +105,8 @@ export function GameBoard({
     gameMode: string | null;
     declarerSeat: number | null;
     partnerSeat: number | null;
+    exchangeCardCount: number | null;
+    returnedTrump: boolean | null;
   } | null>(null);
   const prevPhaseRef = useRef<string | undefined>(undefined);
 
@@ -120,6 +121,8 @@ export function GameBoard({
         gameMode: view.activeGameMode,
         declarerSeat: view.gameModePlayerSeat ?? null,
         partnerSeat: getPartnerSeat(view),
+        exchangeCardCount: view.armutExchangeCardCount ?? null,
+        returnedTrump: view.armutReturnedTrump ?? null,
       });
       setTitleCardKey(Date.now());
     }
@@ -185,15 +188,9 @@ export function GameBoard({
           gameMode={titleCardData.gameMode}
           declarerSeat={titleCardData.declarerSeat}
           partnerSeat={titleCardData.partnerSeat}
+          exchangeCardCount={titleCardData.exchangeCardCount}
+          returnedTrump={titleCardData.returnedTrump}
           onDone={() => setTitleCardKey(null)}
-        />
-      )}
-
-      {/* Armut exchange info banner */}
-      {view?.armutExchangeCardCount != null && view.armutReturnedTrump != null && (
-        <ArmutBanner
-          exchangeCardCount={view.armutExchangeCardCount}
-          returnedTrump={view.armutReturnedTrump}
         />
       )}
 
