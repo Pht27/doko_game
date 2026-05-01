@@ -5,6 +5,7 @@
 ### Spielfläche
 - Im Spiel werden jetzt die Vorbehalte und Spielphasen besser angezeigt.
 - Aktive Sonderkarten werden angezeigt.
+- Beim Ausspielen einer Sonderkarte wird klar angesat, was ausgespielt wurde.
 
 ## [1.1.1] - 2026-04-27
 

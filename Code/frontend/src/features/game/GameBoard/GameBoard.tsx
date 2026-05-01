@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { SonderkarteFlash } from '../SonderkarteFlash/SonderkarteFlash';
 import type { PlayerGameViewResponse, GameResultDto, TrickSummaryDto, SonderkarteNotification } from '@/types/api';
 import type { AnimPhase } from '../TrickArea/TrickArea';
 import type { GameActions } from '@/hooks/useGameActions';
@@ -82,6 +83,22 @@ export function GameBoard({
   const [showInfoOverlay, setShowInfoOverlay] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [showLastTrick, setShowLastTrick] = useState(false);
+
+  const [sonderkartePlayPlayer, setSonderkartePlayPlayer] = useState<number | null>(null);
+  const [sonderkarteFlash, setSonderkarteFlash] = useState<{ key: number; player: number; type: string } | null>(null);
+  const flashKeyRef = useRef(0);
+
+  useEffect(() => {
+    if (!sonderkarteNotification) return;
+    setSonderkartePlayPlayer(sonderkarteNotification.player);
+    setSonderkarteFlash({
+      key: ++flashKeyRef.current,
+      player: sonderkarteNotification.player,
+      type: sonderkarteNotification.type,
+    });
+    const timer = setTimeout(() => setSonderkartePlayPlayer(null), 1000);
+    return () => clearTimeout(timer);
+  }, [sonderkarteNotification]);
 
   // Title card: shown when phase first transitions to Playing
   const [titleCardKey, setTitleCardKey] = useState<number | null>(null);
@@ -211,6 +228,7 @@ export function GameBoard({
             displayTrick={displayTrick}
             animPhase={animPhase}
             winnerSeat={winnerSeat}
+            sonderkartePlayer={sonderkartePlayPlayer ?? undefined}
           />
         }
         right={rightOpponent ? (
@@ -379,6 +397,15 @@ export function GameBoard({
           trick={view.completedTricks[view.completedTricks.length - 1]}
           seatOf={seatOfPlayer}
           onClose={() => setShowLastTrick(false)}
+        />
+      )}
+
+      {/* Sonderkarte name flash — appears briefly when a sonderkarte is triggered */}
+      {sonderkarteFlash && (
+        <SonderkarteFlash
+          key={sonderkarteFlash.key}
+          player={sonderkarteFlash.player}
+          type={sonderkarteFlash.type}
         />
       )}
 

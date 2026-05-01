@@ -8,6 +8,7 @@ interface CenterAreaProps {
   displayTrick: TrickSummaryDto | null;
   animPhase: AnimPhase;
   winnerSeat?: 'bottom' | 'left' | 'top' | 'right';
+  sonderkartePlayer?: number;
 }
 
 /**
@@ -15,7 +16,7 @@ interface CenterAreaProps {
  * Dialog overlays (reservation, health check, armut) are rendered
  * as absolute overlays in GameBoard.tsx.
  */
-export function CenterArea({ requestingPlayer, seatOf, displayTrick, animPhase, winnerSeat }: CenterAreaProps) {
+export function CenterArea({ requestingPlayer, seatOf, displayTrick, animPhase, winnerSeat, sonderkartePlayer }: CenterAreaProps) {
   return (
     <TrickArea
       trick={displayTrick}
@@ -23,6 +24,7 @@ export function CenterArea({ requestingPlayer, seatOf, displayTrick, animPhase, 
       seatOf={seatOf}
       animPhase={animPhase}
       winnerSeat={winnerSeat}
+      sonderkartePlayer={sonderkartePlayer}
     />
   );
 }
