@@ -248,7 +248,6 @@ export function GameBoard({
         ) : <div />}
         center={
           <CenterArea
-            requestingPlayer={activePlayer}
             seatOf={seatOfPlayer}
             displayTrick={displayTrick}
             animPhase={animPhase}

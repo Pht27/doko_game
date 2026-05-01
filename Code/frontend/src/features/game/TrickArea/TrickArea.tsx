@@ -15,7 +15,6 @@ export type AnimPhase = 'appear' | 'winner' | 'flip' | 'stack' | 'fly' | null;
 
 interface TrickAreaProps {
   trick: TrickSummaryDto | null;
-  requestingPlayer: number;
   /** Seat layout: which compass direction a player sits relative to the requesting player */
   seatOf: (player: number) => 'bottom' | 'left' | 'top' | 'right';
   /** Current animation phase (null = normal display) */
@@ -56,7 +55,7 @@ function stackOffset(index: number, cardId: number): { ox: number; oy: number; r
   };
 }
 
-export function TrickArea({ trick, requestingPlayer, seatOf, animPhase = null, winnerSeat, sonderkartePlayer }: TrickAreaProps) {
+export function TrickArea({ trick, seatOf, animPhase = null, winnerSeat, sonderkartePlayer }: TrickAreaProps) {
   if (!trick || trick.cards.length === 0) {
     return <div className="trick-pile" />;
   }
