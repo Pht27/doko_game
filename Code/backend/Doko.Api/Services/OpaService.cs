@@ -65,6 +65,7 @@ public sealed class OpaService(
                     var finished = await PlayFirstCardAsync(gameId, state, ct);
                     if (finished is not null)
                         return finished;
+                    await Task.Delay(700, ct);
                     break;
 
                 default:
