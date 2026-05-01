@@ -1,4 +1,5 @@
 import { t } from '@/utils/translations';
+import { usePlayerName } from '@/context/PlayerNamesContext';
 import './ArmutPartnerDialog.css';
 
 interface ArmutPartnerDialogProps {
@@ -7,9 +8,10 @@ interface ArmutPartnerDialogProps {
 }
 
 export function ArmutPartnerDialog({ playerId, onRespond }: ArmutPartnerDialogProps) {
+  const playerName = usePlayerName(playerId);
   return (
     <div className="armut-partner-dialog">
-      <h2 className="armut-partner-title">{t.armutPartnerTitle(playerId)}</h2>
+      <h2 className="armut-partner-title">{t.armutPartnerTitle(playerId, playerName)}</h2>
       <p className="armut-partner-description">{t.armutPartnerDescription}</p>
 
       <button

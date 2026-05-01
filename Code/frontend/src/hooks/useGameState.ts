@@ -29,6 +29,7 @@ export function useGameState(
   tokens: string[],
   gameId: string | null,
   activePlayer: number,
+  resolvePlayerName?: (id: number) => string,
 ): GameStateResult {
   const [view, setView] = useState<PlayerGameViewResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -48,6 +49,7 @@ export function useGameState(
   const connectionRef = useRef<signalR.HubConnection | null>(null);
   const refetchRef = useRef<(() => void) | null>(null);
   const showPopupRef = useRef<((msg: string) => void) | null>(null);
+  const resolvePlayerNameRef = useRef<((id: number) => string) | undefined>(resolvePlayerName);
 
   const token = tokens[activePlayer];
 
@@ -63,10 +65,14 @@ export function useGameState(
     setPopupAnnouncement(null);
   }, []);
 
-  // Keep showPopupRef in sync so SignalR handlers always call the latest version
+  // Keep refs in sync so SignalR handlers always use the latest versions
   useEffect(() => {
     showPopupRef.current = showPopup;
   }, [showPopup]);
+
+  useEffect(() => {
+    resolvePlayerNameRef.current = resolvePlayerName;
+  }, [resolvePlayerName]);
 
   const refetch = useCallback(async () => {
     if (!token || !gameId) return;
@@ -82,7 +88,9 @@ export function useGameState(
       if (data.phase === 'Playing' && announcedGameModeRef.current === undefined) {
         const incomingMode = data.activeGameMode ?? null;
         announcedGameModeRef.current = incomingMode;
-        const msg = t.gameModePopupMessage(incomingMode, data.gameModePlayerSeat ?? null);
+        const seat = data.gameModePlayerSeat ?? null;
+        const name = seat !== null ? resolvePlayerNameRef.current?.(seat) : undefined;
+        const msg = t.gameModePopupMessage(incomingMode, seat, name);
         showPopupRef.current?.(msg);
       }
       setError(null);
@@ -132,7 +140,8 @@ export function useGameState(
       setSonderkarteNotification(payload);
       setActiveSonderkarten(prev => [...prev, payload]);
       notifTimerRef.current = setTimeout(() => setSonderkarteNotification(null), 3000);
-      showPopupRef.current?.(t.sonderkartePopupMessage(payload.player, payload.type));
+      const skName = resolvePlayerNameRef.current?.(payload.player);
+      showPopupRef.current?.(t.sonderkartePopupMessage(payload.player, payload.type, skName));
       refetchRef.current?.();
     };
 

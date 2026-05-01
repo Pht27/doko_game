@@ -4,6 +4,7 @@ import { useGameState } from './hooks/useGameState';
 import { useTrickAnimation } from './hooks/useTrickAnimation';
 import { useGameActions } from './hooks/useGameActions';
 import { saveLobbySession, loadLobbySession, loadAnySession, clearLobbySession } from './hooks/useLobby';
+import { usePlayerNameResolver } from './context/PlayerNamesContext';
 import { joinSeat, getLobby, leaveLobby, voteNewGame, withdrawNewGame } from './api/lobby';
 import { GameBoard } from '@/features/game/GameBoard/GameBoard';
 import { GameLoader } from '@/features/game/GameLoader/GameLoader';
@@ -207,6 +208,8 @@ export default function App() {
 
   const activePlayer = isGame ? view.myPlayerId : isHotSeat ? hotSeat.activePlayer : 0;
 
+  const resolvePlayerName = usePlayerNameResolver();
+
   const {
     view: gameView,
     loading: viewLoading,
@@ -217,7 +220,7 @@ export default function App() {
     newGameVoteCount,
     newGameId,
     refetch,
-  } = useGameState(gameSession?.tokens ?? [], gameSession?.gameId ?? null, activePlayer);
+  } = useGameState(gameSession?.tokens ?? [], gameSession?.gameId ?? null, activePlayer, resolvePlayerName);
 
   // If the game is gone (backend restart), clear stale session and go home
   useEffect(() => {

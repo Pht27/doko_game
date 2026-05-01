@@ -1,5 +1,6 @@
 import type { PlayerPublicStateDto } from '@/types/api';
 import { t } from '@/utils/translations';
+import { usePlayerName } from '@/context/PlayerNamesContext';
 import './PlayerLabel.css';
 
 interface PlayerLabelProps {
@@ -14,6 +15,7 @@ interface PlayerLabelProps {
 }
 
 export function PlayerLabel({ player, isCurrentTurn, orientation, sonderkarteNotif, trickCount, showHealthStatus, isFlashing, onClick }: PlayerLabelProps) {
+  const playerName = usePlayerName(player.id);
   const active = isCurrentTurn ? 'player-label-active' : 'player-label-inactive';
 
   const nameColor =
@@ -47,7 +49,7 @@ export function PlayerLabel({ player, isCurrentTurn, orientation, sonderkarteNot
   const inner = (
     <>
       <div className="player-label-row">
-        <span className={`player-label-name ${nameColor}`}>{t.playerName(player.id)}</span>
+        <span className={`player-label-name ${nameColor}`}>{playerName}</span>
         {trickCount !== undefined && trickCount > 0 && (
           <span className="player-trick-count">{trickCount}</span>
         )}

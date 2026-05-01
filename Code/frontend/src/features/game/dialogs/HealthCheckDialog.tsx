@@ -1,4 +1,5 @@
 import { t } from '@/utils/translations';
+import { usePlayerName } from '@/context/PlayerNamesContext';
 import './HealthCheckDialog.css';
 
 interface HealthCheckDialogProps {
@@ -7,10 +8,11 @@ interface HealthCheckDialogProps {
 }
 
 export function HealthCheckDialog({ playerId, onDeclare }: HealthCheckDialogProps) {
+  const playerName = usePlayerName(playerId);
   return (
     <div className="health-check-dialog">
       <div className="health-check-who">
-        <span className="health-check-who-name">{t.playerName(playerId)}</span>
+        <span className="health-check-who-name">{playerName}</span>
         <span className="health-check-who-you">Du</span>
       </div>
 

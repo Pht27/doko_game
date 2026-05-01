@@ -1,5 +1,6 @@
 import type { GameResultDto } from '@/types/api';
 import { t } from '@/utils/translations';
+import { usePlayerNameResolver } from '@/context/PlayerNamesContext';
 
 interface LobbyHistoryProps {
   result: GameResultDto;
@@ -9,6 +10,7 @@ interface LobbyHistoryProps {
 }
 
 export function LobbyHistory({ result, mySeat, selectedGame, onSelectGame }: LobbyHistoryProps) {
+  const getPlayerName = usePlayerNameResolver();
   const history = result.matchHistory ?? [];
   const totalGames = history.length + (result.isGeschmissen ? 0 : 1);
   const standings = result.lobbyStandings;
@@ -39,7 +41,7 @@ export function LobbyHistory({ result, mySeat, selectedGame, onSelectGame }: Lob
             key={seat}
             className={seat === mySeat ? 'rh-cell rh-seat-header rh-seat-me' : 'rh-cell rh-seat-header'}
           >
-            {t.seatShort(seat)}
+            {t.seatShort(seat, getPlayerName(seat))}
           </div>
         ))}
       </div>

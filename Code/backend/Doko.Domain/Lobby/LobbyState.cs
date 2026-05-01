@@ -11,6 +11,7 @@ public class LobbyState
 {
     private readonly LobbyPlayer?[] _seats = new LobbyPlayer?[4];
     private readonly int[] _standings = new int[4];
+    private readonly string?[] _playerNames = new string?[4];
     private readonly HashSet<PlayerSeat> _newGameVoters = [];
     private readonly HashSet<PlayerSeat> _lobbyStartVoters = [];
     private readonly List<(
@@ -50,6 +51,17 @@ public class LobbyState
 
     /// <summary>Cumulative lobby standings per seat (index 0–3).</summary>
     public IReadOnlyList<int> Standings => Array.AsReadOnly(_standings);
+
+    /// <summary>Player-chosen display names per seat (index 0–3); null means no custom name.</summary>
+    public IReadOnlyList<string?> PlayerNames => Array.AsReadOnly(_playerNames);
+
+    /// <summary>Sets a custom display name for the given seat. Pass null to clear.</summary>
+    public void SetPlayerName(int seatIndex, string? name)
+    {
+        if (seatIndex < 0 || seatIndex >= 4)
+            return;
+        _playerNames[seatIndex] = string.IsNullOrWhiteSpace(name) ? null : name.Trim();
+    }
 
     /// <summary>Ordered list of completed game results with their net points and party per seat.</summary>
     public IReadOnlyList<(

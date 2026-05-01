@@ -13,6 +13,7 @@ export interface LobbySession {
 export interface LobbyHookState {
   seats: boolean[];
   opaSeats: number[];
+  playerNames: (string | null)[];
   gameId: string | null;
   isStarted: boolean;
   lobbyClosed: boolean;
@@ -56,6 +57,7 @@ export function clearLobbySession(): void {
 export function useLobby(session: LobbySession | null, lobbyId: string): LobbyHookState {
   const [seats, setSeats] = useState<boolean[]>(Array(4).fill(false));
   const [opaSeats, setOpaSeats] = useState<number[]>([]);
+  const [playerNames, setPlayerNames] = useState<(string | null)[]>(Array(4).fill(null));
   const [gameId, setGameId] = useState<string | null>(null);
   const [isStarted, setIsStarted] = useState(false);
   const [lobbyClosed, setLobbyClosed] = useState(false);
@@ -75,6 +77,7 @@ export function useLobby(session: LobbySession | null, lobbyId: string): LobbyHo
         if (!cancelled) {
           setSeats(view.seats);
           setOpaSeats(view.opaSeats ?? []);
+          setPlayerNames(view.playerNames ?? Array(4).fill(null));
           setStartVoteCount(view.startVoteCount ?? 0);
           setReadySeats(view.readySeats ?? []);
           setIsStarted(view.isStarted);
@@ -137,6 +140,15 @@ export function useLobby(session: LobbySession | null, lobbyId: string): LobbyHo
         if (!cancelled) setSelectedScenario(data.name ?? null);
       });
 
+      hub.on('playerNameChanged', (data: { seatIndex: number; name: string | null }) => {
+        if (cancelled) return;
+        setPlayerNames((prev) => {
+          const next = [...prev];
+          next[data.seatIndex] = data.name;
+          return next;
+        });
+      });
+
       hub.onreconnected(async () => {
         if (cancelled) return;
         try {
@@ -146,6 +158,7 @@ export function useLobby(session: LobbySession | null, lobbyId: string): LobbyHo
           if (cancelled) return;
           setSeats(view.seats);
           setOpaSeats(view.opaSeats ?? []);
+          setPlayerNames(view.playerNames ?? Array(4).fill(null));
           setStartVoteCount(view.startVoteCount ?? 0);
           setReadySeats(view.readySeats ?? []);
           setIsStarted(view.isStarted);
@@ -174,5 +187,5 @@ export function useLobby(session: LobbySession | null, lobbyId: string): LobbyHo
     };
   }, [session?.lobbyId, session?.token]);
 
-  return { seats, opaSeats, gameId, isStarted, lobbyClosed, startVoteCount, readySeats, selectedScenario, error };
+  return { seats, opaSeats, playerNames, gameId, isStarted, lobbyClosed, startVoteCount, readySeats, selectedScenario, error };
 }

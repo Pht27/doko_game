@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { SonderkarteInfoDto } from '@/types/api';
 import { t } from '@/utils/translations';
+import { usePlayerNameResolver } from '@/context/PlayerNamesContext';
 import './SonderkarteOverlay.css';
 
 const GENSCHER_TYPES = new Set(['Genscherdamen', 'Gegengenscherdamen']);
@@ -18,6 +19,7 @@ export function SonderkarteOverlay({
   onConfirm,
   onCancel,
 }: SonderkarteOverlayProps) {
+  const getPlayerName = usePlayerNameResolver();
   const [skIdx, setSkIdx] = useState(0);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
   const [inPartnerSelect, setInPartnerSelect] = useState(false);
@@ -80,7 +82,7 @@ export function SonderkarteOverlay({
                   className={`sk-partner-btn ${currentPartner === top ? 'sk-partner-btn-active' : ''}`}
                   onClick={() => setPartnerId(top)}
                 >
-                  {t.playerName(top)}
+                  {getPlayerName(top)}
                 </button>
               )}
             </div>
@@ -91,7 +93,7 @@ export function SonderkarteOverlay({
                     className={`sk-partner-btn ${currentPartner === left ? 'sk-partner-btn-active' : ''}`}
                     onClick={() => setPartnerId(left)}
                   >
-                    {t.playerName(left)}
+                    {getPlayerName(left)}
                   </button>
                 )}
               </div>
@@ -102,7 +104,7 @@ export function SonderkarteOverlay({
                     className={`sk-partner-btn ${currentPartner === right ? 'sk-partner-btn-active' : ''}`}
                     onClick={() => setPartnerId(right)}
                   >
-                    {t.playerName(right)}
+                    {getPlayerName(right)}
                   </button>
                 )}
               </div>

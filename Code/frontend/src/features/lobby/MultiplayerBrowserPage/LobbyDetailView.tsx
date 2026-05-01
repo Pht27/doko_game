@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { t } from '@/utils/translations';
-import { leaveLobby, joinSeat, swapSeat, getLobby, voteReady, withdrawReady, addOpa, removeOpa, getScenarios, setScenario } from '@/api/lobby';
+import { leaveLobby, joinSeat, swapSeat, getLobby, voteReady, withdrawReady, addOpa, removeOpa, getScenarios, setScenario, setLobbyPlayerName } from '@/api/lobby';
 import {
   useLobby,
   loadLobbySession,
@@ -8,6 +8,7 @@ import {
   saveLobbySession,
   clearLobbySession,
 } from '@/hooks/useLobby';
+import { useSetPlayerNames } from '@/context/PlayerNamesContext';
 import { ResultScreen } from '@/features/game/ResultScreen/ResultScreen';
 import { ReadyVoteButton } from '@/features/game/shared/ReadyVoteButton';
 import type { LobbySession } from '@/hooks/useLobby';
@@ -23,9 +24,13 @@ interface LobbyDetailViewProps {
 export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFinishedResult }: LobbyDetailViewProps) {
   const [session, setSession] = useState<LobbySession | null>(() => loadLobbySession(lobbyId));
 
-  const { seats, opaSeats, gameId, isStarted, lobbyClosed, startVoteCount, readySeats, selectedScenario, error } = useLobby(session, lobbyId);
+  const { seats, opaSeats, playerNames, gameId, isStarted, lobbyClosed, startVoteCount, readySeats, selectedScenario, error } = useLobby(session, lobbyId);
+  const setPlayerNamesCtx = useSetPlayerNames();
 
   const [copied, setCopied] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState('');
+  const nameInputRef = useRef<HTMLInputElement>(null);
   const [hasVoted, setHasVoted] = useState(false);
   const [voting, setVoting] = useState(false);
   const [leaving, setLeaving] = useState(false);
@@ -52,6 +57,35 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lobbyClosed]);
+
+  // Sync lobby player names into the app-level context so they persist into the game
+  useEffect(() => {
+    setPlayerNamesCtx(playerNames);
+  }, [playerNames, setPlayerNamesCtx]);
+
+  function startEditingName() {
+    if (!session) return;
+    const current = playerNames[session.seatIndex] ?? '';
+    setNameInput(current);
+    setIsEditingName(true);
+    setTimeout(() => nameInputRef.current?.focus(), 0);
+  }
+
+  async function submitName() {
+    if (!session) return;
+    setIsEditingName(false);
+    const trimmed = nameInput.trim() || null;
+    try {
+      await setLobbyPlayerName(session.token, lobbyId, trimmed);
+    } catch {
+      // best-effort: SignalR will update the name for everyone including us
+    }
+  }
+
+  function handleNameKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Enter') submitName();
+    if (e.key === 'Escape') setIsEditingName(false);
+  }
 
   async function copyLink() {
     await navigator.clipboard.writeText(inviteUrl);
@@ -239,7 +273,7 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
                   occupied ? 'bg-green-400' : 'bg-white/20'
                 }`}
               />
-              <span className="text-sm font-medium truncate flex-1">
+              <span className="text-sm font-medium truncate flex-1 min-w-0">
                 {isBusy ? (
                   t.joiningLobby
                 ) : isOpa ? (
@@ -248,16 +282,42 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
                     <span className="text-white/40 text-xs ml-1">🤖</span>
                   </>
                 ) : occupied ? (
-                  <>
-                    {t.playerSlot(i)}
-                    {isMe && <span className="text-white/50 text-xs">{t.youSuffix}</span>}
-                  </>
+                  isMe && isEditingName ? (
+                    <input
+                      ref={nameInputRef}
+                      value={nameInput}
+                      onChange={(e) => setNameInput(e.target.value)}
+                      onBlur={submitName}
+                      onKeyDown={handleNameKeyDown}
+                      maxLength={16}
+                      placeholder={t.playerSlot(i)}
+                      className="bg-transparent border-b border-white/40 outline-none text-white text-sm w-full"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  ) : (
+                    <>
+                      <span className="truncate">{playerNames[i] ?? t.playerSlot(i)}</span>
+                      {isMe && <span className="text-white/50 text-xs shrink-0">{t.youSuffix}</span>}
+                    </>
+                  )
                 ) : (
                   t.seatLabel(i)
                 )}
               </span>
-              {isReady && !canRemoveOpa && !canAddOpa && (
+              {isMe && !isEditingName && !canRemoveOpa && !canAddOpa && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); startEditingName(); }}
+                  className="ml-auto text-white/30 hover:text-white/70 text-xs px-1 shrink-0"
+                  title="Namen ändern"
+                >
+                  ✏️
+                </button>
+              )}
+              {isReady && !isMe && !canRemoveOpa && !canAddOpa && (
                 <span className="ml-auto text-green-400 text-sm shrink-0" title="Bereit">✓</span>
+              )}
+              {isReady && isMe && !isEditingName && !canRemoveOpa && !canAddOpa && (
+                <span className="text-green-400 text-sm shrink-0" title="Bereit">✓</span>
               )}
               {canRemoveOpa && (
                 <button

@@ -1,4 +1,5 @@
 import { t } from '@/utils/translations';
+import { usePlayerName } from '@/context/PlayerNamesContext';
 import './SelfPlayerLabel.css';
 
 interface SelfPlayerLabelProps {
@@ -16,6 +17,7 @@ export function SelfPlayerLabel({
   highestAnnouncement,
   isCurrentTurn,
 }: SelfPlayerLabelProps) {
+  const playerName = usePlayerName(playerId);
   const bgClass =
     ownParty === 'Re'
       ? 'self-bg-re'
@@ -25,7 +27,7 @@ export function SelfPlayerLabel({
 
   return (
     <div className={`self-player-label ${bgClass} ${isCurrentTurn ? 'self-label-active' : ''}`}>
-      <span className="self-label-name">{t.playerName(playerId)}</span>
+      <span className="self-label-name">{playerName}</span>
       {trickCount > 0 && (
         <>
           <span className="self-label-dot">·</span>

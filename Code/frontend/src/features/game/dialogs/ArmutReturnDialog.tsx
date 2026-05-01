@@ -1,4 +1,5 @@
 import { t } from '@/utils/translations';
+import { usePlayerName } from '@/context/PlayerNamesContext';
 import './ArmutReturnDialog.css';
 
 interface ArmutReturnDialogProps {
@@ -14,10 +15,11 @@ export function ArmutReturnDialog({
   selectedCount,
   onConfirm,
 }: ArmutReturnDialogProps) {
+  const playerName = usePlayerName(playerId);
   return (
     <div className="armut-return-dialog">
       <h2 className="armut-return-title">
-        {t.armutReturnTitle(playerId, cardReturnCount)}
+        {t.armutReturnTitle(playerId, cardReturnCount, playerName)}
       </h2>
       <p className="armut-return-description">
         {t.armutReturnDescription(selectedCount, cardReturnCount)}

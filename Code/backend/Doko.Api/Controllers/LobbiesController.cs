@@ -299,7 +299,8 @@ public class LobbiesController(
                 lobby.ActiveGameId?.ToString(),
                 lobby.OpaSeats.ToArray(),
                 lobby.SelectedScenario,
-                lobby.LobbyStartVoterSeats.ToArray()
+                lobby.LobbyStartVoterSeats.ToArray(),
+                lobby.PlayerNames.ToArray()
             )
         );
     }
@@ -591,6 +592,40 @@ public class LobbiesController(
         return Ok(new { name = body.Name });
     }
 
+    [HttpPatch("{lobbyId}/name")]
+    [Authorize]
+    public async Task<IActionResult> SetPlayerName(
+        string lobbyId,
+        [FromBody] SetPlayerNameRequest body,
+        CancellationToken ct
+    )
+    {
+        if (!Guid.TryParse(lobbyId, out var guid))
+            return NotFound(new ErrorResponse("lobby_not_found"));
+
+        var lobby = await lobbyRepository.GetAsync(new LobbyId(guid), ct);
+        if (lobby is null)
+            return NotFound(new ErrorResponse("lobby_not_found"));
+
+        var callerId = GetCallerSeat();
+        if (!lobby.HasPlayer(callerId))
+            return Forbid();
+
+        var seatIndex = (int)callerId;
+        lobby.SetPlayerName(seatIndex, body.Name);
+        await lobbyRepository.SaveAsync(lobby, ct);
+
+        await hub
+            .Clients.Group($"lobby_{lobbyId}")
+            .SendAsync(
+                "playerNameChanged",
+                new { seatIndex, name = lobby.PlayerNames[seatIndex] },
+                ct
+            );
+
+        return Ok(new { seatIndex, name = lobby.PlayerNames[seatIndex] });
+    }
+
     private PlayerSeat GetCallerSeat()
     {
         var claim = User.FindFirst("seat_index")?.Value ?? "0";
@@ -599,3 +634,5 @@ public class LobbiesController(
 }
 
 public record SetScenarioRequest(string? Name);
+
+public record SetPlayerNameRequest(string? Name);

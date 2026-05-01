@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { t } from '@/utils/translations';
+import { usePlayerName } from '@/context/PlayerNamesContext';
 import './ReservationDialog.css';
 
 interface ReservationDialogProps {
@@ -37,6 +38,7 @@ function getCategories(eligibleReservations: string[]): Category[] {
 }
 
 export function ReservationDialog({ playerId, eligibleReservations, mustDeclare = false, onDeclare }: ReservationDialogProps) {
+  const playerName = usePlayerName(playerId);
   const categories = getCategories(eligibleReservations);
   const [selectedCategory, setSelectedCategory] = useState<Category>(categories[0] ?? 'Solo');
 
@@ -46,7 +48,7 @@ export function ReservationDialog({ playerId, eligibleReservations, mustDeclare 
   return (
     <div className="rd-dialog">
       <div className="rd-header">
-        <span className="rd-title">{t.reservationTitle(playerId)}</span>
+        <span className="rd-title">{t.reservationTitle(playerId, playerName)}</span>
         {!mustDeclare && (
           <button className="rd-pass-btn" onClick={() => onDeclare(null, null, null)}>
             {t.pass}

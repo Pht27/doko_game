@@ -23,7 +23,8 @@ public record LobbyViewResponse(
     string? ActiveGameId = null,
     int[]? OpaSeats = null,
     string? SelectedScenario = null,
-    int[]? ReadySeats = null
+    int[]? ReadySeats = null,
+    string?[]? PlayerNames = null
 );
 
 public record StartLobbyGameResponse(string GameId);
