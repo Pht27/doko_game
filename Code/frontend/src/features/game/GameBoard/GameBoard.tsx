@@ -8,6 +8,7 @@ import { ResultScreen } from '../ResultScreen/ResultScreen';
 import { GameModeBadge } from '../GameModeBadge/GameModeBadge';
 import { BurgerMenu } from '../BurgerMenu/BurgerMenu';
 import { TitleCard } from '../TitleCard/TitleCard';
+import { ShuffleAnimation } from '../ShuffleAnimation/ShuffleAnimation';
 import { PlayerLabel } from '../shared/PlayerLabel';
 import { SelfPlayerLabel } from '../shared/SelfPlayerLabel';
 import { HandDisplay } from '../HandDisplay/HandDisplay';
@@ -125,6 +126,24 @@ export function GameBoard({
     return () => clearTimeout(timer);
   }, [view?.otherPlayers]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Shuffle animation: shown at the start of each new game (detected via gameId change)
+  const [shuffleAnimKey, setShuffleAnimKey] = useState<number | null>(null);
+  const prevGameIdRef = useRef<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (!view) return;
+    if (view.gameId !== prevGameIdRef.current && view.completedTricks.length === 0) {
+      setShuffleAnimKey(Date.now());
+    }
+    prevGameIdRef.current = view.gameId;
+  }, [view?.gameId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Derived synchronously so the hand is hidden already on the first render that
+  // brings in a new gameId — before the effect above has had a chance to run.
+  const isShuffling =
+    shuffleAnimKey !== null ||
+    (view !== null && view.gameId !== prevGameIdRef.current && view.completedTricks.length === 0);
+
   // Title card: shown when phase first transitions to Playing
   const [titleCardKey, setTitleCardKey] = useState<number | null>(null);
   const [titleCardData, setTitleCardData] = useState<{
@@ -205,6 +224,11 @@ export function GameBoard({
             phase={view.phase}
           />
         </div>
+      )}
+
+      {/* Shuffle animation: shown at the start of each new dealing phase */}
+      {isShuffling && (
+        <ShuffleAnimation key={shuffleAnimKey ?? 0} onDone={() => setShuffleAnimKey(null)} />
       )}
 
       {/* Title card: animated center announcement when game mode is determined */}
@@ -316,7 +340,7 @@ export function GameBoard({
       {/* Hand — .hand-container clips the bottom half of the cards so they
            appear to rise from below the table edge (see HandDisplay.css) */}
       <div className="hand-container">
-        {view && (
+        {view && !isShuffling && (
           <HandDisplay
             cards={view.handSorted}
             legalCardIds={legalCardIds}
@@ -332,7 +356,7 @@ export function GameBoard({
       </div>
 
       {/* Dialog overlays: centered, top-anchored, hover over hand */}
-      {view?.shouldDeclareHealth && (
+      {!isShuffling && view?.shouldDeclareHealth && (
         <div className="absolute left-1/2 -translate-x-1/2 top-[20%] z-20">
           <HealthCheckDialog
             playerId={activePlayer}
@@ -341,7 +365,7 @@ export function GameBoard({
         </div>
       )}
 
-      {view?.shouldDeclareReservation && (
+      {!isShuffling && view?.shouldDeclareReservation && (
         <div className="absolute left-1/2 -translate-x-1/2 top-[20%] z-20 w-[calc(100%-2rem)] max-w-sm">
           <ReservationDialog
             playerId={activePlayer}
@@ -352,7 +376,7 @@ export function GameBoard({
         </div>
       )}
 
-      {view?.shouldRespondToArmut && (
+      {!isShuffling && view?.shouldRespondToArmut && (
         <div className="absolute left-1/2 -translate-x-1/2 top-[20%] z-20">
           <ArmutPartnerDialog
             playerId={activePlayer}
@@ -361,7 +385,7 @@ export function GameBoard({
         </div>
       )}
 
-      {view?.shouldReturnArmutCards && view.armutCardReturnCount !== null && (
+      {!isShuffling && view?.shouldReturnArmutCards && view.armutCardReturnCount !== null && (
         <div className="absolute left-1/2 -translate-x-1/2 top-[20%] z-20">
           <ArmutReturnDialog
             playerId={activePlayer}
@@ -372,7 +396,7 @@ export function GameBoard({
         </div>
       )}
 
-      {view?.shouldChooseSchwarzesSauSolo && view.eligibleSchwarzesSauSolos.length > 0 && (
+      {!isShuffling && view?.shouldChooseSchwarzesSauSolo && view.eligibleSchwarzesSauSolos.length > 0 && (
         <div className="absolute left-1/2 -translate-x-1/2 top-[20%] z-20 w-[calc(100%-2rem)] max-w-sm">
           <SchwarzesSauSoloDialog
             playerId={activePlayer}

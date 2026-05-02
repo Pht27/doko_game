@@ -3,6 +3,7 @@
 ## [1.2.2] - 2026-05-02
 
 ### Neu
+- Zu Beginn jedes Spiels läuft eine kurze Misch- und Austeilanimation: Karten kreisen in der Mitte, der Stapel wird abgehoben und dann fliegen die Karten zu jedem Spieler.
 - Spieler können sich in der Lobby einen eigenen Namen geben (Stift-Symbol auf dem eigenen Sitz). Der Name ist für alle anderen Mitspieler sichtbar und erscheint überall, wo bisher „S1"–„S4" stand: Spielfeld, Dialoge, Ergebnisanzeige.
 
 ## [1.2.1] - 2026-05-01

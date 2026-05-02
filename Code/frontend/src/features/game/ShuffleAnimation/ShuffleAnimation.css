@@ -1,0 +1,166 @@
+@reference "../../../styles/index.css";
+
+/* Background dims in and out with the animation */
+@keyframes sa-bg {
+  0%   { background: rgba(0, 0, 0, 0); }
+  5%   { background: rgba(0, 0, 0, 0.30); }
+  80%  { background: rgba(0, 0, 0, 0.30); }
+  100% { background: rgba(0, 0, 0, 0); }
+}
+
+.sa-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  animation: sa-bg 4s linear both;
+}
+
+/* All cards: positioned at screen center; translate(-50%,-50%) is baked into every keyframe */
+.sa-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: clamp(1.4rem, 5.5vw, 2rem);
+  height: auto;
+  border-radius: 3px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
+}
+
+/* ─── Timeline (4 s) ──────────────────────────────────────────────────────
+   Phase 1  0 %–35 %   4 stacks: 90° CW orbit   (N→E, E→S, S→W, W→N)
+   Phase 2  35%–60%    3 stacks: 120° CW orbit   (N→SE, SE→SW, SW→N)
+   Phase 3  60%–73%    1 stack : tiny 90° arc     (N only)
+   Phase 4  73%–100%   quick split + fly to players
+   ──────────────────────────────────────────────────────────────────────── */
+
+/* Circular-arc math (clockwise from north, CSS y-axis down):
+   x_offset =  sin(θ) × r
+   y_offset = −cos(θ) × r
+   Centering: translate(-50%, -50%) baked in as base offset.              */
+
+/* ── CENTER CARD ── stays throughout phases 1–3, fades at deal */
+@keyframes sa-center {
+  0%   { opacity: 0; transform: translate(-50%, -50%); }
+  5%   { opacity: 1; transform: translate(-50%, -50%); }
+  73%  { opacity: 1; transform: translate(-50%, -50%); }
+  80%  { opacity: 0; transform: translate(-50%, -50%); }
+  100% { opacity: 0; transform: translate(-50%, -50%); }
+}
+
+/* ── NORTH ──
+   Ph1: 0°→90° CW (top→right),   r=2.5rem
+   Ph2: 0°→120° CW (top→SE),     r=1.8rem
+   Ph3: tiny 0°→90° arc,          r=0.6rem
+   Ph4: split up, fly north                                               */
+@keyframes sa-north {
+  0%   { opacity: 0; transform: translate(-50%, -50%); }
+  5%   { opacity: 1; transform: translate(-50%, -50%); }
+  /* Phase 1 – 90° arc N→E, 5 stops (faster) */
+  8%   { transform: translate(-50%,                       calc(-50% - 2.5rem)); }
+  12%  { transform: translate(calc(-50% + 0.96rem),       calc(-50% - 2.31rem)); }
+  17%  { transform: translate(calc(-50% + 1.77rem),       calc(-50% - 1.77rem)); }
+  21%  { transform: translate(calc(-50% + 2.31rem),       calc(-50% - 0.96rem)); }
+  25%  { transform: translate(calc(-50% + 2.5rem),        -50%); }
+  35%  { transform: translate(-50%, -50%); }
+  /* Phase 2 – 120° arc N→SE, 5 stops */
+  39%  { transform: translate(-50%,                       calc(-50% - 1.8rem)); }
+  43%  { transform: translate(calc(-50% + 0.9rem),        calc(-50% - 1.56rem)); }
+  47%  { transform: translate(calc(-50% + 1.56rem),       calc(-50% - 0.9rem)); }
+  51%  { transform: translate(calc(-50% + 1.8rem),        -50%); }
+  55%  { transform: translate(calc(-50% + 1.56rem),       calc(-50% + 0.9rem)); }
+  60%  { transform: translate(-50%, -50%); }
+  /* Phase 3 – Abheben: slide right (fully clear), hold, arc back onto stack */
+  62%  { transform: translate(calc(-50% + 3rem),          -50%); }
+  68%  { transform: translate(calc(-50% + 3rem),          -50%); }
+  71%  { transform: translate(calc(-50% + 1.2rem),        calc(-50% - 0.6rem)); }
+  73%  { transform: translate(-50%, -50%); }
+  /* Phase 4 – split + fly north (N/S shorter → naturally slower) */
+  76%  { opacity: 1; transform: translate(-50%, calc(-50% - 0.5rem)) rotate(0deg); }
+  100% { opacity: 0; transform: translate(-50%, calc(-50% - 45vh))   rotate(0deg); }
+}
+
+/* ── EAST ──
+   Ph1: 90°→180° CW (right→bottom),   r=2.5rem
+   Ph2: 120°→240° CW (SE→SW),          r=1.8rem
+   Ph3: stays
+   Ph4: split right, fly east                                             */
+@keyframes sa-east {
+  0%   { opacity: 0; transform: translate(-50%, -50%); }
+  5%   { opacity: 1; transform: translate(-50%, -50%); }
+  /* Phase 1 – 90° arc E→S (faster) */
+  8%   { transform: translate(calc(-50% + 2.5rem),        -50%); }
+  12%  { transform: translate(calc(-50% + 2.31rem),       calc(-50% + 0.96rem)); }
+  17%  { transform: translate(calc(-50% + 1.77rem),       calc(-50% + 1.77rem)); }
+  21%  { transform: translate(calc(-50% + 0.96rem),       calc(-50% + 2.31rem)); }
+  25%  { transform: translate(-50%,                       calc(-50% + 2.5rem)); }
+  35%  { transform: translate(-50%, -50%); }
+  /* Phase 2 – 120° arc SE→SW */
+  39%  { transform: translate(calc(-50% + 1.56rem),       calc(-50% + 0.9rem)); }
+  43%  { transform: translate(calc(-50% + 0.9rem),        calc(-50% + 1.56rem)); }
+  47%  { transform: translate(-50%,                       calc(-50% + 1.8rem)); }
+  51%  { transform: translate(calc(-50% - 0.9rem),        calc(-50% + 1.56rem)); }
+  55%  { transform: translate(calc(-50% - 1.56rem),       calc(-50% + 0.9rem)); }
+  60%  { transform: translate(-50%, -50%); }
+  /* Phase 3 – stays */
+  73%  { transform: translate(-50%, -50%); }
+  /* Phase 4 – split right, fly east */
+  76%  { opacity: 1; transform: translate(calc(-50% + 0.7rem), -50%) rotate(90deg); }
+  100% { opacity: 0; transform: translate(calc(-50% + 60vw),   -50%) rotate(90deg); }
+}
+
+/* ── SOUTH ──
+   Ph1: 180°→270° CW (bottom→left),   r=2.5rem
+   Ph2: 240°→360° CW (SW→top),         r=1.8rem
+   Ph3: stays
+   Ph4: split down, fly south                                             */
+@keyframes sa-south {
+  0%   { opacity: 0; transform: translate(-50%, -50%); }
+  5%   { opacity: 1; transform: translate(-50%, -50%); }
+  /* Phase 1 – 90° arc S→W (faster) */
+  8%   { transform: translate(-50%,                       calc(-50% + 2.5rem)); }
+  12%  { transform: translate(calc(-50% - 0.96rem),       calc(-50% + 2.31rem)); }
+  17%  { transform: translate(calc(-50% - 1.77rem),       calc(-50% + 1.77rem)); }
+  21%  { transform: translate(calc(-50% - 2.31rem),       calc(-50% + 0.96rem)); }
+  25%  { transform: translate(calc(-50% - 2.5rem),        -50%); }
+  35%  { transform: translate(-50%, -50%); }
+  /* Phase 2 – 120° arc SW→N */
+  39%  { transform: translate(calc(-50% - 1.56rem),       calc(-50% + 0.9rem)); }
+  43%  { transform: translate(calc(-50% - 1.8rem),        -50%); }
+  47%  { transform: translate(calc(-50% - 1.56rem),       calc(-50% - 0.9rem)); }
+  51%  { transform: translate(calc(-50% - 0.9rem),        calc(-50% - 1.56rem)); }
+  55%  { transform: translate(-50%,                       calc(-50% - 1.8rem)); }
+  60%  { transform: translate(-50%, -50%); }
+  /* Phase 3 – stays */
+  73%  { transform: translate(-50%, -50%); }
+  /* Phase 4 – split down, fly south */
+  76%  { opacity: 1; transform: translate(-50%, calc(-50% + 0.5rem)) rotate(0deg); }
+  100% { opacity: 0; transform: translate(-50%, calc(-50% + 45vh))   rotate(0deg); }
+}
+
+/* ── WEST ──
+   Ph1: 270°→360° CW (left→top),   r=2.5rem
+   Ph2+3: stays
+   Ph4: split left, fly west                                              */
+@keyframes sa-west {
+  0%   { opacity: 0; transform: translate(-50%, -50%); }
+  5%   { opacity: 1; transform: translate(-50%, -50%); }
+  /* Phase 1 – 90° arc W→N (faster) */
+  8%   { transform: translate(calc(-50% - 2.5rem),        -50%); }
+  12%  { transform: translate(calc(-50% - 2.31rem),       calc(-50% - 0.96rem)); }
+  17%  { transform: translate(calc(-50% - 1.77rem),       calc(-50% - 1.77rem)); }
+  21%  { transform: translate(calc(-50% - 0.96rem),       calc(-50% - 2.31rem)); }
+  25%  { transform: translate(-50%,                       calc(-50% - 2.5rem)); }
+  35%  { transform: translate(-50%, -50%); }
+  /* Phases 2+3 – stays */
+  73%  { transform: translate(-50%, -50%); }
+  /* Phase 4 – split left, fly west */
+  76%  { opacity: 1; transform: translate(calc(-50% - 0.7rem), -50%) rotate(-90deg); }
+  100% { opacity: 0; transform: translate(calc(-50% - 60vw),   -50%) rotate(-90deg); }
+}
+
+.sa-center { animation: sa-center 4s linear both; }
+.sa-north  { animation: sa-north  4s linear both; }
+.sa-east   { animation: sa-east   4s linear both; animation-delay: 0.05s; }
+.sa-south  { animation: sa-south  4s linear both; animation-delay: 0.10s; }
+.sa-west   { animation: sa-west   4s linear both; animation-delay: 0.15s; }
