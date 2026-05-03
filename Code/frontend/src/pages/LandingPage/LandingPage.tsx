@@ -1,16 +1,15 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { t } from '@/utils/translations';
 import { showTestFeatures } from '@/utils/env';
 import { appVersion } from '@/utils/releaseNotes';
 import { ReleaseNotesModal } from '@/components/ReleaseNotesModal/ReleaseNotesModal';
 
-interface LandingPageProps {
-  onMultiplayer: () => void;
-  onTestGame: () => void;
-  onRules: () => void;
-}
-
-export function LandingPage({ onMultiplayer, onTestGame, onRules }: LandingPageProps) {
+export function LandingPage() {
+  const navigate = useNavigate();
+  const onMultiplayer = () => navigate('/lobby');
+  const onTestGame = () => navigate('/hot-seat');
+  const onRules = () => navigate('/rules');
   const [showReleaseNotes, setShowReleaseNotes] = useState(false);
 
   return (

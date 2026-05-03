@@ -1,5 +1,23 @@
 ## Lokale Entwicklung
 
+### PostgreSQL (einmalig anlegen, dann nur noch starten)
+
+```sh
+# Einmalig: Container anlegen
+sudo docker run -d \
+  --name doko-postgres-dev \
+  -e POSTGRES_DB=doko \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 5432:5432 \
+  postgres:17-alpine
+
+# Danach (nach Rechnerneustart etc.):
+sudo docker start doko-postgres-dev
+```
+
+### Backend + Frontend
+
 ```sh
 cd ~/programming/doko/claude_website
 dotnet run --project Code/backend/Doko.Api
