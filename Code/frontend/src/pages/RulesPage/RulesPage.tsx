@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { t } from '@/utils/translations';
 import { BackButton } from '@/components/BackButton/BackButton';
 import './RulesPage.css';
@@ -11,10 +12,6 @@ const cards = import.meta.glob('../../assets/cards/*.svg', {
 
 function card(name: string) {
   return cards[`../../assets/cards/${name}.svg`] ?? '';
-}
-
-interface RulesPageProps {
-  onBack: () => void;
 }
 
 type SectionId = 'grundlagen' | 'trumpf' | 'vorbehalte' | 'soli' | 'ansagen' | 'sonderkarten' | 'extrapunkte' | 'spielwert';
@@ -30,7 +27,9 @@ const SECTION_KEYWORDS: Record<SectionId, string> = {
   spielwert: 'spielwert punkte wertung gewonnen gegen alten solo dreifach',
 };
 
-export function RulesPage({ onBack }: RulesPageProps) {
+export function RulesPage() {
+  const navigate = useNavigate();
+  const onBack = () => navigate(-1);
   const [openSections, setOpenSections] = useState<Set<SectionId>>(new Set(['grundlagen']));
   const [search, setSearch] = useState('');
   const [collapsed, setCollapsed] = useState(false);
