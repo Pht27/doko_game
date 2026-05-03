@@ -32,6 +32,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
       - doko-net
     restart: unless-stopped
@@ -46,6 +47,7 @@ services:
       dockerfile: Code/infrastructure/backend/Dockerfile
     environment:
       - Jwt__Key=${JWT_SECRET}
+      - ConnectionStrings__Analog=Host=postgres;Database=doko_analog;Username=doko_app;Password=${POSTGRES_PASSWORD}
     depends_on:
       - postgres
     networks:
@@ -66,6 +68,7 @@ services:
       dockerfile: Code/infrastructure/backend/Dockerfile
     environment:
       - Jwt__Key=${JWT_SECRET}
+      - ConnectionStrings__Analog=Host=postgres;Database=doko_analog_staging;Username=doko_app;Password=${POSTGRES_PASSWORD}
     depends_on:
       - postgres
     networks:

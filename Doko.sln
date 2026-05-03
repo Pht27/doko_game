@@ -1,4 +1,4 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -22,6 +22,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Api.Tests", "Code\tests\Doko.Api.Tests\Doko.Api.Tests.csproj", "{D6E7F8A9-B0C1-4D2E-9F3A-4B5C6D7E8F9A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Api.IntegrationTests", "Code\tests\Doko.Api.IntegrationTests\Doko.Api.IntegrationTests.csproj", "{E7F8A9B0-C1D2-4E3F-A04B-5C6D7E8F9A0B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "backend", "backend", "{D6F476A3-F118-174E-5696-78A6745069FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Analog", "Code\backend\Doko.Analog\Doko.Analog.csproj", "{84CF1026-6102-451C-BBB4-6DABB1CCB9FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -129,6 +133,18 @@ Global
 		{E7F8A9B0-C1D2-4E3F-A04B-5C6D7E8F9A0B}.Release|x64.Build.0 = Release|Any CPU
 		{E7F8A9B0-C1D2-4E3F-A04B-5C6D7E8F9A0B}.Release|x86.ActiveCfg = Release|Any CPU
 		{E7F8A9B0-C1D2-4E3F-A04B-5C6D7E8F9A0B}.Release|x86.Build.0 = Release|Any CPU
+		{84CF1026-6102-451C-BBB4-6DABB1CCB9FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84CF1026-6102-451C-BBB4-6DABB1CCB9FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84CF1026-6102-451C-BBB4-6DABB1CCB9FF}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{84CF1026-6102-451C-BBB4-6DABB1CCB9FF}.Debug|x64.Build.0 = Debug|Any CPU
+		{84CF1026-6102-451C-BBB4-6DABB1CCB9FF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{84CF1026-6102-451C-BBB4-6DABB1CCB9FF}.Debug|x86.Build.0 = Debug|Any CPU
+		{84CF1026-6102-451C-BBB4-6DABB1CCB9FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84CF1026-6102-451C-BBB4-6DABB1CCB9FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84CF1026-6102-451C-BBB4-6DABB1CCB9FF}.Release|x64.ActiveCfg = Release|Any CPU
+		{84CF1026-6102-451C-BBB4-6DABB1CCB9FF}.Release|x64.Build.0 = Release|Any CPU
+		{84CF1026-6102-451C-BBB4-6DABB1CCB9FF}.Release|x86.ActiveCfg = Release|Any CPU
+		{84CF1026-6102-451C-BBB4-6DABB1CCB9FF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -142,5 +158,7 @@ Global
 		{C5D6E7F8-A9B0-4C1D-8E2F-3A4B5C6D7E8F} = {196828B5-7FA5-49A8-B9B6-C6C916A72567}
 		{D6E7F8A9-B0C1-4D2E-9F3A-4B5C6D7E8F9A} = {7569D44E-D048-4D29-9C5D-65639A42BAFF}
 		{E7F8A9B0-C1D2-4E3F-A04B-5C6D7E8F9A0B} = {7569D44E-D048-4D29-9C5D-65639A42BAFF}
+		{D6F476A3-F118-174E-5696-78A6745069FA} = {196828B5-7FA5-49A8-B9B6-C6C916A72567}
+		{84CF1026-6102-451C-BBB4-6DABB1CCB9FF} = {D6F476A3-F118-174E-5696-78A6745069FA}
 	EndGlobalSection
 EndGlobal
