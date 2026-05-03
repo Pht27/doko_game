@@ -1,0 +1,9 @@
+---
+- name: Doko Server Setup
+  hosts: doko
+  become: true
+
+  roles:
+    - docker
+    - app-deploy
+    - maintenance

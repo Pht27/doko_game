@@ -1,0 +1,21 @@
+---
+- name: Install weekly restart systemd service
+  template:
+    src: weekly-restart.service.j2
+    dest: /etc/systemd/system/weekly-restart.service
+    mode: "0644"
+  notify: Reload systemd
+
+- name: Install weekly restart systemd timer
+  template:
+    src: weekly-restart.timer.j2
+    dest: /etc/systemd/system/weekly-restart.timer
+    mode: "0644"
+  notify: Reload systemd
+
+- name: Enable and start weekly restart timer
+  systemd:
+    name: weekly-restart.timer
+    state: started
+    enabled: true
+    daemon_reload: true

@@ -1,0 +1,8 @@
+[Unit]
+Description=Weekly system update and reboot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'apt-get update -qq && apt-get upgrade -y && /sbin/reboot'
