@@ -1,3 +1,4 @@
+using Doko.Analog.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +15,8 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<AnalogDbContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("Analog"))
         );
+
+        services.AddScoped<AnalogPlayersService>();
 
         return services;
     }
