@@ -1,0 +1,4 @@
+---
+- name: Remind to fill in .env secrets
+  debug:
+    msg: ".env was created from example — fill in real values before services will work correctly."

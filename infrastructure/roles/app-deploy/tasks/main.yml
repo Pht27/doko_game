@@ -1,0 +1,28 @@
+---
+- name: Clone or update repository
+  git:
+    repo: "{{ repo_url }}"
+    dest: "{{ app_path }}"
+    version: main
+    force: false
+
+- name: Check if .env already exists
+  stat:
+    path: "{{ app_path }}/Code/infrastructure/.env"
+  register: env_file
+
+- name: Create .env from example if not present
+  copy:
+    src: "{{ app_path }}/Code/infrastructure/.env.example"
+    dest: "{{ app_path }}/Code/infrastructure/.env"
+    remote_src: true
+  when: not env_file.stat.exists
+  notify: Remind to fill in .env secrets
+
+- name: Start all containers
+  community.docker.docker_compose_v2:
+    project_src: "{{ app_path }}/Code/infrastructure"
+    files:
+      - docker-compose.yml
+    state: present
+    pull: missing

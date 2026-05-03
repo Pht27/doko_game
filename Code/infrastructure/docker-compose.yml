@@ -21,6 +21,22 @@ services:
     restart: unless-stopped
 
   # =========================
+  # POSTGRESQL
+  # =========================
+  postgres:
+    image: postgres:17-alpine
+    container_name: postgres
+    environment:
+      - POSTGRES_DB=doko_analog
+      - POSTGRES_USER=doko_app
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - doko-net
+    restart: unless-stopped
+
+  # =========================
   # BACKEND PROD
   # =========================
   backend:
@@ -30,6 +46,8 @@ services:
       dockerfile: Code/infrastructure/backend/Dockerfile
     environment:
       - Jwt__Key=${JWT_SECRET}
+    depends_on:
+      - postgres
     networks:
       - doko-net
     restart: unless-stopped
@@ -48,6 +66,8 @@ services:
       dockerfile: Code/infrastructure/backend/Dockerfile
     environment:
       - Jwt__Key=${JWT_SECRET}
+    depends_on:
+      - postgres
     networks:
       - doko-net
     restart: unless-stopped
@@ -58,6 +78,7 @@ services:
 
 volumes:
   caddy_data:
+  postgres_data:
 
 networks:
   doko-net:
