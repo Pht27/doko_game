@@ -1,10 +1,12 @@
 using System.Text;
 using System.Text.Json;
+using Doko.Analog;
 using Doko.Api.Extensions;
 using Doko.Api.Hubs;
 using Doko.Application;
 using Doko.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +16,8 @@ var jwtKey =
     ?? throw new InvalidOperationException("Jwt:Key is not configured.");
 
 builder
-    .Services.AddDokoApplication()
+    .Services.AddDokoAnalog(builder.Configuration)
+    .AddDokoApplication()
     .AddDokoInfrastructure(builder.Configuration)
     .AddDokoApi()
     .AddSignalR()
@@ -70,6 +73,12 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AnalogDbContext>();
+    await db.Database.MigrateAsync();
+}
 
 app.UseCors();
 app.UseAuthentication();
