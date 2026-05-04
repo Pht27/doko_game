@@ -6,6 +6,8 @@ import { RulesPage } from '@/pages/RulesPage/RulesPage';
 import { LobbyPage } from '@/pages/LobbyPage/LobbyPage';
 import { GamePage } from '@/pages/GamePage/GamePage';
 import { HotSeatPage } from '@/pages/HotSeatPage/HotSeatPage';
+import { AnalogPlayersPage } from '@/pages/analog/AnalogPlayersPage';
+import { AnalogPlayerPage } from '@/pages/analog/AnalogPlayerPage';
 import { Root } from './Root';
 
 export const router = createBrowserRouter([
@@ -18,6 +20,8 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <LandingPage /> },
           { path: 'rules', element: <RulesPage /> },
+          { path: 'analog/players', element: <AnalogPlayersPage /> },
+          { path: 'analog/players/:id', element: <AnalogPlayerPage /> },
         ],
       },
       {

@@ -17,7 +17,7 @@ Vollständige Übersicht aller Migrations-Schritte. Details jeweils in den verli
 | 4 | [Analog API – Spieler](99_finished/05_analog_api_spieler.md) | erledigt | 1 |
 | 5 | [Analog API – Runden](99_finished/06_analog_api_runden.md) | erledigt | 1 |
 | 6 | [Spiel-Eintragen Analyse](99_finished/07_spiel_eintragen_analyse.md) | erledigt | – |
-| 7 | [Frontend – Spieler-Seite](08_frontend_spieler.md) | offen | 2 + 4 |
+| 7 | [Frontend – Spieler-Seite](99_finished/08_frontend_spieler.md) | erledigt | 2 + 4 |
 | 8 | [Frontend – Match-History](09_frontend_history.md) | offen | 2 + 5 |
 | 9 | [Frontend – Spiel-Eintragen](10_frontend_spiel_eintragen.md) | offen | 2 + 5 + 6 |
 | 10 | [Tests – Analog API](11_analog_api_tests.md) | offen | 1 + 4 + 5 |

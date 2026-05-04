@@ -1,5 +1,10 @@
 # Release Notes
 
+## [1.3.0] - 2026-05-05
+
+### Neu
+- Neue Seiten für den Analog-Modus: Unter `/analog/players` gibt es eine Spieler-Übersicht mit Gesamtpunkten, Spielen, Siegen und Niederlagen. Ein Klick auf einen Spieler zeigt das Einzelprofil mit der Rundenhistorie. Neue Spieler können direkt über die Übersicht angelegt werden.
+
 ## [1.2.2] - 2026-05-02
 
 ### Neu

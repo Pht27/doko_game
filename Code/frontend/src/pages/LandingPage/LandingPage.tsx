@@ -5,11 +5,48 @@ import { showTestFeatures } from '@/utils/env';
 import { appVersion } from '@/utils/releaseNotes';
 import { ReleaseNotesModal } from '@/components/ReleaseNotesModal/ReleaseNotesModal';
 
+const divider = (
+  <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '2px 0' }} />
+);
+
+function PrimaryBtn({ onClick, label }: { onClick: () => void; label: string }) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full text-xl font-semibold text-white bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 transition-colors"
+      style={{ padding: '17px 0', borderRadius: 18, border: 'none' }}
+    >
+      {label}
+    </button>
+  );
+}
+
+function SecondaryBtn({ onClick, label }: { onClick: () => void; label: string }) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full font-medium text-white/50 hover:text-white/70 bg-white/5 hover:bg-white/9 active:bg-white/4 transition-all"
+      style={{ padding: '13px 0', borderRadius: 14, fontSize: 15, border: 'none' }}
+    >
+      {label}
+    </button>
+  );
+}
+
+function DisabledBtn({ label }: { label: string }) {
+  return (
+    <button
+      disabled
+      className="w-full font-medium text-white/20 bg-white/3 cursor-not-allowed"
+      style={{ padding: '13px 0', borderRadius: 14, fontSize: 15, border: 'none' }}
+    >
+      {label}
+    </button>
+  );
+}
+
 export function LandingPage() {
   const navigate = useNavigate();
-  const onMultiplayer = () => navigate('/lobby');
-  const onTestGame = () => navigate('/hot-seat');
-  const onRules = () => navigate('/rules');
   const [showReleaseNotes, setShowReleaseNotes] = useState(false);
 
   return (
@@ -37,32 +74,21 @@ export function LandingPage() {
       </div>
 
       <div className="flex flex-col gap-3 w-full z-10" style={{ maxWidth: 280 }}>
-        <button
-          onClick={onMultiplayer}
-          className="w-full text-xl font-semibold text-white bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 transition-colors"
-          style={{ padding: '17px 0', borderRadius: 18, border: 'none' }}
-        >
-          {t.multiplayer}
-        </button>
-
+        <DisabledBtn label={t.landingSpielEintragen} />
+        <PrimaryBtn onClick={() => navigate('/lobby')} label={t.multiplayer} />
         {showTestFeatures && (
-          <button
-            onClick={onTestGame}
-            className="w-full py-4 text-xl font-semibold rounded-2xl bg-white/10 hover:bg-white/20 active:bg-white/5 text-white/70 transition-colors"
-          >
-            {t.testGame}
-          </button>
+          <SecondaryBtn onClick={() => navigate('/hot-seat')} label={t.testGame} />
         )}
 
-        <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '2px 0' }} />
+        {divider}
 
-        <button
-          onClick={onRules}
-          className="w-full font-medium text-white/40 hover:text-white/65 bg-white/5 hover:bg-white/9 active:bg-white/4 transition-all"
-          style={{ padding: '12px 0', borderRadius: 14, fontSize: 15, border: 'none' }}
-        >
-          {t.rulesTitle}
-        </button>
+        <SecondaryBtn onClick={() => navigate('/analog/players')} label={t.analogPlayersTitle} />
+        <DisabledBtn label={t.landingRundenubersicht} />
+
+        {divider}
+
+        <DisabledBtn label={t.landingStats} />
+        <SecondaryBtn onClick={() => navigate('/rules')} label={t.rulesTitle} />
       </div>
 
       <button
