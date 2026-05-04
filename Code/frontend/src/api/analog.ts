@@ -1,5 +1,12 @@
 import { apiFetch } from './client';
-import type { PlayerListItem, PlayerDetail, RoundListResponse } from '@/types/analog';
+import type {
+  PlayerListItem,
+  PlayerDetail,
+  RoundListResponse,
+  RoundDetail,
+  RoundRequest,
+  StaticData,
+} from '@/types/analog';
 
 export function getPlayers(): Promise<PlayerListItem[]> {
   return apiFetch('/analog/players', null);
@@ -16,8 +23,30 @@ export function createPlayer(name: string, startingPoints = 0): Promise<PlayerLi
   });
 }
 
+export function getStaticData(): Promise<StaticData> {
+  return apiFetch('/analog/static', null);
+}
+
 export function getRounds(page = 1, pageSize = 20): Promise<RoundListResponse> {
   return apiFetch(`/analog/rounds?page=${page}&pageSize=${pageSize}`, null);
+}
+
+export function getRound(id: number): Promise<RoundDetail> {
+  return apiFetch(`/analog/rounds/${id}`, null);
+}
+
+export function createRound(body: RoundRequest): Promise<{ id: number }> {
+  return apiFetch('/analog/rounds', null, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+}
+
+export function updateRound(id: number, body: RoundRequest): Promise<{ id: number }> {
+  return apiFetch(`/analog/rounds/${id}`, null, {
+    method: 'PUT',
+    body: JSON.stringify(body),
+  });
 }
 
 export function deleteRound(id: number): Promise<void> {

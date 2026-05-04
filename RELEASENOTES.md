@@ -5,6 +5,7 @@
 ### Neu
 - Neue Seiten für den Analog-Modus: Unter `/analog/players` gibt es eine Spieler-Übersicht mit Gesamtpunkten, Spielen, Siegen und Niederlagen. Ein Klick auf einen Spieler zeigt das Einzelprofil mit der Rundenhistorie. Neue Spieler können direkt über die Übersicht angelegt werden.
 - Rundenhistorie unter `/analog/history`: Alle eingetragenen Runden, neueste zuerst, mit Datum, Spielern, Ergebnis und Spielmodus. Runden können direkt gelöscht werden. Weitere Runden werden per „Mehr laden" nachgeladen.
+- Spiel eintragen: Über „Spiel eintragen" auf der Startseite können Runden mit Spielmodus, Punkte, Siegerpartei, Sonderkarten und Extrapunkten eingetragen werden. Teams werden per Wisch-Geste zwischen Re und Kontra gewechselt. Bestehende Runden können über die Rundenhistorie bearbeitet werden.
 
 ## [1.2.2] - 2026-05-02
 

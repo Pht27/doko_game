@@ -74,7 +74,7 @@ export function LandingPage() {
       </div>
 
       <div className="flex flex-col gap-3 w-full z-10" style={{ maxWidth: 280 }}>
-        <DisabledBtn label={t.landingSpielEintragen} />
+        <PrimaryBtn onClick={() => navigate('/analog/new')} label={t.landingSpielEintragen} />
         <PrimaryBtn onClick={() => navigate('/lobby')} label={t.multiplayer} />
         {showTestFeatures && (
           <SecondaryBtn onClick={() => navigate('/hot-seat')} label={t.testGame} />

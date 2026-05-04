@@ -1,0 +1,267 @@
+@reference "../../../styles/index.css";
+
+:root {
+  --arf-surface:    #22223a;
+  --arf-surface2:   #2a2a48;
+  --arf-border:     rgba(255,255,255,0.08);
+  --arf-text:       #eeeeee;
+  --arf-text-sub:   #aaaacc;
+  --arf-text-muted: #666688;
+  --arf-primary:    #4f46e5;
+  --arf-primary-h:  #6366f1;
+  --arf-solo:       #d97706;
+  --arf-radius:     12px;
+  --arf-radius-sm:  8px;
+}
+
+.arf-page {
+  @apply flex flex-col w-full h-full overflow-hidden;
+  background: #1a1a2e;
+  color: var(--arf-text);
+}
+
+/* ── Header ── */
+.arf-header {
+  background: var(--arf-surface);
+  border-bottom: 1px solid var(--arf-border);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.arf-back {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.6);
+  font: inherit;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+
+.arf-back:hover { color: #fff; }
+
+.arf-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--arf-text);
+  flex: 1;
+}
+
+/* ── Scrollable form body ── */
+.arf-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 14px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Spielmodus select ── */
+.arf-gamemode-select {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 50px;
+  border: none;
+  background: var(--arf-primary);
+  color: #fff;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  text-align: center;
+  transition: background 0.2s;
+}
+
+.arf-gamemode-select.arf-solo { background: var(--arf-solo); }
+.arf-gamemode-select:focus { outline: 2px solid rgba(99,102,241,0.5); outline-offset: 2px; }
+
+/* ── Meta row (Re-checkbox | Punkte | Kontra-checkbox) ── */
+.arf-meta {
+  display: grid;
+  grid-template-columns: 42% 16% 42%;
+  align-items: center;
+  gap: 0;
+}
+
+.arf-party-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 6px;
+  background: none;
+  border: 1px solid var(--arf-border);
+  border-radius: var(--arf-radius-sm);
+  color: var(--arf-text-muted);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.arf-party-btn.arf-party-selected {
+  background: rgba(74, 222, 128, 0.15);
+  border-color: rgba(74, 222, 128, 0.4);
+  color: #4ade80;
+}
+
+.arf-party-btn.arf-party-selected .arf-party-check { opacity: 1; }
+
+.arf-party-check {
+  font-size: 1rem;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.arf-points-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.arf-points-input {
+  width: 2.8ch;
+  min-width: 2.8ch;
+  max-width: 4ch;
+  background: none;
+  border: none;
+  border-bottom: 2px solid var(--arf-border);
+  color: var(--arf-text);
+  font: inherit;
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+  padding: 4px 0;
+  transition: border-color 0.2s;
+}
+
+.arf-points-input:focus { border-bottom-color: var(--arf-primary-h); }
+
+/* ── Team grid ── */
+.arf-teams {
+  display: grid;
+  grid-template-columns: 42% 16% 42%;
+  grid-template-rows: auto auto;
+  gap: 6px 0;
+  align-items: stretch;
+}
+
+.arf-team-block {
+  min-height: 52px;
+  border-radius: var(--arf-radius-sm);
+  border: 1px solid var(--arf-border);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8px 10px;
+  text-align: left;
+  font: inherit;
+  transition: border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.arf-team-block:active { opacity: 0.85; }
+
+.arf-team-block-right { text-align: right; }
+
+.arf-team-empty {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--arf-text-muted);
+}
+
+.arf-team-players {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--arf-text);
+  line-height: 1.3;
+  display: block;
+}
+
+.arf-team-extras {
+  font-size: 0.72rem;
+  color: var(--arf-text-muted);
+  margin-top: 2px;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Middle column spacer */
+.arf-teams-mid {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.arf-swipe-hint {
+  font-size: 0.65rem;
+  color: var(--arf-text-muted);
+  text-align: center;
+  writing-mode: horizontal-tb;
+  white-space: pre-line;
+  line-height: 1.5;
+}
+
+/* ── Comment ── */
+.arf-comment-input {
+  width: 100%;
+  background: var(--arf-surface);
+  border: 1px solid var(--arf-border);
+  border-radius: var(--arf-radius-sm);
+  color: var(--arf-text);
+  font: inherit;
+  font-size: 0.95rem;
+  padding: 10px 14px;
+  outline: none;
+  resize: none;
+  transition: border-color 0.2s;
+}
+
+.arf-comment-input::placeholder { color: var(--arf-text-muted); }
+.arf-comment-input:focus { border-color: var(--arf-primary-h); }
+
+/* ── Error ── */
+.arf-error {
+  font-size: 0.85rem;
+  color: #f87171;
+  padding: 8px 12px;
+  background: rgba(248, 113, 113, 0.08);
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  border-radius: var(--arf-radius-sm);
+}
+
+/* ── Save button ── */
+.arf-save-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--arf-radius);
+  border: none;
+  background: var(--arf-primary);
+  color: #fff;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-top: 4px;
+}
+
+.arf-save-btn:hover:not(:disabled) { background: var(--arf-primary-h); }
+.arf-save-btn:disabled { opacity: 0.5; cursor: not-allowed; }

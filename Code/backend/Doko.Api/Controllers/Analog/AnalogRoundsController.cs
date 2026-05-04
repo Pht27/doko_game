@@ -109,16 +109,20 @@ public class AnalogRoundsController(AnalogRoundsService roundsService) : Control
 
     private static string? ValidationError(RoundRequest body)
     {
-        if (body.Teams.Length != 2)
-            return "exactly_two_teams_required";
+        if (body.Teams.Length != 4)
+            return "exactly_four_teams_required";
 
-        var parties = body.Teams.Select(t => t.Party).OrderBy(p => p).ToArray();
-        if (parties[0] != Party.Kontra || parties[1] != Party.Re)
-            return "teams_must_be_re_and_kontra";
+        var hasRe = body.Teams.Any(t => t.Party == Party.Re);
+        var hasKontra = body.Teams.Any(t => t.Party == Party.Kontra);
+        if (!hasRe || !hasKontra)
+            return "both_parties_required";
 
-        var totalPlayers = body.Teams.Sum(t => t.PlayerIds.Length);
-        if (totalPlayers != 4)
-            return "exactly_four_players_required";
+        if (body.Teams.Any(t => t.PlayerIds.Length < 1 || t.PlayerIds.Length > 2))
+            return "team_size_invalid";
+
+        var allPlayerIds = body.Teams.SelectMany(t => t.PlayerIds).ToArray();
+        if (allPlayerIds.Distinct().Count() != allPlayerIds.Length)
+            return "duplicate_player";
 
         return null;
     }
