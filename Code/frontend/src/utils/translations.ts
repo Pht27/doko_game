@@ -13,6 +13,9 @@ export const t = {
   createLobby: 'Lobby erstellen',
   testGame: 'Testspiel starten',
   releaseNotesTitle: 'Versionshinweise',
+  landingSpielEintragen: 'Spiel eintragen',
+  landingRundenubersicht: 'Rundenübersicht',
+  landingStats: 'Statistiken',
 
   // ── MultiplayerBrowserPage / LobbyDetailView ───────────────────────────────
   back: '← Zurück',
@@ -146,6 +149,25 @@ export const t = {
   },
   sonderkartePopupMessage: (playerSeat: number, sonderkarteType: string, name?: string) =>
     `${name ?? `S${playerSeat + 1}`} · ${(sonderkarteNames[sonderkarteType] as string | undefined) ?? sonderkarteType}`,
+
+  // ── Analog – Spieler ──────────────────────────────────────────────────────
+  analogPlayersTitle: 'Spieler',
+  analogNewPlayerTitle: 'Neuen Spieler anlegen',
+  analogCreateButton: 'Anlegen',
+  analogNameLabel: 'Name',
+  analogTotalPoints: 'Punkte',
+  analogGamesPlayed: 'Sp.',
+  analogWins: 'S',
+  analogLosses: 'N',
+  analogRecentRounds: 'Letzte Runden',
+  analogDate: 'Datum',
+  analogPoints: 'Punkte',
+  analogCumulative: 'Kumulativ',
+  analogInactive: 'inaktiv',
+  analogNameTaken: 'Name bereits vergeben',
+  analogNoPlayers: 'Noch keine Spieler angelegt',
+  analogNoRounds: 'Noch keine Runden gespielt',
+  analogPlayerNotFound: 'Spieler nicht gefunden',
 
   // ── RulesPage ──────────────────────────────────────────────────────────────
   rulesTitle: 'Regeln',
