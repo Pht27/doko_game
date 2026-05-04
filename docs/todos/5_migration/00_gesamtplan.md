@@ -15,7 +15,7 @@ Vollständige Übersicht aller Migrations-Schritte. Details jeweils in den verli
 | 2 | [React Router + Layout-Splitting](99_finished/03_react_router.md) | erledigt | – |
 | 3 | [Orientation Lock Refactoring](99_finished/04_orientation_lock.md) | erledigt | 2 |
 | 4 | [Analog API – Spieler](99_finished/05_analog_api_spieler.md) | erledigt | 1 |
-| 5 | [Analog API – Runden](06_analog_api_runden.md) | offen | 1 |
+| 5 | [Analog API – Runden](99_finished/06_analog_api_runden.md) | erledigt | 1 |
 | 6 | [Spiel-Eintragen Analyse](07_spiel_eintragen_analyse.md) | offen | – |
 | 7 | [Frontend – Spieler-Seite](08_frontend_spieler.md) | offen | 2 + 4 |
 | 8 | [Frontend – Match-History](09_frontend_history.md) | offen | 2 + 5 |

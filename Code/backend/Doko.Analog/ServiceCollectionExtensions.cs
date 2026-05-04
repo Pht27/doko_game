@@ -17,6 +17,8 @@ public static class ServiceCollectionExtensions
         );
 
         services.AddScoped<AnalogPlayersService>();
+        services.AddScoped<AnalogRoundsService>();
+        services.AddScoped<AnalogStaticService>();
 
         return services;
     }
