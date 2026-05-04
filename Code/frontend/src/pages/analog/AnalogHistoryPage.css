@@ -1,0 +1,241 @@
+@reference "../../styles/index.css";
+
+:root {
+  --ahr-surface:    #22223a;
+  --ahr-surface2:   #2a2a48;
+  --ahr-border:     rgba(255,255,255,0.08);
+  --ahr-text:       #eeeeee;
+  --ahr-text-sub:   #aaaacc;
+  --ahr-text-muted: #666688;
+  --ahr-win:        #4ade80;
+  --ahr-loss:       #94a3b8;
+  --ahr-radius:     12px;
+  --ahr-radius-sm:  8px;
+}
+
+.ahr-page {
+  @apply flex flex-col w-full h-full overflow-hidden;
+  background: #1a1a2e;
+  color: var(--ahr-text);
+}
+
+/* ── Header ── */
+.ahr-header {
+  background: var(--ahr-surface);
+  border-bottom: 1px solid var(--ahr-border);
+  padding: 14px 16px 16px;
+  flex-shrink: 0;
+}
+
+.ahr-back {
+  background: none;
+  border: none;
+  color: var(--ahr-text-sub);
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0;
+  margin-bottom: 10px;
+  display: block;
+  transition: color 0.15s;
+}
+
+.ahr-back:hover { color: var(--ahr-text); }
+
+.ahr-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--ahr-text);
+}
+
+/* ── List ── */
+.ahr-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 12px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ahr-empty {
+  text-align: center;
+  padding: 32px 20px;
+  color: var(--ahr-text-muted);
+  font-size: 0.9rem;
+}
+
+.ahr-error { color: #f87171; }
+
+/* ── Round card ── */
+.ahr-card {
+  background: var(--ahr-surface);
+  border: 1px solid var(--ahr-border);
+  border-radius: var(--ahr-radius);
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.ahr-card-main {
+  flex: 1;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: background 0.12s;
+  min-width: 0;
+}
+
+.ahr-card-main:hover { background: var(--ahr-surface2); }
+
+/* ── Meta row (date / time / mode) ── */
+.ahr-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.ahr-date {
+  font-size: 0.8rem;
+  color: var(--ahr-text-muted);
+}
+
+.ahr-time {
+  font-size: 0.8rem;
+  color: var(--ahr-text-muted);
+}
+
+.ahr-time::before { content: '·'; margin-right: 8px; }
+
+.ahr-gamemode {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ahr-text-muted);
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--ahr-border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-left: auto;
+}
+
+/* ── Three-column teams layout ── */
+.ahr-teams {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.ahr-team {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ahr-team-right { align-items: flex-end; }
+
+.ahr-player {
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--ahr-loss);
+  cursor: pointer;
+  padding: 2px 0;
+  text-align: left;
+  border-radius: 4px;
+  transition: color 0.12s;
+  line-height: 1.3;
+}
+
+.ahr-team-right .ahr-player { text-align: right; }
+
+.ahr-player:hover { color: var(--ahr-text); text-decoration: underline; }
+
+.ahr-player-won { color: var(--ahr-win); }
+.ahr-player-won:hover { color: #86efac; }
+
+/* ── Center score ── */
+.ahr-center {
+  text-align: center;
+  flex-shrink: 0;
+  padding: 0 4px;
+}
+
+.ahr-points {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.ahr-re-wins     { color: var(--ahr-win); }
+.ahr-kontra-wins { color: var(--ahr-win); }
+
+.ahr-winner-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ahr-text-muted);
+  margin-top: 2px;
+}
+
+/* ── Comment ── */
+.ahr-comment {
+  margin-top: 8px;
+  font-size: 0.82rem;
+  color: var(--ahr-text-muted);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Delete button ── */
+.ahr-delete-btn {
+  background: none;
+  border: none;
+  border-left: 1px solid var(--ahr-border);
+  color: var(--ahr-text-muted);
+  font-size: 1.3rem;
+  line-height: 1;
+  padding: 0 16px;
+  cursor: pointer;
+  transition: color 0.12s, background 0.12s;
+  flex-shrink: 0;
+}
+
+.ahr-delete-btn:hover {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.08);
+}
+
+/* ── Load more ── */
+.ahr-load-more {
+  background: var(--ahr-surface);
+  border: 1px solid var(--ahr-border);
+  border-radius: var(--ahr-radius);
+  color: var(--ahr-text-sub);
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 12px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  margin-top: 4px;
+}
+
+.ahr-load-more:hover:not(:disabled) {
+  background: var(--ahr-surface2);
+  color: var(--ahr-text);
+}
+
+.ahr-load-more:disabled {
+  opacity: 0.5;
+  cursor: default;
+}

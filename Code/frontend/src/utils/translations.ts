@@ -150,6 +150,17 @@ export const t = {
   sonderkartePopupMessage: (playerSeat: number, sonderkarteType: string, name?: string) =>
     `${name ?? `S${playerSeat + 1}`} · ${(sonderkarteNames[sonderkarteType] as string | undefined) ?? sonderkarteType}`,
 
+  // ── Analog – History ──────────────────────────────────────────────────────
+  analogHistoryTitle: 'Rundenhistorie',
+  analogHistoryNoRounds: 'Noch keine Runden eingetragen',
+  analogHistoryLoadMore: 'Mehr laden',
+  analogHistoryDelete: 'Löschen',
+  analogHistoryDeleteConfirm: 'Runde wirklich löschen?',
+  analogHistoryEdit: 'Bearbeiten',
+  analogHistoryRe: 'Re',
+  analogHistoryKontra: 'Kontra',
+  analogHistoryPoints: (points: number, party: string) => `${party} gewinnt · ${points} Punkte`,
+
   // ── Analog – Spieler ──────────────────────────────────────────────────────
   analogPlayersTitle: 'Spieler',
   analogNewPlayerTitle: 'Neuen Spieler anlegen',

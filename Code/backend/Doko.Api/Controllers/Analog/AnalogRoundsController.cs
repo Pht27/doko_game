@@ -30,7 +30,8 @@ public class AnalogRoundsController(AnalogRoundsService roundsService) : Control
                         r.WinningParty,
                         r.Points,
                         r.GameMode,
-                        r.Players,
+                        r.RePlayers.Select(p => new PlayerInfoDto(p.Id, p.Name)).ToArray(),
+                        r.KontraPlayers.Select(p => new PlayerInfoDto(p.Id, p.Name)).ToArray(),
                         r.Comment
                     ))
                     .ToArray()

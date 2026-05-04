@@ -83,7 +83,7 @@ export function LandingPage() {
         {divider}
 
         <SecondaryBtn onClick={() => navigate('/analog/players')} label={t.analogPlayersTitle} />
-        <DisabledBtn label={t.landingRundenubersicht} />
+        <SecondaryBtn onClick={() => navigate('/analog/history')} label={t.landingRundenubersicht} />
 
         {divider}
 
