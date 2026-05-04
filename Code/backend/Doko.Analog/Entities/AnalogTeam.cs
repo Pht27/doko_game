@@ -7,4 +7,5 @@ public class AnalogTeam
     public AnalogRound Round { get; set; } = null!;
     public string? Name { get; set; }
     public Party Party { get; set; }
+    public ICollection<AnalogTeamMember> Members { get; set; } = [];
 }

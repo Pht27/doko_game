@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Doko.Api.Hubs;
 using Doko.Api.Services;
 using Doko.Application.Abstractions;
@@ -12,7 +13,11 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IGameEventPublisher, SignalRGameEventPublisher>();
         services.AddSingleton<ITokenService, JwtTokenService>();
         services.AddScoped<IOpaService, OpaService>();
-        services.AddControllers();
+        services
+            .AddControllers()
+            .AddJsonOptions(opts =>
+                opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())
+            );
         return services;
     }
 }

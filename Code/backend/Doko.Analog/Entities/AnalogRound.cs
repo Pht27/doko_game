@@ -8,4 +8,5 @@ public class AnalogRound
     public DateTime PlayedAt { get; set; }
     public int GameModeId { get; set; }
     public AnalogGameMode GameMode { get; set; } = null!;
+    public ICollection<AnalogTeam> Teams { get; set; } = [];
 }
