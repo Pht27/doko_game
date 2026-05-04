@@ -28,7 +28,8 @@ public record RoundListItemDto(
     Party WinningParty,
     int Points,
     string GameMode,
-    string[] Players,
+    PlayerInfoDto[] RePlayers,
+    PlayerInfoDto[] KontraPlayers,
     string? Comment
 );
 

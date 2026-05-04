@@ -25,10 +25,15 @@ public class AnalogRoundsService(AnalogDbContext db)
                 r.WinningParty,
                 r.Points,
                 GameMode = r.GameMode.Name,
-                Players = r
-                    .Teams.SelectMany(t => t.Members)
-                    .OrderBy(m => m.Position)
-                    .Select(m => m.Player.Name)
+                RePlayers = r
+                    .Teams.Where(t => t.Party == Party.Re)
+                    .SelectMany(t => t.Members.OrderBy(m => m.Position))
+                    .Select(m => new PlayerInfo(m.Player.Id, m.Player.Name))
+                    .ToList(),
+                KontraPlayers = r
+                    .Teams.Where(t => t.Party == Party.Kontra)
+                    .SelectMany(t => t.Members.OrderBy(m => m.Position))
+                    .Select(m => new PlayerInfo(m.Player.Id, m.Player.Name))
                     .ToList(),
                 Comment = (string?)
                     db.Comments.Where(c => c.RoundId == r.Id).Select(c => c.Text).FirstOrDefault(),
@@ -42,7 +47,8 @@ public class AnalogRoundsService(AnalogDbContext db)
                 r.WinningParty,
                 r.Points,
                 r.GameMode,
-                r.Players.ToArray(),
+                r.RePlayers.ToArray(),
+                r.KontraPlayers.ToArray(),
                 r.Comment
             ))
             .ToArray();
@@ -287,7 +293,8 @@ public record RoundListItem(
     Party WinningParty,
     int Points,
     string GameMode,
-    string[] Players,
+    PlayerInfo[] RePlayers,
+    PlayerInfo[] KontraPlayers,
     string? Comment
 );
 
