@@ -20,7 +20,8 @@ Vollständige Übersicht aller Migrations-Schritte. Details jeweils in den verli
 | 7 | [Frontend – Spieler-Seite](08_frontend_spieler.md) | offen | 2 + 4 |
 | 8 | [Frontend – Match-History](09_frontend_history.md) | offen | 2 + 5 |
 | 9 | [Frontend – Spiel-Eintragen](10_frontend_spiel_eintragen.md) | offen | 2 + 5 + 6 |
-| 10 | [Datenmigration MySQL → PostgreSQL](11_datenmigration.md) | offen | 1 |
+| 10 | [Tests – Analog API](11_analog_api_tests.md) | offen | 1 + 4 + 5 |
+| 11 | [Datenmigration MySQL → PostgreSQL](12_datenmigration.md) | offen | 1 |
 
 Schritte 0, 1 und 2 können parallel gestartet werden. Schritt 6 (Analyse) kann jederzeit erledigt werden.
 
