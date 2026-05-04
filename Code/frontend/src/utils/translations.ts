@@ -161,6 +161,28 @@ export const t = {
   analogHistoryKontra: 'Kontra',
   analogHistoryPoints: (points: number, party: string) => `${party} gewinnt · ${points} Punkte`,
 
+  // ── Analog – Spiel eintragen ──────────────────────────────────────────────
+  analogNewRoundTitle: 'Spiel eintragen',
+  analogEditRoundTitle: 'Runde bearbeiten',
+  analogSave: 'Speichern',
+  analogSaving: 'Speichern…',
+  analogGameModeLabel: 'Spielmodus wählen…',
+  analogCommentPlaceholder: 'Kommentar…',
+  analogTeamAdd: 'Hinzufügen…',
+  analogTeamEditTitle: 'Team bearbeiten',
+  analogTeamPlayersSection: 'Spieler*innen',
+  analogTeamSpecialCardsSection: 'Sonderkarten',
+  analogTeamExtraPointsSection: 'Extrapunkte',
+  analogAddSpecialCard: '+ Sonderkarte hinzufügen',
+  analogAddExtraPoint: '+ Extrapunkt hinzufügen',
+  analogPlayerSearch: 'Spieler*in hinzufügen…',
+  analogValidationGameMode: 'Bitte Spielmodus wählen.',
+  analogValidationPoints: 'Bitte Punkte eingeben (> 0).',
+  analogValidationWinningParty: 'Bitte Siegerpartei wählen.',
+  analogValidationPlayersRequired: 'Jeder Block braucht mindestens einen Spieler.',
+  analogValidationPlayerDuplicate: 'Ein Spieler darf nicht doppelt vorkommen.',
+  analogValidationMaxPlayers: 'Maximal 2 Spieler pro Block.',
+
   // ── Analog – Spieler ──────────────────────────────────────────────────────
   analogPlayersTitle: 'Spieler',
   analogNewPlayerTitle: 'Neuen Spieler anlegen',

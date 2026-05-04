@@ -19,7 +19,7 @@ Vollständige Übersicht aller Migrations-Schritte. Details jeweils in den verli
 | 6 | [Spiel-Eintragen Analyse](99_finished/07_spiel_eintragen_analyse.md) | erledigt | – |
 | 7 | [Frontend – Spieler-Seite](99_finished/08_frontend_spieler.md) | erledigt | 2 + 4 |
 | 8 | [Frontend – Match-History](99_finished/09_frontend_history.md) | erledigt | 2 + 5 |
-| 9 | [Frontend – Spiel-Eintragen](10_frontend_spiel_eintragen.md) | offen | 2 + 5 + 6 |
+| 9 | [Frontend – Spiel-Eintragen](99_finished/10_frontend_spiel_eintragen.md) | erledigt | 2 + 5 + 6 |
 | 10 | [Tests – Analog API](11_analog_api_tests.md) | offen | 1 + 4 + 5 |
 | 11 | [Datenmigration MySQL → PostgreSQL](12_datenmigration.md) | offen | 1 |
 

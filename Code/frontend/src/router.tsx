@@ -9,6 +9,8 @@ import { HotSeatPage } from '@/pages/HotSeatPage/HotSeatPage';
 import { AnalogPlayersPage } from '@/pages/analog/AnalogPlayersPage';
 import { AnalogPlayerPage } from '@/pages/analog/AnalogPlayerPage';
 import { AnalogHistoryPage } from '@/pages/analog/AnalogHistoryPage';
+import { AnalogNewRoundPage } from '@/pages/analog/AnalogNewRoundPage';
+import { AnalogEditRoundPage } from '@/pages/analog/AnalogEditRoundPage';
 import { Root } from './Root';
 
 export const router = createBrowserRouter([
@@ -24,6 +26,8 @@ export const router = createBrowserRouter([
           { path: 'analog/players', element: <AnalogPlayersPage /> },
           { path: 'analog/players/:id', element: <AnalogPlayerPage /> },
           { path: 'analog/history', element: <AnalogHistoryPage /> },
+          { path: 'analog/new', element: <AnalogNewRoundPage /> },
+          { path: 'analog/edit/:id', element: <AnalogEditRoundPage /> },
         ],
       },
       {
