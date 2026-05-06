@@ -124,8 +124,14 @@ export function RoundForm({
           onClick={() => setShowGameModePicker(true)}
         >
           <span className="arf-gamemode-label">
-            {selectedMode ? selectedMode.name : t.analogGameModeLabel}
+            <span className="arf-gamemode-caption">
+              {isSolo ? 'Solo' : t.analogGameModeCaption}
+            </span>
+            <span className="arf-gamemode-value">
+              {selectedMode ? selectedMode.name : t.analogGameModeEmpty}
+            </span>
           </span>
+          <span className="arf-gamemode-chevron">›</span>
         </button>
 
         {/* ── Meta: Re | Punkte-Label | Kontra ── */}
@@ -212,6 +218,10 @@ export function RoundForm({
 
         {submitError && <div className="arf-error">{submitError}</div>}
 
+        <div className="arf-save-spacer" />
+      </div>
+
+      <div className="arf-save-bar">
         <button className="arf-save-btn" disabled={saving} onClick={handleSubmit}>
           {saving ? t.analogSaving : t.analogSave}
         </button>
