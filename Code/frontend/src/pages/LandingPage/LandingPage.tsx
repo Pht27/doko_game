@@ -5,98 +5,271 @@ import { showTestFeatures } from '@/utils/env';
 import { appVersion } from '@/utils/releaseNotes';
 import { ReleaseNotesModal } from '@/components/ReleaseNotesModal/ReleaseNotesModal';
 
-const divider = (
-  <div style={{ height: 1, background: 'rgba(255,255,255,0.07)', margin: '2px 0' }} />
-);
+const RED_SUIT      = '#f87171';
+const BLACK_SUIT    = 'rgba(255,255,255,0.75)';
+const SURFACE       = 'rgba(255,255,255,0.05)';
+const RE_BLUE       = '#6366f1';
+const KONTRA_PURPLE = 'oklch(65% 0.23 303)';
 
-function PrimaryBtn({ onClick, label }: { onClick: () => void; label: string }) {
+const SUITS = {
+  // primary tiles — border uses suit colour
+  kreuz: { glyph: '♣', color: BLACK_SUIT, glow: 'rgba(255,255,255,0.25)' },
+  herz:  { glyph: '♥', color: RED_SUIT,   glow: 'rgba(248,113,113,0.5)',
+           openBg: 'rgba(248,113,113,0.14)', openBorder: RED_SUIT },
+  // expandable tiles
+  pik:   { glyph: '♠', color: BLACK_SUIT, glow: 'oklch(65% 0.23 303 / 0.55)',
+           openBg: 'oklch(65% 0.23 303 / 0.16)', openBorder: KONTRA_PURPLE },
+  karo:  { glyph: '♦', color: RED_SUIT,   glow: 'rgba(99,102,241,0.5)',
+           openBg: 'rgba(99,102,241,0.14)',       openBorder: RE_BLUE },
+};
+
+type Suit = {
+  glyph: string; color: string; glow: string;
+  openBg?: string; openBorder?: string;
+};
+type DrawerKey = 'spieler' | 'regeln' | 'spielen' | null;
+
+function Tile({
+  suit, label, sub, primary, expanded, onClick,
+}: {
+  suit: Suit; label: string; sub: string;
+  primary?: boolean; expanded?: boolean; onClick?: () => void;
+}) {
+  const expandedBg     = suit.openBg     ?? SURFACE;
+  const expandedBorder = suit.openBorder ?? 'rgba(255,255,255,0.2)';
+
+  let bg          = SURFACE;
+  let borderColor = 'rgba(255,255,255,0.07)';
+  let boxShadow   = 'none';
+
+  if (primary) {
+    borderColor = suit.color;
+    boxShadow   = `0 0 18px ${suit.glow}`;
+  } else if (expanded) {
+    bg          = expandedBg;
+    borderColor = expandedBorder;
+    boxShadow   = `0 0 0 1px ${expandedBorder}, 0 0 28px ${suit.glow}`;
+  }
+
   return (
     <button
       onClick={onClick}
-      className="w-full text-xl font-semibold text-white bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 transition-colors"
-      style={{ padding: '17px 0', borderRadius: 18, border: 'none' }}
+      className="landing-tile"
+      style={{
+        aspectRatio: '1 / 1',
+        borderRadius: 18,
+        border: `1px solid ${borderColor}`,
+        padding: 16,
+        display: 'flex', flexDirection: 'column',
+        alignItems: 'flex-start', justifyContent: 'space-between',
+        color: '#fff', cursor: 'pointer', position: 'relative',
+        fontFamily: 'inherit', textAlign: 'left', background: bg,
+        boxShadow,
+        transition: 'transform 0.15s, border-color 0.25s, background 0.25s, box-shadow 0.25s',
+        WebkitTapHighlightColor: 'transparent',
+      }}
     >
-      {label}
+      {/* corner suit glyph */}
+      <div style={{
+        position: 'absolute', top: 10, left: 12,
+        fontFamily: 'serif', lineHeight: 1,
+        color: suit.color,
+        opacity: expanded || primary ? 0.95 : 0.65,
+        fontSize: 14,
+      }}>
+        {suit.glyph}
+      </div>
+
+      {/* big center glyph */}
+      <div style={{
+        fontFamily: 'serif', fontSize: 60, lineHeight: 0.8,
+        color: suit.color,
+        opacity: expanded ? 1 : (primary ? 0.7 : 0.5),
+        textShadow: (expanded || primary) ? `0 0 24px ${suit.glow}` : 'none',
+        transition: 'opacity 0.25s, text-shadow 0.25s',
+        alignSelf: 'flex-end',
+        pointerEvents: 'none',
+      }}>
+        {suit.glyph}
+      </div>
+
+      {/* label block */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <div style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.01em', color: '#fff' }}>
+          {label}
+        </div>
+        <div style={{
+          fontSize: 12, fontWeight: 500,
+          color: expanded ? 'rgba(255,255,255,0.78)' : 'rgba(255,255,255,0.5)',
+        }}>
+          {sub}
+        </div>
+      </div>
     </button>
   );
 }
 
-function SecondaryBtn({ onClick, label }: { onClick: () => void; label: string }) {
+function SubItem({ label, hint, onClick, disabled }: {
+  label: string; hint: string; onClick?: () => void; disabled?: boolean;
+}) {
   return (
     <button
       onClick={onClick}
-      className="w-full font-medium text-white/50 hover:text-white/70 bg-white/5 hover:bg-white/9 active:bg-white/4 transition-all"
-      style={{ padding: '13px 0', borderRadius: 14, fontSize: 15, border: 'none' }}
+      disabled={disabled}
+      style={{
+        background: 'transparent', border: 'none',
+        padding: '11px 14px',
+        color: disabled ? 'rgba(255,255,255,0.25)' : '#eee',
+        display: 'flex', alignItems: 'center',
+        borderRadius: 10, cursor: disabled ? 'not-allowed' : 'pointer',
+        fontFamily: 'inherit', textAlign: 'left', width: '100%',
+      }}
     >
-      {label}
-    </button>
-  );
-}
-
-function DisabledBtn({ label }: { label: string }) {
-  return (
-    <button
-      disabled
-      className="w-full font-medium text-white/20 bg-white/3 cursor-not-allowed"
-      style={{ padding: '13px 0', borderRadius: 14, fontSize: 15, border: 'none' }}
-    >
-      {label}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'flex-start' }}>
+        <span style={{ fontSize: 14, fontWeight: 600, color: 'inherit' }}>{label}</span>
+        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)' }}>{hint}</span>
+      </div>
     </button>
   );
 }
 
 export function LandingPage() {
   const navigate = useNavigate();
+  const [open, setOpen] = useState<DrawerKey>(null);
   const [showReleaseNotes, setShowReleaseNotes] = useState(false);
 
-  return (
-    <div className="relative w-full h-full flex flex-col items-center justify-center gap-8 px-6 overflow-hidden">
+  const toggle = (key: DrawerKey) => setOpen(prev => prev === key ? null : key);
 
-      {/* Decorative corner suit symbols */}
-      <div className="absolute inset-0 pointer-events-none select-none" style={{ fontFamily: 'serif' }}>
-        <span className="absolute text-white" style={{ top: '8%', left: '6%', fontSize: 120, opacity: 0.035, lineHeight: 1 }}>♠</span>
-        <span className="absolute" style={{ top: '5%', right: '4%', fontSize: 120, opacity: 0.035, lineHeight: 1, color: '#e55' }}>♥</span>
-        <span className="absolute" style={{ bottom: '10%', left: '4%', fontSize: 120, opacity: 0.035, lineHeight: 1, color: '#e55' }}>♦</span>
-        <span className="absolute text-white" style={{ bottom: '8%', right: '5%', fontSize: 120, opacity: 0.035, lineHeight: 1 }}>♣</span>
+  return (
+    <div style={{
+      width: '100%', height: '100%',
+      background: '#1a1a2e',
+      paddingTop: 28, paddingLeft: 22, paddingRight: 22, paddingBottom: 24,
+      display: 'flex', flexDirection: 'column',
+      color: '#eee', fontFamily: 'system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif',
+      position: 'relative', overflow: 'hidden',
+      boxSizing: 'border-box',
+    }}>
+
+      <style>{`.landing-tile:active { transform: scale(0.97); }`}</style>
+
+      {/* Faint corner suit watermarks */}
+      <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', fontFamily: 'serif' }}>
+        <span style={{ position: 'absolute', top: '6%',    left: '4%',   fontSize: 130, opacity: 0.045, lineHeight: 1, color: BLACK_SUIT }}>♣</span>
+        <span style={{ position: 'absolute', top: '4%',    right: '3%',  fontSize: 130, opacity: 0.045, lineHeight: 1, color: RED_SUIT   }}>♥</span>
+        <span style={{ position: 'absolute', bottom: '8%', left: '3%',   fontSize: 130, opacity: 0.045, lineHeight: 1, color: RED_SUIT   }}>♦</span>
+        <span style={{ position: 'absolute', bottom: '6%', right: '4%',  fontSize: 130, opacity: 0.045, lineHeight: 1, color: BLACK_SUIT }}>♠</span>
       </div>
 
-      {/* Title block */}
-      <div className="text-center z-10">
-        <h1 className="font-bold text-white" style={{ fontSize: 'clamp(38px, 12vw, 52px)', letterSpacing: '-0.01em', lineHeight: 1.05 }}>
+      {/* Header */}
+      <div style={{ textAlign: 'center', marginBottom: 26, zIndex: 1 }}>
+        <div style={{
+          display: 'flex', justifyContent: 'center', gap: 10,
+          fontSize: 16, opacity: 0.55, fontFamily: 'serif', marginBottom: 10,
+        }}>
+          <span style={{ color: BLACK_SUIT }}>♣</span>
+          <span style={{ color: RED_SUIT   }}>♥</span>
+          <span style={{ color: RED_SUIT   }}>♦</span>
+          <span style={{ color: BLACK_SUIT }}>♠</span>
+        </div>
+        <h1 style={{
+          fontSize: 38, fontWeight: 800, letterSpacing: '-0.02em',
+          color: '#fff', lineHeight: 1, margin: 0,
+        }}>
           {t.landingTitle}
         </h1>
-        <div className="flex justify-center gap-3 mt-2.5" style={{ fontFamily: 'serif', fontSize: 18, opacity: 0.22 }}>
-          <span style={{ color: '#fff' }}>♣</span>
-          <span style={{ color: '#e55' }}>♥</span>
-          <span style={{ color: '#e55' }}>♦</span>
-          <span style={{ color: '#fff' }}>♠</span>
-        </div>
       </div>
 
-      <div className="flex flex-col gap-3 w-full z-10" style={{ maxWidth: 280 }}>
-        <PrimaryBtn onClick={() => navigate('/analog/new')} label={t.landingSpielEintragen} />
-        <PrimaryBtn onClick={() => navigate('/lobby')} label={t.multiplayer} />
-        {showTestFeatures && (
-          <SecondaryBtn onClick={() => navigate('/hot-seat')} label={t.testGame} />
+      {/* Spacer: schiebt Grid in die Mitte zwischen Titel und Pill */}
+      <div style={{ flexGrow: 1 }} />
+
+      {/* 2×2 grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, zIndex: 1 }}>
+
+        {/* ♣ Kreuz — Spiel eintragen (primary) */}
+        <Tile suit={SUITS.kreuz} label="Spiel" sub="eintragen" primary
+          onClick={() => navigate('/analog/new')} />
+
+        {/* ♥ Herz — Spielen (primary in prod, expandable in staging) */}
+        {showTestFeatures ? (
+          <Tile suit={SUITS.herz} label="Spielen" sub="Mehrspieler"
+            expanded={open === 'spielen'} onClick={() => toggle('spielen')} />
+        ) : (
+          <Tile suit={SUITS.herz} label="Spielen" sub="Mehrspieler" primary
+            onClick={() => navigate('/lobby')} />
         )}
 
-        {divider}
+        {/* ♠ Pik — Spieler & Runden (expandable) */}
+        <Tile suit={SUITS.pik} label="Spieler" sub="& Runden"
+          expanded={open === 'spieler'} onClick={() => toggle('spieler')} />
 
-        <SecondaryBtn onClick={() => navigate('/analog/players')} label={t.analogPlayersTitle} />
-        <SecondaryBtn onClick={() => navigate('/analog/history')} label={t.landingRundenubersicht} />
+        {/* ♦ Karo — Regeln & Statistik (expandable) */}
+        <Tile suit={SUITS.karo} label="Regeln" sub="& Statistik"
+          expanded={open === 'regeln'} onClick={() => toggle('regeln')} />
 
-        {divider}
-
-        <DisabledBtn label={t.landingStats} />
-        <SecondaryBtn onClick={() => navigate('/rules')} label={t.rulesTitle} />
       </div>
 
-      <button
+      {/* Expansion drawer */}
+      <div style={{
+        overflow: 'hidden',
+        maxHeight: open ? 160 : 0,
+        opacity: open ? 1 : 0,
+        marginTop: open ? 12 : 0,
+        transition: 'max-height 0.3s ease, opacity 0.25s, margin-top 0.3s',
+        zIndex: 1,
+      }}>
+        {open === 'spielen' && (
+          <div style={{
+            background: SURFACE, borderRadius: 14, padding: 6,
+            border: `1px solid ${SUITS.herz.color}`,
+            display: 'flex', flexDirection: 'column', gap: 2,
+          }}>
+            <SubItem label={t.multiplayer} hint="Online spielen"      onClick={() => navigate('/lobby')} />
+            <SubItem label={t.testGame}    hint="Allein ausprobieren" onClick={() => navigate('/hot-seat')} />
+          </div>
+        )}
+        {open === 'spieler' && (
+          <div style={{
+            background: SURFACE, borderRadius: 14, padding: 6,
+            border: `1px solid ${SUITS.pik.openBorder}`,
+            display: 'flex', flexDirection: 'column', gap: 2,
+          }}>
+            <SubItem label={t.analogPlayersTitle}     hint="Namen verwalten"   onClick={() => navigate('/analog/players')} />
+            <SubItem label={t.landingRundenubersicht} hint="Vergangene Spiele" onClick={() => navigate('/analog/history')} />
+          </div>
+        )}
+        {open === 'regeln' && (
+          <div style={{
+            background: SURFACE, borderRadius: 14, padding: 6,
+            border: `1px solid ${SUITS.karo.openBorder}`,
+            display: 'flex', flexDirection: 'column', gap: 2,
+          }}>
+            <SubItem label={t.rulesTitle}   hint="Doppelkopf nachlesen" onClick={() => navigate('/rules')} />
+            <SubItem label={t.landingStats} hint="Deine Zahlen"          disabled />
+          </div>
+        )}
+      </div>
+
+      {/* Spacer */}
+      <div style={{ flexGrow: 1 }} />
+
+      {/* Version pill */}
+      <div
         onClick={() => setShowReleaseNotes(true)}
-        className="absolute bottom-3 right-4 text-white/20 text-xs hover:text-white/40 transition-colors z-10"
+        style={{
+          alignSelf: 'center',
+          display: 'flex', alignItems: 'center', gap: 6,
+          background: SURFACE,
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderRadius: 999,
+          padding: '8px 14px',
+          fontSize: 12, color: 'rgba(255,255,255,0.7)',
+          cursor: 'pointer', zIndex: 1,
+        }}
       >
-        v{appVersion}
-      </button>
+        <span style={{ fontWeight: 600 }}>v{appVersion}</span>
+        <span style={{ opacity: 0.55 }}>· Was ist neu?</span>
+      </div>
 
       {showReleaseNotes && <ReleaseNotesModal onClose={() => setShowReleaseNotes(false)} />}
     </div>
