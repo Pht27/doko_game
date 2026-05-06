@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { t } from '@/utils/translations';
 import type { RoundFormState, Party } from '@/hooks/useRoundForm';
 import type { PlayerListItem, StaticData } from '@/types/analog';
 import { TeamBlock } from './TeamBlock';
 import { TeamEditorModal } from './TeamEditorModal';
+import { GameModePickerModal } from './GameModePickerModal';
 import './RoundForm.css';
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
   staticData: StaticData;
   players: PlayerListItem[];
   saving: boolean;
+  lastSwitchedBlock: number | null;
   onBack: () => void;
   onSetGameMode: (id: number | null) => void;
   onSetPoints: (v: number | '') => void;
@@ -44,6 +46,7 @@ export function RoundForm({
   staticData,
   players,
   saving,
+  lastSwitchedBlock,
   onBack,
   onSetGameMode,
   onSetPoints,
@@ -59,7 +62,19 @@ export function RoundForm({
   onSubmit,
 }: Props) {
   const [editingBlock, setEditingBlock] = useState<number | null>(null);
+  const [showGameModePicker, setShowGameModePicker] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  // Local state to allow intermediate '-' during typing
+  const [pointsDisplay, setPointsDisplay] = useState<string>(() =>
+    form.points === '' ? '' : String(form.points),
+  );
+
+  // Sync when form.points changes externally (e.g. edit prefill)
+  useEffect(() => {
+    if (form.points !== '') setPointsDisplay(String(form.points));
+    else if (pointsDisplay !== '' && pointsDisplay !== '-') setPointsDisplay('');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.points]);
 
   const selectedMode = staticData.gameModes.find((gm) => gm.id === form.gameModeId);
   const isSolo = selectedMode?.isSolo ?? false;
@@ -70,131 +85,119 @@ export function RoundForm({
 
   const handleSubmit = () => {
     const err = validate(form);
-    if (err) {
-      setSubmitError(err);
-      return;
-    }
+    if (err) { setSubmitError(err); return; }
     setSubmitError(null);
     onSubmit();
   };
 
-  // All player IDs assigned to other blocks (for modal filtering)
   const otherBlockIds = (blockIndex: number) =>
     form.blocks.flatMap((b, i) => (i === blockIndex ? [] : b.playerIds));
+
+  const indexed = form.blocks.map((block, index) => ({ block, index }));
+  const reBlocks = indexed
+    .filter(({ block }) => block.party === 'Re')
+    .sort((a, b) => {
+      if (a.index === lastSwitchedBlock) return 1;
+      if (b.index === lastSwitchedBlock) return -1;
+      return a.index - b.index;
+    });
+  const kontraBlocks = indexed
+    .filter(({ block }) => block.party === 'Kontra')
+    .sort((a, b) => {
+      if (a.index === lastSwitchedBlock) return 1;
+      if (b.index === lastSwitchedBlock) return -1;
+      return a.index - b.index;
+    });
+
 
   return (
     <div className="arf-page">
       <div className="arf-header">
-        <button className="arf-back" onClick={onBack} aria-label={t.back}>
-          ←
-        </button>
+        <button className="arf-back" onClick={onBack} aria-label={t.back}>←</button>
         <h1 className="arf-title">{title}</h1>
       </div>
 
       <div className="arf-body">
-        {/* ── Spielmodus ── */}
-        <select
-          className={`arf-gamemode-select${isSolo ? ' arf-solo' : ''}`}
-          value={form.gameModeId ?? ''}
-          onChange={(e) => onSetGameMode(e.target.value ? Number(e.target.value) : null)}
+        {/* ── Spielmodus trigger ── */}
+        <button
+          className={`arf-gamemode-btn${isSolo ? ' arf-solo' : ''}${selectedMode ? ' arf-gamemode-selected' : ''}`}
+          onClick={() => setShowGameModePicker(true)}
         >
-          <option value="">{t.analogGameModeLabel}</option>
-          {staticData.gameModes.map((gm) => (
-            <option key={gm.id} value={gm.id}>
-              {gm.name}
-            </option>
-          ))}
-        </select>
+          <span className="arf-gamemode-label">
+            {selectedMode ? selectedMode.name : t.analogGameModeLabel}
+          </span>
+        </button>
 
-        {/* ── Meta: Re | Punkte | Kontra ── */}
+        {/* ── Meta: Re | Punkte-Label | Kontra ── */}
         <div className="arf-meta">
           <button
-            className={`arf-party-btn${form.winningParty === 'Re' ? ' arf-party-selected' : ''}`}
+            className={`arf-party-btn${form.winningParty === 'Re' ? ' arf-re-selected' : ''}`}
             onClick={() => handlePartyToggle('Re')}
           >
-            <span className="arf-party-check">✓</span>
             {t.reLabel}
           </button>
 
-          <div className="arf-points-wrap">
+          <div className="arf-points-label">{t.analogPointsLabel}</div>
+
+          <button
+            className={`arf-party-btn${form.winningParty === 'Kontra' ? ' arf-kontra-selected' : ''}`}
+            onClick={() => handlePartyToggle('Kontra')}
+          >
+            {t.kontraLabel}
+          </button>
+        </div>
+
+        {/* ── Team columns + Punkte input in center ── */}
+        <div className="arf-teams">
+          <div className="arf-party-col arf-re-col">
+            {reBlocks.map(({ block, index }, vi) => (
+              <TeamBlock
+                key={index}
+                block={block}
+                winningParty={form.winningParty}
+                allPlayers={players}
+                specialCards={staticData.specialCards}
+                extraPoints={staticData.extraPoints}
+                animateOnLoad={vi === 0}
+                onSwitch={() => onSwitchParty(index)}
+                onEdit={() => setEditingBlock(index)}
+              />
+            ))}
+          </div>
+
+          <div className="arf-teams-mid">
             <input
               className="arf-points-input"
               type="text"
               inputMode="numeric"
-              pattern="-?[0-9]*"
-              value={form.points}
+              value={pointsDisplay}
               onChange={(e) => {
-                const raw = e.target.value.replace(/[^0-9-]/g, '').replace(/(?!^)-/g, '');
-                onSetPoints(raw === '' || raw === '-' ? '' : Number(raw));
+                const raw = e.target.value.replace(/[^0-9-]/g, '');
+                const cleaned = raw.startsWith('-')
+                  ? '-' + raw.slice(1).replace(/-/g, '')
+                  : raw.replace(/-/g, '');
+                setPointsDisplay(cleaned);
+                onSetPoints(cleaned === '' || cleaned === '-' ? '' : Number(cleaned));
               }}
-              placeholder="·"
+              placeholder=""
               aria-label="Punkte"
             />
           </div>
 
-          <button
-            className={`arf-party-btn${form.winningParty === 'Kontra' ? ' arf-party-selected' : ''}`}
-            onClick={() => handlePartyToggle('Kontra')}
-          >
-            {t.kontraLabel}
-            <span className="arf-party-check">✓</span>
-          </button>
-        </div>
-
-        {/* ── Team-Blocks ── */}
-        <div className="arf-teams">
-          {/* Block 0 (Re col) */}
-          <TeamBlock
-            block={form.blocks[0]}
-            winningParty={form.winningParty}
-            allPlayers={players}
-            specialCards={staticData.specialCards}
-            extraPoints={staticData.extraPoints}
-            align="left"
-            onSwitch={() => onSwitchParty(0)}
-            onEdit={() => setEditingBlock(0)}
-          />
-
-          {/* Middle spacer spanning both rows */}
-          <div className="arf-teams-mid">
-            <span className="arf-swipe-hint">{'←\n→'}</span>
+          <div className="arf-party-col arf-kontra-col">
+            {kontraBlocks.map(({ block, index }) => (
+              <TeamBlock
+                key={index}
+                block={block}
+                winningParty={form.winningParty}
+                allPlayers={players}
+                specialCards={staticData.specialCards}
+                extraPoints={staticData.extraPoints}
+                onSwitch={() => onSwitchParty(index)}
+                onEdit={() => setEditingBlock(index)}
+              />
+            ))}
           </div>
-
-          {/* Block 2 (Kontra col) */}
-          <TeamBlock
-            block={form.blocks[2]}
-            winningParty={form.winningParty}
-            allPlayers={players}
-            specialCards={staticData.specialCards}
-            extraPoints={staticData.extraPoints}
-            align="right"
-            onSwitch={() => onSwitchParty(2)}
-            onEdit={() => setEditingBlock(2)}
-          />
-
-          {/* Block 1 (Re col, row 2) */}
-          <TeamBlock
-            block={form.blocks[1]}
-            winningParty={form.winningParty}
-            allPlayers={players}
-            specialCards={staticData.specialCards}
-            extraPoints={staticData.extraPoints}
-            align="left"
-            onSwitch={() => onSwitchParty(1)}
-            onEdit={() => setEditingBlock(1)}
-          />
-
-          {/* Block 3 (Kontra col, row 2) */}
-          <TeamBlock
-            block={form.blocks[3]}
-            winningParty={form.winningParty}
-            allPlayers={players}
-            specialCards={staticData.specialCards}
-            extraPoints={staticData.extraPoints}
-            align="right"
-            onSwitch={() => onSwitchParty(3)}
-            onEdit={() => setEditingBlock(3)}
-          />
         </div>
 
         {/* ── Kommentar ── */}
@@ -214,7 +217,15 @@ export function RoundForm({
         </button>
       </div>
 
-      {/* ── Team-Editor Modal ── */}
+      {showGameModePicker && (
+        <GameModePickerModal
+          gameModes={staticData.gameModes}
+          selectedId={form.gameModeId}
+          onSelect={onSetGameMode}
+          onClose={() => setShowGameModePicker(false)}
+        />
+      )}
+
       {editingBlock !== null && (
         <TeamEditorModal
           block={form.blocks[editingBlock]}

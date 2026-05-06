@@ -167,6 +167,7 @@ export const t = {
   analogSave: 'Speichern',
   analogSaving: 'Speichern…',
   analogGameModeLabel: 'Spielmodus wählen…',
+  analogPointsLabel: 'Punkte',
   analogCommentPlaceholder: 'Kommentar…',
   analogTeamAdd: 'Hinzufügen…',
   analogTeamEditTitle: 'Team bearbeiten',

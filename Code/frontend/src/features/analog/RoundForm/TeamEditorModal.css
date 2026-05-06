@@ -24,7 +24,7 @@
 .tem-sheet {
   width: 100%;
   max-width: 480px;
-  max-height: 85vh;
+  max-height: 92vh;
   background: var(--tem-surface);
   border-radius: var(--tem-radius) var(--tem-radius) 0 0;
   border-top: 1px solid var(--tem-border);
@@ -149,13 +149,20 @@
 .tem-tag {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   background: rgba(255,255,255,0.08);
   border: 1px solid var(--tem-border);
   border-radius: 20px;
-  padding: 4px 10px 4px 12px;
+  padding: 4px 10px 4px 10px;
   font-size: 0.85rem;
   color: var(--tem-text);
+}
+
+.tem-tag-icon {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  opacity: 0.75;
 }
 
 .tem-tag-remove {
@@ -171,54 +178,42 @@
 
 .tem-tag-remove:hover { color: #f87171; }
 
-/* ── Dropdown trigger ── */
-.tem-add-btn {
+/* ── Chip grid (available special cards / extra points) ── */
+.tem-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tem-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px;
   background: none;
   border: 1px dashed var(--tem-border);
-  border-radius: var(--tem-radius-sm);
+  border-radius: 20px;
   color: var(--tem-text-sub);
   font: inherit;
-  font-size: 0.88rem;
-  padding: 8px 14px;
+  font-size: 0.82rem;
   cursor: pointer;
-  width: 100%;
-  text-align: left;
-  transition: border-color 0.15s, color 0.15s;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.tem-add-btn:hover { border-color: rgba(255,255,255,0.2); color: var(--tem-text); }
-
-.tem-dropdown-wrap {
-  position: relative;
-}
-
-.tem-dropdown {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
-  background: var(--tem-surface2);
-  border: 1px solid var(--tem-border);
-  border-radius: var(--tem-radius-sm);
-  z-index: 10;
-  overflow: hidden;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-}
-
-.tem-dropdown-item {
-  width: 100%;
-  background: none;
-  border: none;
+.tem-chip:hover, .tem-chip:active {
+  background: rgba(255,255,255,0.07);
+  border-color: rgba(255,255,255,0.22);
+  border-style: solid;
   color: var(--tem-text);
-  font: inherit;
-  font-size: 0.9rem;
-  text-align: left;
-  padding: 10px 14px;
-  cursor: pointer;
-  transition: background 0.12s;
 }
 
-.tem-dropdown-item:hover { background: rgba(255,255,255,0.06); }
+.tem-chip-icon {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  opacity: 0.7;
+}
 
 /* ── Extra points row ── */
 .tem-ep-list {
@@ -236,6 +231,14 @@
   border: 1px solid var(--tem-border);
   border-radius: var(--tem-radius-sm);
   padding: 6px 10px;
+}
+
+.tem-ep-icon {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--tem-text-sub);
+  flex-shrink: 0;
 }
 
 .tem-ep-name {

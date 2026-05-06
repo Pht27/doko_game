@@ -19,6 +19,7 @@ export function AnalogEditRoundPage() {
 
   const {
     form,
+    lastSwitchedBlock,
     setGameMode,
     setPoints,
     setWinningParty,
@@ -90,6 +91,7 @@ export function AnalogEditRoundPage() {
       staticData={staticData}
       players={players}
       saving={saving}
+      lastSwitchedBlock={lastSwitchedBlock}
       onBack={() => navigate('/analog/history')}
       onSetGameMode={setGameMode}
       onSetPoints={setPoints}
