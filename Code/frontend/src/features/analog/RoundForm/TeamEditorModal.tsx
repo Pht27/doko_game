@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { t } from '@/utils/translations';
 import type { TeamBlockState } from '@/hooks/useRoundForm';
 import type { PlayerListItem, SpecialCard, ExtraPoint } from '@/types/analog';
+import { SPECIAL_CARD_ICONS, EXTRA_POINT_ICONS } from '../analogIcons';
 import './TeamEditorModal.css';
 
 interface Props {
@@ -10,7 +11,7 @@ interface Props {
   allPlayers: PlayerListItem[];
   specialCards: SpecialCard[];
   extraPoints: ExtraPoint[];
-  assignedPlayerIds: number[]; // all player IDs in use across all other blocks
+  assignedPlayerIds: number[];
   onClose: () => void;
   onSetPlayers: (ids: number[]) => void;
   onAddSpecialCard: (id: number) => void;
@@ -35,13 +36,10 @@ export function TeamEditorModal({
   onRemoveExtraPoint,
 }: Props) {
   const [search, setSearch] = useState('');
-  const [showScDropdown, setShowScDropdown] = useState(false);
-  const [showEpDropdown, setShowEpDropdown] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
-  // Browser-back closes modal — use ref so pushState only fires once
   useEffect(() => {
     history.pushState({ modal: true }, '');
     const handler = () => onCloseRef.current();
@@ -75,11 +73,9 @@ export function TeamEditorModal({
     onSetPlayers(block.playerIds.filter((pid) => pid !== id));
   };
 
-  const handleBackdrop = () => {
-    history.back();
-  };
+  const handleBackdrop = () => history.back();
 
-  const blockPlayers = allPlayers.filter((p) => block.playerIds.includes(p.id));
+  const blockPlayers    = allPlayers.filter((p) => block.playerIds.includes(p.id));
   const blockSpecialCards = specialCards.filter((sc) => block.specialCardIds.includes(sc.id));
 
   return (
@@ -87,9 +83,7 @@ export function TeamEditorModal({
       <div className="tem-sheet" onClick={(e) => e.stopPropagation()}>
         <div className="tem-header">
           <h2 className="tem-title">{t.analogTeamEditTitle}</h2>
-          <button className="tem-close" onClick={handleBackdrop} aria-label="Schließen">
-            ×
-          </button>
+          <button className="tem-close" onClick={handleBackdrop} aria-label="Schließen">×</button>
         </div>
 
         <div className="tem-body">
@@ -154,6 +148,9 @@ export function TeamEditorModal({
               <div className="tem-tag-list">
                 {blockSpecialCards.map((sc) => (
                   <span key={sc.id} className="tem-tag">
+                    {SPECIAL_CARD_ICONS[sc.name] && (
+                      <span className="tem-tag-icon">{SPECIAL_CARD_ICONS[sc.name]}</span>
+                    )}
                     {sc.name}
                     <button
                       className="tem-tag-remove"
@@ -168,29 +165,19 @@ export function TeamEditorModal({
             )}
 
             {availableSpecialCards.length > 0 && (
-              <div className="tem-dropdown-wrap">
-                <button
-                  className="tem-add-btn"
-                  onClick={() => setShowScDropdown((v) => !v)}
-                >
-                  {t.analogAddSpecialCard}
-                </button>
-                {showScDropdown && (
-                  <div className="tem-dropdown">
-                    {availableSpecialCards.map((sc) => (
-                      <button
-                        key={sc.id}
-                        className="tem-dropdown-item"
-                        onClick={() => {
-                          onAddSpecialCard(sc.id);
-                          setShowScDropdown(false);
-                        }}
-                      >
-                        {sc.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
+              <div className="tem-chip-grid">
+                {availableSpecialCards.map((sc) => (
+                  <button
+                    key={sc.id}
+                    className="tem-chip"
+                    onClick={() => onAddSpecialCard(sc.id)}
+                  >
+                    {SPECIAL_CARD_ICONS[sc.name] && (
+                      <span className="tem-chip-icon">{SPECIAL_CARD_ICONS[sc.name]}</span>
+                    )}
+                    {sc.name}
+                  </button>
+                ))}
               </div>
             )}
           </div>
@@ -205,6 +192,9 @@ export function TeamEditorModal({
                   const def = extraPoints.find((e) => e.id === ep.extraPointId);
                   return (
                     <div key={ep.extraPointId} className="tem-ep-row">
+                      {def && EXTRA_POINT_ICONS[def.name] && (
+                        <span className="tem-ep-icon">{EXTRA_POINT_ICONS[def.name]}</span>
+                      )}
                       <span className="tem-ep-name">{def?.name ?? ep.extraPointId}</span>
                       <div className="tem-ep-counter">
                         <button
@@ -237,29 +227,19 @@ export function TeamEditorModal({
             )}
 
             {availableExtraPoints.length > 0 && (
-              <div className="tem-dropdown-wrap">
-                <button
-                  className="tem-add-btn"
-                  onClick={() => setShowEpDropdown((v) => !v)}
-                >
-                  {t.analogAddExtraPoint}
-                </button>
-                {showEpDropdown && (
-                  <div className="tem-dropdown">
-                    {availableExtraPoints.map((ep) => (
-                      <button
-                        key={ep.id}
-                        className="tem-dropdown-item"
-                        onClick={() => {
-                          onAddExtraPoint(ep.id);
-                          setShowEpDropdown(false);
-                        }}
-                      >
-                        {ep.name}
-                      </button>
-                    ))}
-                  </div>
-                )}
+              <div className="tem-chip-grid">
+                {availableExtraPoints.map((ep) => (
+                  <button
+                    key={ep.id}
+                    className="tem-chip"
+                    onClick={() => onAddExtraPoint(ep.id)}
+                  >
+                    {EXTRA_POINT_ICONS[ep.name] && (
+                      <span className="tem-chip-icon">{EXTRA_POINT_ICONS[ep.name]}</span>
+                    )}
+                    {ep.name}
+                  </button>
+                ))}
               </div>
             )}
           </div>

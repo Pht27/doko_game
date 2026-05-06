@@ -9,6 +9,8 @@
   --arf-text-muted: #666688;
   --arf-primary:    #4f46e5;
   --arf-primary-h:  #6366f1;
+  --arf-re:         #818cf8;
+  --arf-kontra:     #c084fc;
   --arf-solo:       #d97706;
   --arf-radius:     12px;
   --arf-radius-sm:  8px;
@@ -59,34 +61,53 @@
 .arf-body {
   flex: 1;
   overflow-y: auto;
-  padding: 14px 14px 24px;
+  padding: 16px 14px 28px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
-/* ── Spielmodus select ── */
-.arf-gamemode-select {
+/* ── Spielmodus trigger button ── */
+.arf-gamemode-btn {
   width: 100%;
   padding: 12px 16px;
-  border-radius: 50px;
-  border: none;
-  background: var(--arf-primary);
-  color: #fff;
+  border-radius: var(--arf-radius-sm);
+  border: 1px solid var(--arf-border);
+  background: var(--arf-surface2);
+  color: var(--arf-text-muted);
   font: inherit;
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 500;
   cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  text-align: center;
-  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  transition: border-color 0.2s, color 0.2s;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.arf-gamemode-select.arf-solo { background: var(--arf-solo); }
-.arf-gamemode-select:focus { outline: 2px solid rgba(99,102,241,0.5); outline-offset: 2px; }
+.arf-gamemode-btn:hover { border-color: rgba(255,255,255,0.2); }
+.arf-gamemode-btn.arf-gamemode-selected { color: var(--arf-text); font-weight: 600; }
+.arf-gamemode-btn.arf-solo { border-color: rgba(217,119,6,0.4); color: var(--arf-solo); }
 
-/* ── Meta row (Re-checkbox | Punkte | Kontra-checkbox) ── */
+.arf-gamemode-label { flex: 1; }
+
+.arf-gamemode-icon {
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+.arf-gamemode-chevron {
+  font-size: 0.72rem;
+  opacity: 0.35;
+  flex-shrink: 0;
+}
+
+/* ── Meta row (Re-btn | Punkte-Label | Kontra-btn) ── */
 .arf-meta {
   display: grid;
   grid-template-columns: 42% 16% 42%;
@@ -98,42 +119,126 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 8px 6px;
+  justify-self: center;       /* centered in grid cell, auto-width */
+  padding: 10px 14px;
   background: none;
   border: 1px solid var(--arf-border);
   border-radius: var(--arf-radius-sm);
   color: var(--arf-text-muted);
   font: inherit;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.arf-party-btn.arf-party-selected {
-  background: rgba(74, 222, 128, 0.15);
-  border-color: rgba(74, 222, 128, 0.4);
-  color: #4ade80;
+.arf-party-btn.arf-re-selected {
+  background: rgba(129,140,248,0.15);
+  border-color: rgba(129,140,248,0.5);
+  color: var(--arf-re);
 }
 
-.arf-party-btn.arf-party-selected .arf-party-check { opacity: 1; }
-
-.arf-party-check {
-  font-size: 1rem;
-  opacity: 0;
-  transition: opacity 0.15s;
+.arf-party-btn.arf-kontra-selected {
+  background: rgba(192,132,252,0.15);
+  border-color: rgba(192,132,252,0.5);
+  color: var(--arf-kontra);
 }
 
-.arf-points-wrap {
+.arf-points-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--arf-text-muted);
+  text-align: center;
+}
+
+/* ── Team columns ── */
+.arf-teams {
+  display: grid;
+  grid-template-columns: 42% 16% 42%;
+  gap: 0;
+  align-items: start;
+}
+
+.arf-party-col {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.arf-team-block {
+  min-height: 58px;
+  border-radius: var(--arf-radius-sm);
+  border: 1px solid var(--arf-border);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
+  padding: 10px 12px;
+  text-align: left;
+  font: inherit;
+  transition: border-color 0.15s, background-color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+  background: transparent;
+}
+
+.arf-team-block:active { opacity: 0.85; }
+
+.arf-re-col .arf-team-block   { border-color: rgba(129,140,248,0.25); }
+.arf-kontra-col .arf-team-block { border-color: rgba(192,132,252,0.25); }
+
+.arf-team-block.arf-winning { background: rgba(74,222,128,0.10); }
+.arf-team-block.arf-losing  { background: rgba(248,113,113,0.10); }
+
+.arf-team-empty {
+  font-size: 0.85rem;
+  font-style: italic;
+  color: var(--arf-text-muted);
+}
+
+.arf-team-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--arf-text);
+  line-height: 1.3;
+}
+
+.arf-team-section {
+  margin-top: 4px;
+}
+
+.arf-team-section-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--arf-text-muted);
+  display: block;
+}
+
+.arf-team-section-item {
+  font-size: 0.75rem;
+  color: var(--arf-text-sub);
+  display: block;
+  line-height: 1.5;
+}
+
+
+/* Middle column — points input */
+.arf-teams-mid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 14px;
 }
 
 .arf-points-input {
-  width: 2.8ch;
-  min-width: 2.8ch;
-  max-width: 4ch;
+  width: 3ch;
+  min-width: 2.5ch;
+  max-width: 4.5ch;
   background: none;
   border: none;
   border-bottom: 2px solid var(--arf-border);
@@ -143,81 +248,11 @@
   font-weight: 700;
   text-align: center;
   outline: none;
-  padding: 4px 0;
+  padding: 6px 0 5px;
   transition: border-color 0.2s;
 }
 
 .arf-points-input:focus { border-bottom-color: var(--arf-primary-h); }
-
-/* ── Team grid ── */
-.arf-teams {
-  display: grid;
-  grid-template-columns: 42% 16% 42%;
-  grid-template-rows: auto auto;
-  gap: 6px 0;
-  align-items: stretch;
-}
-
-.arf-team-block {
-  min-height: 52px;
-  border-radius: var(--arf-radius-sm);
-  border: 1px solid var(--arf-border);
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 8px 10px;
-  text-align: left;
-  font: inherit;
-  transition: border-color 0.15s;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.arf-team-block:active { opacity: 0.85; }
-
-.arf-team-block-right { text-align: right; }
-
-.arf-team-empty {
-  font-size: 0.85rem;
-  font-style: italic;
-  color: var(--arf-text-muted);
-}
-
-.arf-team-players {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--arf-text);
-  line-height: 1.3;
-  display: block;
-}
-
-.arf-team-extras {
-  font-size: 0.72rem;
-  color: var(--arf-text-muted);
-  margin-top: 2px;
-  display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Middle column spacer */
-.arf-teams-mid {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.arf-swipe-hint {
-  font-size: 0.65rem;
-  color: var(--arf-text-muted);
-  text-align: center;
-  writing-mode: horizontal-tb;
-  white-space: pre-line;
-  line-height: 1.5;
-}
 
 /* ── Comment ── */
 .arf-comment-input {
@@ -242,8 +277,8 @@
   font-size: 0.85rem;
   color: #f87171;
   padding: 8px 12px;
-  background: rgba(248, 113, 113, 0.08);
-  border: 1px solid rgba(248, 113, 113, 0.2);
+  background: rgba(248,113,113,0.08);
+  border: 1px solid rgba(248,113,113,0.2);
   border-radius: var(--arf-radius-sm);
 }
 
@@ -265,3 +300,17 @@
 
 .arf-save-btn:hover:not(:disabled) { background: var(--arf-primary-h); }
 .arf-save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Swipe hint animation ── */
+@keyframes arf-swipe-suggest {
+  0%   { transform: translateX(0); }
+  20%  { transform: translateX(10px); }
+  45%  { transform: translateX(-4px); }
+  65%  { transform: translateX(7px); }
+  85%  { transform: translateX(-2px); }
+  100% { transform: translateX(0); }
+}
+
+.arf-swipe-animate {
+  animation: arf-swipe-suggest 0.9s ease 0.6s both;
+}

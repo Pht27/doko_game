@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStaticData } from '@/hooks/useStaticData';
 import { useAnalogPlayers } from '@/hooks/useAnalogPlayers';
@@ -13,6 +13,7 @@ export function AnalogNewRoundPage() {
   const { players, loading: playersLoading, error: playersError } = useAnalogPlayers();
   const {
     form,
+    lastSwitchedBlock,
     setGameMode,
     setPoints,
     setWinningParty,
@@ -28,6 +29,14 @@ export function AnalogNewRoundPage() {
     resetForNew,
   } = useRoundForm();
   const [saving, setSaving] = useState(false);
+
+  // Default game mode: Normal
+  useEffect(() => {
+    if (staticData && form.gameModeId === null) {
+      const normal = staticData.gameModes.find((gm) => gm.name === 'Normal');
+      if (normal) setGameMode(normal.id);
+    }
+  }, [staticData, form.gameModeId, setGameMode]);
 
   if (staticLoading || playersLoading) {
     return (
@@ -64,6 +73,7 @@ export function AnalogNewRoundPage() {
       staticData={staticData}
       players={players}
       saving={saving}
+      lastSwitchedBlock={lastSwitchedBlock}
       onBack={() => navigate('/')}
       onSetGameMode={setGameMode}
       onSetPoints={setPoints}
