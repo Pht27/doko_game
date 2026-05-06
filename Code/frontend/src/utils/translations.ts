@@ -177,7 +177,7 @@ export const t = {
   analogAddExtraPoint: '+ Extrapunkt hinzufügen',
   analogPlayerSearch: 'Spieler*in hinzufügen…',
   analogValidationGameMode: 'Bitte Spielmodus wählen.',
-  analogValidationPoints: 'Bitte Punkte eingeben (> 0).',
+  analogValidationPoints: 'Bitte Punkte eingeben.',
   analogValidationWinningParty: 'Bitte Siegerpartei wählen.',
   analogValidationPlayersRequired: 'Jeder Block braucht mindestens einen Spieler.',
   analogValidationPlayerDuplicate: 'Ein Spieler darf nicht doppelt vorkommen.',

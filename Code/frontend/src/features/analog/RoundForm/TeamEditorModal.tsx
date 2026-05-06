@@ -38,14 +38,16 @@ export function TeamEditorModal({
   const [showScDropdown, setShowScDropdown] = useState(false);
   const [showEpDropdown, setShowEpDropdown] = useState(false);
   const searchRef = useRef<HTMLInputElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
-  // Browser-back closes modal
+  // Browser-back closes modal — use ref so pushState only fires once
   useEffect(() => {
     history.pushState({ modal: true }, '');
-    const handler = () => onClose();
+    const handler = () => onCloseRef.current();
     window.addEventListener('popstate', handler);
     return () => window.removeEventListener('popstate', handler);
-  }, [onClose]);
+  }, []);
 
   const availablePlayers = allPlayers.filter(
     (p) =>

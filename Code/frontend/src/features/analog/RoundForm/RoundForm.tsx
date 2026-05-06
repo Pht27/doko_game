@@ -29,7 +29,7 @@ interface Props {
 
 function validate(form: RoundFormState): string | null {
   if (form.gameModeId === null) return t.analogValidationGameMode;
-  if (form.points === '' || form.points <= 0) return t.analogValidationPoints;
+  if (form.points === '') return t.analogValidationPoints;
   if (form.winningParty === null) return t.analogValidationWinningParty;
   if (form.blocks.some((b) => b.playerIds.length === 0)) return t.analogValidationPlayersRequired;
   if (form.blocks.some((b) => b.playerIds.length > 2)) return t.analogValidationMaxPlayers;
@@ -119,13 +119,14 @@ export function RoundForm({
           <div className="arf-points-wrap">
             <input
               className="arf-points-input"
-              type="number"
+              type="text"
               inputMode="numeric"
-              min={1}
+              pattern="-?[0-9]*"
               value={form.points}
-              onChange={(e) =>
-                onSetPoints(e.target.value === '' ? '' : Math.max(1, Number(e.target.value)))
-              }
+              onChange={(e) => {
+                const raw = e.target.value.replace(/[^0-9-]/g, '').replace(/(?!^)-/g, '');
+                onSetPoints(raw === '' || raw === '-' ? '' : Number(raw));
+              }}
               placeholder="·"
               aria-label="Punkte"
             />
