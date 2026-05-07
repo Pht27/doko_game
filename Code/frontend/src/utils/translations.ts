@@ -16,6 +16,7 @@ export const t = {
   landingSpielEintragen: 'Spiel eintragen',
   landingRundenubersicht: 'Rundenübersicht',
   landingStats: 'Statistiken',
+  landingRegelsets: 'Regelsets',
 
   // ── MultiplayerBrowserPage / LobbyDetailView ───────────────────────────────
   back: '← Zurück',
