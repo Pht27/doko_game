@@ -199,15 +199,15 @@ export function LandingPage() {
           expanded={open === 'kreuz'} onClick={() => toggle('kreuz')} />
 
         {/* ♠ Pik — Spielen */}
-        <Tile suit={SUITS.pik} label="Spielen" sub="Mehrspieler & Test"
+        <Tile suit={SUITS.pik} label="Spielen" sub="Mehrspieler und Testspiel"
           expanded={open === 'pik'} onClick={() => toggle('pik')} />
 
         {/* ♥ Herz — Übersicht */}
-        <Tile suit={SUITS.herz} label="Übersicht" sub="Runden & Statistik"
+        <Tile suit={SUITS.herz} label="Übersicht" sub="Match History und Stats"
           expanded={open === 'herz'} onClick={() => toggle('herz')} />
 
         {/* ♦ Karo — Regeln */}
-        <Tile suit={SUITS.karo} label="Regeln" sub="& Regelsets"
+        <Tile suit={SUITS.karo} label="Regeln" sub="und Regelsets"
           expanded={open === 'karo'} onClick={() => toggle('karo')} />
 
       </div>
