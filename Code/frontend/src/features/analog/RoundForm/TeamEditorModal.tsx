@@ -12,6 +12,7 @@ interface Props {
   specialCards: SpecialCard[];
   extraPoints: ExtraPoint[];
   assignedPlayerIds: number[];
+  assignedSpecialCardIds: number[];
   onClose: () => void;
   onSetPlayers: (ids: number[]) => void;
   onAddSpecialCard: (id: number) => void;
@@ -27,6 +28,7 @@ export function TeamEditorModal({
   specialCards,
   extraPoints,
   assignedPlayerIds,
+  assignedSpecialCardIds,
   onClose,
   onSetPlayers,
   onAddSpecialCard,
@@ -56,7 +58,7 @@ export function TeamEditorModal({
   );
 
   const availableSpecialCards = specialCards.filter(
-    (sc) => !block.specialCardIds.includes(sc.id),
+    (sc) => !block.specialCardIds.includes(sc.id) && !assignedSpecialCardIds.includes(sc.id),
   );
 
   const availableExtraPoints = extraPoints.filter(
@@ -117,7 +119,6 @@ export function TeamEditorModal({
                   placeholder={t.analogPlayerSearch}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  autoFocus
                 />
                 {search && (
                   <div className="tem-search-results">

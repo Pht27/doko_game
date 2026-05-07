@@ -93,6 +93,9 @@ export function RoundForm({
   const otherBlockIds = (blockIndex: number) =>
     form.blocks.flatMap((b, i) => (i === blockIndex ? [] : b.playerIds));
 
+  const otherBlockSpecialCardIds = (blockIndex: number) =>
+    form.blocks.flatMap((b, i) => (i === blockIndex ? [] : b.specialCardIds));
+
   const indexed = form.blocks.map((block, index) => ({ block, index }));
   const reBlocks = indexed
     .filter(({ block }) => block.party === 'Re')
@@ -158,13 +161,14 @@ export function RoundForm({
           <div className="arf-party-col arf-re-col">
             {reBlocks.map(({ block, index }, vi) => (
               <TeamBlock
-                key={index}
+                key={`${index}-${block.party}`}
                 block={block}
                 winningParty={form.winningParty}
                 allPlayers={players}
                 specialCards={staticData.specialCards}
                 extraPoints={staticData.extraPoints}
                 animateOnLoad={vi === 0}
+                justSwitched={lastSwitchedBlock === index}
                 onSwitch={() => onSwitchParty(index)}
                 onEdit={() => setEditingBlock(index)}
               />
@@ -193,12 +197,13 @@ export function RoundForm({
           <div className="arf-party-col arf-kontra-col">
             {kontraBlocks.map(({ block, index }) => (
               <TeamBlock
-                key={index}
+                key={`${index}-${block.party}`}
                 block={block}
                 winningParty={form.winningParty}
                 allPlayers={players}
                 specialCards={staticData.specialCards}
                 extraPoints={staticData.extraPoints}
+                justSwitched={lastSwitchedBlock === index}
                 onSwitch={() => onSwitchParty(index)}
                 onEdit={() => setEditingBlock(index)}
               />
@@ -244,6 +249,7 @@ export function RoundForm({
           specialCards={staticData.specialCards}
           extraPoints={staticData.extraPoints}
           assignedPlayerIds={otherBlockIds(editingBlock)}
+          assignedSpecialCardIds={otherBlockSpecialCardIds(editingBlock)}
           onClose={() => setEditingBlock(null)}
           onSetPlayers={(ids) => onSetBlockPlayers(editingBlock, ids)}
           onAddSpecialCard={(id) => onAddSpecialCard(editingBlock, id)}

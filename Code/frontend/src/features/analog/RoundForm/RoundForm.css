@@ -364,6 +364,25 @@
   cursor: not-allowed;
 }
 
+/* ── Party-switch slide animations ── */
+@keyframes arf-slide-in-right {
+  from { transform: translateX(40px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+@keyframes arf-slide-in-left {
+  from { transform: translateX(-40px); opacity: 0; }
+  to   { transform: translateX(0);     opacity: 1; }
+}
+
+.arf-slide-from-right {
+  animation: arf-slide-in-right 0.2s ease-out both;
+}
+
+.arf-slide-from-left {
+  animation: arf-slide-in-left 0.2s ease-out both;
+}
+
 /* ── Swipe hint animation ── */
 @keyframes arf-swipe-suggest {
   0%   { transform: translateX(0); }

@@ -1,5 +1,14 @@
 # Release Notes
 
+## [1.3.1] - 2026-05-07
+
+### Behoben
+- Beim Spiel eintragen kann eine Sonderkarte nur noch einem Team zugewiesen werden – war sie bereits beim anderen Team, taucht sie dort nicht mehr zur Auswahl auf.
+- Beim Öffnen des Team-Editors wird das Spieler-Suchfeld nicht mehr automatisch fokussiert.
+
+### Verbessert
+- Wechselt ein Team per Wisch-Geste die Seite (Re ↔ Kontra), gleitet der Block jetzt animiert in die neue Spalte.
+
 ## [1.3.0] - 2026-05-05
 
 ### Neu
