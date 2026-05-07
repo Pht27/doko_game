@@ -182,8 +182,8 @@ export function LandingPage() {
       {/* 2×2 grid */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, zIndex: 1 }}>
 
-        {/* ♣ Kreuz — Analog */}
-        <Tile suit={SUITS.kreuz} label="Analog" sub="Eintragen & Spieler"
+        {/* ♣ Kreuz — Eintragen */}
+        <Tile suit={SUITS.kreuz} label="Eintragen" sub="Spieler und Runden verwalten"
           expanded={open === 'kreuz'} onClick={() => toggle('kreuz')} />
 
         {/* ♠ Pik — Spielen */}
