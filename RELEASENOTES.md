@@ -1,5 +1,10 @@
 # Release Notes
 
+## [1.3.4] - 2026-05-08
+
+### Verbessert
+- Nochmalige Landing-Page Updates
+
 ## [1.3.3] - 2026-05-08
 
 ### Verbessert
