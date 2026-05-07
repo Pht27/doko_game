@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useRegisterSW } from 'virtual:pwa-register/react';
 import { t } from '@/utils/translations';
 import { appVersion } from '@/utils/releaseNotes';
 import { ReleaseNotesModal } from '@/components/ReleaseNotesModal/ReleaseNotesModal';
@@ -131,6 +132,7 @@ export function LandingPage() {
   const navigate = useNavigate();
   const [open, setOpen] = useState<DrawerKey>(null);
   const [showReleaseNotes, setShowReleaseNotes] = useState(false);
+  const { needRefresh: [needRefresh], updateServiceWorker } = useRegisterSW();
 
   const toggle = (key: DrawerKey) => setOpen(prev => prev === key ? null : key);
 
@@ -264,19 +266,34 @@ export function LandingPage() {
         style={{
           alignSelf: 'center',
           display: 'flex', alignItems: 'center', gap: 6,
-          background: SURFACE,
-          border: '1px solid rgba(255,255,255,0.08)',
+          background: needRefresh ? 'rgba(99,102,241,0.15)' : SURFACE,
+          border: needRefresh ? '1px solid rgba(99,102,241,0.45)' : '1px solid rgba(255,255,255,0.08)',
           borderRadius: 999,
           padding: '8px 14px',
           fontSize: 12, color: 'rgba(255,255,255,0.7)',
           cursor: 'pointer', zIndex: 1,
+          transition: 'background 0.3s, border-color 0.3s',
         }}
       >
+        {needRefresh && (
+          <span style={{
+            width: 7, height: 7, borderRadius: '50%',
+            background: '#818cf8',
+            boxShadow: '0 0 6px #818cf8',
+            flexShrink: 0,
+          }} />
+        )}
         <span style={{ fontWeight: 600 }}>v{appVersion}</span>
-        <span style={{ opacity: 0.55 }}>· Was ist neu?</span>
+        <span style={{ opacity: 0.55 }}>· {needRefresh ? 'Update verfügbar' : 'Was ist neu?'}</span>
       </div>
 
-      {showReleaseNotes && <ReleaseNotesModal onClose={() => setShowReleaseNotes(false)} />}
+      {showReleaseNotes && (
+        <ReleaseNotesModal
+          onClose={() => setShowReleaseNotes(false)}
+          needRefresh={needRefresh}
+          updateSW={updateServiceWorker}
+        />
+      )}
     </div>
   );
 }

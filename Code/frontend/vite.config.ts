@@ -43,6 +43,7 @@ export default defineConfig(({ mode }) => {
     svgr(),
     mkcert(),
     VitePWA({
+      registerType: 'prompt',
       injectRegister: 'auto',
       devOptions: {
         enabled: true, // lets you test PWA in dev
