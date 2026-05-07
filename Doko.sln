@@ -27,6 +27,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "backend", "backend", "{D6F4
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Analog", "Code\backend\Doko.Analog\Doko.Analog.csproj", "{84CF1026-6102-451C-BBB4-6DABB1CCB9FF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Doko.Analog.IntegrationTests", "Code\tests\Doko.Analog.IntegrationTests\Doko.Analog.IntegrationTests.csproj", "{F3F83538-4627-49C4-9183-FD4EFB415046}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -145,6 +147,18 @@ Global
 		{84CF1026-6102-451C-BBB4-6DABB1CCB9FF}.Release|x64.Build.0 = Release|Any CPU
 		{84CF1026-6102-451C-BBB4-6DABB1CCB9FF}.Release|x86.ActiveCfg = Release|Any CPU
 		{84CF1026-6102-451C-BBB4-6DABB1CCB9FF}.Release|x86.Build.0 = Release|Any CPU
+		{F3F83538-4627-49C4-9183-FD4EFB415046}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3F83538-4627-49C4-9183-FD4EFB415046}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3F83538-4627-49C4-9183-FD4EFB415046}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{F3F83538-4627-49C4-9183-FD4EFB415046}.Debug|x64.Build.0 = Debug|Any CPU
+		{F3F83538-4627-49C4-9183-FD4EFB415046}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F3F83538-4627-49C4-9183-FD4EFB415046}.Debug|x86.Build.0 = Debug|Any CPU
+		{F3F83538-4627-49C4-9183-FD4EFB415046}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3F83538-4627-49C4-9183-FD4EFB415046}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3F83538-4627-49C4-9183-FD4EFB415046}.Release|x64.ActiveCfg = Release|Any CPU
+		{F3F83538-4627-49C4-9183-FD4EFB415046}.Release|x64.Build.0 = Release|Any CPU
+		{F3F83538-4627-49C4-9183-FD4EFB415046}.Release|x86.ActiveCfg = Release|Any CPU
+		{F3F83538-4627-49C4-9183-FD4EFB415046}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -160,5 +174,6 @@ Global
 		{E7F8A9B0-C1D2-4E3F-A04B-5C6D7E8F9A0B} = {7569D44E-D048-4D29-9C5D-65639A42BAFF}
 		{D6F476A3-F118-174E-5696-78A6745069FA} = {196828B5-7FA5-49A8-B9B6-C6C916A72567}
 		{84CF1026-6102-451C-BBB4-6DABB1CCB9FF} = {D6F476A3-F118-174E-5696-78A6745069FA}
+		{F3F83538-4627-49C4-9183-FD4EFB415046} = {7569D44E-D048-4D29-9C5D-65639A42BAFF}
 	EndGlobalSection
 EndGlobal
