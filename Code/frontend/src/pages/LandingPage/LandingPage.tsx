@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { t } from '@/utils/translations';
-import { showTestFeatures } from '@/utils/env';
 import { appVersion } from '@/utils/releaseNotes';
 import { ReleaseNotesModal } from '@/components/ReleaseNotesModal/ReleaseNotesModal';
 
@@ -10,46 +9,39 @@ const BLACK_SUIT    = 'rgba(255,255,255,0.75)';
 const SURFACE       = 'rgba(255,255,255,0.05)';
 const RE_BLUE       = '#6366f1';
 const KONTRA_PURPLE = 'oklch(65% 0.23 303)';
+const ORANGE        = '#fb923c';
 
 const SUITS = {
-  // primary tiles — border uses suit colour
-  kreuz: { glyph: '♣', color: BLACK_SUIT, glow: 'rgba(255,255,255,0.25)' },
+  kreuz: { glyph: '♣', color: BLACK_SUIT, glow: 'rgba(99,102,241,0.5)',
+           openBg: 'rgba(99,102,241,0.14)', openBorder: RE_BLUE },
   herz:  { glyph: '♥', color: RED_SUIT,   glow: 'rgba(248,113,113,0.5)',
            openBg: 'rgba(248,113,113,0.14)', openBorder: RED_SUIT },
-  // expandable tiles
   pik:   { glyph: '♠', color: BLACK_SUIT, glow: 'oklch(65% 0.23 303 / 0.55)',
            openBg: 'oklch(65% 0.23 303 / 0.16)', openBorder: KONTRA_PURPLE },
-  karo:  { glyph: '♦', color: RED_SUIT,   glow: 'rgba(99,102,241,0.5)',
-           openBg: 'rgba(99,102,241,0.14)',       openBorder: RE_BLUE },
+  karo:  { glyph: '♦', color: RED_SUIT,   glow: 'rgba(251,146,60,0.5)',
+           openBg: 'rgba(251,146,60,0.12)', openBorder: ORANGE },
 };
 
 type Suit = {
   glyph: string; color: string; glow: string;
   openBg?: string; openBorder?: string;
 };
-type DrawerKey = 'spieler' | 'regeln' | 'spielen' | null;
+type DrawerKey = 'kreuz' | 'pik' | 'herz' | 'karo' | null;
 
 function Tile({
-  suit, label, sub, primary, expanded, onClick,
+  suit, label, sub, expanded, onClick,
 }: {
   suit: Suit; label: string; sub: string;
-  primary?: boolean; expanded?: boolean; onClick?: () => void;
+  expanded?: boolean; onClick?: () => void;
 }) {
   const expandedBg     = suit.openBg     ?? SURFACE;
   const expandedBorder = suit.openBorder ?? 'rgba(255,255,255,0.2)';
 
-  let bg          = SURFACE;
-  let borderColor = 'rgba(255,255,255,0.07)';
-  let boxShadow   = 'none';
-
-  if (primary) {
-    borderColor = suit.color;
-    boxShadow   = `0 0 18px ${suit.glow}`;
-  } else if (expanded) {
-    bg          = expandedBg;
-    borderColor = expandedBorder;
-    boxShadow   = `0 0 0 1px ${expandedBorder}, 0 0 28px ${suit.glow}`;
-  }
+  const bg          = expanded ? expandedBg : SURFACE;
+  const borderColor = expanded ? expandedBorder : 'rgba(255,255,255,0.07)';
+  const boxShadow   = expanded
+    ? `0 0 0 1px ${expandedBorder}, 0 0 28px ${suit.glow}`
+    : 'none';
 
   return (
     <button
@@ -74,7 +66,7 @@ function Tile({
         position: 'absolute', top: 10, left: 12,
         fontFamily: 'serif', lineHeight: 1,
         color: suit.color,
-        opacity: expanded || primary ? 0.95 : 0.65,
+        opacity: expanded ? 0.95 : 0.65,
         fontSize: 14,
       }}>
         {suit.glyph}
@@ -84,8 +76,8 @@ function Tile({
       <div style={{
         fontFamily: 'serif', fontSize: 60, lineHeight: 0.8,
         color: suit.color,
-        opacity: expanded ? 1 : (primary ? 0.7 : 0.5),
-        textShadow: (expanded || primary) ? `0 0 24px ${suit.glow}` : 'none',
+        opacity: expanded ? 1 : 0.5,
+        textShadow: expanded ? `0 0 24px ${suit.glow}` : 'none',
         transition: 'opacity 0.25s, text-shadow 0.25s',
         alignSelf: 'flex-end',
         pointerEvents: 'none',
@@ -109,8 +101,8 @@ function Tile({
   );
 }
 
-function SubItem({ label, hint, onClick, disabled }: {
-  label: string; hint: string; onClick?: () => void; disabled?: boolean;
+function SubItem({ label, hint, onClick, disabled, hasDivider }: {
+  label: string; hint: string; onClick?: () => void; disabled?: boolean; hasDivider?: boolean;
 }) {
   return (
     <button
@@ -118,10 +110,12 @@ function SubItem({ label, hint, onClick, disabled }: {
       disabled={disabled}
       style={{
         background: 'transparent', border: 'none',
+        borderBottom: hasDivider ? '1px solid rgba(255,255,255,0.08)' : 'none',
         padding: '11px 14px',
         color: disabled ? 'rgba(255,255,255,0.25)' : '#eee',
         display: 'flex', alignItems: 'center',
-        borderRadius: 10, cursor: disabled ? 'not-allowed' : 'pointer',
+        borderRadius: hasDivider ? 0 : 10,
+        cursor: disabled ? 'not-allowed' : 'pointer',
         fontFamily: 'inherit', textAlign: 'left', width: '100%',
       }}
     >
@@ -186,26 +180,21 @@ export function LandingPage() {
       {/* 2×2 grid */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, zIndex: 1 }}>
 
-        {/* ♣ Kreuz — Spiel eintragen (primary) */}
-        <Tile suit={SUITS.kreuz} label="Spiel" sub="eintragen" primary
-          onClick={() => navigate('/analog/new')} />
+        {/* ♣ Kreuz — Analog */}
+        <Tile suit={SUITS.kreuz} label="Analog" sub="Eintragen & Spieler"
+          expanded={open === 'kreuz'} onClick={() => toggle('kreuz')} />
 
-        {/* ♥ Herz — Spielen (primary in prod, expandable in staging) */}
-        {showTestFeatures ? (
-          <Tile suit={SUITS.herz} label="Spielen" sub="Mehrspieler"
-            expanded={open === 'spielen'} onClick={() => toggle('spielen')} />
-        ) : (
-          <Tile suit={SUITS.herz} label="Spielen" sub="Mehrspieler" primary
-            onClick={() => navigate('/lobby')} />
-        )}
+        {/* ♠ Pik — Spielen */}
+        <Tile suit={SUITS.pik} label="Spielen" sub="Mehrspieler & Test"
+          expanded={open === 'pik'} onClick={() => toggle('pik')} />
 
-        {/* ♠ Pik — Spieler & Runden (expandable) */}
-        <Tile suit={SUITS.pik} label="Spieler" sub="& Runden"
-          expanded={open === 'spieler'} onClick={() => toggle('spieler')} />
+        {/* ♥ Herz — Übersicht */}
+        <Tile suit={SUITS.herz} label="Übersicht" sub="Runden & Statistik"
+          expanded={open === 'herz'} onClick={() => toggle('herz')} />
 
-        {/* ♦ Karo — Regeln & Statistik (expandable) */}
-        <Tile suit={SUITS.karo} label="Regeln" sub="& Statistik"
-          expanded={open === 'regeln'} onClick={() => toggle('regeln')} />
+        {/* ♦ Karo — Regeln */}
+        <Tile suit={SUITS.karo} label="Regeln" sub="& Regelsets"
+          expanded={open === 'karo'} onClick={() => toggle('karo')} />
 
       </div>
 
@@ -218,34 +207,50 @@ export function LandingPage() {
         transition: 'max-height 0.3s ease, opacity 0.25s, margin-top 0.3s',
         zIndex: 1,
       }}>
-        {open === 'spielen' && (
+        {open === 'kreuz' && (
           <div style={{
-            background: SURFACE, borderRadius: 14, padding: 6,
-            border: `1px solid ${SUITS.herz.color}`,
-            display: 'flex', flexDirection: 'column', gap: 2,
+            background: SURFACE, borderRadius: 14, padding: '6px 6px',
+            border: `1px solid ${SUITS.kreuz.openBorder}`,
+            display: 'flex', flexDirection: 'column',
           }}>
-            <SubItem label={t.multiplayer} hint="Online spielen"      onClick={() => navigate('/lobby')} />
-            <SubItem label={t.testGame}    hint="Allein ausprobieren" onClick={() => navigate('/hot-seat')} />
+            <SubItem label={t.landingSpielEintragen} hint="Runde aufschreiben" hasDivider
+              onClick={() => navigate('/analog/new')} />
+            <SubItem label={t.analogPlayersTitle} hint="Namen verwalten"
+              onClick={() => navigate('/analog/players')} />
           </div>
         )}
-        {open === 'spieler' && (
+        {open === 'pik' && (
           <div style={{
-            background: SURFACE, borderRadius: 14, padding: 6,
+            background: SURFACE, borderRadius: 14, padding: '6px 6px',
             border: `1px solid ${SUITS.pik.openBorder}`,
-            display: 'flex', flexDirection: 'column', gap: 2,
+            display: 'flex', flexDirection: 'column',
           }}>
-            <SubItem label={t.analogPlayersTitle}     hint="Namen verwalten"   onClick={() => navigate('/analog/players')} />
-            <SubItem label={t.landingRundenubersicht} hint="Vergangene Spiele" onClick={() => navigate('/analog/history')} />
+            <SubItem label={t.multiplayer} hint="Online spielen" hasDivider
+              onClick={() => navigate('/lobby')} />
+            <SubItem label={t.testGame} hint="Allein ausprobieren"
+              onClick={() => navigate('/hot-seat')} />
           </div>
         )}
-        {open === 'regeln' && (
+        {open === 'herz' && (
           <div style={{
-            background: SURFACE, borderRadius: 14, padding: 6,
-            border: `1px solid ${SUITS.karo.openBorder}`,
-            display: 'flex', flexDirection: 'column', gap: 2,
+            background: SURFACE, borderRadius: 14, padding: '6px 6px',
+            border: `1px solid ${SUITS.herz.openBorder}`,
+            display: 'flex', flexDirection: 'column',
           }}>
-            <SubItem label={t.rulesTitle}   hint="Doppelkopf nachlesen" onClick={() => navigate('/rules')} />
-            <SubItem label={t.landingStats} hint="Deine Zahlen"          disabled />
+            <SubItem label={t.landingRundenubersicht} hint="Vergangene Spiele" hasDivider
+              onClick={() => navigate('/analog/history')} />
+            <SubItem label={t.landingStats} hint="Deine Zahlen" disabled />
+          </div>
+        )}
+        {open === 'karo' && (
+          <div style={{
+            background: SURFACE, borderRadius: 14, padding: '6px 6px',
+            border: `1px solid ${SUITS.karo.openBorder}`,
+            display: 'flex', flexDirection: 'column',
+          }}>
+            <SubItem label={t.rulesTitle} hint="Doppelkopf nachlesen" hasDivider
+              onClick={() => navigate('/rules')} />
+            <SubItem label={t.landingRegelsets} hint="Noch nicht verfügbar" disabled />
           </div>
         )}
       </div>

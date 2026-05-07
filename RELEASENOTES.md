@@ -1,5 +1,10 @@
 # Release Notes
 
+## [1.3.2] - 2026-05-08
+
+### Verbessert
+- Startseite neu geordnet: Alle vier Kacheln klappen jetzt auf. ♣ zeigt Spiel eintragen & Spieler (blau), ♠ Mehrspieler & Testspiel, ♥ Rundenübersicht & Statistiken, ♦ Regeln & Regelsets (orange). Die Optionen im aufgeklappten Menü sind jetzt durch eine Trennlinie klar voneinander abgegrenzt.
+
 ## [1.3.1] - 2026-05-07
 
 ### Behoben
