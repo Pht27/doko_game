@@ -3,9 +3,11 @@ import { releaseNotesContent } from '@/utils/releaseNotes';
 
 interface ReleaseNotesModalProps {
   onClose: () => void;
+  needRefresh?: boolean;
+  updateSW?: (reloadPage?: boolean) => void;
 }
 
-export function ReleaseNotesModal({ onClose }: ReleaseNotesModalProps) {
+export function ReleaseNotesModal({ onClose, needRefresh, updateSW }: ReleaseNotesModalProps) {
   return (
     <div
       className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
@@ -24,6 +26,21 @@ export function ReleaseNotesModal({ onClose }: ReleaseNotesModalProps) {
             ×
           </button>
         </div>
+
+        {needRefresh && updateSW && (
+          <div className="mx-4 mt-4 shrink-0 rounded-xl bg-indigo-500/15 border border-indigo-400/30 px-4 py-3 flex items-center justify-between gap-3">
+            <div className="flex flex-col gap-0.5">
+              <span className="text-indigo-300 font-semibold text-sm">Neue Version verfügbar</span>
+              <span className="text-white/50 text-xs">App neu laden, um das Update zu installieren</span>
+            </div>
+            <button
+              onClick={() => updateSW(true)}
+              className="shrink-0 bg-indigo-500 hover:bg-indigo-400 active:bg-indigo-600 text-white font-semibold text-sm rounded-lg px-3 py-1.5 transition-colors"
+            >
+              Aktualisieren
+            </button>
+          </div>
+        )}
 
         <div className="overflow-y-auto px-5 py-4 flex flex-col gap-1">
           {releaseNotesContent.split('\n').map((line, i) => {

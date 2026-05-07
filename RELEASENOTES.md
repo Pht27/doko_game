@@ -2,6 +2,9 @@
 
 ## [1.3.2] - 2026-05-08
 
+### Neu
+- Wenn ein App-Update bereitsteht, zeigt der Versionsknopf unten einen Hinweis an. Ein Tipp darauf öffnet die Release Notes – mit einem „Aktualisieren"-Button, der die neue Version direkt installiert. Kein manuelles Cache-Leeren mehr nötig.
+
 ### Verbessert
 - Startseite neu geordnet: Alle vier Kacheln klappen jetzt auf. ♣ zeigt Spiel eintragen & Spieler (blau), ♠ Mehrspieler & Testspiel, ♥ Rundenübersicht & Statistiken, ♦ Regeln & Regelsets (orange). Die Optionen im aufgeklappten Menü sind jetzt durch eine Trennlinie klar voneinander abgegrenzt.
 
