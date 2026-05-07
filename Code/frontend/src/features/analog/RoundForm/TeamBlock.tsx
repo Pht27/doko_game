@@ -10,6 +10,7 @@ interface Props {
   specialCards: SpecialCard[];
   extraPoints: ExtraPoint[];
   animateOnLoad?: boolean;
+  justSwitched?: boolean;
   onSwitch: () => void;
   onEdit: () => void;
 }
@@ -23,6 +24,7 @@ export function TeamBlock({
   specialCards,
   extraPoints,
   animateOnLoad,
+  justSwitched,
   onSwitch,
   onEdit,
 }: Props) {
@@ -67,6 +69,8 @@ export function TeamBlock({
         isWinner ? 'arf-winning' : '',
         isLoser ? 'arf-losing' : '',
         animateOnLoad ? 'arf-swipe-animate' : '',
+        justSwitched && block.party === 'Re' ? 'arf-slide-from-right' : '',
+        justSwitched && block.party === 'Kontra' ? 'arf-slide-from-left' : '',
       ].filter(Boolean).join(' ')}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
