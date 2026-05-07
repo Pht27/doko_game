@@ -8,6 +8,9 @@ interface ReleaseNotesModalProps {
 }
 
 export function ReleaseNotesModal({ onClose, needRefresh, updateSW }: ReleaseNotesModalProps) {
+  let firstVersionSeen = false;
+  let inFirstVersion = false;
+
   return (
     <div
       className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
@@ -45,22 +48,33 @@ export function ReleaseNotesModal({ onClose, needRefresh, updateSW }: ReleaseNot
         <div className="overflow-y-auto px-5 py-4 flex flex-col gap-1">
           {releaseNotesContent.split('\n').map((line, i) => {
             if (line.startsWith('## ')) {
-              return (
-                <p key={i} className="text-indigo-300 font-semibold text-sm mt-4 first:mt-0">
+              if (!firstVersionSeen) {
+                firstVersionSeen = true;
+                inFirstVersion = true;
+              } else {
+                inFirstVersion = false;
+              }
+              return inFirstVersion ? (
+                <div key={i} className="flex items-center gap-2 mt-4 first:mt-0">
+                  <p className="text-white font-bold text-sm">{line.slice(3)}</p>
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-indigo-500/25 text-indigo-300 rounded-full px-2 py-0.5">Neu</span>
+                </div>
+              ) : (
+                <p key={i} className="text-indigo-300/60 font-semibold text-sm mt-6">
                   {line.slice(3)}
                 </p>
               );
             }
             if (line.startsWith('### ')) {
               return (
-                <p key={i} className="text-white/60 text-xs font-semibold uppercase tracking-wider mt-2">
+                <p key={i} className={`text-xs font-semibold uppercase tracking-wider mt-2 ${inFirstVersion ? 'text-white/50' : 'text-white/30'}`}>
                   {line.slice(4)}
                 </p>
               );
             }
             if (line.startsWith('- ')) {
               return (
-                <p key={i} className="text-white/75 text-sm pl-3">
+                <p key={i} className={`text-sm pl-3 ${inFirstVersion ? 'text-white/85' : 'text-white/40'}`}>
                   · {line.slice(2)}
                 </p>
               );

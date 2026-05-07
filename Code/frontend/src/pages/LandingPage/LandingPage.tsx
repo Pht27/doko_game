@@ -147,7 +147,19 @@ export function LandingPage() {
       boxSizing: 'border-box',
     }}>
 
-      <style>{`.landing-tile:active { transform: scale(0.97); }`}</style>
+      <style>{`
+        .landing-tile:active { transform: scale(0.97); }
+        @keyframes update-glow {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(99,102,241,0.5), 0 0 10px rgba(99,102,241,0.25); border-color: rgba(99,102,241,0.45); }
+          50% { box-shadow: 0 0 0 5px rgba(99,102,241,0), 0 0 22px rgba(99,102,241,0.55); border-color: rgba(99,102,241,0.75); }
+        }
+        @keyframes dot-pulse {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.5); opacity: 0.7; }
+        }
+        .update-pill { animation: update-glow 2s ease-in-out infinite; }
+        .update-dot  { animation: dot-pulse 2s ease-in-out infinite; }
+      `}</style>
 
       {/* Faint corner suit watermarks */}
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', fontFamily: 'serif' }}>
@@ -263,6 +275,7 @@ export function LandingPage() {
       {/* Version pill */}
       <div
         onClick={() => setShowReleaseNotes(true)}
+        className={needRefresh ? 'update-pill' : undefined}
         style={{
           alignSelf: 'center',
           display: 'flex', alignItems: 'center', gap: 6,
@@ -272,16 +285,19 @@ export function LandingPage() {
           padding: '8px 14px',
           fontSize: 12, color: 'rgba(255,255,255,0.7)',
           cursor: 'pointer', zIndex: 1,
-          transition: 'background 0.3s, border-color 0.3s',
+          transition: needRefresh ? undefined : 'background 0.3s, border-color 0.3s',
         }}
       >
         {needRefresh && (
-          <span style={{
-            width: 7, height: 7, borderRadius: '50%',
-            background: '#818cf8',
-            boxShadow: '0 0 6px #818cf8',
-            flexShrink: 0,
-          }} />
+          <span
+            className="update-dot"
+            style={{
+              width: 7, height: 7, borderRadius: '50%',
+              background: '#818cf8',
+              boxShadow: '0 0 8px #818cf8, 0 0 16px rgba(99,102,241,0.5)',
+              flexShrink: 0,
+            }}
+          />
         )}
         <span style={{ fontWeight: 600 }}>v{appVersion}</span>
         <span style={{ opacity: 0.55 }}>· {needRefresh ? 'Update verfügbar' : 'Was ist neu?'}</span>
