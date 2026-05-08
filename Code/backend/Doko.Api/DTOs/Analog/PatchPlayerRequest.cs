@@ -1,3 +1,3 @@
 namespace Doko.Api.DTOs.Analog;
 
-public record PatchPlayerRequest(bool IsActive);
+public record PatchPlayerRequest(bool IsActive, string? Name = null);

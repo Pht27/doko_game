@@ -110,9 +110,10 @@ public class AnalogPlayersService(AnalogDbContext db)
         return player;
     }
 
-    public async Task<AnalogPlayer?> SetPlayerActiveAsync(
+    public async Task<AnalogPlayer?> PatchPlayerAsync(
         int id,
         bool isActive,
+        string? name,
         CancellationToken ct = default
     )
     {
@@ -121,12 +122,20 @@ public class AnalogPlayersService(AnalogDbContext db)
             return null;
 
         player.IsActive = isActive;
+        if (name is not null)
+            player.Name = name;
         await db.SaveChangesAsync(ct);
         return player;
     }
 
     public async Task<bool> NameExistsAsync(string name, CancellationToken ct = default) =>
         await db.Players.AnyAsync(p => p.Name == name, ct);
+
+    public async Task<bool> NameTakenByOtherAsync(
+        int id,
+        string name,
+        CancellationToken ct = default
+    ) => await db.Players.AnyAsync(p => p.Name == name && p.Id != id, ct);
 }
 
 public record PlayerStats(

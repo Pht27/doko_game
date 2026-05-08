@@ -86,10 +86,7 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 12px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  padding: 4px 16px 24px;
 }
 
 .ap-empty {
@@ -99,40 +96,96 @@
   font-size: 0.9rem;
 }
 
-.ap-error {
-  color: #f87171;
+.ap-error { color: #f87171; }
+
+/* ── Section headers ── */
+.ap-section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 16px 4px 8px;
 }
 
-/* ── Player card ── */
-.ap-player-card {
+.ap-section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ap-text-muted);
+}
+
+.ap-section-count {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--ap-text-muted);
+  background: rgba(255,255,255,0.04);
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+
+.ap-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.ap-section-empty {
+  padding: 14px 12px;
+  text-align: center;
+  color: var(--ap-text-muted);
+  font-size: 0.85rem;
+  border: 1px dashed var(--ap-border);
+  border-radius: var(--ap-radius);
+}
+
+/* ── Player row ── */
+@keyframes ap-row-enter {
+  from { opacity: 0; transform: translateX(-6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes ap-row-leave {
+  to { opacity: 0; transform: translateX(10px); }
+}
+
+.ap-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 14px 16px;
+  gap: 10px;
+  padding: 10px 12px;
   background: var(--ap-surface);
   border-radius: var(--ap-radius);
   border: 1px solid var(--ap-border);
+  min-height: 60px;
+  transition: background 0.15s, border-color 0.15s;
+  animation: ap-row-enter 0.2s ease;
+}
+
+.ap-row:hover { background: var(--ap-surface2); border-color: rgba(255,255,255,0.13); }
+
+.ap-row--inactive .ap-name { color: var(--ap-text-sub); }
+
+.ap-row--leaving {
+  animation: ap-row-leave 0.22s ease forwards;
+  pointer-events: none;
+}
+
+/* ── Name button (navigate to stats) ── */
+.ap-name-btn {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
   cursor: pointer;
   text-align: left;
-  width: 100%;
   color: inherit;
   font: inherit;
-  transition: background 0.15s, border-color 0.15s;
-  min-height: 64px;
+  padding: 0;
 }
 
-.ap-player-card:hover  { background: var(--ap-surface2); border-color: rgba(255,255,255,0.14); }
-.ap-player-card:active { background: #1e1e38; }
-
-.ap-player-left {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-}
-
-.ap-player-name {
+.ap-name {
+  display: block;
   font-size: 1rem;
   font-weight: 600;
   color: var(--ap-text);
@@ -141,42 +194,114 @@
   text-overflow: ellipsis;
 }
 
-.ap-inactive-badge {
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--ap-text-muted);
-  background: rgba(255,255,255,0.06);
-  border: 1px solid var(--ap-border);
-  border-radius: 4px;
-  padding: 1px 6px;
-  align-self: flex-start;
-}
-
-.ap-player-right {
+/* ── Inline edit area ── */
+.ap-edit-area {
+  flex: 1;
+  min-width: 0;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
 }
 
-.ap-player-points {
-  font-size: 1.3rem;
-  font-weight: 700;
+.ap-edit-input {
+  flex: 1;
+  min-width: 0;
+  background: var(--ap-surface2);
+  border: 1px solid var(--ap-primary-h);
+  box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
+  border-radius: 6px;
+  padding: 7px 10px;
   color: var(--ap-text);
-  letter-spacing: -0.02em;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  outline: none;
 }
 
-.ap-player-stats {
-  display: flex;
-  gap: 8px;
+.ap-edit-input--error {
+  border-color: #f87171;
+  box-shadow: 0 0 0 3px rgba(248,113,113,0.2);
+}
+
+.ap-edit-error {
   font-size: 0.75rem;
+  color: #f87171;
+  white-space: nowrap;
+}
+
+/* ── Icon buttons ── */
+.ap-icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+
+.ap-icon-btn--edit {
+  background: rgba(255,255,255,0.04);
   color: var(--ap-text-muted);
 }
 
-/* ── Overlay + Dialog ── */
+.ap-icon-btn--edit:hover { background: rgba(255,255,255,0.1); color: var(--ap-text-sub); }
+
+.ap-icon-btn--cancel {
+  background: rgba(255,255,255,0.06);
+  color: var(--ap-text-sub);
+}
+
+.ap-icon-btn--cancel:hover { background: rgba(255,255,255,0.12); }
+
+.ap-icon-btn--confirm {
+  background: var(--ap-primary);
+  color: #fff;
+}
+
+.ap-icon-btn--confirm:hover:not(:disabled) { background: var(--ap-primary-h); }
+.ap-icon-btn--confirm:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Toggle switch ── */
+.ap-switch {
+  position: relative;
+  width: 51px;
+  height: 31px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  touch-action: none;
+  transition: background 0.2s ease;
+}
+
+.ap-switch--on { background: var(--ap-primary); }
+
+.ap-switch--pressing { filter: brightness(0.88); }
+
+.ap-switch-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.2);
+  transition: left 0.22s cubic-bezier(0.4, 0, 0.2, 1), width 0.12s ease;
+}
+
+.ap-switch--on .ap-switch-thumb { left: 23px; }
+
+.ap-switch--pressing .ap-switch-thumb { width: 28px; }
+.ap-switch--on.ap-switch--pressing .ap-switch-thumb { left: 20px; width: 28px; }
+
+/* ── Add player dialog ── */
 .ap-overlay {
   @apply fixed inset-0 flex items-end justify-center;
   background: rgba(0,0,0,0.6);
@@ -270,5 +395,5 @@
   transition: background 0.15s;
 }
 
-.ap-btn-create:hover:not(:disabled)  { background: var(--ap-primary-h); }
+.ap-btn-create:hover:not(:disabled) { background: var(--ap-primary-h); }
 .ap-btn-create:disabled { opacity: 0.5; cursor: not-allowed; }

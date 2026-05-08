@@ -23,6 +23,16 @@ export function createPlayer(name: string, startingPoints = 0): Promise<PlayerLi
   });
 }
 
+export function patchPlayer(
+  id: number,
+  patch: { isActive: boolean; name?: string },
+): Promise<{ id: number; name: string; isActive: boolean }> {
+  return apiFetch(`/analog/players/${id}`, null, {
+    method: 'PATCH',
+    body: JSON.stringify({ isActive: patch.isActive, name: patch.name ?? null }),
+  });
+}
+
 export function getStaticData(): Promise<StaticData> {
   return apiFetch('/analog/static', null);
 }

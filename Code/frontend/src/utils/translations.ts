@@ -201,8 +201,13 @@ export const t = {
   analogPoints: 'Punkte',
   analogCumulative: 'Kumulativ',
   analogInactive: 'inaktiv',
+  analogActive: 'Aktiv',
+  analogInactiveSection: 'Inaktiv',
   analogNameTaken: 'Name bereits vergeben',
   analogNoPlayers: 'Noch keine Spieler angelegt',
+  analogNoActivePlayers: 'Keine aktiven Spieler',
+  analogNoInactivePlayers: 'Keine inaktiven Spieler',
+  analogRenamePlayer: 'Spieler umbenennen',
   analogNoRounds: 'Noch keine Runden gespielt',
   analogPlayerNotFound: 'Spieler nicht gefunden',
 

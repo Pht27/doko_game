@@ -90,7 +90,10 @@ public class AnalogPlayersController(AnalogPlayersService playersService) : Cont
         CancellationToken ct
     )
     {
-        var player = await playersService.SetPlayerActiveAsync(id, body.IsActive, ct);
+        if (body.Name is not null && await playersService.NameTakenByOtherAsync(id, body.Name, ct))
+            return Conflict(new { error = "name_taken" });
+
+        var player = await playersService.PatchPlayerAsync(id, body.IsActive, body.Name, ct);
         if (player is null)
             return NotFound();
 
