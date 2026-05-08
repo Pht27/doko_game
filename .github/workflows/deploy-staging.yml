@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Rebuild staging backend
+      - name: Rebuild staging backend and run dbt
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.DEPLOY_HOST }}
@@ -25,6 +25,10 @@ jobs:
             docker compose -f Code/infrastructure/docker-compose.yml \
               --env-file Code/infrastructure/.env \
               up --build -d --no-deps backend-staging
+            docker compose -f Code/infrastructure/docker-compose.yml \
+              --env-file Code/infrastructure/.env \
+              --profile dbt \
+              run --rm dbt dbt run --target staging
 
       - name: Build frontend
         run: |

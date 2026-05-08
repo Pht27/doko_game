@@ -1,0 +1,42 @@
+name: dbt check
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'dbt/**'
+  pull_request:
+    paths:
+      - 'dbt/**'
+
+jobs:
+  dbt-compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dbt
+        run: pip install dbt-postgres==1.9.*
+
+      - name: dbt compile
+        working-directory: dbt
+        run: |
+          cat > profiles.yml << 'EOF'
+          doko:
+            target: dev
+            outputs:
+              dev:
+                type: postgres
+                host: localhost
+                port: 5432
+                dbname: doko
+                user: postgres
+                password: postgres
+                schema: analytics
+                threads: 1
+          EOF
+          dbt compile

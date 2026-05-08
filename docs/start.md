@@ -16,6 +16,28 @@ sudo docker run -d \
 sudo docker start doko-postgres-dev
 ```
 
+### dbt (einmalig einrichten)
+
+dbt benötigt Python 3.10–3.12 (das Projekt-`.venv` läuft auf 3.14 und ist nicht kompatibel).
+
+```sh
+# Separates venv anlegen (einmalig):
+cd ~/programming/doko/claude_website
+python3.10 -m venv .venv-dbt
+.venv-dbt/bin/pip install dbt-postgres
+
+# analytics-Schema in lokaler DB anlegen (einmalig):
+PGPASSWORD=postgres psql -h localhost -U postgres -d doko \
+  -c "CREATE SCHEMA IF NOT EXISTS analytics;"
+
+# Verbindung prüfen:
+cd dbt
+../.venv-dbt/bin/dbt debug
+
+# Views materialisieren:
+../.venv-dbt/bin/dbt run
+```
+
 ### Backend + Frontend
 
 ```sh
