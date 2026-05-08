@@ -15,13 +15,15 @@ public class AnalogPlayersController(AnalogPlayersService playersService) : Cont
     {
         var players = await playersService.GetPlayersAsync(ct);
         var result = players.Select(p => new PlayerListItemDto(
-            p.Id,
+            p.PlayerId,
             p.Name,
             p.IsActive,
             p.TotalPoints,
             p.GamesPlayed,
             p.Wins,
-            p.Losses
+            p.Losses,
+            p.WinRate,
+            p.AvgPointsPerGame
         ));
         return Ok(result);
     }
@@ -76,6 +78,8 @@ public class AnalogPlayersController(AnalogPlayersService playersService) : Cont
                 player.Name,
                 player.IsActive,
                 player.StartingPoints,
+                0,
+                0,
                 0,
                 0,
                 0

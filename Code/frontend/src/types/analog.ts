@@ -28,6 +28,8 @@ export interface PlayerListItem {
   gamesPlayed: number;
   wins: number;
   losses: number;
+  winRate: number;
+  avgPointsPerGame: number;
 }
 
 export interface PlayerRound {

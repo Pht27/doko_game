@@ -27,7 +27,7 @@ export function AnalogPlayerPage() {
   return (
     <div className="apd-page">
       <div className="apd-header">
-        <button className="apd-back" onClick={() => navigate('/analog/players')}>
+        <button className="apd-back" onClick={() => navigate(-1)}>
           {t.back}
         </button>
         <h1 className="apd-name">{player.name}</h1>

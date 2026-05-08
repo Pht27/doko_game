@@ -15,7 +15,7 @@ export const t = {
   releaseNotesTitle: 'Versionshinweise',
   landingSpielEintragen: 'Spiel eintragen',
   landingRundenubersicht: 'Rundenübersicht',
-  landingStats: 'Statistiken',
+  landingStats: 'Bestenliste',
   landingRegelsets: 'Regelsets',
 
   // ── MultiplayerBrowserPage / LobbyDetailView ───────────────────────────────
@@ -210,6 +210,20 @@ export const t = {
   analogRenamePlayer: 'Spieler umbenennen',
   analogNoRounds: 'Noch keine Runden gespielt',
   analogPlayerNotFound: 'Spieler nicht gefunden',
+
+  // ── AnalogLeaderboardPage ──────────────────────────────────────────────────
+  analogLeaderboardTitle: 'Statistiken',
+  analogLeaderboardChartTitle: 'Verlauf',
+  analogLeaderboardChartSubtitle: 'letzte 24 Spiele',
+  analogLeaderboardSortPoints: 'Punkte',
+  analogLeaderboardSortWinRate: 'Winrate',
+  analogLeaderboardSortGames: 'Spiele',
+  analogLeaderboardShowInactive: 'Inaktive anzeigen',
+  analogLeaderboardWinRate: 'WR',
+  analogLeaderboardAvgPoints: 'Ø Pkt',
+  analogLeaderboardHigh: 'Hoch',
+  analogLeaderboardLow: 'Tief',
+  analogLeaderboardNoPlayers: 'Keine Spieler gefunden',
 
   // ── RulesPage ──────────────────────────────────────────────────────────────
   rulesTitle: 'Regeln',

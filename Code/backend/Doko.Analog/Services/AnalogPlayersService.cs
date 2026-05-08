@@ -5,47 +5,9 @@ namespace Doko.Analog.Services;
 
 public class AnalogPlayersService(AnalogDbContext db)
 {
-    public async Task<IReadOnlyList<PlayerStats>> GetPlayersAsync(CancellationToken ct = default)
-    {
-        var players = await db.Players.AsNoTracking().ToListAsync(ct);
-
-        var roundStats = await db
-            .TeamMembers.AsNoTracking()
-            .Select(tm => new
-            {
-                tm.PlayerId,
-                Won = tm.Team.Party == tm.Team.Round.WinningParty,
-                tm.Team.Round.Points,
-            })
-            .GroupBy(x => x.PlayerId)
-            .Select(g => new
-            {
-                PlayerId = g.Key,
-                GamesPlayed = g.Count(),
-                Wins = g.Count(x => x.Won),
-                Losses = g.Count(x => !x.Won),
-                RoundPoints = g.Sum(x => x.Won ? (decimal)x.Points : -(decimal)x.Points),
-            })
-            .ToListAsync(ct);
-
-        var statsMap = roundStats.ToDictionary(s => s.PlayerId);
-
-        return players
-            .Select(p =>
-            {
-                statsMap.TryGetValue(p.Id, out var s);
-                return new PlayerStats(
-                    p.Id,
-                    p.Name,
-                    p.IsActive,
-                    p.StartingPoints + (s?.RoundPoints ?? 0),
-                    s?.GamesPlayed ?? 0,
-                    s?.Wins ?? 0,
-                    s?.Losses ?? 0
-                );
-            })
-            .ToList();
-    }
+    public async Task<IReadOnlyList<PlayerLeaderboardEntry>> GetPlayersAsync(
+        CancellationToken ct = default
+    ) => await db.PlayerLeaderboard.AsNoTracking().ToListAsync(ct);
 
     public async Task<PlayerDetail?> GetPlayerAsync(int id, CancellationToken ct = default)
     {
@@ -137,16 +99,6 @@ public class AnalogPlayersService(AnalogDbContext db)
         CancellationToken ct = default
     ) => await db.Players.AnyAsync(p => p.Name == name && p.Id != id, ct);
 }
-
-public record PlayerStats(
-    int Id,
-    string Name,
-    bool IsActive,
-    decimal TotalPoints,
-    int GamesPlayed,
-    int Wins,
-    int Losses
-);
 
 public record PlayerRoundEntry(
     int RoundId,

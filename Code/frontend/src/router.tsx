@@ -11,6 +11,7 @@ import { AnalogPlayerPage } from '@/pages/analog/AnalogPlayerPage';
 import { AnalogHistoryPage } from '@/pages/analog/AnalogHistoryPage';
 import { AnalogNewRoundPage } from '@/pages/analog/AnalogNewRoundPage';
 import { AnalogEditRoundPage } from '@/pages/analog/AnalogEditRoundPage';
+import { AnalogLeaderboardPage } from '@/pages/analog/AnalogLeaderboardPage';
 import { Root } from './Root';
 
 export const router = createBrowserRouter([
@@ -28,6 +29,7 @@ export const router = createBrowserRouter([
           { path: 'analog/history', element: <AnalogHistoryPage /> },
           { path: 'analog/new', element: <AnalogNewRoundPage /> },
           { path: 'analog/edit/:id', element: <AnalogEditRoundPage /> },
+          { path: 'analog/leaderboard', element: <AnalogLeaderboardPage /> },
         ],
       },
       {
