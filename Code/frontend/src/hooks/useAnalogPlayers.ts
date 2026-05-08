@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getPlayers, createPlayer as apiCreatePlayer } from '@/api/analog';
+import { getPlayers, createPlayer as apiCreatePlayer, patchPlayer as apiPatchPlayer } from '@/api/analog';
 import type { PlayerListItem } from '@/types/analog';
 
-const byPointsDesc = (a: PlayerListItem, b: PlayerListItem) => b.totalPoints - a.totalPoints;
+const byNameAsc = (a: PlayerListItem, b: PlayerListItem) => a.name.localeCompare(b.name, 'de');
 
 export function useAnalogPlayers() {
   const [players, setPlayers] = useState<PlayerListItem[]>([]);
@@ -14,7 +14,7 @@ export function useAnalogPlayers() {
     getPlayers()
       .then((data) => {
         if (cancelled) return;
-        setPlayers(data.sort(byPointsDesc));
+        setPlayers(data.sort(byNameAsc));
         setLoading(false);
       })
       .catch((err: unknown) => {
@@ -28,7 +28,7 @@ export function useAnalogPlayers() {
   const createPlayer = useCallback(async (name: string, startingPoints = 0): Promise<PlayerListItem> => {
     try {
       const player = await apiCreatePlayer(name, startingPoints);
-      setPlayers((prev) => [...prev, player].sort(byPointsDesc));
+      setPlayers((prev) => [...prev, player].sort(byNameAsc));
       return player;
     } catch (err) {
       const msg = err instanceof Error ? err.message : '';
@@ -37,5 +37,27 @@ export function useAnalogPlayers() {
     }
   }, []);
 
-  return { players, loading, error, createPlayer };
+  const toggleActive = useCallback(async (player: PlayerListItem): Promise<void> => {
+    const updated = await apiPatchPlayer(player.id, { isActive: !player.isActive });
+    setPlayers((prev) =>
+      prev.map((p) => (p.id === updated.id ? { ...p, isActive: updated.isActive } : p)),
+    );
+  }, []);
+
+  const renamePlayer = useCallback(async (player: PlayerListItem, newName: string): Promise<void> => {
+    try {
+      const updated = await apiPatchPlayer(player.id, { isActive: player.isActive, name: newName });
+      setPlayers((prev) =>
+        prev
+          .map((p) => (p.id === updated.id ? { ...p, name: updated.name } : p))
+          .sort(byNameAsc),
+      );
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '';
+      if (msg.includes('409') || msg.includes('name_taken')) throw new Error('name_taken');
+      throw err;
+    }
+  }, []);
+
+  return { players, loading, error, createPlayer, toggleActive, renamePlayer };
 }

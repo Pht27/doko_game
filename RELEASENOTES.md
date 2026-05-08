@@ -1,5 +1,10 @@
 # Release Notes
 
+## [1.3.5] - 2026-05-08
+
+### Verbessert
+- Spielerverwaltung komplett überarbeitet: Aktive und inaktive Spieler sind jetzt in zwei getrennten Bereichen. Jede Zeile zeigt ein farbiges Initialen-Avatar, einen Schalter zum Aktivieren/Deaktivieren und ein Stift-Symbol zum Umbenennen direkt in der Liste. Ein Tipp auf den Namen führt weiterhin zur Statistikseite.
+
 ## [1.3.4] - 2026-05-08
 
 ### Verbessert
