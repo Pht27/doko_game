@@ -45,6 +45,7 @@ Thumbs.db
 __pycache__/
 *.pyc
 .venv/
+.venv-dbt/
 
 # Todos
 docs/todos/

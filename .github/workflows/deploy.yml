@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Rebuild production backend
+      - name: Rebuild production backend and run dbt
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.DEPLOY_HOST }}
@@ -25,6 +25,10 @@ jobs:
               --env-file Code/infrastructure/.env \
               up --build -d --no-deps backend
             docker exec caddy caddy reload --config /etc/caddy/Caddyfile
+            docker compose -f Code/infrastructure/docker-compose.yml \
+              --env-file Code/infrastructure/.env \
+              --profile dbt \
+              run --rm dbt dbt run --target prod
 
       - name: Build frontend
         run: |

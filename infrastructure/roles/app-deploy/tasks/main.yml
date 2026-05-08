@@ -26,3 +26,17 @@
       - docker-compose.yml
     state: present
     pull: missing
+
+- name: Create analytics schema in prod database
+  shell: >
+    docker exec postgres psql -U doko_app -d doko_analog
+    -c "CREATE SCHEMA IF NOT EXISTS analytics;
+        GRANT ALL ON SCHEMA analytics TO doko_app;
+        ALTER DEFAULT PRIVILEGES IN SCHEMA analytics GRANT ALL ON TABLES TO doko_app;"
+
+- name: Create analytics schema in staging database
+  shell: >
+    docker exec postgres psql -U doko_app -d doko_analog_staging
+    -c "CREATE SCHEMA IF NOT EXISTS analytics;
+        GRANT ALL ON SCHEMA analytics TO doko_app;
+        ALTER DEFAULT PRIVILEGES IN SCHEMA analytics GRANT ALL ON TABLES TO doko_app;"

@@ -79,6 +79,23 @@ services:
         limits:
           memory: 512M
 
+  # =========================
+  # DBT
+  # =========================
+  dbt:
+    build:
+      context: ../../dbt
+      dockerfile: ../Code/infrastructure/dbt/Dockerfile
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    networks:
+      - doko-net
+    depends_on:
+      - postgres
+    restart: "no"
+    profiles:
+      - dbt
+
 volumes:
   caddy_data:
   postgres_data:

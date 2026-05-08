@@ -37,17 +37,19 @@ dbt/                  ← neues Verzeichnis im Repo-Root
 ## 1. Lokale Installation
 
 ### Voraussetzungen
-- Python 3.9+ (`python --version`)
+- Python **3.10–3.12** (dbt unterstützt noch kein Python 3.13/3.14)
+  - Im Repo liegt bereits Python 3.14 im `.venv` — **nicht** für dbt nutzen
+  - `python3.10 --version` sollte verfügbar sein (lokal bereits installiert)
 - Lokale PostgreSQL-Instanz mit DB `doko` (bereits vorhanden)
 
 ### dbt installieren
 
 ```bash
-pip install dbt-postgres
-# oder mit uv (empfohlen falls vorhanden):
-uv tool install dbt-postgres
+# Separates venv mit Python 3.10 anlegen (einmalig):
+python3.10 -m venv .venv-dbt
+.venv-dbt/bin/pip install dbt-postgres
 
-dbt --version  # sollte dbt-core + dbt-postgres zeigen
+.venv-dbt/bin/dbt --version  # sollte dbt-core + dbt-postgres zeigen
 ```
 
 ### Projekt initialisieren
@@ -59,9 +61,9 @@ dbt init doko --skip-profile-setup
 # Legt dbt_project.yml + models/-Ordner an; profiles.yml separat (s.u.)
 ```
 
-### profiles.yml anlegen (gitignored!)
+### profiles.yml
 
-Datei: `dbt/profiles.yml`
+`dbt/profiles.yml` ist **committed** (keine Secrets — `POSTGRES_PASSWORD` kommt zur Laufzeit per env_var).
 
 ```yaml
 doko:
@@ -107,11 +109,17 @@ dbt_packages/
 logs/
 ```
 
+### analytics-Schema lokal anlegen (einmalig)
+
+```bash
+PGPASSWORD=postgres psql -h localhost -U postgres -d doko -c "CREATE SCHEMA IF NOT EXISTS analytics;"
+```
+
 ### Verbindung testen
 
 ```bash
 cd dbt
-dbt debug  # Prüft Verbindung + Konfiguration
+../.venv-dbt/bin/dbt debug  # Prüft Verbindung + Konfiguration
 ```
 
 ---
@@ -263,9 +271,9 @@ from {{ source('analog', 'round_special_card') }}
 
 ```bash
 cd dbt
-dbt run          # alle Staging-Views in analytics_staging-Schema anlegen
-dbt test         # keine Tests definiert, sollte grün durchlaufen
-dbt docs generate && dbt docs serve  # optionaler Data-Lineage-Graph
+../.venv-dbt/bin/dbt run          # alle Staging-Views in analytics-Schema anlegen
+../.venv-dbt/bin/dbt test         # keine Tests definiert, sollte grün durchlaufen
+../.venv-dbt/bin/dbt docs generate && ../.venv-dbt/bin/dbt docs serve  # optionaler Data-Lineage-Graph
 ```
 
 ---

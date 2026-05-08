@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: analog
+    schema: analog
+    tables:
+      - name: player
+        description: "Analoge Spieler"
+      - name: round
+        description: "Einzelne Runden/Spiele"
+      - name: game_mode
+        description: "Spielmodi (Normal, Solo, Hochzeit, ...)"
+      - name: team
+        description: "Re/Kontra-Teams pro Runde"
+      - name: team_member
+        description: "Spieler-zu-Team-Zuordnung"
+      - name: special_card
+        description: "Sonderkarten-Definitionen"
+      - name: round_special_card
+        description: "Welche Sonderkarten in welcher Runde gespielt"
+      - name: extra_point
+        description: "Extrapunkt-Definitionen"
+      - name: round_extra_point
+        description: "Welche Extrapunkte in welcher Runde erzielt"
+      - name: comment
+        description: "Kommentare zu Runden"
