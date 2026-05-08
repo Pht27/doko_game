@@ -15,10 +15,26 @@ public class AnalogDbContext(DbContextOptions<AnalogDbContext> options) : DbCont
     public DbSet<AnalogRoundSpecialCard> RoundSpecialCards => Set<AnalogRoundSpecialCard>();
     public DbSet<AnalogRoundExtraPoint> RoundExtraPoints => Set<AnalogRoundExtraPoint>();
     public DbSet<AnalogComment> Comments => Set<AnalogComment>();
+    public DbSet<PlayerLeaderboardEntry> PlayerLeaderboard => Set<PlayerLeaderboardEntry>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("analog");
+
+        modelBuilder.Entity<PlayerLeaderboardEntry>(e =>
+        {
+            e.HasNoKey();
+            e.ToView("player_leaderboard", "analytics");
+            e.Property(p => p.PlayerId).HasColumnName("player_id");
+            e.Property(p => p.Name).HasColumnName("name");
+            e.Property(p => p.IsActive).HasColumnName("is_active");
+            e.Property(p => p.TotalPoints).HasColumnName("total_points");
+            e.Property(p => p.GamesPlayed).HasColumnName("games_played");
+            e.Property(p => p.Wins).HasColumnName("wins");
+            e.Property(p => p.Losses).HasColumnName("losses");
+            e.Property(p => p.WinRate).HasColumnName("win_rate");
+            e.Property(p => p.AvgPointsPerGame).HasColumnName("avg_points_per_game");
+        });
 
         modelBuilder.Entity<AnalogPlayer>(e =>
         {

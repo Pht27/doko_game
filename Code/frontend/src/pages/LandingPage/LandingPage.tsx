@@ -251,9 +251,10 @@ export function LandingPage() {
             border: `1px solid ${SUITS.herz.openBorder}`,
             display: 'flex', flexDirection: 'column',
           }}>
-            <SubItem label={t.landingRundenubersicht} hint="Vergangene Spiele" hasDivider
+            <SubItem label={t.landingRundenubersicht} hint="Schau dir vergangene Runden an" hasDivider
               onClick={() => navigate('/analog/history')} />
-            <SubItem label={t.landingStats} hint="Deine Zahlen" disabled />
+            <SubItem label={t.landingStats} hint="Wer sitzt oben?"
+              onClick={() => navigate('/analog/leaderboard')} />
           </div>
         )}
         {open === 'karo' && (

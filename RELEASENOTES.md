@@ -2,7 +2,11 @@
 
 ## [1.3.5] - 2026-05-08
 
+### Neu
+- Neue Statistikseite unter „Übersicht → Statistiken": Ein Verlaufs-Chart zeigt die Punkte der Top-Spieler über die letzten 24 Runden. Darunter eine ausklappbare Rangliste – ein Tipp auf eine Zeile zeigt Winrate, Durchschnittspunkte, Höchst- und Tiefstwert samt Sparkline. Sortierung nach Punkten, Winrate oder Spielanzahl per Auswahl. Inaktive Spieler können optional eingeblendet werden. Ein Tipp auf den Spielernamen führt direkt zur Einzelansicht.
+
 ### Verbessert
+- Spielerstatistiken werden jetzt korrekt berechnet: Punkte werden pro Spieler aufgeteilt wenn zwei Spieler eine Hand teilen, und Solo-Runden zählen dreifach für die Solo-Partei. Die API gibt jetzt zusätzlich Winrate und durchschnittliche Punkte pro Runde zurück.
 - Spielerverwaltung komplett überarbeitet: Aktive und inaktive Spieler sind jetzt in zwei getrennten Bereichen. Jede Zeile zeigt ein farbiges Initialen-Avatar, einen Schalter zum Aktivieren/Deaktivieren und ein Stift-Symbol zum Umbenennen direkt in der Liste. Ein Tipp auf den Namen führt weiterhin zur Statistikseite.
 
 ## [1.3.4] - 2026-05-08

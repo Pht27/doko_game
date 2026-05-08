@@ -7,5 +7,7 @@ public record PlayerListItemDto(
     decimal TotalPoints,
     int GamesPlayed,
     int Wins,
-    int Losses
+    int Losses,
+    decimal WinRate,
+    decimal AvgPointsPerGame
 );
