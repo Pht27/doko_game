@@ -46,3 +46,30 @@
     state: started
     enabled: true
     daemon_reload: true
+
+- name: Install prod DB backup script
+  template:
+    src: db-backup.sh.j2
+    dest: /usr/local/bin/db-backup.sh
+    mode: "0755"
+
+- name: Install prod DB backup systemd service
+  template:
+    src: db-backup.service.j2
+    dest: /etc/systemd/system/db-backup.service
+    mode: "0644"
+  notify: Reload systemd
+
+- name: Install prod DB backup systemd timer
+  template:
+    src: db-backup.timer.j2
+    dest: /etc/systemd/system/db-backup.timer
+    mode: "0644"
+  notify: Reload systemd
+
+- name: Enable and start prod DB backup timer
+  systemd:
+    name: db-backup.timer
+    state: started
+    enabled: true
+    daemon_reload: true

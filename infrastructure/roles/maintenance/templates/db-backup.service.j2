@@ -1,0 +1,10 @@
+[Unit]
+Description=Every-other-night production database backup
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/db-backup.sh
+StandardOutput=journal
+StandardError=journal
