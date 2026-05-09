@@ -1,5 +1,10 @@
 # Release Notes
 
+## [1.3.6] - 2026-05-09
+
+### Neu
+- Automatisches Datenbank-Backup: Jede zweite Nacht wird ein komprimiertes Backup der Produktionsdatenbank erstellt und auf dem Server gespeichert. Die letzten 15 Backups werden aufgehoben.
+
 ## [1.3.5] - 2026-05-08
 
 ### Neu

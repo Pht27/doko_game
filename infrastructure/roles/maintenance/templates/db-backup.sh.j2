@@ -1,0 +1,15 @@
+#!/bin/bash
+# Every-other-night prod DB backup: dumps doko_analog, keeps the last 15 backups.
+set -euo pipefail
+
+BACKUP_DIR="/root/opt/doko-backups"
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+BACKUP_FILE="$BACKUP_DIR/doko_prod_${TIMESTAMP}.sql.gz"
+MAX_BACKUPS=15
+
+mkdir -p "$BACKUP_DIR"
+
+docker exec postgres pg_dump -U doko_app doko_analog | gzip > "$BACKUP_FILE"
+
+# Delete oldest backups beyond the limit
+ls -t "$BACKUP_DIR"/doko_prod_*.sql.gz 2>/dev/null | tail -n +$((MAX_BACKUPS + 1)) | xargs -r rm -f
