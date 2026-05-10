@@ -6,6 +6,12 @@
 - Die Statistikseite hat jetzt einen interaktiven Verlaufs-Graph im Vollbild: Tippen auf den Chart oder das ⤢-Symbol öffnet eine Querformat-Ansicht. Spieler lassen sich per Toggle-Filter ein- und ausblenden. Ein Schieberegler steuert, wie viele Spiele zurück angezeigt werden – dynamisch bis zum Maximum der vorhandenen Daten. Zwischen Spiel-Index und echten Datumsangaben auf der X-Achse kann umgeschaltet werden. Der Graph unterstützt Pinch-to-Zoom auf beiden Achsen.
 
 ### Verbessert
+- Die Inline-Komponenten `MultiLineChart` und `ExpandableRow` der Rangliste sind in eigene Dateien ausgelagert – die Codebasis ist damit übersichtlicher strukturiert.
+- Die Komponenten `RoundCard` und `TeamBlock` der Rundenübersicht sind in eigene Dateien ausgelagert – die Codebasis ist damit übersichtlicher strukturiert.
+- Die Hilfskomponenten `Tile` und `SubItem` der Startseite sind in eigene Dateien ausgelagert. Die CSS-Animationen liegen jetzt in einer eigenen CSS-Datei statt als inline `<style>`-Block.
+- Die `SeatCard`-Komponente der Lobby-Detailansicht ist in eine eigene Datei ausgelagert – die Codebasis ist damit übersichtlicher strukturiert.
+- Die Komponenten `PlayerRow` und `SectionHeader` der Spielerliste sind in eigene Dateien ausgelagert – die Codebasis ist damit übersichtlicher strukturiert.
+- Die URLs und Seitenstruktur für Rundenübersicht, Rangliste, Spielerliste und Spielerdetail sind jetzt allgemein gehalten (`/history`, `/leaderboard`, `/players`) – ohne „analog"-Präfix, da diese Seiten künftig auch digitale Spiele einbeziehen werden.
 - Alle deutschen Texte in der App sind jetzt zentral in Übersetzungsdateien gepflegt und nach Bereich aufgeteilt (Spiel, Lobby, Landing, Analog, Regeln). Doppelte und ungenutzte Texte wurden bereinigt.
 - Das Einklappen der Untermenüs auf der Startseite läuft jetzt flüssig durch – die Animation startet sofort und ohne Verzögerung.
 

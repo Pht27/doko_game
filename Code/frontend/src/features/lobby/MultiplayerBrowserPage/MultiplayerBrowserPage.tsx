@@ -3,7 +3,7 @@ import { t } from '@/utils/translations';
 import { BackButton } from '@/components/BackButton/BackButton';
 import { listLobbies, createLobby, leaveLobby } from '@/api/lobby';
 import { saveLobbySession, clearLobbySession, loadAnySession } from '@/hooks/useLobby';
-import { LobbyDetailView } from './LobbyDetailView';
+import { LobbyDetailView } from './LobbyDetailView/LobbyDetailView';
 import type { LobbyListItemResponse } from '@/api/lobby';
 import type { LobbySession } from '@/hooks/useLobby';
 import type { GameResultDto } from '@/types/api';

@@ -1,14 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAnalogRounds } from '@/hooks/useAnalogRounds';
 import { getRound } from '@/api/analog';
 import { t } from '@/utils/translations';
 import type { RoundListItem, RoundDetail } from '@/types/analog';
-import { PageHeader } from '@/components/PageHeader/PageHeader';
-import { StatusState } from '@/components/StatusState/StatusState';
-import './AnalogHistoryPage.css';
+import { TeamBlock } from './TeamBlock/TeamBlock';
 
-interface NormalizedTeam {
+export interface NormalizedTeam {
   players: { id: number; name: string }[];
   specialCards: { id: number; name: string }[];
   extraPoints: { id: number; name: string; count: number }[];
@@ -28,57 +25,7 @@ function fromDetail(detail: RoundDetail, party: 'Re' | 'Kontra'): NormalizedTeam
     }));
 }
 
-function TeamBlock({
-  team,
-  won,
-  expanded,
-  onPlayerClick,
-}: {
-  team: NormalizedTeam;
-  won: boolean;
-  expanded: boolean;
-  onPlayerClick: (id: number) => void;
-}) {
-  const hasSpecials = team.specialCards.length > 0;
-  const hasExtras = team.extraPoints.length > 0;
-
-  return (
-    <div className={`ahr-team-block ${won ? 'ahr-party-win' : 'ahr-party-lose'}${expanded ? ' ahr-block-expanded' : ''}`}>
-      {team.players.map((p) => (
-        <button
-          key={p.id}
-          className="ahr-player-name"
-          onClick={(e) => {
-            e.stopPropagation();
-            onPlayerClick(p.id);
-          }}
-        >
-          {p.name}
-        </button>
-      ))}
-      {hasSpecials && (
-        <div className={`ahr-team-section${expanded ? ' ahr-section-show' : ''}`}>
-          <span className="ahr-section-label">Sonderkarten</span>
-          {team.specialCards.map((sc) => (
-            <span key={sc.id} className="ahr-section-item">{sc.name}</span>
-          ))}
-        </div>
-      )}
-      {hasExtras && (
-        <div className={`ahr-team-section${expanded ? ' ahr-section-show' : ''}`}>
-          <span className="ahr-section-label">Extrapunkte</span>
-          {team.extraPoints.map((ep) => (
-            <span key={ep.id} className="ahr-section-item">
-              {ep.name}{ep.count > 1 ? ` (${ep.count})` : ''}
-            </span>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function RoundCard({
+export function RoundCard({
   round,
   onDelete,
 }: {
@@ -141,7 +88,7 @@ function RoundCard({
                 team={team}
                 won={reWon}
                 expanded={expanded}
-                onPlayerClick={(id) => navigate(`/analog/players/${id}`)}
+                onPlayerClick={(id) => navigate(`/players/${id}`)}
               />
             ))}
           </div>
@@ -157,7 +104,7 @@ function RoundCard({
                 team={team}
                 won={!reWon}
                 expanded={expanded}
-                onPlayerClick={(id) => navigate(`/analog/players/${id}`)}
+                onPlayerClick={(id) => navigate(`/players/${id}`)}
               />
             ))}
           </div>
@@ -210,54 +157,6 @@ function RoundCard({
             {t.analogHistoryEdit}
           </button>
         </div>
-      </div>
-    </div>
-  );
-}
-
-export function AnalogHistoryPage() {
-  const { rounds, loading, loadingMore, error, hasMore, loadMore, deleteRound } =
-    useAnalogRounds();
-
-  const handleDelete = async (id: number) => {
-    if (!window.confirm(t.analogHistoryDeleteConfirm)) return;
-    await deleteRound(id);
-  };
-
-  if (loading) {
-    return (
-      <div className="ahr-page">
-        <StatusState type="loading" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="ahr-page">
-        <StatusState type="error" message={error} />
-      </div>
-    );
-  }
-
-  return (
-    <div className="ahr-page">
-      <PageHeader title={t.analogHistoryTitle} backTo="/" />
-
-      <div className="ahr-list">
-        {rounds.length === 0 ? (
-          <StatusState type="empty" message={t.analogHistoryNoRounds} />
-        ) : (
-          rounds.map((round) => (
-            <RoundCard key={round.id} round={round} onDelete={handleDelete} />
-          ))
-        )}
-
-        {hasMore && (
-          <button className="ahr-load-more" onClick={loadMore} disabled={loadingMore}>
-            {loadingMore ? t.loading : t.analogHistoryLoadMore}
-          </button>
-        )}
       </div>
     </div>
   );

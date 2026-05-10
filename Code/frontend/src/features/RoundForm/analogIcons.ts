@@ -5,7 +5,7 @@ export const GAME_MODE_ICONS: Record<string, string> = {
   Bubensolo:         'B',
   Damensolo:         'D',
   Farbsolo:          '♦♠',
-  Fleischloses:      '∅',
+  Fleischloses:      'A',
   Knochenloses:      '∅',
   Kontrasolo:        'K',
   'Schlanker Martin':'✦',

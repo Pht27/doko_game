@@ -1,22 +1,16 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useStaticData } from '@/hooks/useStaticData';
 import { useAnalogPlayers } from '@/hooks/useAnalogPlayers';
 import { useRoundForm } from '@/hooks/useRoundForm';
-import { getRound, updateRound } from '@/api/analog';
-import { RoundForm } from '@/features/analog/RoundForm/RoundForm';
+import { createRound } from '@/api/analog';
+import { RoundForm } from '@/features/RoundForm/RoundForm';
 import { t } from '@/utils/translations';
 
-export function AnalogEditRoundPage() {
+export function AnalogNewRoundPage() {
   const navigate = useNavigate();
-  const { id } = useParams<{ id: string }>();
-  const roundId = Number(id);
-
   const { data: staticData, loading: staticLoading, error: staticError } = useStaticData();
   const { players, loading: playersLoading, error: playersError } = useAnalogPlayers();
-  const [roundLoading, setRoundLoading] = useState(true);
-  const [roundError, setRoundError] = useState<string | null>(null);
-
   const {
     form,
     lastSwitchedBlock,
@@ -32,31 +26,19 @@ export function AnalogEditRoundPage() {
     updateExtraPointCount,
     removeExtraPoint,
     toApiRequest,
-    loadFromDetail,
+    resetForNew,
   } = useRoundForm();
   const [saving, setSaving] = useState(false);
 
+  // Default game mode: Normal
   useEffect(() => {
-    if (!roundId) return;
-    let cancelled = false;
-    getRound(roundId)
-      .then((detail) => {
-        if (cancelled) return;
-        loadFromDetail(detail);
-        setRoundLoading(false);
-      })
-      .catch((err: unknown) => {
-        if (cancelled) return;
-        setRoundError(err instanceof Error ? err.message : 'Fehler');
-        setRoundLoading(false);
-      });
-    return () => { cancelled = true; };
-  }, [roundId, loadFromDetail]);
+    if (staticData && form.gameModeId === null) {
+      const normal = staticData.gameModes.find((gm) => gm.name === 'Normal');
+      if (normal) setGameMode(normal.id);
+    }
+  }, [staticData, form.gameModeId, setGameMode]);
 
-  const isLoading = staticLoading || playersLoading || roundLoading;
-  const error = staticError ?? playersError ?? roundError;
-
-  if (isLoading) {
+  if (staticLoading || playersLoading) {
     return (
       <div className="arf-page">
         <div style={{ padding: 32, textAlign: 'center', color: '#aaaacc' }}>{t.loading}</div>
@@ -64,11 +46,11 @@ export function AnalogEditRoundPage() {
     );
   }
 
-  if (error || !staticData) {
+  if (staticError || playersError || !staticData) {
     return (
       <div className="arf-page">
         <div style={{ padding: 32, textAlign: 'center', color: '#f87171' }}>
-          {error ?? 'Fehler'}
+          {staticError ?? playersError ?? 'Fehler'}
         </div>
       </div>
     );
@@ -77,8 +59,8 @@ export function AnalogEditRoundPage() {
   const handleSubmit = async () => {
     setSaving(true);
     try {
-      await updateRound(roundId, toApiRequest());
-      navigate('/analog/history');
+      await createRound(toApiRequest());
+      resetForNew();
     } finally {
       setSaving(false);
     }
@@ -86,13 +68,13 @@ export function AnalogEditRoundPage() {
 
   return (
     <RoundForm
-      title={t.analogEditRoundTitle}
+      title={t.analogNewRoundTitle}
       form={form}
       staticData={staticData}
       players={players}
       saving={saving}
       lastSwitchedBlock={lastSwitchedBlock}
-      onBack={() => navigate('/analog/history')}
+      onBack={() => navigate('/')}
       onSetGameMode={setGameMode}
       onSetPoints={setPoints}
       onSetWinningParty={setWinningParty}

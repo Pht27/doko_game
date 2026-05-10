@@ -1,4 +1,4 @@
-@reference "../../../styles/index.css";
+@reference "../../styles/index.css";
 
 :root {
   --arf-surface:    #22223a;

@@ -62,6 +62,12 @@ export const analog = {
   analogLeaderboardHigh: 'Hoch',
   analogLeaderboardLow: 'Tief',
   analogLeaderboardNoPlayers: 'Keine Spieler gefunden',
+  analogLeaderboardNotEnoughData: 'Noch nicht genug Daten',
+  analogLeaderboardExpandLabel: 'Verlauf vergrößern',
+  analogLeaderboardDetailError: 'Fehler beim Laden',
+  analogLeaderboardBalance: 'Bilanz',
+  analogLeaderboardChartToday: 'heute',
+  analogLeaderboardChartPast: 'vor 50 Spielen',
 
   // ── LeaderboardGraphOverlay ────────────────────────────────────────────────
   analogLeaderboardGraphTitle: 'Verlauf',
