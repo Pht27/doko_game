@@ -62,4 +62,14 @@ export const analog = {
   analogLeaderboardHigh: 'Hoch',
   analogLeaderboardLow: 'Tief',
   analogLeaderboardNoPlayers: 'Keine Spieler gefunden',
+
+  // ── LeaderboardGraphOverlay ────────────────────────────────────────────────
+  analogLeaderboardGraphTitle: 'Verlauf',
+  analogLeaderboardGraphPlayers: 'Spielerfilter',
+  analogLeaderboardGraphDone: 'Fertig',
+  analogLeaderboardGraphActivePlayers: 'Aktive Spieler',
+  analogLeaderboardGraphInactivePlayers: 'Inaktive Spieler',
+  analogLeaderboardGraphModeGames: 'Spiele',
+  analogLeaderboardGraphModeDate: 'Datum',
+  analogLeaderboardGraphWeeks: 'Wo.',
 };

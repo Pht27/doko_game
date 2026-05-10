@@ -48,6 +48,9 @@ export default defineConfig(({ mode }) => {
       devOptions: {
         enabled: true, // lets you test PWA in dev
       },
+      workbox: {
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MiB (ECharts is large)
+      },
       manifest: {
         id: "/",
         name: env.VITE_APP_NAME ?? 'Doppelkopf',

@@ -40,38 +40,19 @@
   padding: 12px 14px 10px;
 }
 
-.alb-hero-head {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  margin-bottom: 8px;
-}
 
-.alb-topn-row {
-  display: flex;
-  background: rgba(255,255,255,0.04);
-  border-radius: 6px;
-  padding: 2px;
-  gap: 0;
-}
-
-.alb-topn-btn {
-  padding: 3px 9px;
-  font: inherit;
-  font-size: 0.72rem;
-  font-weight: 600;
+/* ── Hero chart button ── */
+.alb-hero-chart-btn {
+  display: block;
+  width: 100%;
+  background: none;
   border: none;
+  padding: 0;
   cursor: pointer;
-  border-radius: 4px;
-  background: transparent;
-  color: var(--alb-text-sub);
-  transition: background 0.15s, color 0.15s;
   -webkit-tap-highlight-color: transparent;
+  position: relative;
 }
-.alb-topn-btn--active {
-  background: var(--alb-accent);
-  color: #fff;
-}
+.alb-hero-chart-btn:active { opacity: 0.85; }
 
 /* ── Chart ── */
 .alb-chart-wrap { width: 100%; overflow: visible; }
@@ -83,6 +64,31 @@
   font-size: 0.8rem;
   padding: 20px 0;
 }
+
+/* ── Chart row with expand button ── */
+.alb-chart-row {
+  position: relative;
+}
+
+.alb-expand-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.06);
+  border: none;
+  border-radius: 6px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s, color 0.12s;
+}
+.alb-expand-btn:active { background: rgba(255,255,255,0.14); color: rgba(255,255,255,0.8); }
 
 
 /* ── Toolbar ── */

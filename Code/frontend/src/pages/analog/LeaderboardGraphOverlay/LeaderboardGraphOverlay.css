@@ -1,0 +1,161 @@
+@reference "../../../styles/index.css";
+
+.lgo-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #12122a;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Header ── */
+.lgo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+  background: #1a1a38;
+}
+
+.lgo-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #eee;
+}
+
+.lgo-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lgo-players-btn {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #818cf8;
+  background: rgba(129, 140, 248, 0.12);
+  border: 1px solid rgba(129, 140, 248, 0.3);
+  border-radius: 8px;
+  padding: 4px 10px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s;
+}
+.lgo-players-btn:active { background: rgba(129, 140, 248, 0.22); }
+
+.lgo-close-btn {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.06);
+  border: none;
+  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s;
+}
+.lgo-close-btn:active { background: rgba(255, 255, 255, 0.12); }
+
+/* ── Controls bar ── */
+.lgo-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+  background: #16163a;
+}
+
+.lgo-mode-tabs {
+  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 2px;
+  gap: 0;
+  flex-shrink: 0;
+}
+
+.lgo-mode-tab {
+  padding: 3px 9px;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.4);
+  transition: background 0.15s, color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  white-space: nowrap;
+}
+.lgo-mode-tab--active {
+  background: #4f46e5;
+  color: #fff;
+}
+
+/* ── Slider ── */
+.lgo-slider {
+  flex: 1;
+  min-width: 0;
+  height: 4px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  accent-color: #818cf8;
+}
+.lgo-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #818cf8;
+  cursor: pointer;
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.25);
+}
+.lgo-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #818cf8;
+  border: none;
+  cursor: pointer;
+}
+
+.lgo-slider-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: ui-monospace, monospace;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 54px;
+  text-align: right;
+}
+
+/* ── Chart ── */
+.lgo-chart-wrap {
+  flex: 1;
+  min-height: 0;
+  padding: 8px 0 0;
+}
+
+.lgo-empty {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.85rem;
+}
