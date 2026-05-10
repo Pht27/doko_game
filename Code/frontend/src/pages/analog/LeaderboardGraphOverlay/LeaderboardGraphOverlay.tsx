@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import ReactECharts from 'echarts-for-react';
 import { t } from '@/utils/translations';
 import type { PlayerListItem, PlayerDetail } from '@/types/analog';
@@ -37,7 +37,19 @@ export function LeaderboardGraphOverlay({
   const [maxRounds, setMaxRounds] = useState(DEFAULT_ROUNDS);
   const [weeksBack, setWeeksBack] = useState(DEFAULT_WEEKS);
   const [xMode, setXMode] = useState<XAxisMode>('games');
+  const chartRef = useRef<ReactECharts>(null);
+  const chartWrapRef = useRef<HTMLDivElement>(null);
   useOrientationLock();
+
+  useEffect(() => {
+    const el = chartWrapRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      chartRef.current?.getEchartsInstance()?.resize();
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     visibleIds.forEach((id) => onFetchDetail(id));
@@ -265,12 +277,15 @@ export function LeaderboardGraphOverlay({
         <span className="lgo-slider-label">{sliderLabel}</span>
       </div>
 
-      <div className="lgo-chart-wrap">
+      <div className="lgo-chart-wrap" ref={chartWrapRef}>
         {series.length === 0 ? (
           <div className="lgo-empty">Keine Daten</div>
         ) : (
           <ReactECharts
+            key={xMode}
+            ref={chartRef}
             option={option}
+            notMerge
             style={{ width: '100%', height: '100%' }}
             opts={{ renderer: 'canvas', devicePixelRatio: window.devicePixelRatio }}
           />
