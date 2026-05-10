@@ -2,6 +2,9 @@
 
 ## [1.3.7] - 2026-05-10
 
+### Neu
+- Die Statistikseite hat jetzt einen interaktiven Verlaufs-Graph im Vollbild: Tippen auf den Chart oder das ⤢-Symbol öffnet eine Querformat-Ansicht. Spieler lassen sich per Toggle-Filter ein- und ausblenden. Ein Schieberegler steuert, wie viele Spiele zurück angezeigt werden – dynamisch bis zum Maximum der vorhandenen Daten. Zwischen Spiel-Index und echten Datumsangaben auf der X-Achse kann umgeschaltet werden. Der Graph unterstützt Pinch-to-Zoom auf beiden Achsen.
+
 ### Verbessert
 - Alle deutschen Texte in der App sind jetzt zentral in Übersetzungsdateien gepflegt und nach Bereich aufgeteilt (Spiel, Lobby, Landing, Analog, Regeln). Doppelte und ungenutzte Texte wurden bereinigt.
 - Das Einklappen der Untermenüs auf der Startseite läuft jetzt flüssig durch – die Animation startet sofort und ohne Verzögerung.

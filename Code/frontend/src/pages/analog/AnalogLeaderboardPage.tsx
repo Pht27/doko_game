@@ -6,6 +6,7 @@ import type { PlayerListItem, PlayerDetail } from '@/types/analog';
 import { PageHeader } from '@/components/PageHeader/PageHeader';
 import { ToggleSwitch } from '@/components/ToggleSwitch/ToggleSwitch';
 import { StatusState } from '@/components/StatusState/StatusState';
+import { LeaderboardGraphOverlay } from './LeaderboardGraphOverlay/LeaderboardGraphOverlay';
 import './AnalogLeaderboardPage.css';
 
 const PLAYER_COLORS = [
@@ -20,9 +21,7 @@ const MAX_ROUNDS = 24;
 type SortKey = 'totalPoints' | 'winRate' | 'gamesPlayed';
 type DetailState = PlayerDetail | 'loading' | 'error';
 
-// ── Custom toggle switch ────────────────────────────────────────────────────
-
-// ── SVG multi-line chart ────────────────────────────────────────────────────
+// ── SVG multi-line chart (mini, used in expandable rows and hero) ────────────
 
 interface ChartSeries { name: string; color: string; points: number[]; }
 
@@ -99,7 +98,7 @@ function MultiLineChart({ series }: { series: ChartSeries[] }) {
 // ── Expandable row ──────────────────────────────────────────────────────────
 
 function ExpandableRow({
-  player, rank, color, detail, expanded, onToggle,
+  player, rank, color, detail, expanded, onToggle, onExpand,
 }: {
   player: PlayerListItem;
   rank: number;
@@ -107,6 +106,7 @@ function ExpandableRow({
   detail: DetailState | undefined;
   expanded: boolean;
   onToggle: () => void;
+  onExpand: () => void;
 }) {
   const positive = player.totalPoints >= 0;
   const winPct = Math.round((player.winRate ?? 0) * 100);
@@ -120,7 +120,6 @@ function ExpandableRow({
   const maxDelta = deltaPts.length ? Math.max(...deltaPts) : null;
   const minDelta = deltaPts.length ? Math.min(...deltaPts) : null;
 
-  // Use cumulative trajectory as single-player "chart" data
   const chartSeries: ChartSeries[] = rounds && cumulativePts.length >= 2
     ? [{ name: player.name, color, points: cumulativePts.slice(-MAX_ROUNDS) }]
     : [];
@@ -177,7 +176,12 @@ function ExpandableRow({
             {rounds && (
               <>
                 {chartSeries.length >= 1 && (
-                  <MultiLineChart series={chartSeries} />
+                  <div className="alb-chart-row">
+                    <MultiLineChart series={chartSeries} />
+                    <button className="alb-expand-btn" onClick={(e) => { e.stopPropagation(); onExpand(); }} aria-label="Vergrößern">
+                      ⤢
+                    </button>
+                  </div>
                 )}
                 <div className="alb-mini-grid" style={{ borderTop: `2px solid ${color}` }}>
                   <div className="alb-mini-cell">
@@ -215,8 +219,10 @@ export function AnalogLeaderboardPage() {
 
   const [sortBy, setSortBy] = useState<SortKey>('totalPoints');
   const [showInactive, setShowInactive] = useState(false);
-  const [topN, setTopN] = useState<3 | 5 | 8>(5);
   const [expandedId, setExpandedId] = useState<number | null>(null);
+
+  const [graphOpen, setGraphOpen] = useState(false);
+  const [graphInitialIds, setGraphInitialIds] = useState<Set<number>>(new Set());
 
   const [details, setDetails] = useState<Record<number, DetailState>>({});
   const fetchedIds = useRef(new Set<number>());
@@ -236,21 +242,26 @@ export function AnalogLeaderboardPage() {
       .catch((err: unknown) => { setError(err instanceof Error ? err.message : 'Fehler'); setLoading(false); });
   }, []);
 
+  // Pre-fetch all active players so the hero chart is complete
   useEffect(() => {
     if (players.length === 0) return;
     [...players]
       .filter((p) => p.isActive)
       .sort((a, b) => b.totalPoints - a.totalPoints)
-      .slice(0, 5)
       .forEach((p) => fetchDetail(p.id));
   }, [players, fetchDetail]);
 
-  const colorMap = new Map<number, string>(
-    [...players]
-      .filter((p) => p.isActive)
-      .sort((a, b) => b.totalPoints - a.totalPoints)
-      .map((p, i) => [p.id, PLAYER_COLORS[i % PLAYER_COLORS.length]])
-  );
+  const sortedActive = [...players]
+    .filter((p) => p.isActive)
+    .sort((a, b) => b.totalPoints - a.totalPoints);
+  const sortedInactive = [...players]
+    .filter((p) => !p.isActive)
+    .sort((a, b) => b.totalPoints - a.totalPoints);
+
+  const allColorMap = new Map<number, string>([
+    ...sortedActive.map((p, i) => [p.id, PLAYER_COLORS[i % PLAYER_COLORS.length]] as [number, string]),
+    ...sortedInactive.map((p, i) => [p.id, PLAYER_COLORS[(sortedActive.length + i) % PLAYER_COLORS.length]] as [number, string]),
+  ]);
 
   const sorted = [...players]
     .filter((p) => showInactive || p.isActive)
@@ -260,17 +271,23 @@ export function AnalogLeaderboardPage() {
       return b.gamesPlayed - a.gamesPlayed;
     });
 
-  const heroSeries: ChartSeries[] = [...players]
-    .filter((p) => p.isActive)
-    .sort((a, b) => b.totalPoints - a.totalPoints)
-    .slice(0, topN)
-    .flatMap((p) => {
-      const d = details[p.id];
-      if (!d || d === 'loading' || d === 'error') return [];
-      const points = d.recentRounds.slice(-MAX_ROUNDS).map((r) => r.cumulativePoints);
-      if (points.length < 2) return [];
-      return [{ name: p.name, color: colorMap.get(p.id) ?? PLAYER_COLORS[0], points }];
-    });
+  const heroSeries: ChartSeries[] = sortedActive.flatMap((p) => {
+    const d = details[p.id];
+    if (!d || d === 'loading' || d === 'error') return [];
+    const points = d.recentRounds.slice(-MAX_ROUNDS).map((r) => r.cumulativePoints);
+    if (points.length < 2) return [];
+    return [{ name: p.name, color: allColorMap.get(p.id) ?? PLAYER_COLORS[0], points }];
+  });
+
+  const openGraphForAll = () => {
+    setGraphInitialIds(new Set(sortedActive.map((p) => p.id)));
+    setGraphOpen(true);
+  };
+
+  const openGraphForPlayer = (playerId: number) => {
+    setGraphInitialIds(new Set([playerId]));
+    setGraphOpen(true);
+  };
 
   const handleToggle = (id: number) => {
     if (expandedId === id) { setExpandedId(null); return; }
@@ -285,26 +302,15 @@ export function AnalogLeaderboardPage() {
       <div className="alb-body">
         {/* Hero chart */}
         <div className="alb-hero">
-          <div className="alb-hero-head">
-            <div className="alb-topn-row">
-              {([3, 5, 8] as const).map((n) => (
-                <button key={n}
-                  className={`alb-topn-btn${topN === n ? ' alb-topn-btn--active' : ''}`}
-                  onClick={() => setTopN(n)}>
-                  Top {n}
-                </button>
-              ))}
-            </div>
-          </div>
-
           {loading ? (
             <StatusState type="loading" />
           ) : heroSeries.length === 0 ? (
             <div className="alb-chart-empty">Noch nicht genug Daten</div>
           ) : (
-            <MultiLineChart series={heroSeries} />
+            <button className="alb-hero-chart-btn" onClick={openGraphForAll} aria-label="Verlauf vergrößern">
+              <MultiLineChart series={heroSeries} />
+            </button>
           )}
-
         </div>
 
         {/* Toolbar */}
@@ -340,14 +346,26 @@ export function AnalogLeaderboardPage() {
               key={player.id}
               player={player}
               rank={idx + 1}
-              color={colorMap.get(player.id) ?? PLAYER_COLORS[idx % PLAYER_COLORS.length]}
+              color={allColorMap.get(player.id) ?? PLAYER_COLORS[idx % PLAYER_COLORS.length]}
               detail={details[player.id]}
               expanded={expandedId === player.id}
               onToggle={() => handleToggle(player.id)}
+              onExpand={() => openGraphForPlayer(player.id)}
             />
           ))}
         </div>
       </div>
+
+      {graphOpen && (
+        <LeaderboardGraphOverlay
+          players={players}
+          details={details}
+          colorMap={allColorMap}
+          initialVisibleIds={graphInitialIds}
+          onClose={() => setGraphOpen(false)}
+          onFetchDetail={fetchDetail}
+        />
+      )}
     </div>
   );
 }
