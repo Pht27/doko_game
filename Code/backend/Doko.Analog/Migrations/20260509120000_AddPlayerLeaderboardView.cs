@@ -10,7 +10,8 @@ namespace Doko.Analog.Migrations
         {
             migrationBuilder.Sql("CREATE SCHEMA IF NOT EXISTS analytics;");
 
-            migrationBuilder.Sql("""
+            migrationBuilder.Sql(
+                """
                 CREATE OR REPLACE VIEW analytics.player_leaderboard AS
                 WITH team_sizes AS (
                     SELECT "TeamId" AS team_id, count(*) AS team_size
@@ -52,7 +53,8 @@ namespace Doko.Analog.Migrations
                 FROM analog.player p
                 LEFT JOIN player_round_results r ON r.player_id = p."Id"
                 GROUP BY p."Id", p."Name", p."IsActive", p."StartingPoints";
-                """);
+                """
+            );
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

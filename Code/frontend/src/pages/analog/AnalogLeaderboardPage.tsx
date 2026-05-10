@@ -176,11 +176,8 @@ function ExpandableRow({
             {rounds && (
               <>
                 {chartSeries.length >= 1 && (
-                  <div className="alb-chart-row">
+                  <div className="alb-chart-row" onClick={(e) => { e.stopPropagation(); onExpand(); }}>
                     <MultiLineChart series={chartSeries} />
-                    <button className="alb-expand-btn" onClick={(e) => { e.stopPropagation(); onExpand(); }} aria-label="Vergrößern">
-                      ⤢
-                    </button>
                   </div>
                 )}
                 <div className="alb-mini-grid" style={{ borderTop: `2px solid ${color}` }}>

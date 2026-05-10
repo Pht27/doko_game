@@ -30,7 +30,6 @@ public class AnalogPlayersService(AnalogDbContext db)
 
         var cumulativePoints = player.StartingPoints;
         var recentRounds = rounds
-            .TakeLast(50)
             .Select(r =>
             {
                 var delta = r.Won ? (decimal)r.Points : -(decimal)r.Points;
