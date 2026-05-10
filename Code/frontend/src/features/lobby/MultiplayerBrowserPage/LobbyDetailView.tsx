@@ -308,22 +308,22 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
                 <button
                   onClick={(e) => { e.stopPropagation(); startEditingName(); }}
                   className="ml-auto text-white/30 hover:text-white/70 text-xs px-1 shrink-0"
-                  title="Namen ändern"
+                  title={t.nameChange}
                 >
                   ✏️
                 </button>
               )}
               {isReady && !isMe && !canRemoveOpa && !canAddOpa && (
-                <span className="ml-auto text-green-400 text-sm shrink-0" title="Bereit">✓</span>
+                <span className="ml-auto text-green-400 text-sm shrink-0" title={t.readyTooltip}>✓</span>
               )}
               {isReady && isMe && !isEditingName && !canRemoveOpa && !canAddOpa && (
-                <span className="text-green-400 text-sm shrink-0" title="Bereit">✓</span>
+                <span className="text-green-400 text-sm shrink-0" title={t.readyTooltip}>✓</span>
               )}
               {canRemoveOpa && (
                 <button
                   onClick={(e) => { e.stopPropagation(); doRemoveOpa(i); }}
                   className="ml-auto text-red-400 hover:text-red-300 text-xs px-1 shrink-0"
-                  title="Opa entfernen"
+                  title={t.opaRemove}
                 >
                   ✕
                 </button>
@@ -332,7 +332,7 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
                 <button
                   onClick={(e) => { e.stopPropagation(); doAddOpa(i); }}
                   className="ml-auto text-white/30 hover:text-white/60 text-xs px-1 shrink-0"
-                  title="Opa hinzufügen"
+                  title={t.opaAdd}
                 >
                   🤖
                 </button>
@@ -345,7 +345,7 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
       <p className="text-white/40 text-xs shrink-0">
         {t.playerCount(filledCount, 4)}
         {isStarted
-          ? <span className="text-orange-400"> · Spiel läuft</span>
+          ? <span className="text-orange-400"> · {t.gameRunning}</span>
           : filledCount < 4 && ` · ${t.waitingForPlayers}`}
       </p>
 
@@ -368,14 +368,14 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
       {/* Actions — only shown when user has a seat in this lobby */}
       {isMyLobby && !isStarted && (
         <div className="flex flex-col gap-1 shrink-0">
-          <span className="text-white/40 text-xs uppercase tracking-wider">Szenario</span>
+          <span className="text-white/40 text-xs uppercase tracking-wider">{t.scenarioLabel}</span>
           <select
             disabled={settingScenario}
             value={selectedScenario ?? ''}
             onChange={(e) => handleSelectScenario(e.target.value || null)}
             className="w-full bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-white text-sm disabled:opacity-50 focus:outline-none focus:border-indigo-500/50"
           >
-            <option value="" className="bg-gray-900 text-white/50">Zufällig</option>
+            <option value="" className="bg-gray-900 text-white/50">{t.scenarioRandom}</option>
             {availableScenarios.map((name) => (
               <option key={name} value={name} className="bg-gray-900 text-white">{name}</option>
             ))}

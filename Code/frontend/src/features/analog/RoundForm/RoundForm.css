@@ -23,40 +23,6 @@
   position: relative;
 }
 
-/* ── Header ── */
-.arf-header {
-  background: var(--arf-surface);
-  border-bottom: 1px solid var(--arf-border);
-  padding: 14px 16px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
-.arf-back {
-  background: none;
-  border: none;
-  color: rgba(255,255,255,0.6);
-  font: inherit;
-  font-size: 1.25rem;
-  line-height: 1;
-  cursor: pointer;
-  padding: 4px;
-  flex-shrink: 0;
-  transition: color 0.15s;
-}
-
-.arf-back:hover { color: #fff; }
-
-.arf-title {
-  font-size: 1.3rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin: 0;
-  color: var(--arf-text);
-  flex: 1;
-}
 
 /* ── Scrollable form body ── */
 .arf-body {
@@ -321,16 +287,6 @@
 .arf-comment-input::placeholder { color: var(--arf-text-muted); }
 .arf-comment-input:focus { border-bottom-color: var(--arf-primary-h); }
 
-/* ── Error ── */
-.arf-error {
-  font-size: 0.85rem;
-  color: #f87171;
-  padding: 8px 12px;
-  background: rgba(248,113,113,0.08);
-  border: 1px solid rgba(248,113,113,0.2);
-  border-radius: var(--arf-radius-sm);
-}
-
 /* ── Save bar (fixed at bottom) ── */
 .arf-save-spacer { height: 88px; flex-shrink: 0; }
 
@@ -342,31 +298,6 @@
   pointer-events: none;
 }
 
-/* ── Save button ── */
-.arf-save-btn {
-  width: 100%;
-  padding: 15px;
-  border-radius: 14px;
-  border: none;
-  background: var(--arf-primary);
-  color: #fff;
-  font: inherit;
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  cursor: pointer;
-  box-shadow: 0 8px 24px rgba(79,70,229,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
-  transition: background 0.15s, box-shadow 0.15s;
-  pointer-events: auto;
-}
-
-.arf-save-btn:hover:not(:disabled) { background: var(--arf-primary-h); }
-.arf-save-btn:disabled {
-  background: var(--arf-surface2);
-  color: var(--arf-text-muted);
-  box-shadow: none;
-  cursor: not-allowed;
-}
 
 /* ── Party-switch slide animations ── */
 @keyframes arf-slide-in-right {

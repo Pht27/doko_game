@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { SonderkarteInfoDto } from '@/types/api';
 import { t } from '@/utils/translations';
 import { usePlayerNameResolver } from '@/context/PlayerNamesContext';
+import { Button } from '@/components/Button/Button';
 import './SonderkarteOverlay.css';
 
 const GENSCHER_TYPES = new Set(['Genscherdamen', 'Gegengenscherdamen']);
@@ -110,13 +111,13 @@ export function SonderkarteOverlay({
               </div>
             </div>
           </div>
-          <button
-            className="sk-btn-primary"
+          <Button
+            className="w-full"
             onClick={handlePartnerConfirm}
             disabled={currentPartner === null}
           >
             {t.bestaetigen}
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -133,16 +134,16 @@ export function SonderkarteOverlay({
         <div className="sk-divider" />
         <p className="sk-description">{sk.description}</p>
         <div className="sk-actions">
-          <button className="sk-btn-primary" onClick={handleActivate}>
+          <Button className="w-full" onClick={handleActivate}>
             {t.aktivieren}
-          </button>
-          <button className="sk-btn-secondary" onClick={handleSkip}>
+          </Button>
+          <Button variant="secondary" className="w-full" onClick={handleSkip}>
             {t.nichtAktivieren}
-          </button>
+          </Button>
         </div>
-        <button className="sk-btn-link" onClick={onCancel}>
+        <Button variant="link" className="w-full py-1 text-xs text-center" onClick={onCancel}>
           {t.abbrechen}
-        </button>
+        </Button>
       </div>
     </div>
   );

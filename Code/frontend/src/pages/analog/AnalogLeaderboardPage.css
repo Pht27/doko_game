@@ -25,36 +25,6 @@
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
-/* ── Header ── */
-.alb-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 14px 16px;
-  background: var(--alb-surface);
-  border-bottom: 1px solid var(--alb-border);
-  flex-shrink: 0;
-}
-
-.alb-back {
-  background: none;
-  border: none;
-  color: rgba(255,255,255,0.6);
-  font: inherit;
-  font-size: 1.4rem;
-  line-height: 1;
-  cursor: pointer;
-  padding: 4px;
-  transition: color 0.15s;
-}
-.alb-back:hover { color: var(--alb-text); }
-
-.alb-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin: 0;
-}
 
 /* ── Scrollable body ── */
 .alb-body {
@@ -176,48 +146,11 @@
   white-space: nowrap;
 }
 
-/* Custom switch */
-.alb-switch {
-  position: relative;
-  width: 42px;
-  height: 25px;
-  border-radius: 13px;
-  background: rgba(255,255,255,0.15);
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  flex-shrink: 0;
-  touch-action: none;
-  transition: background 0.2s ease;
-  -webkit-tap-highlight-color: transparent;
-}
-.alb-switch--on { background: var(--alb-accent); }
-.alb-switch--pressing { filter: brightness(0.88); }
-.alb-switch-thumb {
-  position: absolute;
-  top: 3px; left: 3px;
-  width: 19px; height: 19px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.35);
-  transition: left 0.22s cubic-bezier(0.4,0,0.2,1), width 0.12s ease;
-}
-.alb-switch--on .alb-switch-thumb { left: 20px; }
-.alb-switch--pressing .alb-switch-thumb { width: 23px; }
-.alb-switch--on.alb-switch--pressing .alb-switch-thumb { left: 17px; width: 23px; }
 
 /* ── List (flat, borderBottom style like design) ── */
 .alb-list {
   padding-bottom: 24px;
 }
-
-.alb-list-msg {
-  text-align: center;
-  color: var(--alb-text-muted);
-  font-size: 0.85rem;
-  padding: 24px 0;
-}
-.alb-list-msg--error { color: var(--alb-loss); }
 
 /* ── Row head ── */
 .alb-row-head {

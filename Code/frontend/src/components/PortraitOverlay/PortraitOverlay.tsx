@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { t } from '@/utils/translations';
 
 interface PortraitOverlayProps {
   active: boolean;
@@ -38,7 +39,7 @@ export function PortraitOverlay({ active }: PortraitOverlayProps) {
       <button
         onClick={() => setMinimized(false)}
         className="fixed top-4 right-4 z-9999 flex items-center justify-center w-12 h-12 rounded-full bg-green-900/90 text-white shadow-lg animate-pulse"
-        aria-label="Gerät drehen"
+        aria-label={t.portraitRotateAriaLabel}
       >
         <RotateIcon />
       </button>
@@ -52,13 +53,13 @@ export function PortraitOverlay({ active }: PortraitOverlayProps) {
 
       <div className="relative flex flex-col items-center gap-4 rounded-2xl bg-green-900 px-8 py-6 text-white shadow-2xl max-w-xs w-full mx-4">
         <RotateIcon className="w-14 h-14 opacity-90" />
-        <p className="text-lg font-semibold tracking-wide text-center">Bitte Gerät drehen</p>
-        <p className="text-sm opacity-70 text-center">Dieses Spiel benötigt Querformat</p>
+        <p className="text-lg font-semibold tracking-wide text-center">{t.portraitTitle}</p>
+        <p className="text-sm opacity-70 text-center">{t.portraitSubtitle}</p>
         <button
           onClick={() => setMinimized(true)}
           className="mt-1 text-xs opacity-50 underline underline-offset-2"
         >
-          Verstanden
+          {t.portraitDismiss}
         </button>
       </div>
     </div>

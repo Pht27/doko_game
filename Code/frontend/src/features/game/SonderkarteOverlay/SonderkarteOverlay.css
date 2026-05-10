@@ -25,21 +25,6 @@
   @apply flex flex-col gap-2 mt-1;
 }
 
-.sk-btn-primary {
-  @apply w-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white rounded-xl py-3
-    font-bold text-sm transition-colors;
-}
-
-.sk-btn-secondary {
-  @apply w-full bg-white/8 hover:bg-white/12 active:bg-white/18 text-white/70 rounded-xl py-3
-    font-semibold text-sm transition-colors;
-}
-
-.sk-btn-link {
-  @apply w-full text-white/30 text-xs py-1 text-center hover:text-white/50 active:text-white/60
-    transition-colors;
-}
-
 .sk-divider {
   @apply border-t border-white/10;
 }

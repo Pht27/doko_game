@@ -1,8 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { getPlayers, getPlayer } from '@/api/analog';
 import { t } from '@/utils/translations';
 import type { PlayerListItem, PlayerDetail } from '@/types/analog';
+import { PageHeader } from '@/components/PageHeader/PageHeader';
+import { ToggleSwitch } from '@/components/ToggleSwitch/ToggleSwitch';
+import { StatusState } from '@/components/StatusState/StatusState';
 import './AnalogLeaderboardPage.css';
 
 const PLAYER_COLORS = [
@@ -18,23 +21,6 @@ type SortKey = 'totalPoints' | 'winRate' | 'gamesPlayed';
 type DetailState = PlayerDetail | 'loading' | 'error';
 
 // ── Custom toggle switch ────────────────────────────────────────────────────
-
-function MiniSwitch({ on, onChange }: { on: boolean; onChange: () => void }) {
-  const [pressing, setPressing] = useState(false);
-  return (
-    <button
-      className={`alb-switch${on ? ' alb-switch--on' : ''}${pressing ? ' alb-switch--pressing' : ''}`}
-      onPointerDown={() => setPressing(true)}
-      onPointerUp={() => { setPressing(false); onChange(); }}
-      onPointerLeave={() => setPressing(false)}
-      onPointerCancel={() => setPressing(false)}
-      onClick={(e) => e.preventDefault()}
-      aria-pressed={on}
-    >
-      <span className="alb-switch-thumb" />
-    </button>
-  );
-}
 
 // ── SVG multi-line chart ────────────────────────────────────────────────────
 
@@ -186,8 +172,8 @@ function ExpandableRow({
       <div className={`alb-row-body${expanded ? ' alb-row-body--open' : ''}`}>
         <div className="alb-row-body-inner">
           <div className="alb-row-detail">
-            {detail === 'loading' && <div className="alb-row-detail-loading">{t.loading}</div>}
-            {detail === 'error' && <div className="alb-row-detail-loading">Fehler beim Laden</div>}
+            {detail === 'loading' && <StatusState type="loading" className="alb-row-detail-loading" />}
+            {detail === 'error' && <StatusState type="error" message="Fehler beim Laden" className="alb-row-detail-loading" />}
             {rounds && (
               <>
                 {chartSeries.length >= 1 && (
@@ -223,8 +209,6 @@ function ExpandableRow({
 // ── Main page ───────────────────────────────────────────────────────────────
 
 export function AnalogLeaderboardPage() {
-  const navigate = useNavigate();
-
   const [players, setPlayers] = useState<PlayerListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -296,10 +280,7 @@ export function AnalogLeaderboardPage() {
 
   return (
     <div className="alb-page">
-      <div className="alb-header">
-        <button className="alb-back" onClick={() => navigate('/')} aria-label={t.back}>←</button>
-        <h1 className="alb-title">{t.analogLeaderboardTitle}</h1>
-      </div>
+      <PageHeader title={t.analogLeaderboardTitle} backTo="/" />
 
       <div className="alb-body">
         {/* Hero chart */}
@@ -317,7 +298,7 @@ export function AnalogLeaderboardPage() {
           </div>
 
           {loading ? (
-            <div className="alb-chart-empty">{t.loading}</div>
+            <StatusState type="loading" />
           ) : heroSeries.length === 0 ? (
             <div className="alb-chart-empty">Noch nicht genug Daten</div>
           ) : (
@@ -343,16 +324,16 @@ export function AnalogLeaderboardPage() {
 
           <div className="alb-inactive-row">
             <span className="alb-inactive-label">{t.analogLeaderboardShowInactive}</span>
-            <MiniSwitch on={showInactive} onChange={() => setShowInactive((v) => !v)} />
+            <ToggleSwitch on={showInactive} onChange={() => setShowInactive((v) => !v)} size="sm" />
           </div>
         </div>
 
         {/* List */}
         <div className="alb-list">
-          {loading && <div className="alb-list-msg">{t.loading}</div>}
-          {error && <div className="alb-list-msg alb-list-msg--error">{error}</div>}
+          {loading && <StatusState type="loading" />}
+          {error && <StatusState type="error" message={error} />}
           {!loading && !error && sorted.length === 0 && (
-            <div className="alb-list-msg">{t.analogLeaderboardNoPlayers}</div>
+            <StatusState type="empty" message={t.analogLeaderboardNoPlayers} />
           )}
           {sorted.map((player, idx) => (
             <ExpandableRow

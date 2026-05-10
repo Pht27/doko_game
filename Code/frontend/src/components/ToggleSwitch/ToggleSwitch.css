@@ -1,0 +1,47 @@
+.ts-switch {
+  position: relative;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  touch-action: none;
+  transition: background 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Sizes ── */
+.ts-switch--md { width: 51px; height: 31px; }
+.ts-switch--sm { width: 42px; height: 25px; }
+
+/* ── On state ── */
+.ts-switch--on { background: #4f46e5; }
+
+/* ── Pressing ── */
+.ts-switch--pressing { filter: brightness(0.88); }
+
+/* ── Thumb ── */
+.ts-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  border-radius: 50%;
+  background: #fff;
+  transition: left 0.22s cubic-bezier(0.4, 0, 0.2, 1), width 0.12s ease;
+}
+
+/* md thumb */
+.ts-switch--md .ts-thumb               { width: 25px; height: 25px; }
+.ts-switch--md.ts-switch--on .ts-thumb { left: 23px; }
+.ts-switch--md.ts-switch--pressing .ts-thumb             { width: 28px; }
+.ts-switch--md.ts-switch--on.ts-switch--pressing .ts-thumb { left: 20px; width: 28px; }
+
+/* sm thumb */
+.ts-switch--sm .ts-thumb               { width: 19px; height: 19px; box-shadow: 0 2px 4px rgba(0,0,0,0.35); }
+.ts-switch--sm.ts-switch--on .ts-thumb { left: 20px; }
+.ts-switch--sm.ts-switch--pressing .ts-thumb             { width: 23px; }
+.ts-switch--sm.ts-switch--on.ts-switch--pressing .ts-thumb { left: 17px; width: 23px; }
+
+/* md thumb shadow */
+.ts-switch--md .ts-thumb { box-shadow: 0 2px 5px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.2); }

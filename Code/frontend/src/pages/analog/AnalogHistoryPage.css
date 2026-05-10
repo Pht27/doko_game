@@ -19,35 +19,6 @@
   color: var(--ahr-text);
 }
 
-/* ── Page header ── */
-.ahr-header {
-  background: var(--ahr-surface);
-  border-bottom: 1px solid var(--ahr-border);
-  padding: 14px 16px 16px;
-  flex-shrink: 0;
-}
-
-.ahr-back {
-  background: none;
-  border: none;
-  color: var(--ahr-text-sub);
-  font: inherit;
-  font-size: 0.9rem;
-  cursor: pointer;
-  padding: 0;
-  margin-bottom: 10px;
-  display: block;
-  transition: color 0.15s;
-}
-
-.ahr-back:hover { color: var(--ahr-text); }
-
-.ahr-title {
-  font-size: 1.6rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin: 0;
-}
 
 /* ── Card list ── */
 .ahr-list {
@@ -59,15 +30,6 @@
   flex-direction: column;
   gap: 10px;
 }
-
-.ahr-empty {
-  text-align: center;
-  padding: 32px 20px;
-  color: var(--ahr-text-muted);
-  font-size: 0.9rem;
-}
-
-.ahr-error { color: #f87171; }
 
 /* ── Card ── */
 .ahr-card {

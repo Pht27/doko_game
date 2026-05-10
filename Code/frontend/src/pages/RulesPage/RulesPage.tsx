@@ -1,5 +1,4 @@
 import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { t } from '@/utils/translations';
 import { BackButton } from '@/components/BackButton/BackButton';
 import './RulesPage.css';
@@ -28,8 +27,6 @@ const SECTION_KEYWORDS: Record<SectionId, string> = {
 };
 
 export function RulesPage() {
-  const navigate = useNavigate();
-  const onBack = () => navigate(-1);
   const [openSections, setOpenSections] = useState<Set<SectionId>>(new Set(['grundlagen']));
   const [search, setSearch] = useState('');
   const [collapsed, setCollapsed] = useState(false);
@@ -72,7 +69,7 @@ export function RulesPage() {
     <div className="rp-page">
       <div className={`rp-header${collapsed ? ' rp-header--collapsed' : ''}`} ref={headerRef}>
         <div className="rp-header-nav">
-          <BackButton onClick={onBack} />
+          <BackButton to={-1} />
           <span className="rp-header-title-inline">{t.rulesTitle}</span>
         </div>
         <div className="rp-header-collapsible">

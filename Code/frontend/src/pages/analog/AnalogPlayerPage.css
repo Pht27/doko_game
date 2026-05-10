@@ -21,26 +21,14 @@
 
 /* ── Header ── */
 .apd-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   background: var(--apd-surface);
   border-bottom: 1px solid var(--apd-border);
-  padding: 14px 16px 16px;
+  padding: 14px 16px;
   flex-shrink: 0;
 }
-
-.apd-back {
-  background: none;
-  border: none;
-  color: var(--apd-text-sub);
-  font: inherit;
-  font-size: 0.9rem;
-  cursor: pointer;
-  padding: 0;
-  margin-bottom: 10px;
-  display: block;
-  transition: color 0.15s;
-}
-
-.apd-back:hover { color: var(--apd-text); }
 
 .apd-name {
   font-size: 1.6rem;
@@ -117,12 +105,7 @@
   margin: 0 0 12px;
 }
 
-.apd-empty {
-  text-align: center;
-  padding: 32px 20px;
-  color: var(--apd-text-muted);
-  font-size: 0.9rem;
-}
+
 
 /* ── Rounds table ── */
 .apd-table {
