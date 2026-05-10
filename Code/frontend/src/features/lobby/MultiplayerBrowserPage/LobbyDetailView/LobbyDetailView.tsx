@@ -13,6 +13,7 @@ import { ResultScreen } from '@/features/game/ResultScreen/ResultScreen';
 import { ReadyVoteButton } from '@/features/game/shared/ReadyVoteButton';
 import type { LobbySession } from '@/hooks/useLobby';
 import type { GameResultDto } from '@/types/api';
+import { SeatCard } from './SeatCard/SeatCard';
 
 interface LobbyDetailViewProps {
   lobbyId: string;
@@ -35,7 +36,7 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
   const [voting, setVoting] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
-  const [busySeat, setBusySeat] = useState<number | null>(null); // index being joined/swapped
+  const [busySeat, setBusySeat] = useState<number | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [availableScenarios, setAvailableScenarios] = useState<string[]>([]);
   const [settingScenario, setSettingScenario] = useState(false);
@@ -58,7 +59,6 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lobbyClosed]);
 
-  // Sync lobby player names into the app-level context so they persist into the game
   useEffect(() => {
     setPlayerNamesCtx(playerNames);
   }, [playerNames, setPlayerNamesCtx]);
@@ -93,7 +93,6 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
     setTimeout(() => setCopied(false), 2000);
   }
 
-  /** Join an empty seat for the first time (no existing session in this lobby). */
   async function doJoin(targetSeat: number) {
     setBusySeat(targetSeat);
     setActionError(null);
@@ -102,13 +101,12 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
       const newSession: LobbySession = {
         lobbyId: res.lobbyId,
         token: res.token,
-        
+
         seatIndex: res.seatIndex,
       };
       saveLobbySession(newSession);
       setSession(newSession);
 
-      // If a game is already running, navigate straight to it
       const lobby = await getLobby(lobbyId);
       if (lobby.isStarted && lobby.activeGameId) {
         clearLobbySession();
@@ -121,7 +119,6 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
     }
   }
 
-  /** Leave current seat and immediately occupy a different one in the same lobby. */
   async function doSwap(targetSeat: number) {
     if (!session) return;
     setBusySeat(targetSeat);
@@ -226,9 +223,7 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
 
   const filledCount = seats.filter(Boolean).length;
   const isMyLobby = session !== null;
-  // True if user has a session stored for a *different* lobby — blocks joining seats here
   const isInAnotherLobby = !isMyLobby && loadAnySession() !== null;
-  // When a game is running, seat swapping is not allowed — only joining empty seats
   const canSwapSeats = isMyLobby && !isStarted;
 
   return (
@@ -245,99 +240,34 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
           const canAddOpa = isMyLobby && !occupied && !isStarted;
           const canRemoveOpa = isMyLobby && isOpa && !isStarted;
 
-          function handleClick() {
-            if (!canInteract || isBusy) return;
-            if (canSwapSeats) doSwap(i);
-            else doJoin(i);
-          }
-
           return (
-            <div
+            <SeatCard
               key={i}
-              className={`flex items-center gap-2 px-3 py-3 rounded-xl transition-colors ${
-                isMe
-                  ? 'bg-indigo-600/50 text-white ring-1 ring-indigo-400'
-                  : isOpa
-                    ? 'bg-white/15 text-white'
-                    : occupied
-                      ? 'bg-white/15 text-white'
-                      : canInteract
-                        ? 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white/80 cursor-pointer'
-                        : 'bg-white/5 text-white/20'
-              }`}
-              onClick={!isOpa ? handleClick : undefined}
-              role={!isOpa && canInteract ? 'button' : undefined}
-            >
-              <div
-                className={`w-2.5 h-2.5 rounded-full shrink-0 ${
-                  occupied ? 'bg-green-400' : 'bg-white/20'
-                }`}
-              />
-              <span className="text-sm font-medium truncate flex-1 min-w-0">
-                {isBusy ? (
-                  t.joiningLobby
-                ) : isOpa ? (
-                  <>
-                    Opa
-                    <span className="text-white/40 text-xs ml-1">🤖</span>
-                  </>
-                ) : occupied ? (
-                  isMe && isEditingName ? (
-                    <input
-                      ref={nameInputRef}
-                      value={nameInput}
-                      onChange={(e) => setNameInput(e.target.value)}
-                      onBlur={submitName}
-                      onKeyDown={handleNameKeyDown}
-                      maxLength={16}
-                      placeholder={t.playerSlot(i)}
-                      className="bg-transparent border-b border-white/40 outline-none text-white text-sm w-full"
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                  ) : (
-                    <>
-                      <span className="truncate">{playerNames[i] ?? t.playerSlot(i)}</span>
-                      {isMe && <span className="text-white/50 text-xs shrink-0">{t.youSuffix}</span>}
-                    </>
-                  )
-                ) : (
-                  t.seatLabel(i)
-                )}
-              </span>
-              {isMe && !isEditingName && !canRemoveOpa && !canAddOpa && (
-                <button
-                  onClick={(e) => { e.stopPropagation(); startEditingName(); }}
-                  className="ml-auto text-white/30 hover:text-white/70 text-xs px-1 shrink-0"
-                  title={t.nameChange}
-                >
-                  ✏️
-                </button>
-              )}
-              {isReady && !isMe && !canRemoveOpa && !canAddOpa && (
-                <span className="ml-auto text-green-400 text-sm shrink-0" title={t.readyTooltip}>✓</span>
-              )}
-              {isReady && isMe && !isEditingName && !canRemoveOpa && !canAddOpa && (
-                <span className="text-green-400 text-sm shrink-0" title={t.readyTooltip}>✓</span>
-              )}
-              {canRemoveOpa && (
-                <button
-                  onClick={(e) => { e.stopPropagation(); doRemoveOpa(i); }}
-                  className="ml-auto text-red-400 hover:text-red-300 text-xs px-1 shrink-0"
-                  title={t.opaRemove}
-                >
-                  ✕
-                </button>
-              )}
-              {canAddOpa && (
-                <button
-                  onClick={(e) => { e.stopPropagation(); doAddOpa(i); }}
-                  className="ml-auto text-white/30 hover:text-white/60 text-xs px-1 shrink-0"
-                  title={t.opaAdd}
-                >
-                  🤖
-                </button>
-              )}
-            </div>
+              seatIndex={i}
+              occupied={occupied}
+              isOpa={isOpa}
+              isMe={isMe}
+              isReady={isReady}
+              isBusy={isBusy}
+              canInteract={canInteract}
+              canAddOpa={canAddOpa}
+              canRemoveOpa={canRemoveOpa}
+              playerName={playerNames[i]}
+              isEditingName={isEditingName && isMe}
+              nameInput={nameInput}
+              nameInputRef={nameInputRef}
+              onNameChange={setNameInput}
+              onNameBlur={submitName}
+              onNameKeyDown={handleNameKeyDown}
+              onStartEditingName={startEditingName}
+              onClick={() => {
+                if (!canInteract || isBusy) return;
+                if (canSwapSeats) doSwap(i);
+                else doJoin(i);
+              }}
+              onAddOpa={() => doAddOpa(i)}
+              onRemoveOpa={() => doRemoveOpa(i)}
+            />
           );
         })}
       </div>
@@ -384,7 +314,6 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
       )}
       {isMyLobby && (
         <div className="flex flex-col gap-2 shrink-0">
-          {/* Match history button */}
           {lastFinishedResult && (
             <button
               onClick={() => setShowHistory(true)}
@@ -393,7 +322,6 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
               {t.spielverlauf}
             </button>
           )}
-          {/* Leave + Ready row */}
           {!isStarted && (
             <div className="flex gap-2">
               <button
@@ -412,7 +340,6 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
               />
             </div>
           )}
-          {/* Game running: only show leave button */}
           {isStarted && (
             <button
               onClick={handleLeaveSeat}

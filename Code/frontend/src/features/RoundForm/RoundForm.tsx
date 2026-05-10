@@ -5,9 +5,9 @@ import type { PlayerListItem, StaticData } from '@/types/analog';
 import { PageHeader } from '@/components/PageHeader/PageHeader';
 import { Button } from '@/components/Button/Button';
 import { FormError } from '@/components/FormError/FormError';
-import { TeamBlock } from './TeamBlock';
-import { TeamEditorModal } from './TeamEditorModal';
-import { GameModePickerModal } from './GameModePickerModal';
+import { TeamBlock } from './TeamBlock/TeamBlock';
+import { TeamEditorModal } from './TeamEditorModal/TeamEditorModal';
+import { GameModePickerModal } from './GameModePickerModal/GameModePickerModal';
 import './RoundForm.css';
 
 interface Props {

@@ -3,9 +3,9 @@ import { useAnalogPlayer } from '@/hooks/useAnalogPlayer';
 import { t } from '@/utils/translations';
 import { BackButton } from '@/components/BackButton/BackButton';
 import { StatusState } from '@/components/StatusState/StatusState';
-import './AnalogPlayerPage.css';
+import './PlayerPage.css';
 
-export function AnalogPlayerPage() {
+export function PlayerPage() {
   const { id } = useParams<{ id: string }>();
   const { player, loading, error } = useAnalogPlayer(Number(id));
 

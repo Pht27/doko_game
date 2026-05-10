@@ -36,7 +36,7 @@ export function LeaderboardGraphOverlay({
   const [pickerOpen, setPickerOpen] = useState(false);
   const [maxRounds, setMaxRounds] = useState(DEFAULT_ROUNDS);
   const [weeksBack, setWeeksBack] = useState(DEFAULT_WEEKS);
-  const [xMode, setXMode] = useState<XAxisMode>('games');
+  const [xMode, setXMode] = useState<XAxisMode>('date');
   const chartRef = useRef<ReactECharts>(null);
   const chartWrapRef = useRef<HTMLDivElement>(null);
   useOrientationLock();

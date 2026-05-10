@@ -6,12 +6,12 @@ import { RulesPage } from '@/pages/RulesPage/RulesPage';
 import { LobbyPage } from '@/pages/LobbyPage/LobbyPage';
 import { GamePage } from '@/pages/GamePage/GamePage';
 import { HotSeatPage } from '@/pages/HotSeatPage/HotSeatPage';
-import { AnalogPlayersPage } from '@/pages/analog/AnalogPlayersPage';
-import { AnalogPlayerPage } from '@/pages/analog/AnalogPlayerPage';
-import { AnalogHistoryPage } from '@/pages/analog/AnalogHistoryPage';
-import { AnalogNewRoundPage } from '@/pages/analog/AnalogNewRoundPage';
-import { AnalogEditRoundPage } from '@/pages/analog/AnalogEditRoundPage';
-import { AnalogLeaderboardPage } from '@/pages/analog/AnalogLeaderboardPage';
+import { PlayersPage } from '@/pages/PlayersPage/PlayersPage';
+import { PlayerPage } from '@/pages/PlayerPage/PlayerPage';
+import { HistoryPage } from '@/pages/HistoryPage/HistoryPage';
+import { AnalogNewRoundPage } from '@/pages/AnalogNewRoundPage/AnalogNewRoundPage';
+import { AnalogEditRoundPage } from '@/pages/AnalogEditRoundPage/AnalogEditRoundPage';
+import { LeaderboardPage } from '@/pages/LeaderboardPage/LeaderboardPage';
 import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage';
 import { Root } from './Root';
 
@@ -25,12 +25,12 @@ export const router = createBrowserRouter([
         children: [
           { index: true, element: <LandingPage /> },
           { path: 'rules', element: <RulesPage /> },
-          { path: 'analog/players', element: <AnalogPlayersPage /> },
-          { path: 'analog/players/:id', element: <AnalogPlayerPage /> },
-          { path: 'analog/history', element: <AnalogHistoryPage /> },
+          { path: 'players', element: <PlayersPage /> },
+          { path: 'players/:id', element: <PlayerPage /> },
+          { path: 'history', element: <HistoryPage /> },
           { path: 'analog/new', element: <AnalogNewRoundPage /> },
           { path: 'analog/edit/:id', element: <AnalogEditRoundPage /> },
-          { path: 'analog/leaderboard', element: <AnalogLeaderboardPage /> },
+          { path: 'leaderboard', element: <LeaderboardPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },
