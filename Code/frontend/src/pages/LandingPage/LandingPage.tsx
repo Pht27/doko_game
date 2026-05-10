@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { t } from '@/utils/translations';
@@ -133,8 +133,11 @@ export function LandingPage() {
   const [open, setOpen] = useState<DrawerKey>(null);
   const [showReleaseNotes, setShowReleaseNotes] = useState(false);
   const { needRefresh: [needRefresh], updateServiceWorker } = useRegisterSW();
+  const lastOpenRef = useRef<NonNullable<DrawerKey>>('kreuz');
 
   const toggle = (key: DrawerKey) => setOpen(prev => prev === key ? null : key);
+  if (open !== null) lastOpenRef.current = open;
+  const displayKey = open ?? lastOpenRef.current;
 
   return (
     <div style={{
@@ -212,62 +215,63 @@ export function LandingPage() {
 
       </div>
 
-      {/* Expansion drawer */}
+      {/* Expansion drawer — grid-template-rows animates smoothly with no dead zone */}
       <div style={{
-        overflow: 'hidden',
-        maxHeight: open ? 160 : 0,
-        opacity: open ? 1 : 0,
+        display: 'grid',
+        gridTemplateRows: open ? '1fr' : '0fr',
         marginTop: open ? 12 : 0,
-        transition: 'max-height 0.3s ease, opacity 0.25s, margin-top 0.3s',
+        transition: 'grid-template-rows 0.35s ease, margin-top 0.35s ease',
         zIndex: 1,
       }}>
-        {open === 'kreuz' && (
-          <div style={{
-            background: SURFACE, borderRadius: 14, padding: '6px 6px',
-            border: `1px solid ${SUITS.kreuz.openBorder}`,
-            display: 'flex', flexDirection: 'column',
-          }}>
-            <SubItem label={t.landingSpielEintragen} hint={t.landingHintSpielEintragen} hasDivider
-              onClick={() => navigate('/analog/new')} />
-            <SubItem label={t.analogPlayersTitle} hint={t.landingHintSpieler}
-              onClick={() => navigate('/analog/players')} />
-          </div>
-        )}
-        {open === 'pik' && (
-          <div style={{
-            background: SURFACE, borderRadius: 14, padding: '6px 6px',
-            border: `1px solid ${SUITS.pik.openBorder}`,
-            display: 'flex', flexDirection: 'column',
-          }}>
-            <SubItem label={t.multiplayer} hint={t.landingHintMultiplayer} hasDivider
-              onClick={() => navigate('/lobby')} />
-            <SubItem label={t.testGame} hint={t.landingHintTestGame}
-              onClick={() => navigate('/hot-seat')} />
-          </div>
-        )}
-        {open === 'herz' && (
-          <div style={{
-            background: SURFACE, borderRadius: 14, padding: '6px 6px',
-            border: `1px solid ${SUITS.herz.openBorder}`,
-            display: 'flex', flexDirection: 'column',
-          }}>
-            <SubItem label={t.landingRundenubersicht} hint={t.landingHintRundenubersicht} hasDivider
-              onClick={() => navigate('/analog/history')} />
-            <SubItem label={t.landingStats} hint={t.landingHintStats}
-              onClick={() => navigate('/analog/leaderboard')} />
-          </div>
-        )}
-        {open === 'karo' && (
-          <div style={{
-            background: SURFACE, borderRadius: 14, padding: '6px 6px',
-            border: `1px solid ${SUITS.karo.openBorder}`,
-            display: 'flex', flexDirection: 'column',
-          }}>
-            <SubItem label={t.rulesTitle} hint={t.landingHintRegeln} hasDivider
-              onClick={() => navigate('/rules')} />
-            <SubItem label={t.landingRegelsets} hint={t.landingHintRegelsets} disabled />
-          </div>
-        )}
+        <div style={{ overflow: 'hidden' }}>
+          {displayKey === 'kreuz' && (
+            <div style={{
+              background: SURFACE, borderRadius: 14, padding: '6px 6px',
+              border: `1px solid ${SUITS.kreuz.openBorder}`,
+              display: 'flex', flexDirection: 'column',
+            }}>
+              <SubItem label={t.landingSpielEintragen} hint={t.landingHintSpielEintragen} hasDivider
+                onClick={() => navigate('/analog/new')} />
+              <SubItem label={t.analogPlayersTitle} hint={t.landingHintSpieler}
+                onClick={() => navigate('/analog/players')} />
+            </div>
+          )}
+          {displayKey === 'pik' && (
+            <div style={{
+              background: SURFACE, borderRadius: 14, padding: '6px 6px',
+              border: `1px solid ${SUITS.pik.openBorder}`,
+              display: 'flex', flexDirection: 'column',
+            }}>
+              <SubItem label={t.multiplayer} hint={t.landingHintMultiplayer} hasDivider
+                onClick={() => navigate('/lobby')} />
+              <SubItem label={t.testGame} hint={t.landingHintTestGame}
+                onClick={() => navigate('/hot-seat')} />
+            </div>
+          )}
+          {displayKey === 'herz' && (
+            <div style={{
+              background: SURFACE, borderRadius: 14, padding: '6px 6px',
+              border: `1px solid ${SUITS.herz.openBorder}`,
+              display: 'flex', flexDirection: 'column',
+            }}>
+              <SubItem label={t.landingRundenubersicht} hint={t.landingHintRundenubersicht} hasDivider
+                onClick={() => navigate('/analog/history')} />
+              <SubItem label={t.landingStats} hint={t.landingHintStats}
+                onClick={() => navigate('/analog/leaderboard')} />
+            </div>
+          )}
+          {displayKey === 'karo' && (
+            <div style={{
+              background: SURFACE, borderRadius: 14, padding: '6px 6px',
+              border: `1px solid ${SUITS.karo.openBorder}`,
+              display: 'flex', flexDirection: 'column',
+            }}>
+              <SubItem label={t.rulesTitle} hint={t.landingHintRegeln} hasDivider
+                onClick={() => navigate('/rules')} />
+              <SubItem label={t.landingRegelsets} hint={t.landingHintRegelsets} disabled />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Spacer */}

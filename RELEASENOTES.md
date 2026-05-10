@@ -4,6 +4,7 @@
 
 ### Verbessert
 - Alle deutschen Texte in der App sind jetzt zentral in Übersetzungsdateien gepflegt und nach Bereich aufgeteilt (Spiel, Lobby, Landing, Analog, Regeln). Doppelte und ungenutzte Texte wurden bereinigt.
+- Das Einklappen der Untermenüs auf der Startseite läuft jetzt flüssig durch – die Animation startet sofort und ohne Verzögerung.
 
 ## [1.3.6] - 2026-05-09
 
