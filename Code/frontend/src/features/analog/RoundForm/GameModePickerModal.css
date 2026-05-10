@@ -1,7 +1,6 @@
 @reference "../../../styles/index.css";
 
 :root {
-  --gmp-surface:  #22223a;
   --gmp-surface2: #2a2a48;
   --gmp-border:   rgba(255,255,255,0.08);
   --gmp-text:     #eeeeee;
@@ -9,57 +8,8 @@
   --gmp-muted:    #666688;
   --gmp-primary:  #4f46e5;
   --gmp-solo:     #d97706;
-  --gmp-radius:   16px;
   --gmp-radius-sm: 10px;
 }
-
-.gmp-overlay {
-  @apply fixed inset-0 flex items-end justify-center;
-  background: rgba(0,0,0,0.65);
-  z-index: 200;
-  padding: 0 0 env(safe-area-inset-bottom, 0);
-}
-
-.gmp-sheet {
-  width: 100%;
-  max-width: 480px;
-  max-height: 88vh;
-  background: var(--gmp-surface);
-  border-radius: var(--gmp-radius) var(--gmp-radius) 0 0;
-  border-top: 1px solid var(--gmp-border);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.gmp-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px 12px;
-  border-bottom: 1px solid var(--gmp-border);
-  flex-shrink: 0;
-}
-
-.gmp-title {
-  font-size: 1rem;
-  font-weight: 700;
-  margin: 0;
-  color: var(--gmp-text);
-}
-
-.gmp-close {
-  background: none;
-  border: none;
-  color: var(--gmp-muted);
-  font-size: 1.4rem;
-  line-height: 1;
-  cursor: pointer;
-  padding: 4px;
-  transition: color 0.15s;
-}
-
-.gmp-close:hover { color: var(--gmp-text); }
 
 .gmp-body {
   flex: 1;

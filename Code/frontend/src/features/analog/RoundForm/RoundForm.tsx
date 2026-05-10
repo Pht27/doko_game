@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { t } from '@/utils/translations';
 import type { RoundFormState, Party } from '@/hooks/useRoundForm';
 import type { PlayerListItem, StaticData } from '@/types/analog';
+import { PageHeader } from '@/components/PageHeader/PageHeader';
+import { Button } from '@/components/Button/Button';
+import { FormError } from '@/components/FormError/FormError';
 import { TeamBlock } from './TeamBlock';
 import { TeamEditorModal } from './TeamEditorModal';
 import { GameModePickerModal } from './GameModePickerModal';
@@ -115,10 +118,7 @@ export function RoundForm({
 
   return (
     <div className="arf-page">
-      <div className="arf-header">
-        <button className="arf-back" onClick={onBack} aria-label={t.back}>←</button>
-        <h1 className="arf-title">{title}</h1>
-      </div>
+      <PageHeader title={title} onBack={onBack} />
 
       <div className="arf-body">
         {/* ── Spielmodus trigger ── */}
@@ -221,15 +221,15 @@ export function RoundForm({
           maxLength={500}
         />
 
-        {submitError && <div className="arf-error">{submitError}</div>}
+        <FormError message={submitError} />
 
         <div className="arf-save-spacer" />
       </div>
 
       <div className="arf-save-bar">
-        <button className="arf-save-btn" disabled={saving} onClick={handleSubmit}>
+        <Button className="w-full pointer-events-auto" disabled={saving} onClick={handleSubmit}>
           {saving ? t.analogSaving : t.analogSave}
-        </button>
+        </Button>
       </div>
 
       {showGameModePicker && (

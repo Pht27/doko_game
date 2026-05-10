@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { t } from '@/utils/translations';
 import type { TeamBlockState } from '@/hooks/useRoundForm';
 import type { PlayerListItem, SpecialCard, ExtraPoint } from '@/types/analog';
 import { SPECIAL_CARD_ICONS, EXTRA_POINT_ICONS } from '../analogIcons';
+import { BottomSheet } from '@/components/BottomSheet/BottomSheet';
 import './TeamEditorModal.css';
 
 interface Props {
@@ -39,15 +40,6 @@ export function TeamEditorModal({
 }: Props) {
   const [search, setSearch] = useState('');
   const searchRef = useRef<HTMLInputElement>(null);
-  const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
-
-  useEffect(() => {
-    history.pushState({ modal: true }, '');
-    const handler = () => onCloseRef.current();
-    window.addEventListener('popstate', handler);
-    return () => window.removeEventListener('popstate', handler);
-  }, []);
 
   const availablePlayers = allPlayers.filter(
     (p) =>
@@ -75,20 +67,12 @@ export function TeamEditorModal({
     onSetPlayers(block.playerIds.filter((pid) => pid !== id));
   };
 
-  const handleBackdrop = () => history.back();
-
   const blockPlayers    = allPlayers.filter((p) => block.playerIds.includes(p.id));
   const blockSpecialCards = specialCards.filter((sc) => block.specialCardIds.includes(sc.id));
 
   return (
-    <div className="tem-overlay" onClick={handleBackdrop}>
-      <div className="tem-sheet" onClick={(e) => e.stopPropagation()}>
-        <div className="tem-header">
-          <h2 className="tem-title">{t.analogTeamEditTitle}</h2>
-          <button className="tem-close" onClick={handleBackdrop} aria-label="Schließen">×</button>
-        </div>
-
-        <div className="tem-body">
+    <BottomSheet title={t.analogTeamEditTitle} onClose={onClose} maxHeight="92vh">
+      <div className="tem-body">
           {/* ── Spieler ── */}
           <div>
             <div className="tem-section-label">{t.analogTeamPlayersSection}</div>
@@ -244,8 +228,7 @@ export function TeamEditorModal({
               </div>
             )}
           </div>
-        </div>
       </div>
-    </div>
+    </BottomSheet>
   );
 }

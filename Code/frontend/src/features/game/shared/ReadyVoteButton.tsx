@@ -1,3 +1,5 @@
+import { t } from '@/utils/translations';
+
 interface ReadyVoteButtonProps {
   hasVoted: boolean;
   voteCount: number;
@@ -21,7 +23,7 @@ export function ReadyVoteButton({ hasVoted, voteCount, disabled, onClick, classN
         {voteCount}/4 👤
       </span>
       <span className="flex-1 text-center">
-        {hasVoted ? '✓' : 'Bereit'}
+        {hasVoted ? '✓' : t.bereit}
       </span>
       <span className="w-8" />
     </button>

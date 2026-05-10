@@ -1,0 +1,31 @@
+export const lobby = {
+  // ── MultiplayerBrowserPage ─────────────────────────────────────────────────
+  multiplayer: 'Mehrspieler',
+  createLobby: 'Lobby erstellen',
+  testGame: 'Testspiel starten',
+  noLobbiesAvailable: 'Keine Lobbys vorhanden',
+
+  // ── LobbyDetailView ────────────────────────────────────────────────────────
+  lobbyTitle: 'Lobby',
+  seatLabel: (n: number) => `Sitz ${n + 1}`,
+  waitingForPlayers: 'Warte auf Spieler…',
+  inviteLink: 'Einladungslink',
+  copyLink: 'Link kopieren',
+  linkCopied: 'Kopiert!',
+  startGame: 'Spiel starten',
+  leaveSeat: 'Platz verlassen',
+  playerSlot: (n: number) => `Spieler ${n + 1}`,
+  youSuffix: ' (Du)',
+  playerCount: (current: number, total: number) => `${current} von ${total} Spielern`,
+  joiningLobby: 'Trete Lobby bei…',
+  lobbyFull: 'Lobby ist voll',
+  lobbyNotFound: 'Lobby nicht gefunden',
+  spielverlauf: 'Spielverlauf',
+  nameChange: 'Namen ändern',
+  readyTooltip: 'Bereit',
+  opaRemove: 'Opa entfernen',
+  opaAdd: 'Opa hinzufügen',
+  gameRunning: 'Spiel läuft',
+  scenarioLabel: 'Szenario',
+  scenarioRandom: 'Zufällig',
+};

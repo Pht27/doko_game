@@ -1,0 +1,55 @@
+.ss-root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+/* ── Spinner ── */
+@keyframes ss-spin {
+  to { transform: rotate(360deg); }
+}
+
+.ss-spinner {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(255, 255, 255, 0.12);
+  border-top-color: rgba(255, 255, 255, 0.55);
+  animation: ss-spin 0.75s linear infinite;
+  flex-shrink: 0;
+}
+
+/* ── Text ── */
+.ss-text {
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.ss-loading .ss-text {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ── Error ── */
+.ss-error .ss-icon {
+  font-size: 1.1rem;
+  color: #f87171;
+  flex-shrink: 0;
+}
+
+.ss-error .ss-text {
+  color: #f87171;
+}
+
+/* ── Empty ── */
+.ss-empty .ss-text {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.ss-empty--dashed {
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 14px 12px;
+}

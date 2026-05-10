@@ -3,26 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAnalogPlayers } from '@/hooks/useAnalogPlayers';
 import { t } from '@/utils/translations';
 import type { PlayerListItem } from '@/types/analog';
+import { PageHeader } from '@/components/PageHeader/PageHeader';
+import { Button } from '@/components/Button/Button';
+import { ToggleSwitch } from '@/components/ToggleSwitch/ToggleSwitch';
+import { StatusState } from '@/components/StatusState/StatusState';
+import { FormError } from '@/components/FormError/FormError';
 import './AnalogPlayersPage.css';
-
-function Switch({ on, onChange }: { on: boolean; onChange: () => void }) {
-  const [pressing, setPressing] = useState(false);
-
-  return (
-    <button
-      className={`ap-switch${on ? ' ap-switch--on' : ''}${pressing ? ' ap-switch--pressing' : ''}`}
-      onPointerDown={(e) => { e.stopPropagation(); setPressing(true); }}
-      onPointerUp={(e) => { e.stopPropagation(); setPressing(false); onChange(); }}
-      onPointerLeave={() => setPressing(false)}
-      onPointerCancel={() => setPressing(false)}
-      onClick={(e) => e.stopPropagation()}
-      aria-pressed={on}
-      aria-label={on ? t.analogActive : t.analogInactiveSection}
-    >
-      <span className="ap-switch-thumb" />
-    </button>
-  );
-}
 
 function PlayerRow({
   player,
@@ -89,7 +75,7 @@ function PlayerRow({
               if (e.key === 'Escape') cancel();
             }}
           />
-          {renameError && <span className="ap-edit-error">{renameError}</span>}
+          <FormError message={renameError} />
           <button className="ap-icon-btn ap-icon-btn--cancel" onClick={cancel} aria-label="Abbrechen">
             <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -120,7 +106,12 @@ function PlayerRow({
         </button>
       )}
 
-      <Switch on={leaving ? !player.isActive : player.isActive} onChange={handleToggle} />
+      <ToggleSwitch
+        on={leaving ? !player.isActive : player.isActive}
+        onChange={handleToggle}
+        stopPropagation
+        ariaLabel={player.isActive ? t.analogActive : t.analogInactiveSection}
+      />
     </div>
   );
 }
@@ -134,9 +125,6 @@ function SectionHeader({ label, count }: { label: string; count: number }) {
   );
 }
 
-function EmptySection({ text }: { text: string }) {
-  return <div className="ap-section-empty">{text}</div>;
-}
 
 export function AnalogPlayersPage() {
   const navigate = useNavigate();
@@ -178,28 +166,26 @@ export function AnalogPlayersPage() {
 
   return (
     <div className="ap-page">
-      <div className="ap-header">
-        <div className="ap-header-left">
-          <button className="ap-back" onClick={() => navigate('/')} aria-label={t.back}>
-            ←
+      <PageHeader
+        title={t.analogPlayersTitle}
+        backTo="/"
+        right={
+          <button className="ap-add-btn" onClick={openDialog} aria-label={t.analogNewPlayerTitle}>
+            +
           </button>
-          <h1 className="ap-title">{t.analogPlayersTitle}</h1>
-        </div>
-        <button className="ap-add-btn" onClick={openDialog} aria-label={t.analogNewPlayerTitle}>
-          +
-        </button>
-      </div>
+        }
+      />
 
       <div className="ap-list">
-        {loading && <div className="ap-empty">{t.loading}</div>}
-        {error && <div className="ap-empty ap-error">{error}</div>}
+        {loading && <StatusState type="loading" message={t.loading} />}
+        {error && <StatusState type="error" message={error} />}
 
         {!loading && !error && (
           <>
             <SectionHeader label={t.analogActive} count={active.length} />
             <div className="ap-section">
               {active.length === 0
-                ? <EmptySection text={t.analogNoActivePlayers} />
+                ? <StatusState type="empty" message={t.analogNoActivePlayers} dashed />
                 : active.map((p) => (
                   <PlayerRow key={p.id} player={p} {...makeHandlers(p)} />
                 ))}
@@ -208,7 +194,7 @@ export function AnalogPlayersPage() {
             <SectionHeader label={t.analogInactiveSection} count={inactive.length} />
             <div className="ap-section">
               {inactive.length === 0
-                ? <EmptySection text={t.analogNoInactivePlayers} />
+                ? <StatusState type="empty" message={t.analogNoInactivePlayers} dashed />
                 : inactive.map((p) => (
                   <PlayerRow key={p.id} player={p} {...makeHandlers(p)} />
                 ))}
@@ -233,19 +219,19 @@ export function AnalogPlayersPage() {
               onKeyDown={(e) => { if (e.key === 'Enter') void handleCreate(); }}
             />
 
-            {dialogError && <div className="ap-dialog-error">{dialogError}</div>}
+            <FormError message={dialogError} />
 
             <div className="ap-dialog-actions">
-              <button className="ap-btn-cancel" onClick={() => setShowDialog(false)}>
+              <Button variant="secondary" className="flex-1" onClick={() => setShowDialog(false)}>
                 {t.abbrechen}
-              </button>
-              <button
-                className="ap-btn-create"
+              </Button>
+              <Button
+                className="flex-2"
                 onClick={() => void handleCreate()}
                 disabled={!name.trim() || creating}
               >
                 {t.analogCreateButton}
-              </button>
+              </Button>
             </div>
           </div>
         </div>

@@ -195,19 +195,19 @@ export function LandingPage() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, zIndex: 1 }}>
 
         {/* ♣ Kreuz — Eintragen */}
-        <Tile suit={SUITS.kreuz} label="Eintragen" sub="Spieler und Runden verwalten"
+        <Tile suit={SUITS.kreuz} label={t.landingTileEintragen} sub={t.landingTileSubEintragen}
           expanded={open === 'kreuz'} onClick={() => toggle('kreuz')} />
 
         {/* ♠ Pik — Spielen */}
-        <Tile suit={SUITS.pik} label="Spielen" sub="Mehrspieler und Testspiel"
+        <Tile suit={SUITS.pik} label={t.landingTileSpielen} sub={t.landingTileSubSpielen}
           expanded={open === 'pik'} onClick={() => toggle('pik')} />
 
         {/* ♥ Herz — Übersicht */}
-        <Tile suit={SUITS.herz} label="Übersicht" sub="Match History und Stats"
+        <Tile suit={SUITS.herz} label={t.landingTileUbersicht} sub={t.landingTileSubUbersicht}
           expanded={open === 'herz'} onClick={() => toggle('herz')} />
 
         {/* ♦ Karo — Regeln */}
-        <Tile suit={SUITS.karo} label="Regeln" sub="und Regelsets"
+        <Tile suit={SUITS.karo} label={t.rulesTitle} sub={t.landingTileSubRegeln}
           expanded={open === 'karo'} onClick={() => toggle('karo')} />
 
       </div>
@@ -227,9 +227,9 @@ export function LandingPage() {
             border: `1px solid ${SUITS.kreuz.openBorder}`,
             display: 'flex', flexDirection: 'column',
           }}>
-            <SubItem label={t.landingSpielEintragen} hint="Runde aufschreiben" hasDivider
+            <SubItem label={t.landingSpielEintragen} hint={t.landingHintSpielEintragen} hasDivider
               onClick={() => navigate('/analog/new')} />
-            <SubItem label={t.analogPlayersTitle} hint="Namen verwalten"
+            <SubItem label={t.analogPlayersTitle} hint={t.landingHintSpieler}
               onClick={() => navigate('/analog/players')} />
           </div>
         )}
@@ -239,9 +239,9 @@ export function LandingPage() {
             border: `1px solid ${SUITS.pik.openBorder}`,
             display: 'flex', flexDirection: 'column',
           }}>
-            <SubItem label={t.multiplayer} hint="Online spielen" hasDivider
+            <SubItem label={t.multiplayer} hint={t.landingHintMultiplayer} hasDivider
               onClick={() => navigate('/lobby')} />
-            <SubItem label={t.testGame} hint="Allein ausprobieren"
+            <SubItem label={t.testGame} hint={t.landingHintTestGame}
               onClick={() => navigate('/hot-seat')} />
           </div>
         )}
@@ -251,9 +251,9 @@ export function LandingPage() {
             border: `1px solid ${SUITS.herz.openBorder}`,
             display: 'flex', flexDirection: 'column',
           }}>
-            <SubItem label={t.landingRundenubersicht} hint="Schau dir vergangene Runden an" hasDivider
+            <SubItem label={t.landingRundenubersicht} hint={t.landingHintRundenubersicht} hasDivider
               onClick={() => navigate('/analog/history')} />
-            <SubItem label={t.landingStats} hint="Wer sitzt oben?"
+            <SubItem label={t.landingStats} hint={t.landingHintStats}
               onClick={() => navigate('/analog/leaderboard')} />
           </div>
         )}
@@ -263,9 +263,9 @@ export function LandingPage() {
             border: `1px solid ${SUITS.karo.openBorder}`,
             display: 'flex', flexDirection: 'column',
           }}>
-            <SubItem label={t.rulesTitle} hint="Doppelkopf nachlesen" hasDivider
+            <SubItem label={t.rulesTitle} hint={t.landingHintRegeln} hasDivider
               onClick={() => navigate('/rules')} />
-            <SubItem label={t.landingRegelsets} hint="Noch nicht verfügbar" disabled />
+            <SubItem label={t.landingRegelsets} hint={t.landingHintRegelsets} disabled />
           </div>
         )}
       </div>
@@ -301,7 +301,7 @@ export function LandingPage() {
           />
         )}
         <span style={{ fontWeight: 600 }}>v{appVersion}</span>
-        <span style={{ opacity: 0.55 }}>· {needRefresh ? 'Update verfügbar' : 'Was ist neu?'}</span>
+        <span style={{ opacity: 0.55 }}>· {needRefresh ? t.landingUpdateAvailable : t.landingWhatsNew}</span>
       </div>
 
       {showReleaseNotes && (

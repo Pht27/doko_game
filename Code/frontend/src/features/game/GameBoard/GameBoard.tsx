@@ -304,7 +304,7 @@ export function GameBoard({
           <button
             onClick={() => setShowLastTrick(true)}
             className="rounded-xl bg-gray-700/80 hover:bg-gray-600/90 active:bg-gray-800 shadow-lg transition-colors p-1.5"
-            title="Letzter Stich"
+            title={t.lastTrick}
           >
             <img src={cardBackSvgPath} alt="" className="w-7 h-auto block" />
           </button>

@@ -1,67 +1,15 @@
 @reference "../../../styles/index.css";
 
 :root {
-  --tem-surface:    #22223a;
   --tem-surface2:   #2a2a48;
-  --tem-surface3:   #1e1e36;
   --tem-border:     rgba(255,255,255,0.08);
   --tem-text:       #eeeeee;
   --tem-text-sub:   #aaaacc;
   --tem-text-muted: #666688;
   --tem-primary:    #4f46e5;
   --tem-primary-h:  #6366f1;
-  --tem-radius:     16px;
   --tem-radius-sm:  8px;
 }
-
-.tem-overlay {
-  @apply fixed inset-0 flex items-end justify-center;
-  background: rgba(0,0,0,0.65);
-  z-index: 200;
-  padding: 0 0 env(safe-area-inset-bottom, 0);
-}
-
-.tem-sheet {
-  width: 100%;
-  max-width: 480px;
-  max-height: 92vh;
-  background: var(--tem-surface);
-  border-radius: var(--tem-radius) var(--tem-radius) 0 0;
-  border-top: 1px solid var(--tem-border);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-/* ── Header ── */
-.tem-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px 12px;
-  border-bottom: 1px solid var(--tem-border);
-  flex-shrink: 0;
-}
-
-.tem-title {
-  font-size: 1rem;
-  font-weight: 700;
-  margin: 0;
-  color: var(--tem-text);
-}
-
-.tem-close {
-  background: none;
-  border: none;
-  color: var(--tem-text-muted);
-  font-size: 1.4rem;
-  line-height: 1;
-  cursor: pointer;
-  padding: 4px;
-  transition: color 0.15s;
-}
-
-.tem-close:hover { color: var(--tem-text); }
 
 /* ── Scrollable body ── */
 .tem-body {

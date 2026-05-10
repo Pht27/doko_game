@@ -1,17 +1,18 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useAnalogPlayer } from '@/hooks/useAnalogPlayer';
 import { t } from '@/utils/translations';
+import { BackButton } from '@/components/BackButton/BackButton';
+import { StatusState } from '@/components/StatusState/StatusState';
 import './AnalogPlayerPage.css';
 
 export function AnalogPlayerPage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const { player, loading, error } = useAnalogPlayer(Number(id));
 
   if (loading) {
     return (
       <div className="apd-page">
-        <div className="apd-empty">{t.loading}</div>
+        <StatusState type="loading" />
       </div>
     );
   }
@@ -19,7 +20,7 @@ export function AnalogPlayerPage() {
   if (error || !player) {
     return (
       <div className="apd-page">
-        <div className="apd-empty">{error ?? t.analogPlayerNotFound}</div>
+        <StatusState type="error" message={error ?? t.analogPlayerNotFound} />
       </div>
     );
   }
@@ -27,9 +28,7 @@ export function AnalogPlayerPage() {
   return (
     <div className="apd-page">
       <div className="apd-header">
-        <button className="apd-back" onClick={() => navigate(-1)}>
-          {t.back}
-        </button>
+        <BackButton to={-1} />
         <h1 className="apd-name">{player.name}</h1>
         {!player.isActive && <span className="apd-inactive">{t.analogInactive}</span>}
       </div>
@@ -57,7 +56,7 @@ export function AnalogPlayerPage() {
         <h2 className="apd-section-title">{t.analogRecentRounds}</h2>
 
         {player.recentRounds.length === 0 ? (
-          <div className="apd-empty">{t.analogNoRounds}</div>
+          <StatusState type="empty" message={t.analogNoRounds} />
         ) : (
           <table className="apd-table">
             <thead>

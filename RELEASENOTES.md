@@ -1,9 +1,19 @@
 # Release Notes
 
+## [1.3.7] - 2026-05-10
+
+### Verbessert
+- Alle deutschen Texte in der App sind jetzt zentral in Übersetzungsdateien gepflegt und nach Bereich aufgeteilt (Spiel, Lobby, Landing, Analog, Regeln). Doppelte und ungenutzte Texte wurden bereinigt.
+
 ## [1.3.6] - 2026-05-09
 
 ### Neu
 - Automatisches Datenbank-Backup: Jede zweite Nacht wird ein komprimiertes Backup der Produktionsdatenbank erstellt und auf dem Server gespeichert. Die letzten 15 Backups werden aufgehoben.
+
+### Verbessert
+- Buttons in Dialogen und Formularen sehen jetzt überall gleich aus – Primary-, Sekundär- und Link-Buttons folgen einem einheitlichen Design.
+- Lade-, Fehler- und Leer-Zustände sind jetzt einheitlich gestaltet: Ein animierter Spinner zeigt Ladevorgänge an, Fehler erscheinen rot mit Warnzeichen, leere Listen mit dezenter Beschriftung. Formularfehler folgen ebenfalls einem einheitlichen Look.
+- Die Sheets für Spielmodus-Auswahl und Team-Editor teilen jetzt eine gemeinsame BottomSheet-Komponente – Overlay, Einfahranimation und Schließen-Button verhalten sich überall identisch.
 
 ## [1.3.5] - 2026-05-08
 

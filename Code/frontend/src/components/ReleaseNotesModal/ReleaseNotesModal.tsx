@@ -1,5 +1,7 @@
 import { t } from '@/utils/translations';
 import { releaseNotesContent } from '@/utils/releaseNotes';
+import { Button } from '@/components/Button/Button';
+import { CloseButton } from '@/components/CloseButton/CloseButton';
 
 interface ReleaseNotesModalProps {
   onClose: () => void;
@@ -22,12 +24,7 @@ export function ReleaseNotesModal({ onClose, needRefresh, updateSW }: ReleaseNot
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 shrink-0">
           <h2 className="text-white font-bold text-base">{t.releaseNotesTitle}</h2>
-          <button
-            onClick={onClose}
-            className="text-white/40 hover:text-white/70 text-xl leading-none transition-colors px-1"
-          >
-            ×
-          </button>
+          <CloseButton onClick={onClose} />
         </div>
 
         {needRefresh && updateSW && (
@@ -36,12 +33,12 @@ export function ReleaseNotesModal({ onClose, needRefresh, updateSW }: ReleaseNot
               <span className="text-indigo-300 font-semibold text-sm">Neue Version verfügbar</span>
               <span className="text-white/50 text-xs">App neu laden, um das Update zu installieren</span>
             </div>
-            <button
+            <Button
               onClick={() => updateSW(true)}
-              className="shrink-0 bg-indigo-500 hover:bg-indigo-400 active:bg-indigo-600 text-white font-semibold text-sm rounded-lg px-3 py-1.5 transition-colors"
+              className="shrink-0 text-sm rounded-lg px-3 py-1.5"
             >
               Aktualisieren
-            </button>
+            </Button>
           </div>
         )}
 

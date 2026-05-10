@@ -1,4 +1,5 @@
 import { t } from '@/utils/translations';
+import { StatusState } from '@/components/StatusState/StatusState';
 
 interface GameLoaderProps {
   loading: boolean;
@@ -8,13 +9,13 @@ interface GameLoaderProps {
 
 export function GameLoader({ loading, error, onRetry }: GameLoaderProps) {
   return (
-    <div className="w-full h-full flex items-center justify-center">
-      {loading && <p className="text-white/60 text-lg">{t.startingGame}</p>}
+    <div className="w-full h-full flex flex-col items-center justify-center gap-4">
+      {loading && <StatusState type="loading" message={t.startingGame} />}
       {error && (
-        <div className="text-center">
-          <p className="text-red-400 mb-4">{error}</p>
+        <>
+          <StatusState type="error" message={error} />
           <button onClick={onRetry} className="bg-indigo-500 text-white px-6 py-2 rounded-lg">{t.retry}</button>
-        </div>
+        </>
       )}
     </div>
   );

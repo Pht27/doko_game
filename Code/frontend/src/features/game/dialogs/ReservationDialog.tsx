@@ -106,7 +106,7 @@ export function ReservationDialog({ playerId, eligibleReservations, mustDeclare 
                 onClick={() => onDeclare(selectedCategory, null, null)}
               >
                 <span style={{ marginRight: 6 }}>{meta.icon}</span>
-                {t.bestaetigenSolo}
+                {t.bestaetigen}
               </button>
             )}
           </div>

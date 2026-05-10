@@ -4,6 +4,8 @@ import { useAnalogRounds } from '@/hooks/useAnalogRounds';
 import { getRound } from '@/api/analog';
 import { t } from '@/utils/translations';
 import type { RoundListItem, RoundDetail } from '@/types/analog';
+import { PageHeader } from '@/components/PageHeader/PageHeader';
+import { StatusState } from '@/components/StatusState/StatusState';
 import './AnalogHistoryPage.css';
 
 interface NormalizedTeam {
@@ -214,7 +216,6 @@ function RoundCard({
 }
 
 export function AnalogHistoryPage() {
-  const navigate = useNavigate();
   const { rounds, loading, loadingMore, error, hasMore, loadMore, deleteRound } =
     useAnalogRounds();
 
@@ -226,7 +227,7 @@ export function AnalogHistoryPage() {
   if (loading) {
     return (
       <div className="ahr-page">
-        <div className="ahr-empty">{t.loading}</div>
+        <StatusState type="loading" />
       </div>
     );
   }
@@ -234,23 +235,18 @@ export function AnalogHistoryPage() {
   if (error) {
     return (
       <div className="ahr-page">
-        <div className="ahr-empty ahr-error">{error}</div>
+        <StatusState type="error" message={error} />
       </div>
     );
   }
 
   return (
     <div className="ahr-page">
-      <div className="ahr-header">
-        <button className="ahr-back" onClick={() => navigate('/')}>
-          {t.back}
-        </button>
-        <h1 className="ahr-title">{t.analogHistoryTitle}</h1>
-      </div>
+      <PageHeader title={t.analogHistoryTitle} backTo="/" />
 
       <div className="ahr-list">
         {rounds.length === 0 ? (
-          <div className="ahr-empty">{t.analogHistoryNoRounds}</div>
+          <StatusState type="empty" message={t.analogHistoryNoRounds} />
         ) : (
           rounds.map((round) => (
             <RoundCard key={round.id} round={round} onDelete={handleDelete} />
