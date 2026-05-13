@@ -1,21 +1,21 @@
 @reference "../../styles/index.css";
 
 :root {
-  --apd-surface:    #22223a;
-  --apd-surface2:   #2a2a48;
-  --apd-border:     rgba(255,255,255,0.08);
-  --apd-text:       #eeeeee;
-  --apd-text-sub:   #aaaacc;
-  --apd-text-muted: #666688;
-  --apd-win:        #4ade80;
-  --apd-loss:       #f87171;
+  --apd-surface:    var(--app-surface);
+  --apd-surface2:   var(--app-surface-2);
+  --apd-border:     var(--app-border);
+  --apd-text:       var(--app-text);
+  --apd-text-sub:   var(--app-text-sub);
+  --apd-text-muted: var(--app-text-muted);
+  --apd-win:        var(--app-win);
+  --apd-loss:       var(--app-loss);
   --apd-radius:     12px;
   --apd-radius-sm:  8px;
 }
 
 .apd-page {
   @apply flex flex-col w-full h-full overflow-hidden;
-  background: #1a1a2e;
+  background: var(--app-bg);
   color: var(--apd-text);
 }
 
@@ -46,7 +46,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--apd-text-muted);
-  background: rgba(255,255,255,0.06);
+  background: var(--app-surface-hover);
   border: 1px solid var(--apd-border);
   border-radius: 4px;
   padding: 2px 7px;
@@ -122,7 +122,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--apd-text-muted);
-  background: rgba(255,255,255,0.03);
+  background: var(--app-surface-subtle);
   border-radius: var(--apd-radius-sm) var(--apd-radius-sm) 0 0;
 }
 
@@ -138,7 +138,7 @@
 
 .apd-table tr:last-child td { border-bottom: none; }
 
-.apd-table tr:hover td { background: rgba(255,255,255,0.02); }
+.apd-table tr:hover td { background: var(--app-surface-subtle); }
 
 .apd-td-won  { color: var(--apd-win);  font-weight: 600; }
 .apd-td-lost { color: var(--apd-loss); font-weight: 600; }

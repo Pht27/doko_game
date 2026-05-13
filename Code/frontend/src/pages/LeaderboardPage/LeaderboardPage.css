@@ -1,18 +1,18 @@
 @reference "../../styles/index.css";
 
 :root {
-  --alb-bg:      #1a1a2e;
-  --alb-surface:    #22223a;
-  --alb-surface2:   #2a2a48;
-  --alb-border:     rgba(255,255,255,0.08);
-  --alb-border2:    rgba(255,255,255,0.14);
-  --alb-text:       #eeeeee;
-  --alb-text-sub:   #aaaacc;
-  --alb-text-muted: #666688;
-  --alb-win:        #4ade80;
-  --alb-loss:       #f87171;
-  --alb-accent:     #4f46e5;
-  --alb-accent-h:   #6366f1;
+  --alb-bg:         var(--app-bg);
+  --alb-surface:    var(--app-surface);
+  --alb-surface2:   var(--app-surface-2);
+  --alb-border:     var(--app-border);
+  --alb-border2:    var(--app-border-md);
+  --alb-text:       var(--app-text);
+  --alb-text-sub:   var(--app-text-sub);
+  --alb-text-muted: var(--app-text-muted);
+  --alb-win:        var(--app-win);
+  --alb-loss:       var(--app-loss);
+  --alb-accent:     var(--app-primary);
+  --alb-accent-h:   var(--app-primary-h);
   --alb-radius:     14px;
   --alb-radius-sm:  8px;
 }
@@ -94,7 +94,7 @@
 .alb-select {
   appearance: none;
   -webkit-appearance: none;
-  background: rgba(255,255,255,0.04);
+  background: var(--app-surface-subtle);
   border: 1px solid var(--alb-border2);
   border-radius: 8px;
   color: var(--alb-text);
@@ -170,10 +170,10 @@
 .alb-row-rank {
   font-size: 0.95rem;
   font-weight: 700;
-  color: rgba(129,140,248,0.5);
+  color: rgba(var(--app-re-raw),0.5);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
-.alb-row-rank--top { color: #818cf8; }
+.alb-row-rank--top { color: var(--app-re); }
 
 /* Info column (name + stats) */
 .alb-row-info {

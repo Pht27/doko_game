@@ -1,0 +1,28 @@
+.seat-card { transition: background 0.15s, color 0.15s; }
+
+.seat-card--me {
+  background: color-mix(in srgb, var(--app-primary) 45%, transparent);
+  color: var(--app-text);
+  outline: 1px solid var(--app-primary-h);
+}
+
+.seat-card--occupied {
+  background: var(--app-surface-raised);
+  color: var(--app-text);
+}
+
+.seat-card--interactable {
+  background: var(--app-surface-hover);
+  color: var(--app-text-muted);
+  cursor: pointer;
+}
+.seat-card--interactable:hover {
+  background: var(--app-surface-raised);
+  color: var(--app-text-sub);
+}
+
+.seat-card--disabled {
+  background: var(--app-surface-subtle);
+  color: var(--app-text-muted);
+  opacity: 0.6;
+}

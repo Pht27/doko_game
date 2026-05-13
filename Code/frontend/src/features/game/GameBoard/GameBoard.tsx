@@ -204,7 +204,7 @@ export function GameBoard({
   }, {});
 
   return (
-    <div className="w-full h-full relative flex flex-col bg-[#1a1a2e] select-none overflow-hidden">
+    <div className="w-full h-full relative flex flex-col bg-[var(--app-bg)] select-none overflow-hidden">
       {/* Burger menu — top-left, opens match history overlay */}
       {view && (
         <BurgerMenu onClick={() => setShowInfoOverlay(true)} />
@@ -303,7 +303,7 @@ export function GameBoard({
         <div className="absolute bottom-[20%] left-[10%] z-10">
           <button
             onClick={() => setShowLastTrick(true)}
-            className="rounded-xl bg-gray-700/80 hover:bg-gray-600/90 active:bg-gray-800 shadow-lg transition-colors p-1.5"
+            className="rounded-xl bg-(--app-surface-2)/80 hover:bg-(--app-surface-2) active:bg-(--app-deep)/80 shadow-lg transition-colors p-1.5"
             title={t.lastTrick}
           >
             <img src={cardBackSvgPath} alt="" className="w-7 h-auto block" />
@@ -321,7 +321,7 @@ export function GameBoard({
       </div>
 
       {/* Loading / error feedback above the hand */}
-      {viewLoading && !view && <div className="text-center text-white/40 text-xs py-1">{t.loading}</div>}
+      {viewLoading && !view && <div className="text-center text-(--app-text-muted) text-xs py-1">{t.loading}</div>}
       {viewError && <div className="text-center text-red-400 text-xs py-1">{viewError}</div>}
 
       {/* Own player label — bar glued to the bottom edge of the screen */}
@@ -419,19 +419,19 @@ export function GameBoard({
       {/* Leave confirmation dialog */}
       {showLeaveConfirm && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-60 p-4">
-          <div className="bg-gray-800 rounded-2xl p-6 w-full max-w-xs shadow-2xl flex flex-col gap-4 text-white text-center">
+          <div className="bg-(--app-surface-2) rounded-2xl p-6 w-full max-w-xs shadow-2xl flex flex-col gap-4 text-(--app-text) text-center">
             <p className="font-semibold text-base">Willst du die Lobby wirklich verlassen?</p>
-            <p className="text-white/50 text-sm">Dein Platz wird frei und kann von anderen besetzt werden.</p>
+            <p className="text-(--app-text-sub) text-sm">Dein Platz wird frei und kann von anderen besetzt werden.</p>
             <div className="flex flex-col gap-2">
               <button
                 onClick={confirmLeave}
-                className="w-full py-2.5 rounded-xl bg-red-700 hover:bg-red-600 active:bg-red-800 text-white font-semibold transition-colors"
+                className="w-full py-2.5 rounded-xl bg-(--app-loss) hover:opacity-90 active:opacity-80 text-white font-semibold transition-colors"
               >
                 Ja, verlassen
               </button>
               <button
                 onClick={() => setShowLeaveConfirm(false)}
-                className="w-full py-2.5 rounded-xl bg-gray-600 hover:bg-gray-500 active:bg-gray-700 text-white font-semibold transition-colors"
+                className="w-full py-2.5 rounded-xl bg-(--app-surface-raised) hover:bg-(--app-surface-hover) text-(--app-text) font-semibold transition-colors"
               >
                 Nein, weiterspielen
               </button>

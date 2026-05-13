@@ -1,0 +1,47 @@
+/* Rosé — pale pink bg, surfaces get darker as elevation increases */
+
+html.neutral-rose {
+  --app-bg:             #FAE4EE;
+  --app-surface:        #F0C0D6;
+  --app-surface-2:      #E098B8;
+  --app-deep:           #A03060;
+  --app-text:           #111111;
+  --app-header-text:    #FAE4EE;
+  --app-header-bg:      #A03060;
+  --app-header-back:      #FAE4EE;
+  --app-match-header-bg:   #ca6593;
+  --app-match-header-text: #FAE4EE;
+  --app-switch-on:      #C02858;
+  --app-switch-off:     rgba(0,0,0,0.18);
+  --app-text-sub:       #5A1A38;
+  --app-text-muted:     #8A5070;
+  --app-border:         rgba(0,0,0,0.10);
+  --app-border-md:      rgba(0,0,0,0.18);
+  --app-border-lg:      rgba(0,0,0,0.26);
+  --app-surface-hover:  rgba(0,0,0,0.05);
+  --app-surface-subtle: rgba(0,0,0,0.025);
+  --app-surface-raised: rgba(0,0,0,0.08);
+}
+
+html.accent-rose {
+  --app-primary:        #C02858;
+  --app-primary-h:      #D83870;
+  --app-primary-text:   #fff;
+  --app-primary-raw:    192,40,88;
+  --app-re:             #6f9de7;
+  --app-re-soft:        rgba(58,112,200,0.18);
+  --app-re-label:       #5A8EE0;
+  --app-re-raw:         58,112,200;
+  --app-kontra:         #D43060;
+  --app-kontra-soft:    rgba(212,48,96,0.15);
+  --app-kontra-label:   #E85080;
+  --app-kontra-raw:     212,48,96;
+  --app-solo:           #b86800;
+  --app-solo-raw:       184,104,0;
+  --app-win:            #1e8c50;
+  --app-win-raw:        30,140,80;
+  --app-loss:           #9020d0;
+  --app-loss-raw:       200,48,64;
+  --app-warning:        #b87800;
+  --app-orange:         #e451bf;
+}

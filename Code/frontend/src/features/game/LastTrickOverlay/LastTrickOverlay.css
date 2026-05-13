@@ -8,12 +8,12 @@
   --lt-offset-f:    0.33;
   --lt-spread:      calc(1 + 2 * var(--lt-offset-f));
 
-  @apply bg-[#0f172a] rounded-2xl shadow-2xl flex flex-col items-center gap-4 p-6;
-  border: 2px solid rgba(255, 255, 255, 0.15);
+  @apply bg-(--app-surface-2) rounded-2xl shadow-2xl flex flex-col items-center gap-4 p-6;
+  border: 2px solid var(--app-border-md);
 }
 
 .last-trick-title {
-  @apply text-white/70 text-sm font-semibold tracking-wide uppercase;
+  @apply text-(--app-text-sub) text-sm font-semibold tracking-wide uppercase;
 }
 
 .last-trick-pile {

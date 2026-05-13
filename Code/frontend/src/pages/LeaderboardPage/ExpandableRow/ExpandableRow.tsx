@@ -40,7 +40,7 @@ export function ExpandableRow({
   };
 
   return (
-    <div style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+    <div style={{ borderBottom: '1px solid var(--app-border)' }}>
       <div
         className={`alb-row-head${expanded ? ' alb-row-head--open' : ''}`}
         onClick={handleHeadClick}

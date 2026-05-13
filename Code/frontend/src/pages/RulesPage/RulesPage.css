@@ -1,27 +1,29 @@
 @reference "../../styles/index.css";
 
 :root {
-  --rp-surface:       #22223a;
-  --rp-surface2:      #2a2a48;
-  --rp-border:        rgba(255,255,255,0.08);
-  --rp-text:          #eeeeee;
-  --rp-text-sub:      #aaaacc;
-  --rp-text-muted:    #666688;
-  --rp-re:            #3b82f6;
-  --rp-re-soft:       rgba(59,130,246,0.15);
-  --rp-re-label:      #93c5fd;
-  --rp-kontra:        oklch(65% 0.23 303);
-  --rp-kontra-soft:   oklch(65% 0.23 303 / 0.15);
-  --rp-kontra-label:  oklch(78% 0.18 303);
-  --rp-red-suit:      #f87171;
-  --rp-black-suit:    #e2e2e2;
+  --rp-surface:       var(--app-surface);
+  --rp-surface2:      var(--app-surface-2);
+  --rp-border:        var(--app-border);
+  --rp-text:          var(--app-text);
+  --rp-text-sub:      var(--app-text-sub);
+  --rp-text-muted:    var(--app-text-muted);
+  --rp-re:            var(--app-re);
+  --rp-re-soft:       var(--app-re-soft);
+  --rp-re-label:      var(--app-re-label);
+  --rp-kontra:        var(--app-kontra);
+  --rp-kontra-soft:   var(--app-kontra-soft);
+  --rp-kontra-label:  var(--app-kontra-label);
+  --rp-red-suit:      var(--app-loss);
+  --rp-black-suit:    var(--app-text);
   --rp-radius:        10px;
   --rp-radius-sm:     7px;
-  --rp-shadow:        0 2px 8px rgba(0,0,0,0.4);
+  --rp-shadow:        0 2px 8px rgba(0,0,0,0.3);
 }
 
 .rp-page {
-  @apply w-full h-full flex flex-col bg-[#1a1a2e] text-white overflow-hidden;
+  @apply w-full h-full flex flex-col overflow-hidden;
+  background: var(--app-bg);
+  color: var(--app-text);
 }
 
 /* ── Header ── */
@@ -105,7 +107,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.6);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.5);
   overflow: hidden;
 }
 
@@ -135,7 +137,7 @@
 /* ── Search ── */
 .rp-search-bar {
   padding: 10px 16px;
-  background: #1a1a2e;
+  background: var(--app-bg);
   border-bottom: 1px solid var(--rp-border);
   flex-shrink: 0;
   position: sticky;
@@ -171,7 +173,7 @@
 
 .rp-search-input:focus {
   border-color: var(--rp-re);
-  box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+  box-shadow: 0 0 0 3px rgba(var(--app-re-raw), 0.2);
 }
 
 .rp-search-input::placeholder {
@@ -194,15 +196,15 @@
   border-radius: var(--rp-radius);
   box-shadow: var(--rp-shadow);
   overflow: hidden;
-  border: 2px solid rgba(255,255,255,0.10);
+  border: 2px solid var(--app-border);
   flex-shrink: 0;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .rp-section-open {
-  border-color: rgba(255,255,255,0.18);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5), 0 0 0 1px rgba(59,130,246,0.2);
-  background: #252540;
+  border-color: var(--app-border-md);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 1px rgba(var(--app-re-raw), 0.15);
+  background: var(--app-surface);
 }
 
 .rp-section-header {
@@ -218,7 +220,7 @@
 }
 
 .rp-section-header:active {
-  background: rgba(255,255,255,0.03);
+  background: var(--app-surface-subtle);
 }
 
 .rp-section-icon {
@@ -330,15 +332,15 @@
 }
 
 .rp-info-gold {
-  background: rgba(251,191,36,0.12);
-  border-left: 3px solid #fbbf24;
-  color: #fde68a;
+  background: color-mix(in srgb, var(--app-warning) 12%, transparent);
+  border-left: 3px solid var(--app-warning);
+  color: var(--rp-text-sub);
 }
 
 .rp-info-red {
-  background: rgba(248,113,113,0.1);
-  border-left: 3px solid #f87171;
-  color: #fca5a5;
+  background: color-mix(in srgb, var(--app-loss) 10%, transparent);
+  border-left: 3px solid var(--app-loss);
+  color: var(--rp-text-sub);
 }
 
 /* ── Trump ladder ── */
@@ -359,10 +361,10 @@
   background: var(--rp-surface2);
 }
 
-.rp-trump-dulle { background: rgba(251,191,36,0.12); border-left: 3px solid #fbbf24; }
+.rp-trump-dulle { background: color-mix(in srgb, var(--app-warning) 12%, transparent); border-left: 3px solid var(--app-warning); }
 .rp-trump-dame  { background: var(--rp-re-soft); border-left: 3px solid var(--rp-re); }
-.rp-trump-bube  { background: rgba(99,179,237,0.08); border-left: 3px solid #63b3ed; }
-.rp-trump-karo  { background: rgba(248,113,113,0.07); border-left: 3px solid #f87171; }
+.rp-trump-bube  { background: color-mix(in srgb, var(--app-re) 8%, transparent); border-left: 3px solid var(--app-re); }
+.rp-trump-karo  { background: color-mix(in srgb, var(--app-loss) 8%, transparent); border-left: 3px solid var(--app-loss); }
 
 .rp-trump-rank {
   font-size: 0.7rem;
@@ -409,8 +411,8 @@
 }
 
 .rp-badge-re    { background: var(--rp-re-soft); color: var(--rp-re-label); border: 1px solid var(--rp-re); }
-.rp-badge-dulle { background: rgba(251,191,36,0.2); color: #fde68a; border: 1px solid #fbbf24; }
-.rp-badge-fuchs { background: rgba(251,191,36,0.15); color: #fcd34d; border: 1px solid #f59e0b; }
+.rp-badge-dulle { background: color-mix(in srgb, var(--app-warning) 20%, transparent); color: var(--app-warning); border: 1px solid var(--app-warning); }
+.rp-badge-fuchs { background: color-mix(in srgb, var(--app-solo) 15%, transparent); color: var(--app-solo); border: 1px solid var(--app-solo); }
 
 /* ── Augen table ── */
 .rp-augen-table {
@@ -428,7 +430,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--rp-text-muted);
-  background: rgba(255,255,255,0.04);
+  background: var(--app-surface-subtle);
 }
 
 .rp-augen-table td {
@@ -462,8 +464,8 @@
   font-weight: 600;
 }
 
-.rp-party-re     { background: var(--rp-re-soft); color: var(--rp-re-label); border: 1px solid rgba(59,130,246,0.3); }
-.rp-party-kontra { background: var(--rp-kontra-soft); color: var(--rp-kontra-label); border: 1px solid oklch(65% 0.23 303 / 0.3); }
+.rp-party-re     { background: var(--rp-re-soft); color: var(--rp-re-label); border: 1px solid rgba(var(--app-re-raw), 0.3); }
+.rp-party-kontra { background: var(--rp-kontra-soft); color: var(--rp-kontra-label); border: 1px solid rgba(var(--app-kontra-raw), 0.3); }
 
 .rp-pill-label { font-size: 1rem; margin-bottom: 2px; }
 .rp-pill-sub   { font-size: 0.78rem; opacity: 0.75; font-weight: 400; }
@@ -512,7 +514,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--rp-text-muted);
-  background: rgba(255,255,255,0.04);
+  background: var(--app-surface-subtle);
 }
 
 .rp-score-table td {

@@ -21,7 +21,7 @@ export function BackButton({ to, onClick, className = '' }: BackButtonProps) {
   return (
     <button
       onClick={handleClick}
-      className={`text-white/60 hover:text-white active:text-white/40 text-xl leading-none transition-colors px-1 py-1 ${className}`}
+      className={`text-(--app-header-back) hover:text-(--app-header-text) active:opacity-70 text-xl leading-none transition-colors px-1 py-1 ${className}`}
       aria-label={t.backAriaLabel}
     >
       ←

@@ -1,21 +1,21 @@
 @reference "../../styles/index.css";
 
 :root {
-  --ap-surface:    #22223a;
-  --ap-surface2:   #2a2a48;
-  --ap-border:     rgba(255,255,255,0.08);
-  --ap-text:       #eeeeee;
-  --ap-text-sub:   #aaaacc;
-  --ap-text-muted: #666688;
-  --ap-primary:    #4f46e5;
-  --ap-primary-h:  #6366f1;
+  --ap-surface:    var(--app-surface);
+  --ap-surface2:   var(--app-surface-2);
+  --ap-border:     var(--app-border);
+  --ap-text:       var(--app-text);
+  --ap-text-sub:   var(--app-text-sub);
+  --ap-text-muted: var(--app-text-muted);
+  --ap-primary:    var(--app-primary);
+  --ap-primary-h:  var(--app-primary-h);
   --ap-radius:     12px;
   --ap-radius-sm:  8px;
 }
 
 .ap-page {
   @apply flex flex-col w-full h-full overflow-hidden;
-  background: #1a1a2e;
+  background: var(--app-bg);
   color: var(--ap-text);
 }
 
@@ -25,7 +25,7 @@
   height: 40px;
   border-radius: 50%;
   background: var(--ap-primary);
-  color: #fff;
+  color: var(--app-primary-text);
   font-size: 1.5rem;
   line-height: 1;
   border: none;
@@ -38,7 +38,7 @@
 }
 
 .ap-add-btn:hover  { background: var(--ap-primary-h); }
-.ap-add-btn:active { background: #4338ca; }
+.ap-add-btn:active { background: color-mix(in srgb, var(--ap-primary) 80%, black); }
 
 /* ── List ── */
 .ap-list {
@@ -68,7 +68,7 @@
   font-size: 0.72rem;
   font-weight: 600;
   color: var(--ap-text-muted);
-  background: rgba(255,255,255,0.04);
+  background: var(--app-surface-subtle);
   padding: 1px 7px;
   border-radius: 999px;
 }
@@ -103,7 +103,7 @@
   animation: ap-row-enter 0.2s ease;
 }
 
-.ap-row:hover { background: var(--ap-surface2); border-color: rgba(255,255,255,0.13); }
+.ap-row:hover { background: var(--ap-surface2); border-color: var(--app-border-md); }
 
 .ap-row--inactive .ap-name { color: var(--ap-text-sub); }
 
@@ -149,7 +149,7 @@
   min-width: 0;
   background: var(--ap-surface2);
   border: 1px solid var(--ap-primary-h);
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
+  box-shadow: 0 0 0 3px rgba(var(--app-primary-raw),0.2);
   border-radius: 6px;
   padding: 7px 10px;
   color: var(--ap-text);
@@ -160,8 +160,8 @@
 }
 
 .ap-edit-input--error {
-  border-color: #f87171;
-  box-shadow: 0 0 0 3px rgba(248,113,113,0.2);
+  border-color: var(--app-loss);
+  box-shadow: 0 0 0 3px rgba(var(--app-loss-raw),0.2);
 }
 
 /* ── Icon buttons ── */
@@ -179,22 +179,22 @@
 }
 
 .ap-icon-btn--edit {
-  background: rgba(255,255,255,0.04);
+  background: var(--app-surface-subtle);
   color: var(--ap-text-muted);
 }
 
-.ap-icon-btn--edit:hover { background: rgba(255,255,255,0.1); color: var(--ap-text-sub); }
+.ap-icon-btn--edit:hover { background: var(--app-border); color: var(--ap-text-sub); }
 
 .ap-icon-btn--cancel {
-  background: rgba(255,255,255,0.06);
+  background: var(--app-surface-hover);
   color: var(--ap-text-sub);
 }
 
-.ap-icon-btn--cancel:hover { background: rgba(255,255,255,0.12); }
+.ap-icon-btn--cancel:hover { background: var(--app-border-md); }
 
 .ap-icon-btn--confirm {
   background: var(--ap-primary);
-  color: #fff;
+  color: var(--app-primary-text);
 }
 
 .ap-icon-btn--confirm:hover:not(:disabled) { background: var(--ap-primary-h); }
@@ -252,7 +252,7 @@
 
 .ap-input:focus {
   border-color: var(--ap-primary-h);
-  box-shadow: 0 0 0 3px rgba(99,102,241,0.2);
+  box-shadow: 0 0 0 3px rgba(var(--app-primary-raw),0.2);
 }
 
 .ap-dialog-actions {

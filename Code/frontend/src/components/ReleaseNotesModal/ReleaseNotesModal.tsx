@@ -19,19 +19,19 @@ export function ReleaseNotesModal({ onClose, needRefresh, updateSW }: ReleaseNot
       onClick={onClose}
     >
       <div
-        className="bg-gray-800/95 border border-white/10 rounded-2xl shadow-2xl flex flex-col w-full max-w-lg max-h-[80vh]"
+        className="bg-(--app-surface-2) border border-(--app-border) rounded-2xl shadow-2xl flex flex-col w-full max-w-lg max-h-[80vh]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/10 shrink-0">
-          <h2 className="text-white font-bold text-base">{t.releaseNotesTitle}</h2>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-(--app-border) shrink-0">
+          <h2 className="text-(--app-text) font-bold text-base">{t.releaseNotesTitle}</h2>
           <CloseButton onClick={onClose} />
         </div>
 
         {needRefresh && updateSW && (
-          <div className="mx-4 mt-4 shrink-0 rounded-xl bg-indigo-500/15 border border-indigo-400/30 px-4 py-3 flex items-center justify-between gap-3">
+          <div className="mx-4 mt-4 shrink-0 rounded-xl bg-(--app-re-soft) border border-(--app-border-md) px-4 py-3 flex items-center justify-between gap-3">
             <div className="flex flex-col gap-0.5">
-              <span className="text-indigo-300 font-semibold text-sm">Neue Version verfügbar</span>
-              <span className="text-white/50 text-xs">App neu laden, um das Update zu installieren</span>
+              <span className="text-(--app-re) font-semibold text-sm">Neue Version verfügbar</span>
+              <span className="text-(--app-text-muted) text-xs">App neu laden, um das Update zu installieren</span>
             </div>
             <Button
               onClick={() => updateSW(true)}
@@ -53,25 +53,25 @@ export function ReleaseNotesModal({ onClose, needRefresh, updateSW }: ReleaseNot
               }
               return inFirstVersion ? (
                 <div key={i} className="flex items-center gap-2 mt-4 first:mt-0">
-                  <p className="text-white font-bold text-sm">{line.slice(3)}</p>
-                  <span className="text-[10px] font-bold uppercase tracking-wider bg-indigo-500/25 text-indigo-300 rounded-full px-2 py-0.5">Neu</span>
+                  <p className="text-(--app-text) font-bold text-sm">{line.slice(3)}</p>
+                  <span className="text-[10px] font-bold uppercase tracking-wider bg-(--app-re-soft) text-(--app-re-label) rounded-full px-2 py-0.5">Neu</span>
                 </div>
               ) : (
-                <p key={i} className="text-indigo-300/60 font-semibold text-sm mt-6">
+                <p key={i} className="text-(--app-text-muted) font-semibold text-sm mt-6">
                   {line.slice(3)}
                 </p>
               );
             }
             if (line.startsWith('### ')) {
               return (
-                <p key={i} className={`text-xs font-semibold uppercase tracking-wider mt-2 ${inFirstVersion ? 'text-white/50' : 'text-white/30'}`}>
+                <p key={i} className={`text-xs font-semibold uppercase tracking-wider mt-2 ${inFirstVersion ? 'text-(--app-text-sub)' : 'text-(--app-text-muted)'}`}>
                   {line.slice(4)}
                 </p>
               );
             }
             if (line.startsWith('- ')) {
               return (
-                <p key={i} className={`text-sm pl-3 ${inFirstVersion ? 'text-white/85' : 'text-white/40'}`}>
+                <p key={i} className={`text-sm pl-3 ${inFirstVersion ? 'text-(--app-text)' : 'text-(--app-text-muted)'}`}>
                   · {line.slice(2)}
                 </p>
               );
@@ -80,7 +80,7 @@ export function ReleaseNotesModal({ onClose, needRefresh, updateSW }: ReleaseNot
               return null;
             }
             return (
-              <p key={i} className="text-white/50 text-sm">
+              <p key={i} className="text-(--app-text-muted) text-sm">
                 {line}
               </p>
             );

@@ -4,7 +4,7 @@
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: #12122a;
+  background: var(--app-bg);
   display: flex;
   flex-direction: column;
 }
@@ -15,15 +15,15 @@
   align-items: center;
   justify-content: space-between;
   padding: 10px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--app-border);
   flex-shrink: 0;
-  background: #1a1a38;
+  background: var(--app-surface);
 }
 
 .lgo-title {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #eee;
+  color: var(--app-text);
 }
 
 .lgo-header-actions {
@@ -35,21 +35,21 @@
 .lgo-players-btn {
   font-size: 0.78rem;
   font-weight: 600;
-  color: #818cf8;
-  background: rgba(129, 140, 248, 0.12);
-  border: 1px solid rgba(129, 140, 248, 0.3);
+  color: var(--app-re);
+  background: var(--app-re-soft);
+  border: 1px solid rgba(var(--app-re-raw), 0.3);
   border-radius: 8px;
   padding: 4px 10px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: background 0.12s;
 }
-.lgo-players-btn:active { background: rgba(129, 140, 248, 0.22); }
+.lgo-players-btn:active { background: rgba(var(--app-re-raw), 0.22); }
 
 .lgo-close-btn {
   font-size: 1rem;
-  color: rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.06);
+  color: var(--app-text-muted);
+  background: var(--app-surface-hover);
   border: none;
   border-radius: 8px;
   width: 30px;
@@ -61,7 +61,7 @@
   -webkit-tap-highlight-color: transparent;
   transition: background 0.12s;
 }
-.lgo-close-btn:active { background: rgba(255, 255, 255, 0.12); }
+.lgo-close-btn:active { background: var(--app-surface-raised); }
 
 /* ── Controls bar ── */
 .lgo-controls {
@@ -69,14 +69,14 @@
   align-items: center;
   gap: 10px;
   padding: 7px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--app-border);
   flex-shrink: 0;
-  background: #16163a;
+  background: var(--app-surface-2);
 }
 
 .lgo-mode-tabs {
   display: flex;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--app-surface-subtle);
   border-radius: 6px;
   padding: 2px;
   gap: 0;
@@ -92,14 +92,14 @@
   cursor: pointer;
   border-radius: 4px;
   background: transparent;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--app-text-muted);
   transition: background 0.15s, color 0.15s;
   -webkit-tap-highlight-color: transparent;
   white-space: nowrap;
 }
 .lgo-mode-tab--active {
-  background: #4f46e5;
-  color: #fff;
+  background: var(--app-primary);
+  color: var(--app-primary-text);
 }
 
 /* ── Slider ── */
@@ -109,26 +109,26 @@
   height: 4px;
   appearance: none;
   -webkit-appearance: none;
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--app-border-md);
   border-radius: 2px;
   outline: none;
   cursor: pointer;
-  accent-color: #818cf8;
+  accent-color: var(--app-re);
 }
 .lgo-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #818cf8;
+  background: var(--app-re);
   cursor: pointer;
-  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.25);
+  box-shadow: 0 0 0 3px rgba(var(--app-re-raw), 0.25);
 }
 .lgo-slider::-moz-range-thumb {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #818cf8;
+  background: var(--app-re);
   border: none;
   cursor: pointer;
 }
@@ -136,7 +136,7 @@
 .lgo-slider-label {
   font-size: 0.7rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--app-text-muted);
   font-family: ui-monospace, monospace;
   white-space: nowrap;
   flex-shrink: 0;
@@ -156,6 +156,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--app-text-muted);
   font-size: 0.85rem;
 }

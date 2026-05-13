@@ -1,21 +1,21 @@
 @reference "../../styles/index.css";
 
 :root {
-  --ahr-surface:    #22223a;
-  --ahr-surface2:   #2a2a48;
-  --ahr-border:     rgba(255,255,255,0.08);
-  --ahr-text:       #eeeeee;
-  --ahr-text-sub:   #aaaacc;
-  --ahr-text-muted: #666688;
-  --ahr-re:         #818cf8;
-  --ahr-solo:       #d97706;
+  --ahr-surface:    var(--app-surface);
+  --ahr-surface2:   var(--app-surface-2);
+  --ahr-border:     var(--app-border);
+  --ahr-text:       var(--app-text);
+  --ahr-text-sub:   var(--app-text-sub);
+  --ahr-text-muted: var(--app-text-muted);
+  --ahr-re:         var(--app-re);
+  --ahr-solo:       var(--app-solo);
   --ahr-radius:     10px;
 }
 
 /* ── Page shell ── */
 .ahr-page {
   @apply flex flex-col w-full h-full overflow-hidden;
-  background: #1a1a2e;
+  background: var(--app-bg);
   color: var(--ahr-text);
 }
 
@@ -43,13 +43,13 @@
 
 /* ── Title bar ("Runde #X") ── */
 .ahr-title-bar {
-  background: var(--ahr-surface2);
+  background: var(--app-match-header-bg);
   border-bottom: 1px solid var(--ahr-border);
   padding: 4px 12px;
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: var(--ahr-text-muted);
+  color: var(--app-match-header-text);
   text-align: center;
   text-transform: uppercase;
 }

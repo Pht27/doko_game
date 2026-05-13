@@ -1,0 +1,47 @@
+/* Aqua — pale teal bg, surfaces get darker as elevation increases */
+
+html.neutral-aqua {
+  --app-bg:             #D8F0F2;
+  --app-surface:        #B0D8DC;
+  --app-surface-2:      #80B8C0;
+  --app-deep:           #1A7888;
+  --app-text:           #111111;
+  --app-header-text:    #58def5;
+  --app-header-bg:      #1A7888;
+  --app-header-back:    var(--app-text-sub);
+  --app-match-header-bg:   var(--app-surface-2);
+  --app-match-header-text: var(--app-text);
+  --app-switch-on:      #0E8898;
+  --app-switch-off:     rgba(0,0,0,0.18);
+  --app-text-sub:       #1A4444;
+  --app-text-muted:     #3A6868;
+  --app-border:         rgba(0,0,0,0.10);
+  --app-border-md:      rgba(0,0,0,0.18);
+  --app-border-lg:      rgba(0,0,0,0.26);
+  --app-surface-hover:  rgba(0,0,0,0.05);
+  --app-surface-subtle: rgba(0,0,0,0.025);
+  --app-surface-raised: rgba(0,0,0,0.08);
+}
+
+html.accent-aqua {
+  --app-primary:        #CC1010;
+  --app-primary-h:      #E02020;
+  --app-primary-text:   #fff;
+  --app-primary-raw:    204,16,16;
+  --app-re:             #0E8898;
+  --app-re-soft:        rgba(14,136,152,0.18);
+  --app-re-label:       #30A8B8;
+  --app-re-raw:         14,136,152;
+  --app-kontra:         #CC1010;
+  --app-kontra-soft:    rgba(204,16,16,0.15);
+  --app-kontra-label:   #E03030;
+  --app-kontra-raw:     204,16,16;
+  --app-solo:           #b86800;
+  --app-solo-raw:       184,104,0;
+  --app-win:            #1e8c50;
+  --app-win-raw:        30,140,80;
+  --app-loss:           #C01010;
+  --app-loss-raw:       192,16,16;
+  --app-warning:        #b87800;
+  --app-orange:         #d06820;
+}

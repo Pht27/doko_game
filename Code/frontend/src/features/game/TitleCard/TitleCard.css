@@ -34,11 +34,11 @@
 }
 
 .title-card-inner {
-  background: rgba(18, 18, 36, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--app-surface-2);
+  border: 1px solid var(--app-border-md);
   border-radius: 20px;
   padding: 18px 32px 16px;
-  box-shadow: 0 16px 56px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  box-shadow: 0 16px 56px rgba(0, 0, 0, 0.7);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -60,15 +60,15 @@
   letter-spacing: -0.01em;
 }
 
-.tc-solo    { color: oklch(88% 0.15 82); }
-.tc-armut   { color: oklch(82% 0.13 232); }
-.tc-hochzeit{ color: oklch(82% 0.13 272); }
-.tc-normal  { color: rgba(255, 255, 255, 0.75); }
+.tc-solo    { color: var(--app-solo); }
+.tc-armut   { color: var(--app-re-label); }
+.tc-hochzeit{ color: var(--app-primary); }
+.tc-normal  { color: var(--app-text-sub); }
 
 .tc-line {
   width: 40px;
   height: 1px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--app-border);
   margin: 2px 0;
 }
 
@@ -88,26 +88,26 @@
 }
 
 .tc-chip-re {
-  background: oklch(33% 0.15 238);
-  color: oklch(82% 0.13 232);
-  border: 1px solid oklch(55% 0.18 238 / 0.5);
+  background: var(--app-re-soft);
+  color: var(--app-re-label);
+  border: 1px solid rgba(var(--app-re-raw), 0.5);
 }
 
 .tc-chip-solo {
-  background: oklch(33% 0.13 75);
-  color: oklch(88% 0.15 82);
-  border: 1px solid oklch(60% 0.16 75 / 0.5);
+  background: color-mix(in srgb, var(--app-solo) 30%, transparent);
+  color: var(--app-solo);
+  border: 1px solid rgba(var(--app-solo-raw), 0.5);
 }
 
 .tc-chip-unk {
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--app-surface-hover);
+  color: var(--app-text-muted);
+  border: 1px solid var(--app-border);
 }
 
 .tc-exchange-info {
   font-size: 11px;
-  color: oklch(70% 0.10 232);
+  color: var(--app-re-label);
   margin-top: 6px;
   opacity: 0.85;
 }

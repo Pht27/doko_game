@@ -6,6 +6,10 @@ import { useOrientationLock } from '@/hooks/useOrientationLock';
 import { PlayerPickerModal } from '../PlayerPickerModal/PlayerPickerModal';
 import './LeaderboardGraphOverlay.css';
 
+function cssVar(name: string): string {
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
 const DEFAULT_ROUNDS = 24;
 const MIN_ROUNDS = 10;
 const DEFAULT_WEEKS = 8;
@@ -116,7 +120,7 @@ export function LeaderboardGraphOverlay({
             name: p.name,
             type: 'line',
             data,
-            color: colorMap.get(p.id) ?? 'rgba(255,255,255,0.4)',
+            color: colorMap.get(p.id) ?? cssVar('--app-text-muted'),
             smooth: false,
             symbol: 'circle',
             symbolSize: 5,
@@ -132,7 +136,7 @@ export function LeaderboardGraphOverlay({
       return {
         type: 'time',
         axisLabel: {
-          color: 'rgba(255,255,255,0.35)',
+          color: cssVar('--app-text-muted'),
           fontSize: 10,
           formatter: (val: number) => {
             const d = new Date(val);
@@ -140,7 +144,7 @@ export function LeaderboardGraphOverlay({
           },
         },
         splitLine: { show: false },
-        axisLine: { lineStyle: { color: 'rgba(255,255,255,0.12)' } },
+        axisLine: { lineStyle: { color: cssVar('--app-border') } },
         axisTick: { show: false },
       };
     }
@@ -150,12 +154,12 @@ export function LeaderboardGraphOverlay({
       max: effectiveMaxRounds - 1,
       minInterval: effectiveMaxRounds - 1,
       axisLabel: {
-        color: 'rgba(255,255,255,0.35)',
+        color: cssVar('--app-text-muted'),
         fontSize: 10,
         formatter: (val: number) => (val === 0 ? `vor ${effectiveMaxRounds}` : 'heute'),
       },
       splitLine: { show: false },
-      axisLine: { lineStyle: { color: 'rgba(255,255,255,0.12)' } },
+      axisLine: { lineStyle: { color: cssVar('--app-border') } },
       axisTick: { show: false },
     };
   }, [xMode, effectiveMaxRounds]);
@@ -170,18 +174,18 @@ export function LeaderboardGraphOverlay({
       yAxis: {
         type: 'value',
         axisLabel: {
-          color: 'rgba(255,255,255,0.35)',
+          color: cssVar('--app-text-muted'),
           fontSize: 10,
           formatter: (val: number) => Math.round(val).toString(),
         },
-        splitLine: { lineStyle: { color: 'rgba(255,255,255,0.06)' } },
+        splitLine: { lineStyle: { color: cssVar('--app-border') } },
         axisLine: { show: false },
         axisTick: { show: false },
       },
       legend: {
         bottom: 6,
         left: 'center',
-        textStyle: { color: 'rgba(255,255,255,0.6)', fontSize: 11 },
+        textStyle: { color: cssVar('--app-text-sub'), fontSize: 11 },
         icon: 'circle',
         itemWidth: 9,
         itemHeight: 9,
@@ -193,16 +197,17 @@ export function LeaderboardGraphOverlay({
       ],
       tooltip: {
         trigger: 'axis',
-        backgroundColor: 'rgba(18,18,36,0.96)',
-        borderColor: 'rgba(255,255,255,0.1)',
+        backgroundColor: cssVar('--app-surface-2'),
+        borderColor: cssVar('--app-border-md'),
         borderWidth: 1,
-        textStyle: { color: '#eee', fontSize: 12 },
+        textStyle: { color: cssVar('--app-text'), fontSize: 12 },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         formatter: (params: any[]) => {
           if (!params?.length) return '';
+          const dateLabelColor = cssVar('--app-text-muted');
           const header =
             xMode === 'date'
-              ? `<div style="color:rgba(255,255,255,0.45);font-size:11px;margin-bottom:4px">${new Date(params[0].value[0]).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit' })}</div>`
+              ? `<div style="color:${dateLabelColor};font-size:11px;margin-bottom:4px">${new Date(params[0].value[0]).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: '2-digit' })}</div>`
               : '';
           const rows = params
             .map(

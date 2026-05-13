@@ -12,8 +12,8 @@
 }
 
 .ppm-modal {
-  background: #1e1e38;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--app-surface-2);
+  border: 1px solid var(--app-border);
   border-radius: 18px;
   width: min(360px, 100%);
   max-height: 70vh;
@@ -28,20 +28,20 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--app-border);
   flex-shrink: 0;
 }
 
 .ppm-title {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #eee;
+  color: var(--app-text);
 }
 
 .ppm-done {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #818cf8;
+  color: var(--app-re);
   background: none;
   border: none;
   cursor: pointer;
@@ -50,7 +50,7 @@
   -webkit-tap-highlight-color: transparent;
   transition: background 0.12s;
 }
-.ppm-done:active { background: rgba(129, 140, 248, 0.15); }
+.ppm-done:active { background: var(--app-re-soft); }
 
 .ppm-list {
   overflow-y: auto;
@@ -63,7 +63,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--app-text-muted);
   padding: 10px 16px 4px;
 }
 
@@ -77,7 +77,7 @@
   transition: background 0.1s;
   user-select: none;
 }
-.ppm-item:active { background: rgba(255, 255, 255, 0.04); }
+.ppm-item:active { background: var(--app-surface-hover); }
 
 .ppm-dot {
   width: 10px;
@@ -89,10 +89,10 @@
 .ppm-name {
   flex: 1;
   font-size: 0.9rem;
-  color: #eee;
+  color: var(--app-text);
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.ppm-item--inactive .ppm-name { color: rgba(255, 255, 255, 0.4); }
+.ppm-item--inactive .ppm-name { color: var(--app-text-muted); }

@@ -1,3 +1,5 @@
+import './Button.css';
+
 type ButtonVariant = 'primary' | 'secondary' | 'link';
 
 interface ButtonProps {
@@ -11,10 +13,10 @@ interface ButtonProps {
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    'bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-semibold rounded-xl px-4 py-2.5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed',
+    'btn-primary font-semibold rounded-xl px-4 py-2.5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed',
   secondary:
-    'bg-white/8 hover:bg-white/12 active:bg-white/6 text-white/80 rounded-xl px-4 py-2.5 transition-colors',
-  link: 'text-white/40 hover:text-white/60 transition-colors',
+    'btn-secondary rounded-xl px-4 py-2.5 transition-colors disabled:opacity-40 disabled:cursor-not-allowed',
+  link: 'btn-link transition-colors',
 };
 
 export function Button({

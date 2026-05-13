@@ -4,26 +4,12 @@ import { useRegisterSW } from 'virtual:pwa-register/react';
 import { t } from '@/utils/translations';
 import { appVersion } from '@/utils/releaseNotes';
 import { ReleaseNotesModal } from '@/components/ReleaseNotesModal/ReleaseNotesModal';
+import { BottomSheet } from '@/components/BottomSheet/BottomSheet';
+import { useTheme } from '@/hooks/useTheme';
 import { Tile } from './Tile/Tile';
 import { SubItem } from './SubItem/SubItem';
+import { ThemePicker } from './ThemePicker/ThemePicker';
 import './LandingPage.css';
-
-const RED_SUIT      = '#f87171';
-const BLACK_SUIT    = 'rgba(255,255,255,0.75)';
-const RE_BLUE       = '#6366f1';
-const KONTRA_PURPLE = 'oklch(65% 0.23 303)';
-const ORANGE        = '#fb923c';
-
-const SUITS = {
-  kreuz: { glyph: '♣', color: BLACK_SUIT, glow: 'rgba(99,102,241,0.5)',
-           openBg: 'rgba(99,102,241,0.14)', openBorder: RE_BLUE },
-  herz:  { glyph: '♥', color: RED_SUIT,   glow: 'rgba(248,113,113,0.5)',
-           openBg: 'rgba(248,113,113,0.14)', openBorder: RED_SUIT },
-  pik:   { glyph: '♠', color: BLACK_SUIT, glow: 'oklch(65% 0.23 303 / 0.55)',
-           openBg: 'oklch(65% 0.23 303 / 0.16)', openBorder: KONTRA_PURPLE },
-  karo:  { glyph: '♦', color: RED_SUIT,   glow: 'rgba(251,146,60,0.5)',
-           openBg: 'rgba(251,146,60,0.12)', openBorder: ORANGE },
-};
 
 type DrawerKey = 'kreuz' | 'pik' | 'herz' | 'karo' | null;
 
@@ -31,8 +17,10 @@ export function LandingPage() {
   const navigate = useNavigate();
   const [open, setOpen] = useState<DrawerKey>(null);
   const [showReleaseNotes, setShowReleaseNotes] = useState(false);
+  const [showThemePicker, setShowThemePicker] = useState(false);
   const { needRefresh: [needRefresh], updateServiceWorker } = useRegisterSW();
   const lastOpenRef = useRef<NonNullable<DrawerKey>>('kreuz');
+  const { setPreset, activePreset } = useTheme();
 
   const toggle = (key: DrawerKey) => setOpen(prev => prev === key ? null : key);
   if (open !== null) lastOpenRef.current = open;
@@ -48,6 +36,16 @@ export function LandingPage() {
         <span className="landing-watermark landing-watermark--br">♠</span>
       </div>
 
+      <div className="landing-bottom-left">
+        <button
+          className="landing-palette-btn"
+          onClick={() => setShowThemePicker(true)}
+          aria-label="Theme wählen"
+        >
+          🎨
+        </button>
+      </div>
+
       <div className="landing-header">
         <div className="landing-header-suits">
           <span className="suit-black">♣</span>
@@ -61,13 +59,13 @@ export function LandingPage() {
       <div className="landing-spacer" />
 
       <div className="landing-grid">
-        <Tile suit={SUITS.kreuz} label={t.landingTileEintragen} sub={t.landingTileSubEintragen}
+        <Tile suit="kreuz" label={t.landingTileEintragen} sub={t.landingTileSubEintragen}
           expanded={open === 'kreuz'} onClick={() => toggle('kreuz')} />
-        <Tile suit={SUITS.pik} label={t.landingTileSpielen} sub={t.landingTileSubSpielen}
+        <Tile suit="pik" label={t.landingTileSpielen} sub={t.landingTileSubSpielen}
           expanded={open === 'pik'} onClick={() => toggle('pik')} />
-        <Tile suit={SUITS.herz} label={t.landingTileUbersicht} sub={t.landingTileSubUbersicht}
+        <Tile suit="herz" label={t.landingTileUbersicht} sub={t.landingTileSubUbersicht}
           expanded={open === 'herz'} onClick={() => toggle('herz')} />
-        <Tile suit={SUITS.karo} label={t.rulesTitle} sub={t.landingTileSubRegeln}
+        <Tile suit="karo" label={t.rulesTitle} sub={t.landingTileSubRegeln}
           expanded={open === 'karo'} onClick={() => toggle('karo')} />
       </div>
 
@@ -78,7 +76,7 @@ export function LandingPage() {
       >
         <div className="landing-drawer-inner">
           {displayKey === 'kreuz' && (
-            <div className="landing-drawer-panel" style={{ borderColor: SUITS.kreuz.openBorder }}>
+            <div className="landing-drawer-panel landing-drawer-panel--kreuz">
               <SubItem label={t.landingSpielEintragen} hint={t.landingHintSpielEintragen} hasDivider
                 onClick={() => navigate('/analog/new')} />
               <SubItem label={t.analogPlayersTitle} hint={t.landingHintSpieler}
@@ -86,7 +84,7 @@ export function LandingPage() {
             </div>
           )}
           {displayKey === 'pik' && (
-            <div className="landing-drawer-panel" style={{ borderColor: SUITS.pik.openBorder }}>
+            <div className="landing-drawer-panel landing-drawer-panel--pik">
               <SubItem label={t.multiplayer} hint={t.landingHintMultiplayer} hasDivider
                 onClick={() => navigate('/lobby')} />
               <SubItem label={t.testGame} hint={t.landingHintTestGame}
@@ -94,7 +92,7 @@ export function LandingPage() {
             </div>
           )}
           {displayKey === 'herz' && (
-            <div className="landing-drawer-panel" style={{ borderColor: SUITS.herz.openBorder }}>
+            <div className="landing-drawer-panel landing-drawer-panel--herz">
               <SubItem label={t.landingRundenubersicht} hint={t.landingHintRundenubersicht} hasDivider
                 onClick={() => navigate('/history')} />
               <SubItem label={t.landingStats} hint={t.landingHintStats}
@@ -102,7 +100,7 @@ export function LandingPage() {
             </div>
           )}
           {displayKey === 'karo' && (
-            <div className="landing-drawer-panel" style={{ borderColor: SUITS.karo.openBorder }}>
+            <div className="landing-drawer-panel landing-drawer-panel--karo">
               <SubItem label={t.rulesTitle} hint={t.landingHintRegeln} hasDivider
                 onClick={() => navigate('/rules')} />
               <SubItem label={t.landingRegelsets} hint={t.landingHintRegelsets} disabled />
@@ -128,6 +126,15 @@ export function LandingPage() {
           needRefresh={needRefresh}
           updateSW={updateServiceWorker}
         />
+      )}
+
+      {showThemePicker && (
+        <BottomSheet title="Theme" onClose={() => setShowThemePicker(false)}>
+          <ThemePicker
+            activePreset={activePreset}
+            onSelect={(preset) => { setPreset(preset); setShowThemePicker(false); }}
+          />
+        </BottomSheet>
       )}
     </div>
   );

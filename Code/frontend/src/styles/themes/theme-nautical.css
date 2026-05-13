@@ -1,0 +1,47 @@
+/* Nautical — pale ocean-blue bg, surfaces get darker as elevation increases */
+
+html.neutral-nautical {
+  --app-bg:             #D0E4F0;
+  --app-surface:        #A8CCDE;
+  --app-surface-2:      #7AACCA;
+  --app-deep:           #003A6A;
+  --app-text:           #111111;
+  --app-header-text:    #D0E4F0;
+  --app-header-bg:      #003A6A;
+  --app-header-back:    #D0E4F0;
+  --app-match-header-bg:   #216196;
+  --app-match-header-text: #D0E4F0;
+  --app-switch-on:      #002C54;
+  --app-switch-off:     rgba(0,0,0,0.18);
+  --app-text-sub:       #1A2A40;
+  --app-text-muted:     #3A5068;
+  --app-border:         rgba(0,0,0,0.10);
+  --app-border-md:      rgba(0,0,0,0.18);
+  --app-border-lg:      rgba(0,0,0,0.26);
+  --app-surface-hover:  rgba(0,0,0,0.05);
+  --app-surface-subtle: rgba(0,0,0,0.025);
+  --app-surface-raised: rgba(0,0,0,0.08);
+}
+
+html.accent-nautical {
+  --app-primary:        #002C54;
+  --app-primary-h:      #003a70;
+  --app-primary-text:   #fff;
+  --app-primary-raw:    0,44,84;
+  --app-re:             #002C54;
+  --app-re-soft:        rgba(0,44,84,0.15);
+  --app-re-label:       #1A4878;
+  --app-re-raw:         0,44,84;
+  --app-kontra:         #C5001A;
+  --app-kontra-soft:    rgba(197,0,26,0.15);
+  --app-kontra-label:   #E01830;
+  --app-kontra-raw:     197,0,26;
+  --app-solo:           #b86800;
+  --app-solo-raw:       184,104,0;
+  --app-win:            #1e8c50;
+  --app-win-raw:        30,140,80;
+  --app-loss:           #C5001A;
+  --app-loss-raw:       197,0,26;
+  --app-warning:        #b87800;
+  --app-orange:         #d06820;
+}

@@ -1,0 +1,264 @@
+[
+  {
+    "value": "#1a1a2e",
+    "semantic": "app-bg",
+    "description": "Page background — the deepest layer of the UI",
+    "count": "~15",
+    "files": [
+      "index.css (body)",
+      "RoundForm.css",
+      "HistoryPage.css",
+      "PlayersPage.css",
+      "PlayerPage.css",
+      "RulesPage.css",
+      "LandingPage.css",
+      "LeaderboardPage.css (via --alb-bg)",
+      "GameBoard.tsx (bg-[var(--app-bg)])",
+      "NotFoundPage.tsx (inline style)"
+    ]
+  },
+  {
+    "value": "#22223a",
+    "semantic": "app-surface",
+    "description": "Card and panel background — primary surface layer",
+    "count": "~20",
+    "files": [
+      "RoundForm.css (--arf-surface)",
+      "TeamEditorModal.css (--tem-surface: none — uses surface2)",
+      "HistoryPage.css (--ahr-surface)",
+      "PlayersPage.css (--ap-surface)",
+      "PlayerPage.css (--apd-surface)",
+      "RulesPage.css (--rp-surface)",
+      "LeaderboardPage.css (--alb-surface)",
+      "BottomSheet.tsx (inline style)",
+      "PageHeader.tsx (bg-[var(--app-surface)])"
+    ]
+  },
+  {
+    "value": "#2a2a48",
+    "semantic": "app-surface-2",
+    "description": "Elevated surface — inputs, inner cards, secondary panels",
+    "count": "~12",
+    "files": [
+      "RoundForm.css (--arf-surface2)",
+      "TeamEditorModal.css (--tem-surface2)",
+      "GameModePickerModal.css (--gmp-surface2)",
+      "HistoryPage.css (--ahr-surface2)",
+      "PlayersPage.css (--ap-surface2)",
+      "PlayerPage.css (--apd-surface2)",
+      "RulesPage.css (--rp-surface2)",
+      "LeaderboardPage.css (--alb-surface2)"
+    ]
+  },
+  {
+    "value": "#12122a",
+    "semantic": "app-deep",
+    "description": "Deep overlay background — fullscreen overlays, modal backdrops",
+    "count": "~3",
+    "files": [
+      "LeaderboardGraphOverlay.css (.lgo-overlay)",
+      "LeaderboardGraphOverlay.tsx (tooltip backgroundColor)"
+    ]
+  },
+  {
+    "value": "#eeeeee",
+    "semantic": "app-text",
+    "description": "Primary text color",
+    "count": "~10",
+    "files": [
+      "index.css (body)",
+      "RoundForm.css (--arf-text)",
+      "TeamEditorModal.css (--tem-text)",
+      "HistoryPage.css (--ahr-text)",
+      "PlayersPage.css (--ap-text)",
+      "PlayerPage.css (--apd-text)",
+      "RulesPage.css (--rp-text)",
+      "LeaderboardPage.css (--alb-text)",
+      "BottomSheet.tsx (inline style)"
+    ]
+  },
+  {
+    "value": "#aaaacc",
+    "semantic": "app-text-sub",
+    "description": "Secondary / descriptive text",
+    "count": "~8",
+    "files": [
+      "RoundForm.css (--arf-text-sub)",
+      "HistoryPage.css (--ahr-text-sub)",
+      "PlayersPage.css (--ap-text-sub)",
+      "PlayerPage.css (--apd-text-sub)",
+      "RulesPage.css (--rp-text-sub)",
+      "LeaderboardPage.css (--alb-text-sub)",
+      "AnalogEditRoundPage.tsx (inline style)",
+      "AnalogNewRoundPage.tsx (inline style)"
+    ]
+  },
+  {
+    "value": "#666688",
+    "semantic": "app-text-muted",
+    "description": "Muted labels, placeholders, metadata",
+    "count": "~8",
+    "files": [
+      "RoundForm.css (--arf-text-muted)",
+      "TeamEditorModal.css (--tem-text-muted)",
+      "GameModePickerModal.css (--gmp-muted)",
+      "HistoryPage.css (--ahr-text-muted)",
+      "PlayersPage.css (--ap-text-muted)",
+      "PlayerPage.css (--apd-text-muted)",
+      "RulesPage.css (--rp-text-muted)",
+      "LeaderboardPage.css (--alb-text-muted)"
+    ]
+  },
+  {
+    "value": "rgba(255,255,255,0.08)",
+    "semantic": "app-border",
+    "description": "Default subtle border",
+    "count": "~20",
+    "files": [
+      "RoundForm.css (--arf-border)",
+      "TeamEditorModal.css (--tem-border)",
+      "GameModePickerModal.css (--gmp-border)",
+      "HistoryPage.css (--ahr-border)",
+      "PlayersPage.css (--ap-border)",
+      "PlayerPage.css (--apd-border)",
+      "RulesPage.css (--rp-border)",
+      "LeaderboardPage.css (--alb-border)",
+      "BottomSheet.tsx (inline style)",
+      "ExpandableRow.tsx (inline style)",
+      "LandingPage.tsx (version-pill border)"
+    ]
+  },
+  {
+    "value": "rgba(255,255,255,0.14)",
+    "semantic": "app-border-md",
+    "description": "Medium-weight border, used for more prominent separators",
+    "count": "~4",
+    "files": [
+      "LeaderboardPage.css (--alb-border2)",
+      "RulesPage.css (rp-section border)"
+    ]
+  },
+  {
+    "value": "#4f46e5",
+    "semantic": "app-primary",
+    "description": "Primary action color — indigo-600",
+    "count": "~8",
+    "files": [
+      "RoundForm.css (--arf-primary)",
+      "TeamEditorModal.css (--tem-primary)",
+      "GameModePickerModal.css (--gmp-primary)",
+      "PlayersPage.css (--ap-primary)",
+      "LeaderboardPage.css (--alb-accent)",
+      "ToggleSwitch.css (.ts-switch--on)",
+      "LeaderboardGraphOverlay.css (.lgo-mode-tab--active)"
+    ]
+  },
+  {
+    "value": "#6366f1",
+    "semantic": "app-primary-h",
+    "description": "Primary hover state — indigo-500",
+    "count": "~5",
+    "files": [
+      "RoundForm.css (--arf-primary-h)",
+      "TeamEditorModal.css (--tem-primary-h)",
+      "PlayersPage.css (--ap-primary-h)",
+      "LeaderboardPage.css (--alb-accent-h)"
+    ]
+  },
+  {
+    "value": "#818cf8",
+    "semantic": "app-re",
+    "description": "Re team accent — indigo-400 range, used for announcements and rank highlights",
+    "count": "~6",
+    "files": [
+      "RoundForm.css (--arf-re)",
+      "HistoryPage.css (--ahr-re)",
+      "LandingPage.css (version-pill-dot)",
+      "LeaderboardPage.css (rank numbers, slider)",
+      "LeaderboardGraphOverlay.css (players-btn, slider)"
+    ]
+  },
+  {
+    "value": "oklch(65% 0.23 303) / #c084fc",
+    "semantic": "app-kontra / color-kontra-400",
+    "description": "Kontra team accent — purple-400",
+    "count": "~5",
+    "files": [
+      "index.css (@theme --color-kontra-400)",
+      "RoundForm.css (--arf-kontra)",
+      "RulesPage.css (--rp-kontra)",
+      "PlayerLabel.css (via kontra-* Tailwind tokens)"
+    ]
+  },
+  {
+    "value": "#d97706",
+    "semantic": "app-solo",
+    "description": "Solo game mode color — amber-600",
+    "count": "~4",
+    "files": [
+      "RoundForm.css (--arf-solo)",
+      "GameModePickerModal.css (--gmp-solo)",
+      "HistoryPage.css (--ahr-solo)"
+    ]
+  },
+  {
+    "value": "#4ade80",
+    "semantic": "app-win",
+    "description": "Win / success color — green-400",
+    "count": "~5",
+    "files": [
+      "PlayerPage.css (--apd-win)",
+      "LeaderboardPage.css (--alb-win)",
+      "RoundForm.css (rgba(74,222,128,0.10) win bg)",
+      "ResultScreen.css (rh-points-pos / rd-value-pos)"
+    ]
+  },
+  {
+    "value": "#f87171",
+    "semantic": "app-loss",
+    "description": "Loss / error color — red-400",
+    "count": "~8",
+    "files": [
+      "PlayerPage.css (--apd-loss)",
+      "LeaderboardPage.css (--alb-loss)",
+      "TeamEditorModal.css (hover color)",
+      "PlayersPage.css (edit-input error border)",
+      "StatusState.css (.ss-error)",
+      "RulesPage.css (--rp-red-suit)",
+      "LandingPage.css (watermarks)",
+      "AnalogEditRoundPage.tsx / AnalogNewRoundPage.tsx (inline)"
+    ]
+  },
+  {
+    "value": "#facc15",
+    "semantic": "app-warning",
+    "description": "Active turn / warning — yellow-400 (used in Tailwind as yellow-400)",
+    "count": "~3",
+    "files": [
+      "PlayerLabel.css (ring-yellow-400 via Tailwind)",
+      "SelfPlayerLabel.css (border-yellow-400 via Tailwind)",
+      "LastTrickOverlay.css (ring-yellow-400 via Tailwind)"
+    ]
+  },
+  {
+    "value": "#fb923c / rgba(251,146,60,*)",
+    "semantic": "app-orange",
+    "description": "Sonderkarte glow, karo suit highlight — orange-400",
+    "count": "~6",
+    "files": [
+      "SonderkarteFlash.css",
+      "HandDisplay.css (glow animation)",
+      "TrickArea.css (sonderkarte box-shadow)",
+      "LandingPage.tsx (ORANGE constant, karo suit)"
+    ]
+  },
+  {
+    "value": "Various chart colors",
+    "semantic": "chart-palette",
+    "description": "8 fixed player colors for the leaderboard chart",
+    "count": "8",
+    "files": [
+      "LeaderboardPage.tsx: ['#818cf8','#f472b6','#34d399','#fbbf24','#60a5fa','#fb923c','#a78bfa','#4ade80']"
+    ]
+  }
+]
