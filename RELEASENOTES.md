@@ -1,15 +1,11 @@
 # Release Notes
 
-## [1.3.7] - 2026-05-10
+## [1.4.0] - 2026-05-14
 
 ### Neu
 - Farbthemen können jetzt direkt auf der Startseite gewechselt werden: Das 🎨-Symbol oben rechts öffnet eine Auswahl mit sechs Themes – **Default** (dunkel), **Rosé**, **Aqua**, **Classic**, **Cherry** und **Nautical**. Die fünf neuen Themes sind helle Designs; jedes zeigt die Kartenfarben Re und Kontra in eigenen Tönen. Die Auswahl wird sofort angewendet und gespeichert.
 
-### Verbessert
-- Alle Komponenten (Startseite, Formulare, Listen, Modals) nutzen jetzt konsequent CSS-Variablen – hardcodierte Farben sind vollständig entfernt. Helle Themes werden dadurch korrekt dargestellt.
-
-### Verbessert
-- Alle Farben der App sind jetzt in einem zentralen Farbsystem zusammengefasst. Eine einzige Änderung in der Themendatei genügt, um die gesamte Oberfläche anzupassen – kein manuelles Suchen und Ersetzen in Dutzenden von Dateien mehr.
+## [1.3.7] - 2026-05-10
 
 ### Neu
 - Die Statistikseite hat jetzt einen interaktiven Verlaufs-Graph im Vollbild: Tippen auf den Chart oder das ⤢-Symbol öffnet eine Querformat-Ansicht. Spieler lassen sich per Toggle-Filter ein- und ausblenden. Ein Schieberegler steuert, wie viele Spiele zurück angezeigt werden – dynamisch bis zum Maximum der vorhandenen Daten. Zwischen Spiel-Index und echten Datumsangaben auf der X-Achse kann umgeschaltet werden. Der Graph unterstützt Pinch-to-Zoom auf beiden Achsen.
