@@ -11,21 +11,21 @@
 }
 
 .announcement-btn-re {
-  background: theme(colors.re.500 / 25%);
-  border: 1px solid theme(colors.re.500 / 40%);
-  color: theme(colors.re.300);
+  background: var(--app-re-soft);
+  border: 1px solid rgba(var(--app-re-raw), 0.4);
+  color: var(--app-re-label);
 }
 
 .announcement-btn-re:hover {
-  background: theme(colors.re.500 / 35%);
+  background: color-mix(in srgb, var(--app-re) 25%, transparent);
 }
 
 .announcement-btn-kontra {
-  background: theme(colors.kontra.500 / 25%);
-  border: 1px solid theme(colors.kontra.500 / 40%);
-  color: theme(colors.kontra.300);
+  background: var(--app-kontra-soft);
+  border: 1px solid rgba(var(--app-kontra-raw), 0.4);
+  color: var(--app-kontra-label);
 }
 
 .announcement-btn-kontra:hover {
-  background: theme(colors.kontra.500 / 35%);
+  background: color-mix(in srgb, var(--app-kontra) 25%, transparent);
 }

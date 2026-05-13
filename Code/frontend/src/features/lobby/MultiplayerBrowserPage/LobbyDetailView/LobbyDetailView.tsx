@@ -272,7 +272,7 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
         })}
       </div>
 
-      <p className="text-white/40 text-xs shrink-0">
+      <p className="text-(--app-text-muted) text-xs shrink-0">
         {t.playerCount(filledCount, 4)}
         {isStarted
           ? <span className="text-orange-400"> · {t.gameRunning}</span>
@@ -281,14 +281,14 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
 
       {/* Invite link */}
       <div className="flex flex-col gap-1.5 shrink-0">
-        <span className="text-white/40 text-xs uppercase tracking-wider">{t.inviteLink}</span>
+        <span className="text-(--app-text-muted) text-xs uppercase tracking-wider">{t.inviteLink}</span>
         <div className="flex gap-2">
-          <div className="flex-1 bg-white/10 rounded-xl px-3 py-2 text-white/50 text-xs font-mono truncate">
+          <div className="flex-1 bg-(--app-surface-raised) rounded-xl px-3 py-2 text-(--app-text-muted) text-xs font-mono truncate">
             {inviteUrl}
           </div>
           <button
             onClick={copyLink}
-            className="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-xs font-semibold transition-colors shrink-0"
+            className="px-3 py-2 rounded-xl bg-(--app-primary) hover:bg-(--app-primary-h) text-(--app-primary-text) text-xs font-semibold transition-colors shrink-0"
           >
             {copied ? t.linkCopied : t.copyLink}
           </button>
@@ -298,16 +298,16 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
       {/* Actions — only shown when user has a seat in this lobby */}
       {isMyLobby && !isStarted && (
         <div className="flex flex-col gap-1 shrink-0">
-          <span className="text-white/40 text-xs uppercase tracking-wider">{t.scenarioLabel}</span>
+          <span className="text-(--app-text-muted) text-xs uppercase tracking-wider">{t.scenarioLabel}</span>
           <select
             disabled={settingScenario}
             value={selectedScenario ?? ''}
             onChange={(e) => handleSelectScenario(e.target.value || null)}
-            className="w-full bg-white/10 border border-white/10 rounded-xl px-3 py-2 text-white text-sm disabled:opacity-50 focus:outline-none focus:border-indigo-500/50"
+            className="w-full bg-(--app-surface-raised) border border-(--app-border) rounded-xl px-3 py-2 text-(--app-text) text-sm disabled:opacity-50 focus:outline-none focus:border-(--app-primary)"
           >
-            <option value="" className="bg-gray-900 text-white/50">{t.scenarioRandom}</option>
+            <option value="" className="bg-(--app-surface-2) text-(--app-text-muted)">{t.scenarioRandom}</option>
             {availableScenarios.map((name) => (
-              <option key={name} value={name} className="bg-gray-900 text-white">{name}</option>
+              <option key={name} value={name} className="bg-(--app-surface-2) text-(--app-text)">{name}</option>
             ))}
           </select>
         </div>
@@ -317,7 +317,7 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
           {lastFinishedResult && (
             <button
               onClick={() => setShowHistory(true)}
-              className="w-full py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/5 text-white/70 transition-colors"
+              className="w-full py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg bg-(--app-surface-raised) hover:bg-(--app-surface-2) text-(--app-text-sub) transition-colors"
             >
               {t.spielverlauf}
             </button>
@@ -353,7 +353,7 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
       )}
 
       {(error || actionError) && (
-        <p className="text-red-400 text-xs text-center shrink-0">{error ?? actionError}</p>
+        <p className="text-(--app-loss) text-xs text-center shrink-0">{error ?? actionError}</p>
       )}
 
       {showHistory && lastFinishedResult && (

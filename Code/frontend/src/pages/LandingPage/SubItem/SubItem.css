@@ -1,0 +1,46 @@
+@reference "../../../styles/index.css";
+
+.sub-item {
+  background: transparent;
+  border: none;
+  border-bottom: none;
+  padding: 11px 14px;
+  color: var(--app-text);
+  display: flex;
+  align-items: center;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+  transition: background 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sub-item--divider {
+  border-bottom: 1px solid var(--app-border);
+  border-radius: 0;
+}
+
+.sub-item--disabled {
+  color: var(--app-text-muted);
+  cursor: not-allowed;
+}
+
+.sub-item-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+}
+
+.sub-item-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: inherit;
+}
+
+.sub-item-hint {
+  font-size: 11px;
+  color: var(--app-text-muted);
+}

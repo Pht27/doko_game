@@ -1,0 +1,25 @@
+@reference "../../styles/index.css";
+
+.bottom-sheet-backdrop {
+  background: rgba(0,0,0,0.65);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.bottom-sheet-panel {
+  max-width: 480px;
+  background: var(--app-surface);
+  border-radius: 16px 16px 0 0;
+  border-top: 1px solid var(--app-border);
+}
+
+.bottom-sheet-header {
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.bottom-sheet-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--app-text);
+}

@@ -1,7 +1,7 @@
 .ts-switch {
   position: relative;
   border-radius: 999px;
-  background: rgba(255,255,255,0.15);
+  background: var(--app-switch-off);
   border: none;
   cursor: pointer;
   padding: 0;
@@ -16,7 +16,7 @@
 .ts-switch--sm { width: 42px; height: 25px; }
 
 /* ── On state ── */
-.ts-switch--on { background: #4f46e5; }
+.ts-switch--on { background: var(--app-switch-on); }
 
 /* ── Pressing ── */
 .ts-switch--pressing { filter: brightness(0.88); }

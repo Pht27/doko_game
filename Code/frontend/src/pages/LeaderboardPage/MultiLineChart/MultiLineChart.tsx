@@ -37,10 +37,11 @@ export function MultiLineChart({ series }: { series: ChartSeries[] }) {
           return (
             <g key={i}>
               <line x1={CHART_PAD.left} x2={W - CHART_PAD.right} y1={yy} y2={yy}
-                stroke={isZero ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.05)'}
+                style={{ stroke: isZero ? 'var(--app-border-md)' : 'var(--app-border)' }}
                 strokeWidth={1} />
               <text x={CHART_PAD.left - 5} y={yy + 3}
-                textAnchor="end" fontSize={9} fill="rgba(255,255,255,0.3)"
+                textAnchor="end" fontSize={9}
+                style={{ fill: 'var(--app-text-muted)' }}
                 fontFamily="ui-monospace, monospace">
                 {Math.round(g)}
               </text>
@@ -63,11 +64,11 @@ export function MultiLineChart({ series }: { series: ChartSeries[] }) {
           );
         })}
         <text x={CHART_PAD.left} y={CHART_H - 4} fontSize={9}
-          fill="rgba(255,255,255,0.3)" fontFamily="ui-monospace, monospace">
+          style={{ fill: 'var(--app-text-muted)' }} fontFamily="ui-monospace, monospace">
           {t.analogLeaderboardChartPast}
         </text>
         <text x={W - CHART_PAD.right} y={CHART_H - 4} fontSize={9}
-          fill="rgba(255,255,255,0.3)" fontFamily="ui-monospace, monospace"
+          style={{ fill: 'var(--app-text-muted)' }} fontFamily="ui-monospace, monospace"
           textAnchor="end">
           {t.analogLeaderboardChartToday}
         </text>

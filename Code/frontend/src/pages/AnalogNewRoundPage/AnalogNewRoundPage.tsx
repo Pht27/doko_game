@@ -41,7 +41,7 @@ export function AnalogNewRoundPage() {
   if (staticLoading || playersLoading) {
     return (
       <div className="arf-page">
-        <div style={{ padding: 32, textAlign: 'center', color: '#aaaacc' }}>{t.loading}</div>
+        <div style={{ padding: 32, textAlign: 'center', color: 'var(--app-text-sub)' }}>{t.loading}</div>
       </div>
     );
   }
@@ -49,7 +49,7 @@ export function AnalogNewRoundPage() {
   if (staticError || playersError || !staticData) {
     return (
       <div className="arf-page">
-        <div style={{ padding: 32, textAlign: 'center', color: '#f87171' }}>
+        <div style={{ padding: 32, textAlign: 'center', color: 'var(--app-loss)' }}>
           {staticError ?? playersError ?? 'Fehler'}
         </div>
       </div>

@@ -71,7 +71,7 @@ export function MultiplayerBrowserPage({
       const session: LobbySession = {
         lobbyId: res.lobbyId,
         token: res.token,
-        
+
         seatIndex: res.seatIndex,
       };
       saveLobbySession(session);
@@ -102,11 +102,11 @@ export function MultiplayerBrowserPage({
       {/* Two-panel layout */}
       <div className="flex flex-1 min-h-0 gap-0">
         {/* Left panel — lobby list */}
-        <div className="w-[30%] flex flex-col border-r border-white/10">
+        <div className="w-[30%] flex flex-col border-r border-(--app-border)">
           {/* Scrollable list */}
           <div className="flex-1 overflow-y-auto px-2 py-2 flex flex-col gap-1">
             {lobbies.length === 0 ? (
-              <p className="text-white/30 text-sm text-center py-4">{t.noLobbiesAvailable}</p>
+              <p className="text-(--app-text-muted) text-sm text-center py-4">{t.noLobbiesAvailable}</p>
             ) : (
               lobbies.map((lobby) => {
                 const filledCount = lobby.seats.filter(Boolean).length;
@@ -117,24 +117,24 @@ export function MultiplayerBrowserPage({
                     onClick={() => onSelectLobby(lobby.lobbyId)}
                     className={`w-full text-left px-3 py-2.5 rounded-xl transition-colors ${
                       isSelected
-                        ? 'bg-indigo-600 text-white'
-                        : 'bg-white/5 text-white/70 hover:bg-white/10 hover:text-white'
+                        ? 'bg-(--app-primary) text-(--app-primary-text)'
+                        : 'bg-(--app-surface-hover) text-(--app-text-sub) hover:bg-(--app-surface-raised) hover:text-(--app-text)'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex flex-col min-w-0">
                         <span className="text-sm font-medium">Lobby</span>
-                        <span className={`text-[10px] ${isSelected ? 'text-white/60' : 'text-white/30'}`}>
+                        <span className={`text-[10px] ${isSelected ? 'opacity-70' : 'text-(--app-text-muted)'}`}>
                           {new Date(lobby.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5 shrink-0">
                         {lobby.isStarted && (
-                          <span className={`text-xs font-medium ${isSelected ? 'text-orange-300' : 'text-orange-400'}`}>
+                          <span className="text-xs font-medium text-orange-400">
                             Spiel läuft
                           </span>
                         )}
-                        <span className={`text-xs ${isSelected ? 'text-white/80' : 'text-white/40'}`}>
+                        <span className={`text-xs ${isSelected ? 'opacity-80' : 'text-(--app-text-muted)'}`}>
                           {filledCount}/4
                         </span>
                       </div>
@@ -146,8 +146,8 @@ export function MultiplayerBrowserPage({
                           key={i}
                           className={`w-2 h-2 rounded-full ${
                             occupied
-                              ? isSelected ? 'bg-white' : 'bg-green-400'
-                              : isSelected ? 'bg-white/30' : 'bg-white/15'
+                              ? isSelected ? 'bg-(--app-primary-text)' : 'bg-(--app-win)'
+                              : isSelected ? 'bg-(--app-border-lg)' : 'bg-(--app-border)'
                           }`}
                         />
                       ))}
@@ -159,11 +159,11 @@ export function MultiplayerBrowserPage({
           </div>
 
           {/* Create lobby button */}
-          <div className="px-2 py-2 shrink-0 border-t border-white/10">
+          <div className="px-2 py-2 shrink-0 border-t border-(--app-border)">
             <button
               onClick={handleCreateLobby}
               disabled={creating}
-              className="w-full py-2.5 text-sm font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white transition-colors disabled:opacity-50"
+              className="w-full py-2.5 text-sm font-semibold rounded-xl bg-(--app-primary) hover:bg-(--app-primary-h) text-(--app-primary-text) transition-colors disabled:opacity-50"
             >
               {creating ? t.loading : t.createLobby}
             </button>
@@ -181,7 +181,7 @@ export function MultiplayerBrowserPage({
               lastFinishedResult={lastFinishedResult}
             />
           ) : (
-            <div className="h-full flex items-center justify-center text-white/30 text-sm">
+            <div className="h-full flex items-center justify-center text-(--app-text-muted) text-sm">
               {t.noLobbiesAvailable}
             </div>
           )}

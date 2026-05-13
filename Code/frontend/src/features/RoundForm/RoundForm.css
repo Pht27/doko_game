@@ -1,24 +1,24 @@
 @reference "../../styles/index.css";
 
 :root {
-  --arf-surface:    #22223a;
-  --arf-surface2:   #2a2a48;
-  --arf-border:     rgba(255,255,255,0.08);
-  --arf-text:       #eeeeee;
-  --arf-text-sub:   #aaaacc;
-  --arf-text-muted: #666688;
-  --arf-primary:    #4f46e5;
-  --arf-primary-h:  #6366f1;
-  --arf-re:         #818cf8;
-  --arf-kontra:     #c084fc;
-  --arf-solo:       #d97706;
+  --arf-surface:    var(--app-surface);
+  --arf-surface2:   var(--app-surface-2);
+  --arf-border:     var(--app-border);
+  --arf-text:       var(--app-text);
+  --arf-text-sub:   var(--app-text-sub);
+  --arf-text-muted: var(--app-text-muted);
+  --arf-primary:    var(--app-primary);
+  --arf-primary-h:  var(--app-primary-h);
+  --arf-re:         var(--app-re);
+  --arf-kontra:     var(--app-kontra);
+  --arf-solo:       var(--app-solo);
   --arf-radius:     12px;
   --arf-radius-sm:  8px;
 }
 
 .arf-page {
   @apply flex flex-col w-full h-full overflow-hidden;
-  background: #1a1a2e;
+  background: var(--app-bg);
   color: var(--arf-text);
   position: relative;
 }
@@ -52,16 +52,16 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.arf-gamemode-btn:hover { border-color: rgba(255,255,255,0.2); }
+.arf-gamemode-btn:hover { border-color: var(--app-border-lg); }
 
 .arf-gamemode-btn.arf-gamemode-selected {
-  background: var(--arf-surface2);
-  border-color: rgba(255,255,255,0.18);
+  background: var(--arf-surface);
+  border-color: var(--app-border-md);
 }
 
 .arf-gamemode-btn.arf-solo {
-  background: rgba(217,119,6,0.14);
-  border-color: rgba(217,119,6,0.45);
+  background: rgba(var(--app-solo-raw),0.14);
+  border-color: rgba(var(--app-solo-raw),0.45);
 }
 
 .arf-gamemode-label {
@@ -141,17 +141,17 @@
 
 
 .arf-party-btn.arf-re-selected {
-  background: rgba(129,140,248,0.14);
-  border-color: rgba(129,140,248,0.45);
+  background: rgba(var(--app-re-raw),0.14);
+  border-color: rgba(var(--app-re-raw),0.45);
   color: var(--arf-re);
-  box-shadow: 0 0 0 1px rgba(129,140,248,0.45), 0 6px 18px rgba(129,140,248,0.14);
+  box-shadow: 0 0 0 1px rgba(var(--app-re-raw),0.45), 0 6px 18px rgba(var(--app-re-raw),0.14);
 }
 
 .arf-party-btn.arf-kontra-selected {
-  background: rgba(192,132,252,0.14);
-  border-color: rgba(192,132,252,0.45);
+  background: rgba(var(--app-kontra-raw),0.14);
+  border-color: rgba(var(--app-kontra-raw),0.45);
   color: var(--arf-kontra);
-  box-shadow: 0 0 0 1px rgba(192,132,252,0.45), 0 6px 18px rgba(192,132,252,0.14);
+  box-shadow: 0 0 0 1px rgba(var(--app-kontra-raw),0.45), 0 6px 18px rgba(var(--app-kontra-raw),0.14);
 }
 
 .arf-points-label {
@@ -195,11 +195,11 @@
 
 .arf-team-block:active { opacity: 0.85; }
 
-.arf-re-col .arf-team-block   { border-color: rgba(129,140,248,0.25); }
-.arf-kontra-col .arf-team-block { border-color: rgba(192,132,252,0.25); }
+.arf-re-col .arf-team-block     { border-color: rgba(var(--app-re-raw),0.25); }
+.arf-kontra-col .arf-team-block { border-color: rgba(var(--app-kontra-raw),0.25); }
 
-.arf-team-block.arf-winning { background: rgba(74,222,128,0.10); }
-.arf-team-block.arf-losing  { background: rgba(248,113,113,0.10); }
+.arf-team-block.arf-winning { background: rgba(var(--app-win-raw),0.10); }
+.arf-team-block.arf-losing  { background: rgba(var(--app-loss-raw),0.10); }
 
 .arf-team-empty {
   font-size: 0.85rem;
@@ -294,7 +294,7 @@
   position: absolute;
   left: 0; right: 0; bottom: 0;
   padding: 12px 16px 24px;
-  background: linear-gradient(180deg, rgba(26,26,46,0) 0%, #1a1a2e 28%);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--app-bg) 0%, transparent) 0%, var(--app-bg) 28%);
   pointer-events: none;
 }
 

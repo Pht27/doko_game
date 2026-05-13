@@ -2,20 +2,20 @@
 @reference "../../../styles/index.css";
 
 .ssd-dialog {
-  @apply bg-gray-800/95 rounded-2xl shadow-2xl border border-white/10 flex flex-col w-full overflow-hidden;
+  @apply bg-(--app-surface-2) rounded-2xl shadow-2xl border border-(--app-border) flex flex-col w-full overflow-hidden;
   max-height: 60svh;
 }
 
 .ssd-header {
-  @apply flex flex-col gap-0.5 px-4 py-3 border-b border-white/10 flex-shrink-0;
+  @apply flex flex-col gap-0.5 px-4 py-3 border-b border-(--app-border) shrink-0;
 }
 
 .ssd-title {
-  @apply text-white font-bold text-sm;
+  @apply text-(--app-text) font-bold text-sm;
 }
 
 .ssd-subtitle {
-  @apply text-white/50 text-xs;
+  @apply text-(--app-text-muted) text-xs;
 }
 
 .ssd-body {
@@ -23,7 +23,7 @@
 }
 
 .ssd-solo-btn {
-  @apply w-full bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white
+  @apply w-full bg-(--app-primary) hover:bg-(--app-primary-h) active:opacity-80 text-(--app-primary-text)
     rounded-lg py-2 text-sm font-medium transition-colors;
 }
 

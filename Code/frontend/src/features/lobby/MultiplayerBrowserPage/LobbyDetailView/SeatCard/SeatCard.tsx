@@ -1,4 +1,5 @@
 import { t } from '@/utils/translations';
+import './SeatCard.css';
 
 interface SeatCardProps {
   seatIndex: number;
@@ -45,25 +46,23 @@ export function SeatCard({
   onAddOpa,
   onRemoveOpa,
 }: SeatCardProps) {
+  const cardClass = isMe
+    ? 'seat-card--me'
+    : (isOpa || occupied)
+      ? 'seat-card--occupied'
+      : canInteract
+        ? 'seat-card--interactable'
+        : 'seat-card--disabled';
+
   return (
     <div
-      className={`flex items-center gap-2 px-3 py-3 rounded-xl transition-colors ${
-        isMe
-          ? 'bg-indigo-600/50 text-white ring-1 ring-indigo-400'
-          : isOpa
-            ? 'bg-white/15 text-white'
-            : occupied
-              ? 'bg-white/15 text-white'
-              : canInteract
-                ? 'bg-white/5 text-white/50 hover:bg-white/10 hover:text-white/80 cursor-pointer'
-                : 'bg-white/5 text-white/20'
-      }`}
+      className={`seat-card flex items-center gap-2 px-3 py-3 rounded-xl ${cardClass}`}
       onClick={!isOpa ? onClick : undefined}
       role={!isOpa && canInteract ? 'button' : undefined}
     >
       <div
         className={`w-2.5 h-2.5 rounded-full shrink-0 ${
-          occupied ? 'bg-green-400' : 'bg-white/20'
+          occupied ? 'bg-(--app-win)' : 'bg-(--app-border-md)'
         }`}
       />
       <span className="text-sm font-medium truncate flex-1 min-w-0">
@@ -72,7 +71,7 @@ export function SeatCard({
         ) : isOpa ? (
           <>
             Opa
-            <span className="text-white/40 text-xs ml-1">🤖</span>
+            <span className="text-(--app-text-muted) text-xs ml-1">🤖</span>
           </>
         ) : occupied ? (
           isEditingName ? (
@@ -84,13 +83,13 @@ export function SeatCard({
               onKeyDown={onNameKeyDown}
               maxLength={16}
               placeholder={t.playerSlot(seatIndex)}
-              className="bg-transparent border-b border-white/40 outline-none text-white text-sm w-full"
+              className="bg-transparent border-b border-(--app-border-md) outline-none text-(--app-text) text-sm w-full"
               onClick={(e) => e.stopPropagation()}
             />
           ) : (
             <>
               <span className="truncate">{playerName ?? t.playerSlot(seatIndex)}</span>
-              {isMe && <span className="text-white/50 text-xs shrink-0">{t.youSuffix}</span>}
+              {isMe && <span className="text-(--app-text-muted) text-xs shrink-0">{t.youSuffix}</span>}
             </>
           )
         ) : (
@@ -100,22 +99,22 @@ export function SeatCard({
       {isMe && !isEditingName && !canRemoveOpa && !canAddOpa && (
         <button
           onClick={(e) => { e.stopPropagation(); onStartEditingName(); }}
-          className="ml-auto text-white/30 hover:text-white/70 text-xs px-1 shrink-0"
+          className="ml-auto text-(--app-text-muted) hover:text-(--app-text) text-xs px-1 shrink-0"
           title={t.nameChange}
         >
           ✏️
         </button>
       )}
       {isReady && !isMe && !canRemoveOpa && !canAddOpa && (
-        <span className="ml-auto text-green-400 text-sm shrink-0" title={t.readyTooltip}>✓</span>
+        <span className="ml-auto text-(--app-win) text-sm shrink-0" title={t.readyTooltip}>✓</span>
       )}
       {isReady && isMe && !isEditingName && !canRemoveOpa && !canAddOpa && (
-        <span className="text-green-400 text-sm shrink-0" title={t.readyTooltip}>✓</span>
+        <span className="text-(--app-win) text-sm shrink-0" title={t.readyTooltip}>✓</span>
       )}
       {canRemoveOpa && (
         <button
           onClick={(e) => { e.stopPropagation(); onRemoveOpa(); }}
-          className="ml-auto text-red-400 hover:text-red-300 text-xs px-1 shrink-0"
+          className="ml-auto text-(--app-loss) hover:text-(--app-loss) text-xs px-1 shrink-0"
           title={t.opaRemove}
         >
           ✕
@@ -124,7 +123,7 @@ export function SeatCard({
       {canAddOpa && (
         <button
           onClick={(e) => { e.stopPropagation(); onAddOpa(); }}
-          className="ml-auto text-white/30 hover:text-white/60 text-xs px-1 shrink-0"
+          className="ml-auto text-(--app-text-muted) hover:text-(--app-text-sub) text-xs px-1 shrink-0"
           title={t.opaAdd}
         >
           🤖

@@ -8,7 +8,7 @@ export function CloseButton({ onClick, className = '', ariaLabel = 'Schließen' 
   return (
     <button
       onClick={onClick}
-      className={`text-white/40 hover:text-white/70 active:text-white/30 text-xl leading-none transition-colors px-1 py-1 ${className}`}
+      className={`text-(--app-text-muted) hover:text-(--app-text) active:text-(--app-text-muted) text-xl leading-none transition-colors px-1 py-1 ${className}`}
       aria-label={ariaLabel}
     >
       ×

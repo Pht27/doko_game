@@ -1,13 +1,14 @@
 @reference "../../../styles/index.css";
 
 :root {
-  --gmp-surface2: #2a2a48;
-  --gmp-border:   rgba(255,255,255,0.08);
-  --gmp-text:     #eeeeee;
-  --gmp-text-sub: #aaaacc;
-  --gmp-muted:    #666688;
-  --gmp-primary:  #4f46e5;
-  --gmp-solo:     #d97706;
+  --gmp-surface:  var(--app-surface);
+  --gmp-surface2: var(--app-surface-2);
+  --gmp-border:   var(--app-border);
+  --gmp-text:     var(--app-text);
+  --gmp-text-sub: var(--app-text-sub);
+  --gmp-muted:    var(--app-text-muted);
+  --gmp-primary:  var(--app-primary);
+  --gmp-solo:     var(--app-solo);
   --gmp-radius-sm: 10px;
 }
 
@@ -42,27 +43,27 @@
   padding: 12px 6px 10px;
   border-radius: var(--gmp-radius-sm);
   border: 1px solid var(--gmp-border);
-  background: var(--gmp-surface2);
+  background: var(--gmp-surface);
   cursor: pointer;
   font: inherit;
   transition: background 0.15s, border-color 0.15s;
   -webkit-tap-highlight-color: transparent;
 }
 
-.gmp-card:hover  { border-color: rgba(255,255,255,0.18); }
+.gmp-card:hover  { border-color: var(--app-border-lg); }
 .gmp-card:active { opacity: 0.82; }
 
 .gmp-card-solo {
-  border-color: rgba(217,119,6,0.2);
+  border-color: rgba(var(--app-solo-raw),0.2);
 }
 
 .gmp-card-selected {
-  background: rgba(79,70,229,0.22);
+  background: rgba(var(--app-primary-raw),0.22);
   border-color: var(--gmp-primary);
 }
 
 .gmp-card-solo.gmp-card-selected {
-  background: rgba(217,119,6,0.18);
+  background: rgba(var(--app-solo-raw),0.18);
   border-color: var(--gmp-solo);
 }
 

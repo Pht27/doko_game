@@ -10,7 +10,7 @@
 }
 
 .player-label-inactive {
-  @apply text-white/60;
+  @apply text-(--app-text-muted);
 }
 
 .player-label-top,
@@ -28,19 +28,19 @@
 }
 
 .player-name-re {
-  @apply text-re-400;
+  color: var(--app-re-label);
 }
 
 .player-name-kontra {
-  @apply text-kontra-400;
+  color: var(--app-kontra-label);
 }
 
 .player-trick-count {
-  @apply text-[10px] font-bold bg-white/15 rounded px-1 py-0.5 leading-none text-white/70;
+  @apply text-[10px] font-bold bg-(--app-surface-raised) rounded px-1 py-0.5 leading-none text-(--app-text-sub);
 }
 
 .player-label-clickable {
-  @apply cursor-pointer hover:bg-white/10 hover:scale-105 transition-transform;
+  @apply cursor-pointer hover:bg-(--app-surface-hover) hover:scale-105 transition-transform;
 }
 
 /* Announcement badge — shown when a player has announced */
@@ -49,15 +49,17 @@
 }
 
 .player-ann-re {
-  @apply bg-re-600/80 text-white;
+  background: color-mix(in srgb, var(--app-re) 70%, transparent);
+  color: white;
 }
 
 .player-ann-kontra {
-  @apply bg-kontra-600/80 text-white;
+  background: color-mix(in srgb, var(--app-kontra) 70%, transparent);
+  color: white;
 }
 
 .player-ann-other {
-  @apply bg-white/20 text-white;
+  @apply bg-(--app-surface-raised) text-(--app-text);
 }
 
 /* Health status chip — shown during reservation phases */
@@ -75,22 +77,22 @@
 }
 
 .player-health-pending {
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.25);
-  border-color: rgba(255, 255, 255, 0.08);
+  background: var(--app-surface-subtle);
+  color: var(--app-text-muted);
+  border-color: var(--app-border);
   letter-spacing: 0.1em;
 }
 
 .player-health-gesund {
-  background: oklch(22% 0.06 155);
-  color: oklch(78% 0.12 152);
-  border-color: oklch(52% 0.14 152 / 0.35);
+  background: color-mix(in srgb, var(--app-win) 20%, transparent);
+  color: var(--app-win);
+  border-color: rgba(var(--app-win-raw), 0.35);
 }
 
 .player-health-vorbehalt {
-  background: oklch(26.407% 0.08575 28.455);
-  color: oklch(71.222% 0.16048 35.058);
-  border-color: oklch(60.282% 0.22545 31.705 / 0.4);
+  background: color-mix(in srgb, var(--app-solo) 20%, transparent);
+  color: var(--app-solo);
+  border-color: rgba(var(--app-solo-raw), 0.4);
 }
 
 /* Announce flash — a pseudo-element that expands and fades, leaving the label untouched */
@@ -109,14 +111,14 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  border: 1.5px solid rgba(129, 140, 248, 0.65);
-  background: rgba(99, 102, 241, 0.18);
+  border: 1.5px solid rgba(var(--app-re-raw), 0.65);
+  background: rgba(var(--app-re-raw), 0.18);
   pointer-events: none;
   animation: announce-ping 1.3s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
 }
 
 /* Sonderkarte notification — briefly appears after a sonderkarte is triggered */
 .player-sonderkarte-notif {
-  @apply text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-amber-500/80 text-black
-    animate-pulse;
+  @apply text-[10px] font-semibold px-1.5 py-0.5 rounded-md text-black animate-pulse;
+  background: color-mix(in srgb, var(--app-solo) 80%, transparent);
 }

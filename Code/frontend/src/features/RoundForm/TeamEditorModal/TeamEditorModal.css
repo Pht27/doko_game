@@ -1,13 +1,14 @@
 @reference "../../../styles/index.css";
 
 :root {
-  --tem-surface2:   #2a2a48;
-  --tem-border:     rgba(255,255,255,0.08);
-  --tem-text:       #eeeeee;
-  --tem-text-sub:   #aaaacc;
-  --tem-text-muted: #666688;
-  --tem-primary:    #4f46e5;
-  --tem-primary-h:  #6366f1;
+  --tem-surface2:   var(--app-surface-2);
+  --tem-bg:         var(--app-bg);
+  --tem-border:     var(--app-text);
+  --tem-text:       var(--app-text);
+  --tem-text-sub:   var(--app-text-sub);
+  --tem-text-muted: var(--app-text-muted);
+  --tem-primary:    var(--app-primary);
+  --tem-primary-h:  var(--app-primary-h);
   --tem-radius-sm:  8px;
 }
 
@@ -41,7 +42,7 @@
   padding: 10px 14px;
   border: 1px solid var(--tem-border);
   border-radius: var(--tem-radius-sm);
-  background: var(--tem-surface2);
+  background: var(--tem-bg);
   color: var(--tem-text);
   font: inherit;
   font-size: 0.95rem;
@@ -78,7 +79,7 @@
   transition: background 0.12s;
 }
 
-.tem-search-result:hover { background: rgba(255,255,255,0.06); }
+.tem-search-result:hover { background: var(--app-surface-hover); }
 
 .tem-search-empty {
   padding: 10px 14px;
@@ -98,7 +99,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  background: rgba(255,255,255,0.08);
+  background: var(--app-surface-raised);
   border: 1px solid var(--tem-border);
   border-radius: 20px;
   padding: 4px 10px 4px 10px;
@@ -124,7 +125,7 @@
   transition: color 0.12s;
 }
 
-.tem-tag-remove:hover { color: #f87171; }
+.tem-tag-remove:hover { color: var(--app-loss); }
 
 /* ── Chip grid (available special cards / extra points) ── */
 .tem-chip-grid {
@@ -150,8 +151,8 @@
 }
 
 .tem-chip:hover, .tem-chip:active {
-  background: rgba(255,255,255,0.07);
-  border-color: rgba(255,255,255,0.22);
+  background: var(--app-surface-hover);
+  border-color: var(--app-border-lg);
   border-style: solid;
   color: var(--tem-text);
 }
@@ -175,7 +176,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255,255,255,0.05);
+  background: var(--app-surface-hover);
   border: 1px solid var(--tem-border);
   border-radius: var(--tem-radius-sm);
   padding: 6px 10px;
@@ -206,7 +207,7 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.08);
+  background: var(--app-surface-raised);
   border: 1px solid var(--tem-border);
   color: var(--tem-text);
   font-size: 1.1rem;
@@ -218,7 +219,7 @@
   transition: background 0.12s;
 }
 
-.tem-ep-count-btn:hover { background: rgba(255,255,255,0.14); }
+.tem-ep-count-btn:hover { background: var(--app-border-md); }
 
 .tem-ep-count {
   min-width: 20px;
@@ -238,4 +239,4 @@
   transition: color 0.12s;
 }
 
-.tem-ep-remove:hover { color: #f87171; }
+.tem-ep-remove:hover { color: var(--app-loss); }

@@ -3,8 +3,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(30, 30, 60, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: var(--app-surface-2);
+  border: 1px solid var(--app-border-md);
   border-radius: 12px;
   padding: 8px 36px 12px 14px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
@@ -14,7 +14,7 @@
 }
 
 .game-announce-message {
-  color: #f0f0ff;
+  color: var(--app-text);
   font-size: 0.9rem;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -27,7 +27,7 @@
   left: 0;
   height: 2px;
   width: 100%;
-  background: rgba(120, 140, 255, 0.7);
+  background: var(--app-re);
   border-radius: 0 0 12px 12px;
   transform-origin: left center;
   animation: announce-shrink 3s linear forwards;

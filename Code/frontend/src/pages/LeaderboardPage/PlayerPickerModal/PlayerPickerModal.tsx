@@ -40,7 +40,7 @@ export function PlayerPickerModal({ players, visibleIds, colorMap, onConfirm, on
         className={`ppm-item${!p.isActive ? ' ppm-item--inactive' : ''}`}
         onClick={() => toggle(p.id)}
       >
-        <span className="ppm-dot" style={{ background: colorMap.get(p.id) ?? 'rgba(255,255,255,0.25)' }} />
+        <span className="ppm-dot" style={{ background: colorMap.get(p.id) ?? 'var(--app-border-md)' }} />
         <span className="ppm-name">{p.name}</span>
         <ToggleSwitch on={on} onChange={() => toggle(p.id)} size="sm" stopPropagation />
       </div>

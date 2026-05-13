@@ -4,10 +4,10 @@
 .rd-dialog {
   display: flex;
   flex-direction: column;
-  background: rgba(22, 22, 40, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--app-surface-2);
+  border: 1px solid var(--app-border);
   border-radius: 20px;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   overflow: hidden;
@@ -20,20 +20,20 @@
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid var(--app-border);
   flex-shrink: 0;
 }
 
 .rd-title {
   font-size: 14px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.82);
+  color: var(--app-text);
 }
 
 .rd-pass-btn {
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.45);
+  background: var(--app-surface-hover);
+  border: 1px solid var(--app-border);
+  color: var(--app-text-muted);
   border-radius: 10px;
   padding: 4px 12px;
   font-size: 12px;
@@ -43,7 +43,7 @@
 }
 
 .rd-pass-btn:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--app-surface-raised);
 }
 
 .rd-body {
@@ -59,7 +59,7 @@
   flex-direction: column;
   gap: 4px;
   padding: 10px 8px;
-  border-right: 1px solid rgba(255, 255, 255, 0.07);
+  border-right: 1px solid var(--app-border);
   min-width: 116px;
   overflow-y: auto;
   flex-shrink: 0;
@@ -78,13 +78,13 @@
   border: 1px solid transparent;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;
-  background: rgba(255, 255, 255, 0.03);
-  color: rgba(255, 255, 255, 0.45);
+  background: var(--app-surface-subtle);
+  color: var(--app-text-muted);
 }
 
 .rd-cat-btn:hover:not(.rd-cat-btn-active) {
-  background: rgba(255, 255, 255, 0.07);
-  color: rgba(255, 255, 255, 0.7);
+  background: var(--app-surface-hover);
+  color: var(--app-text-sub);
 }
 
 .rd-cat-icon {
@@ -97,33 +97,33 @@
 
 /* Active state per category */
 .rd-cat-btn-active.rd-cat-solo {
-  background: oklch(28% 0.09 75);
-  color: oklch(88% 0.15 82);
-  border-color: oklch(60% 0.16 75 / 0.45);
+  background: color-mix(in srgb, var(--app-solo) 20%, transparent);
+  color: var(--app-solo);
+  border-color: rgba(var(--app-solo-raw), 0.45);
 }
 
 .rd-cat-btn-active.rd-cat-armut {
-  background: oklch(24% 0.09 238);
-  color: oklch(82% 0.13 232);
-  border-color: oklch(55% 0.18 238 / 0.45);
+  background: var(--app-re-soft);
+  color: var(--app-re-label);
+  border-color: rgba(var(--app-re-raw), 0.45);
 }
 
 .rd-cat-btn-active.rd-cat-schmeissen {
-  background: oklch(24% 0.08 25);
-  color: oklch(82% 0.12 22);
-  border-color: oklch(55% 0.15 25 / 0.4);
+  background: color-mix(in srgb, var(--app-loss) 20%, transparent);
+  color: var(--app-loss);
+  border-color: rgba(var(--app-loss-raw), 0.4);
 }
 
 .rd-cat-btn-active.rd-cat-hochzeit {
-  background: oklch(24% 0.09 278);
-  color: oklch(82% 0.13 272);
-  border-color: oklch(55% 0.16 278 / 0.45);
+  background: color-mix(in srgb, var(--app-primary) 20%, transparent);
+  color: var(--app-primary);
+  border-color: rgba(var(--app-primary-raw), 0.45);
 }
 
 .rd-cat-btn-active.rd-cat-martin {
-  background: oklch(24% 0.08 310);
-  color: oklch(82% 0.11 308);
-  border-color: oklch(55% 0.14 310 / 0.4);
+  background: var(--app-kontra-soft);
+  color: var(--app-kontra-label);
+  border-color: rgba(var(--app-kontra-raw), 0.4);
 }
 
 /* Right column: detail options */
@@ -138,9 +138,9 @@
 
 .rd-detail-btn {
   width: 100%;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.75);
+  background: var(--app-surface-hover);
+  border: 1px solid var(--app-border);
+  color: var(--app-text-sub);
   border-radius: 10px;
   padding: 8px 12px;
   font-size: 12px;
@@ -152,8 +152,8 @@
 }
 
 .rd-detail-btn:hover {
-  background: rgba(255, 255, 255, 0.11);
-  color: rgba(255, 255, 255, 0.92);
+  background: var(--app-surface-raised);
+  color: var(--app-text);
 }
 
 .rd-detail-btn:active {
@@ -162,14 +162,14 @@
 
 /* Confirm button (for single-action categories like Armut, Schmeißen) */
 .rd-detail-btn-confirm {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.85);
+  background: var(--app-surface-raised);
+  border-color: var(--app-border-md);
+  color: var(--app-text);
   font-size: 13px;
   padding: 10px 12px;
   text-align: center;
 }
 
 .rd-detail-btn-confirm:hover {
-  background: rgba(255, 255, 255, 0.13);
+  background: color-mix(in srgb, var(--app-surface-raised) 150%, transparent);
 }

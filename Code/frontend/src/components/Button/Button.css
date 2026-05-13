@@ -1,0 +1,19 @@
+.btn-primary {
+  background: var(--app-primary);
+  color: var(--app-primary-text);
+}
+.btn-primary:hover:not(:disabled)  { background: var(--app-primary-h); }
+.btn-primary:active:not(:disabled) { background: color-mix(in srgb, var(--app-primary) 80%, black); }
+
+.btn-secondary {
+  background: var(--app-surface-hover);
+  color: var(--app-text);
+}
+.btn-secondary:hover:not(:disabled)  { background: var(--app-border-md); }
+.btn-secondary:active:not(:disabled) { background: var(--app-border); }
+
+.btn-link {
+  color: var(--app-text-muted);
+  background: transparent;
+}
+.btn-link:hover:not(:disabled)  { color: var(--app-text-sub); }
