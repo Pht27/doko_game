@@ -35,11 +35,11 @@ export function createPlayer(name: string, startingPoints = 0): Promise<PlayerLi
 
 export function patchPlayer(
   id: number,
-  patch: { isActive: boolean; name?: string },
-): Promise<{ id: number; name: string; isActive: boolean }> {
+  patch: { isActive: boolean; name?: string; heroCard?: string },
+): Promise<{ id: number; name: string; isActive: boolean; heroCard?: string | null }> {
   return apiFetch(`/analog/players/${id}`, null, {
     method: 'PATCH',
-    body: JSON.stringify({ isActive: patch.isActive, name: patch.name ?? null }),
+    body: JSON.stringify({ isActive: patch.isActive, name: patch.name ?? null, heroCard: patch.heroCard ?? null }),
   });
 }
 

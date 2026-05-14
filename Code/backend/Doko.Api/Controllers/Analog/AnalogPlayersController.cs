@@ -57,7 +57,8 @@ public class AnalogPlayersController(
                 player.GamesPlayed,
                 player.Wins,
                 player.Losses,
-                rounds
+                rounds,
+                player.HeroCard
             )
         );
     }
@@ -131,7 +132,13 @@ public class AnalogPlayersController(
         if (body.Name is not null && await playersService.NameTakenByOtherAsync(id, body.Name, ct))
             return Conflict(new { error = "name_taken" });
 
-        var player = await playersService.PatchPlayerAsync(id, body.IsActive, body.Name, ct);
+        var player = await playersService.PatchPlayerAsync(
+            id,
+            body.IsActive,
+            body.Name,
+            body.HeroCard,
+            ct
+        );
         if (player is null)
             return NotFound();
 
@@ -141,6 +148,7 @@ public class AnalogPlayersController(
                 player.Id,
                 player.Name,
                 player.IsActive,
+                player.HeroCard,
             }
         );
     }

@@ -3,6 +3,7 @@ using System;
 using Doko.Analog;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Doko.Analog.Migrations
 {
     [DbContext(typeof(AnalogDbContext))]
-    partial class AnalogDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260514232157_AddHeroCard")]
+    partial class AddHeroCard
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -82,6 +82,143 @@
   justify-content: center;
 }
 
+.ps-hero-edit-btn {
+  background: none;
+  border: none;
+  color: var(--app-text-muted, #888);
+  font-size: 15px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-hero-edit-btn:active {
+  opacity: 0.6;
+}
+
+/* ── Edit profile modal ── */
+
+.ps-edit-profile {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 14px;
+  overflow-y: auto;
+}
+
+.ps-edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ps-edit-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--app-text-muted, #888);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ps-edit-name-input {
+  background: var(--app-input-bg, #1e1e1e);
+  border: 1px solid var(--app-border, #333);
+  border-radius: 8px;
+  color: var(--app-text, #fff);
+  font-size: 16px;
+  padding: 10px 12px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ps-edit-name-input:focus {
+  border-color: var(--app-accent, #3b82f6);
+}
+
+.ps-edit-name-input.ps-edit-name-error {
+  border-color: #ef4444;
+}
+
+.ps-edit-name-errmsg {
+  font-size: 12px;
+  color: #ef4444;
+}
+
+.ps-edit-save-error {
+  font-size: 13px;
+  color: #ef4444;
+  padding: 6px 0;
+}
+
+.ps-edit-actions {
+  display: flex;
+  gap: 10px;
+  padding-bottom: 4px;
+}
+
+.ps-edit-btn-cancel {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--app-border, #333);
+  background: none;
+  color: var(--app-text, #fff);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.ps-edit-btn-save {
+  flex: 2;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background: var(--app-accent, #3b82f6);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ps-edit-btn-save:disabled,
+.ps-edit-btn-cancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Card picker grid (used inside edit profile modal) ── */
+
+.ps-card-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+}
+
+.ps-card-picker-item {
+  background: none;
+  border: 2px solid transparent;
+  border-radius: 7px;
+  padding: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-card-picker-item:active {
+  opacity: 0.7;
+}
+
+.ps-card-picker-selected {
+  border-color: var(--app-accent, #3b82f6);
+  background: rgba(59, 130, 246, 0.12);
+}
+
 .ps-hero-right {
   flex: 1;
   min-width: 0;
