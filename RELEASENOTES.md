@@ -3,7 +3,16 @@
 ## [1.4.0] - 2026-05-14
 
 ### Neu
+- Beim Eintragen eines neuen Spiels gibt es jetzt einen Button **„Letzte Teams laden"**: Er füllt die vier Team-Blöcke mit den Spielern aus dem zuletzt gespeicherten Spiel – so müssen Spieler nach einem kurzen Zurück-Gehen nicht neu zugewiesen werden. Falls bereits Spieler eingetragen sind, erscheint vorher ein Bestätigungs-Dialog.
 - Farbthemen können jetzt direkt auf der Startseite gewechselt werden: Das 🎨-Symbol oben rechts öffnet eine Auswahl mit sechs Themes – **Default** (dunkel), **Rosé**, **Aqua**, **Classic**, **Cherry** und **Nautical**. Die fünf neuen Themes sind helle Designs; jedes zeigt die Kartenfarben Re und Kontra in eigenen Tönen. Die Auswahl wird sofort angewendet und gespeichert.
+
+### Verbessert
+- In der Rangliste zeigt das aufgeklappte Detail jetzt zwei Bilanzen nebeneinander: die Gesamtbilanz und die Bilanz der letzten 50 Spiele.
+- Beim Speichern einer Runde prüft das System jetzt auf Plausibilität: falsche Spieleranzahl pro Partei (Solo oder Normal), ungültige Sonderkarten-Kombinationen (z. B. Hyperschweinchen ohne Superschweinchen, Heidfrau ohne Heidmann) und überschrittene Limits bei Extrapunkten (z. B. Karlchen + Agathe max. 1×). Fehler werden direkt im Formular angezeigt.
+
+### Behoben
+- Der Verlaufs-Graph im Vollbild wurde beim ersten Öffnen nur auf der linken Hälfte angezeigt. Der Graph füllt jetzt sofort den gesamten Bereich aus.
+- Die Punkte im Verlaufs-Graph wurden falsch berechnet: Solo-Spiele (3-facher Multiplikator) und die Aufteilung auf Teammitglieder wurden nicht berücksichtigt. Die Punkteverläufe stimmen jetzt mit der Rangliste überein.
 
 ## [1.3.7] - 2026-05-10
 

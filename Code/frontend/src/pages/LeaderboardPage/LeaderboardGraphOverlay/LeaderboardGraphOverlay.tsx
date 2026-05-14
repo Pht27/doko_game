@@ -293,6 +293,9 @@ export function LeaderboardGraphOverlay({
             notMerge
             style={{ width: '100%', height: '100%' }}
             opts={{ renderer: 'canvas', devicePixelRatio: window.devicePixelRatio }}
+            onChartReady={() => {
+              setTimeout(() => chartRef.current?.getEchartsInstance()?.resize(), 0);
+            }}
           />
         )}
       </div>

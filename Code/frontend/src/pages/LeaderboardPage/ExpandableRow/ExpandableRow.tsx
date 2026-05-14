@@ -26,9 +26,9 @@ export function ExpandableRow({
 
   const rounds = detail && detail !== 'loading' && detail !== 'error' ? detail.recentRounds : null;
   const cumulativePts = rounds?.map((r) => r.cumulativePoints) ?? [];
-  const deltaPts = rounds?.map((r) => r.points) ?? [];
-  const maxDelta = deltaPts.length ? Math.max(...deltaPts) : null;
-  const minDelta = deltaPts.length ? Math.min(...deltaPts) : null;
+  const last50 = rounds ? rounds.slice(-50) : null;
+  const last50Wins = last50?.filter((r) => r.won).length ?? 0;
+  const last50Losses = last50 ? last50.length - last50Wins : 0;
 
   const chartSeries: ChartSeries[] = rounds && cumulativePts.length >= 2
     ? [{ name: player.name, color, points: cumulativePts.slice(-MAX_ROUNDS) }]
@@ -92,20 +92,12 @@ export function ExpandableRow({
                 )}
                 <div className="alb-mini-grid" style={{ borderTop: `2px solid ${color}` }}>
                   <div className="alb-mini-cell">
-                    <span className="alb-mini-val alb-mini-val--pos">
-                      {maxDelta !== null ? `+${maxDelta.toFixed(1)}` : '—'}
-                    </span>
-                    <span className="alb-mini-lbl">{t.analogLeaderboardHigh}</span>
-                  </div>
-                  <div className="alb-mini-cell">
-                    <span className={`alb-mini-val${minDelta !== null && minDelta < 0 ? ' alb-mini-val--neg' : ''}`}>
-                      {minDelta !== null ? `${minDelta > 0 ? '+' : ''}${minDelta.toFixed(1)}` : '—'}
-                    </span>
-                    <span className="alb-mini-lbl">{t.analogLeaderboardLow}</span>
-                  </div>
-                  <div className="alb-mini-cell">
                     <span className="alb-mini-val">{player.wins}S · {player.losses}N</span>
                     <span className="alb-mini-lbl">{t.analogLeaderboardBalance}</span>
+                  </div>
+                  <div className="alb-mini-cell">
+                    <span className="alb-mini-val">{last50Wins}S · {last50Losses}N</span>
+                    <span className="alb-mini-lbl">{t.analogLeaderboardLast50}</span>
                   </div>
                 </div>
               </>

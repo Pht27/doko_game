@@ -15,40 +15,32 @@ public class AnalogPlayersService(AnalogDbContext db)
         if (player is null)
             return null;
 
-        var rounds = await db
-            .TeamMembers.AsNoTracking()
-            .Where(tm => tm.PlayerId == id)
-            .Select(tm => new
-            {
-                tm.Team.Round.Id,
-                tm.Team.Round.PlayedAt,
-                tm.Team.Round.Points,
-                Won = tm.Team.Party == tm.Team.Round.WinningParty,
-            })
+        var history = await db
+            .PlayerRoundHistory.AsNoTracking()
+            .Where(r => r.PlayerId == id)
             .OrderBy(r => r.PlayedAt)
             .ToListAsync(ct);
 
-        var cumulativePoints = player.StartingPoints;
-        var recentRounds = rounds
-            .Select(r =>
-            {
-                var delta = r.Won ? (decimal)r.Points : -(decimal)r.Points;
-                cumulativePoints += delta;
-                return new PlayerRoundEntry(r.Id, r.PlayedAt, delta, r.Won, cumulativePoints);
-            })
+        var recentRounds = history
+            .Select(r => new PlayerRoundEntry(
+                r.RoundId,
+                r.PlayedAt,
+                r.PointDelta,
+                r.Won,
+                r.CumulativePoints
+            ))
             .ToList();
 
-        var totalPoints =
-            player.StartingPoints + rounds.Sum(r => r.Won ? (decimal)r.Points : -(decimal)r.Points);
+        var totalPoints = history.Count > 0 ? history[^1].CumulativePoints : player.StartingPoints;
 
         return new PlayerDetail(
             player.Id,
             player.Name,
             player.IsActive,
             totalPoints,
-            rounds.Count,
-            rounds.Count(r => r.Won),
-            rounds.Count(r => !r.Won),
+            history.Count,
+            history.Count(r => r.Won),
+            history.Count(r => !r.Won),
             recentRounds
         );
     }

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { ApiError } from '@/api/client';
 import { t } from '@/utils/translations';
 import type { RoundFormState, Party } from '@/hooks/useRoundForm';
 import type { PlayerListItem, StaticData } from '@/types/analog';
@@ -8,7 +9,18 @@ import { FormError } from '@/components/FormError/FormError';
 import { TeamBlock } from './TeamBlock/TeamBlock';
 import { TeamEditorModal } from './TeamEditorModal/TeamEditorModal';
 import { GameModePickerModal } from './GameModePickerModal/GameModePickerModal';
+import { BottomSheet } from '@/components/BottomSheet/BottomSheet';
 import './RoundForm.css';
+
+function ImportIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="7.5" y1="1.5" x2="7.5" y2="9" />
+      <polyline points="4.5,6.5 7.5,9.5 10.5,6.5" />
+      <polyline points="2,9 2,13.5 13,13.5 13,9" />
+    </svg>
+  );
+}
 
 interface Props {
   title: string;
@@ -29,7 +41,8 @@ interface Props {
   onAddExtraPoint: (i: number, id: number) => void;
   onUpdateExtraPointCount: (i: number, epId: number, delta: number) => void;
   onRemoveExtraPoint: (i: number, epId: number) => void;
-  onSubmit: () => void;
+  onSubmit: () => Promise<void>;
+  onImportLastTeams?: () => Promise<void>;
 }
 
 function validate(form: RoundFormState): string | null {
@@ -63,9 +76,11 @@ export function RoundForm({
   onUpdateExtraPointCount,
   onRemoveExtraPoint,
   onSubmit,
+  onImportLastTeams,
 }: Props) {
   const [editingBlock, setEditingBlock] = useState<number | null>(null);
   const [showGameModePicker, setShowGameModePicker] = useState(false);
+  const [showImportConfirm, setShowImportConfirm] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   // Local state to allow intermediate '-' during typing
   const [pointsDisplay, setPointsDisplay] = useState<string>(() =>
@@ -86,11 +101,35 @@ export function RoundForm({
     onSetWinningParty(form.winningParty === party ? null : party);
   };
 
-  const handleSubmit = () => {
+  const hasAnyPlayers = form.blocks.some((b) => b.playerIds.length > 0);
+
+  const handleImportClick = () => {
+    if (!onImportLastTeams) return;
+    if (hasAnyPlayers) {
+      setShowImportConfirm(true);
+    } else {
+      onImportLastTeams();
+    }
+  };
+
+  const handleImportConfirm = () => {
+    setShowImportConfirm(false);
+    onImportLastTeams?.();
+  };
+
+  const handleSubmit = async () => {
     const err = validate(form);
     if (err) { setSubmitError(err); return; }
     setSubmitError(null);
-    onSubmit();
+    try {
+      await onSubmit();
+    } catch (e) {
+      if (e instanceof ApiError && e.code && t.analogServerErrors[e.code]) {
+        setSubmitError(t.analogServerErrors[e.code]);
+      } else {
+        setSubmitError(t.analogSaveError);
+      }
+    }
   };
 
   const otherBlockIds = (blockIndex: number) =>
@@ -227,6 +266,12 @@ export function RoundForm({
       </div>
 
       <div className="arf-save-bar">
+        {onImportLastTeams && (
+          <Button variant="secondary" className="arf-import-btn pointer-events-auto" onClick={handleImportClick}>
+            {t.analogImportLastTeams}
+            <ImportIcon />
+          </Button>
+        )}
         <Button className="w-full pointer-events-auto" disabled={saving} onClick={handleSubmit}>
           {saving ? t.analogSaving : t.analogSave}
         </Button>
@@ -239,6 +284,24 @@ export function RoundForm({
           onSelect={onSetGameMode}
           onClose={() => setShowGameModePicker(false)}
         />
+      )}
+
+      {showImportConfirm && (
+        <BottomSheet
+          title={t.analogImportLastTeamsConfirmTitle}
+          onClose={() => setShowImportConfirm(false)}
+          maxHeight="auto"
+        >
+          <div className="arf-import-confirm">
+            <p className="arf-import-confirm-text">{t.analogImportLastTeamsConfirmText}</p>
+            <div className="arf-import-confirm-actions">
+              <Button onClick={handleImportConfirm}>{t.analogImportLastTeamsConfirmOk}</Button>
+              <Button variant="secondary" className="w-full" onClick={() => setShowImportConfirm(false)}>
+                {t.analogImportCancel}
+              </Button>
+            </div>
+          </div>
+        </BottomSheet>
       )}
 
       {editingBlock !== null && (

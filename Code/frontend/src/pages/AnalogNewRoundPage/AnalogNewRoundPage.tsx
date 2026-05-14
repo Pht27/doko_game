@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useStaticData } from '@/hooks/useStaticData';
 import { useAnalogPlayers } from '@/hooks/useAnalogPlayers';
 import { useRoundForm } from '@/hooks/useRoundForm';
-import { createRound } from '@/api/analog';
+import { createRound, getRounds, getRound } from '@/api/analog';
 import { RoundForm } from '@/features/RoundForm/RoundForm';
 import { t } from '@/utils/translations';
 
@@ -27,6 +27,7 @@ export function AnalogNewRoundPage() {
     removeExtraPoint,
     toApiRequest,
     resetForNew,
+    importTeams,
   } = useRoundForm();
   const [saving, setSaving] = useState(false);
 
@@ -55,6 +56,21 @@ export function AnalogNewRoundPage() {
       </div>
     );
   }
+
+  const handleImportLastTeams = async () => {
+    const list = await getRounds(1, 1);
+    if (list.items.length === 0) return;
+    const detail = await getRound(list.items[0].id);
+    const activeIds = new Set(players.filter((p) => p.isActive).map((p) => p.id));
+    const filtered = {
+      ...detail,
+      teams: detail.teams.map((t) => ({
+        ...t,
+        players: t.players.filter((p) => activeIds.has(p.id)),
+      })),
+    };
+    importTeams(filtered);
+  };
 
   const handleSubmit = async () => {
     setSaving(true);
@@ -87,6 +103,7 @@ export function AnalogNewRoundPage() {
       onUpdateExtraPointCount={updateExtraPointCount}
       onRemoveExtraPoint={removeExtraPoint}
       onSubmit={handleSubmit}
+      onImportLastTeams={handleImportLastTeams}
     />
   );
 }

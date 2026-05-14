@@ -19,7 +19,7 @@ export function ReleaseNotesModal({ onClose, needRefresh, updateSW }: ReleaseNot
       onClick={onClose}
     >
       <div
-        className="bg-(--app-surface-2) border border-(--app-border) rounded-2xl shadow-2xl flex flex-col w-full max-w-lg max-h-[80vh]"
+        className="bg-(--app-surface) border border-(--app-border) rounded-2xl shadow-2xl flex flex-col w-full max-w-lg max-h-[80vh]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between px-5 py-4 border-b border-(--app-border) shrink-0">

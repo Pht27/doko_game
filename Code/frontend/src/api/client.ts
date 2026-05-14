@@ -1,5 +1,15 @@
 const BASE_URL = import.meta.env.VITE_API_URL ?? '/api';
 
+export class ApiError extends Error {
+  constructor(
+    public status: number,
+    public code: string | null,
+    rawBody: string,
+  ) {
+    super(`HTTP ${status}: ${rawBody}`);
+  }
+}
+
 export async function apiFetch<T>(
   path: string,
   token: string | null,
@@ -12,7 +22,12 @@ export async function apiFetch<T>(
 
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`HTTP ${res.status}: ${body}`);
+    let code: string | null = null;
+    try {
+      const json = JSON.parse(body);
+      code = typeof json.error === 'string' ? json.error : null;
+    } catch {}
+    throw new ApiError(res.status, code, body);
   }
 
   const text = await res.text();
