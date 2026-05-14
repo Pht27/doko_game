@@ -8,4 +8,5 @@ public class PlayerPartnerStatsEntry
     public int GamesTogether { get; set; }
     public int WinsTogether { get; set; }
     public decimal WinRateTogether { get; set; }
+    public decimal AvgPointsWonLost { get; set; }
 }

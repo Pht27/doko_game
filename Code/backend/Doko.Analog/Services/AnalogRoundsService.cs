@@ -56,6 +56,151 @@ public class AnalogRoundsService(AnalogDbContext db)
         return new RoundListPage(total, page, items);
     }
 
+    public async Task<(
+        PlayerRoundListItem? Best,
+        PlayerRoundListItem? Worst
+    )> GetPlayerBestWorstAsync(int playerId, CancellationToken ct = default)
+    {
+        // Exclude solo game modes from best/worst calculation
+        var history = await (
+            from h in db.PlayerRoundHistory.AsNoTracking()
+            join r in db.Rounds on h.RoundId equals r.Id
+            where h.PlayerId == playerId && !r.GameMode.IsSolo
+            select h
+        ).ToListAsync(ct);
+
+        if (history.Count == 0)
+            return (null, null);
+
+        var bestEntry = history.MaxBy(r => r.PointDelta)!;
+        var worstEntry = history.MinBy(r => r.PointDelta)!;
+
+        var bestId = bestEntry.RoundId;
+        var worstId = worstEntry.RoundId;
+
+        var rounds = await db
+            .Rounds.AsNoTracking()
+            .Where(r => r.Id == bestId || r.Id == worstId)
+            .Select(r => new
+            {
+                r.Id,
+                r.PlayedAt,
+                r.WinningParty,
+                r.Points,
+                GameMode = r.GameMode.Name,
+                RePlayers = r
+                    .Teams.Where(t => t.Party == Party.Re)
+                    .SelectMany(t => t.Members.OrderBy(m => m.Position))
+                    .Select(m => new PlayerInfo(m.Player.Id, m.Player.Name))
+                    .ToList(),
+                KontraPlayers = r
+                    .Teams.Where(t => t.Party == Party.Kontra)
+                    .SelectMany(t => t.Members.OrderBy(m => m.Position))
+                    .Select(m => new PlayerInfo(m.Player.Id, m.Player.Name))
+                    .ToList(),
+                TeamPartners = r
+                    .Teams.Where(t => t.Members.Any(m => m.PlayerId == playerId))
+                    .SelectMany(t =>
+                        t.Members.Where(m => m.PlayerId != playerId).OrderBy(m => m.Position)
+                    )
+                    .Select(m => new PlayerInfo(m.Player.Id, m.Player.Name))
+                    .ToList(),
+                Comment = (string?)
+                    db.Comments.Where(c => c.RoundId == r.Id).Select(c => c.Text).FirstOrDefault(),
+            })
+            .ToListAsync(ct);
+
+        PlayerRoundListItem? ToItem(int id, decimal pointDelta) =>
+            rounds
+                .Where(r => r.Id == id)
+                .Select(r => new PlayerRoundListItem(
+                    r.Id,
+                    r.PlayedAt,
+                    r.WinningParty,
+                    r.Points,
+                    r.GameMode,
+                    r.RePlayers.ToArray(),
+                    r.KontraPlayers.ToArray(),
+                    r.Comment,
+                    r.TeamPartners.ToArray(),
+                    pointDelta
+                ))
+                .FirstOrDefault();
+
+        return (ToItem(bestId, bestEntry.PointDelta), ToItem(worstId, worstEntry.PointDelta));
+    }
+
+    public async Task<PlayerRoundListPage> GetPlayerRoundsAsync(
+        int playerId,
+        int page,
+        int pageSize,
+        CancellationToken ct = default
+    )
+    {
+        var query = db
+            .Rounds.AsNoTracking()
+            .Where(r => r.Teams.Any(t => t.Members.Any(m => m.PlayerId == playerId)));
+
+        var total = await query.CountAsync(ct);
+
+        var rounds = await query
+            .OrderByDescending(r => r.PlayedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .Select(r => new
+            {
+                r.Id,
+                r.PlayedAt,
+                r.WinningParty,
+                r.Points,
+                GameMode = r.GameMode.Name,
+                RePlayers = r
+                    .Teams.Where(t => t.Party == Party.Re)
+                    .SelectMany(t => t.Members.OrderBy(m => m.Position))
+                    .Select(m => new PlayerInfo(m.Player.Id, m.Player.Name))
+                    .ToList(),
+                KontraPlayers = r
+                    .Teams.Where(t => t.Party == Party.Kontra)
+                    .SelectMany(t => t.Members.OrderBy(m => m.Position))
+                    .Select(m => new PlayerInfo(m.Player.Id, m.Player.Name))
+                    .ToList(),
+                TeamPartners = r
+                    .Teams.Where(t => t.Members.Any(m => m.PlayerId == playerId))
+                    .SelectMany(t =>
+                        t.Members.Where(m => m.PlayerId != playerId).OrderBy(m => m.Position)
+                    )
+                    .Select(m => new PlayerInfo(m.Player.Id, m.Player.Name))
+                    .ToList(),
+                Comment = (string?)
+                    db.Comments.Where(c => c.RoundId == r.Id).Select(c => c.Text).FirstOrDefault(),
+            })
+            .ToListAsync(ct);
+
+        var roundIds = rounds.Select(r => r.Id).ToList();
+        var deltas = await db
+            .PlayerRoundHistory.Where(h => h.PlayerId == playerId && roundIds.Contains(h.RoundId))
+            .Select(h => new { h.RoundId, h.PointDelta })
+            .ToListAsync(ct);
+        var deltaMap = deltas.ToDictionary(h => h.RoundId, h => h.PointDelta);
+
+        var items = rounds
+            .Select(r => new PlayerRoundListItem(
+                r.Id,
+                r.PlayedAt,
+                r.WinningParty,
+                r.Points,
+                r.GameMode,
+                r.RePlayers.ToArray(),
+                r.KontraPlayers.ToArray(),
+                r.Comment,
+                r.TeamPartners.ToArray(),
+                deltaMap.GetValueOrDefault(r.Id)
+            ))
+            .ToArray();
+
+        return new PlayerRoundListPage(total, page, items);
+    }
+
     public async Task<RoundDetail?> GetRoundAsync(int id, CancellationToken ct = default)
     {
         var round = await db
@@ -395,6 +540,21 @@ public record RoundListItem(
     PlayerInfo[] RePlayers,
     PlayerInfo[] KontraPlayers,
     string? Comment
+);
+
+public record PlayerRoundListPage(int Total, int Page, PlayerRoundListItem[] Items);
+
+public record PlayerRoundListItem(
+    int Id,
+    DateTime PlayedAt,
+    Party WinningParty,
+    int Points,
+    string GameMode,
+    PlayerInfo[] RePlayers,
+    PlayerInfo[] KontraPlayers,
+    string? Comment,
+    PlayerInfo[] TeamPartners,
+    decimal PointDelta
 );
 
 public record RoundDetail(

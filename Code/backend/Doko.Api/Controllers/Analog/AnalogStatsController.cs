@@ -7,8 +7,35 @@ namespace Doko.Api.Controllers.Analog;
 
 [ApiController]
 [AllowAnonymous]
-public class AnalogStatsController(AnalogStatsService statsService) : ControllerBase
+public class AnalogStatsController(
+    AnalogStatsService statsService,
+    AnalogRoundsService roundsService
+) : ControllerBase
 {
+    [HttpGet("analog/players/{id:int}/stats/best-worst")]
+    public async Task<IActionResult> GetPlayerBestWorstRounds(int id, CancellationToken ct)
+    {
+        var (best, worst) = await roundsService.GetPlayerBestWorstAsync(id, ct);
+
+        PlayerRoundListItemDto? ToDto(Doko.Analog.Services.PlayerRoundListItem? r) =>
+            r is null
+                ? null
+                : new PlayerRoundListItemDto(
+                    r.Id,
+                    r.PlayedAt,
+                    r.WinningParty,
+                    r.Points,
+                    r.GameMode,
+                    r.RePlayers.Select(p => new PlayerInfoDto(p.Id, p.Name)).ToArray(),
+                    r.KontraPlayers.Select(p => new PlayerInfoDto(p.Id, p.Name)).ToArray(),
+                    r.Comment,
+                    r.TeamPartners.Select(p => new PlayerInfoDto(p.Id, p.Name)).ToArray(),
+                    r.PointDelta
+                );
+
+        return Ok(new { best = ToDto(best), worst = ToDto(worst) });
+    }
+
     [HttpGet("analog/players/{id:int}/stats")]
     public async Task<IActionResult> GetPlayerStats(int id, CancellationToken ct)
     {
@@ -103,7 +130,8 @@ public class AnalogStatsController(AnalogStatsService statsService) : Controller
                 e.PartnerName,
                 e.GamesTogether,
                 e.WinsTogether,
-                e.WinRateTogether
+                e.WinRateTogether,
+                e.AvgPointsWonLost
             ))
         );
     }
