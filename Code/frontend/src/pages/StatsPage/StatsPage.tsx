@@ -146,7 +146,7 @@ export function StatsPage() {
     },
     {
       key: 'reAvgGameValue',
-      label: 'Re Ø',
+      label: 'Re Ø Wert',
       sortValue: (r) => r.reAvgGameValue,
       render: (r) =>
         r.reAvgGameValue != null ? (
@@ -173,7 +173,7 @@ export function StatsPage() {
     },
     {
       key: 'avg',
-      label: 'Ø',
+      label: 'Ø Wert',
       sortValue: (r) => r.avgGameValue,
       render: (r) => (
         <span style={{ color: colorForMean(r.avgGameValue) }}>{fmtMean(r.avgGameValue)}</span>
@@ -197,7 +197,7 @@ export function StatsPage() {
     },
     {
       key: 'avg',
-      label: 'Ø',
+      label: 'Ø Wert',
       sortValue: (r) => r.avgGameValue,
       render: (r) => (
         <span style={{ color: colorForMean(r.avgGameValue) }}>{fmtMean(r.avgGameValue)}</span>

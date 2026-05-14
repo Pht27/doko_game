@@ -339,6 +339,62 @@
   border-bottom: 1px solid var(--app-border);
 }
 
+.ps-pt-info-btn {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--app-text-muted);
+  background: transparent;
+  color: var(--app-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: auto;
+  transition: border-color 0.1s, color 0.1s;
+}
+
+.ps-pt-info-btn:hover {
+  border-color: var(--app-text);
+  color: var(--app-text);
+}
+
+.ps-pt-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 4px 0 16px;
+  overflow-y: auto;
+}
+
+.ps-pt-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.ps-pt-info-item:last-child {
+  border-bottom: none;
+}
+
+.ps-pt-info-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--app-text);
+}
+
+.ps-pt-info-desc {
+  font-size: 13px;
+  color: var(--app-text-muted);
+  line-height: 1.5;
+}
+
 .ps-pt-label {
   font-size: 10px;
   font-weight: 600;

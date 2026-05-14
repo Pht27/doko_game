@@ -2,6 +2,10 @@
 
 ## [1.4.2] - 2026-05-14
 
+### Neu
+- Der **Punkte-Umschalter** im Spielerprofil heißt jetzt „Spielwert / Brutto / Netto" und erklärt per **?-Button** den Unterschied zwischen den drei Punktetypen.
+- Auf der **Spielstatistik-Seite** sind die Ø-Spalten jetzt als „Ø Wert" beschriftet, damit klar erkennbar ist, dass dort der Spielwert (ohne Solo- und Teamfaktor) angezeigt wird.
+
 ### Verbessert
 - Das **Spielerprofil** wurde umfassend überarbeitet: Hero-Bereich mit Karte, Name, Rangabzeichen (Platzierung unter aktiven Spielern) und drei Inline-Stats (Spiele, Winrate, Ø-Wert) direkt neben dem Punktestand. Bestes und schlechtestes Spiel als Mini-Karten (Solos ausgenommen).
 - Der **Spielverlauf** im Profil zeigt jetzt den tatsächlich verdienten Punkteunterschied pro Runde (mit Solo- und Teamfaktor). Als Teampartner wird nur der direkte Mitspieler im gleichen Team angezeigt – nicht alle Parteimitglieder. Spielt man alleine, bleibt das Feld leer. Die Partei (Re/Ko) hat eine eigene Spalte.
