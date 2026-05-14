@@ -1,5 +1,16 @@
 # Release Notes
 
+## [1.4.2] - 2026-05-14
+
+### Verbessert
+- Das **Spielerprofil** wurde umfassend überarbeitet: Hero-Bereich mit Karte, Name, Rangabzeichen (Platzierung unter aktiven Spielern) und drei Inline-Stats (Spiele, Winrate, Ø-Wert) direkt neben dem Punktestand. Bestes und schlechtestes Spiel als Mini-Karten (Solos ausgenommen).
+- Der **Spielverlauf** im Profil zeigt jetzt den tatsächlich verdienten Punkteunterschied pro Runde (mit Solo- und Teamfaktor). Als Teampartner wird nur der direkte Mitspieler im gleichen Team angezeigt – nicht alle Parteimitglieder. Spielt man alleine, bleibt das Feld leer. Die Partei (Re/Ko) hat eine eigene Spalte.
+- Die **Pagination** im Spielverlauf hat jetzt ein klassisches Ellipsis-Format (‹ 1 … 4 5 6 … 12 ›) statt aller Seitenzahlen auf einmal.
+- Der **Punkte-Umschalter** (Spielwert / Punkte / Diff) sperrt jetzt nicht anwendbare Optionen: Bei Sonderkarten und Extrapunkten sind nur die relevanten Werte auswählbar.
+- Die **Teamstatistik** zeigt jetzt zusätzlich den Ø-Punktewert pro Spiel mit einem bestimmten Partner (mit Solofaktor, ohne Teamfaktor).
+- Der Punktestand-Label im **Verlaufs-Graph** hat jetzt einen Pille-Hintergrund, damit er auch bei hellem Graphbereich lesbar bleibt.
+- Der Aufklapp-Pfeil bei Spielkarten im Spielverlauf ist jetzt korrekt zentriert.
+
 ## [1.4.1] - 2026-05-14
 
 ### Behoben
