@@ -16,6 +16,7 @@ on-run-start:
 
 models:
   doko:
+    +pre-hook: "drop view if exists {{ this }}"
     staging:
       +materialized: view
     intermediate:
