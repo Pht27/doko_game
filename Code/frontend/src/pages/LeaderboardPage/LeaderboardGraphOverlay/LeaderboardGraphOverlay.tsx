@@ -56,6 +56,12 @@ export function LeaderboardGraphOverlay({
   }, []);
 
   useEffect(() => {
+    const handleResize = () => chartRef.current?.getEchartsInstance()?.resize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
     visibleIds.forEach((id) => onFetchDetail(id));
   }, [visibleIds, onFetchDetail]);
 
