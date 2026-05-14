@@ -6,6 +6,7 @@ import { t } from '@/utils/translations';
 import { BackButton } from '@/components/BackButton/BackButton';
 import { StatusState } from '@/components/StatusState/StatusState';
 import { SortableTable } from '@/components/SortableTable/SortableTable';
+import { BottomSheet } from '@/components/BottomSheet/BottomSheet';
 import { RoundCard } from '@/pages/HistoryPage/RoundCard/RoundCard';
 import type { Column } from '@/components/SortableTable/SortableTable';
 import type {
@@ -25,6 +26,27 @@ import './PlayerPage.css';
 type PointType = 'value' | 'wonlost' | 'earned';
 type TabId = 'gm' | 'sc' | 'ep' | 'pt' | 'al';
 
+function PointTypeInfoSheet({ onClose }: { onClose: () => void }) {
+  return (
+    <BottomSheet title="Punktetypen" onClose={onClose}>
+      <div className="ps-pt-info">
+        <div className="ps-pt-info-item">
+          <span className="ps-pt-info-name">Spielwert</span>
+          <span className="ps-pt-info-desc">Der reine Spielwert ohne Solofaktor und Teamfaktor. Vergleichbar unabhängig von Spielkonstellation.</span>
+        </div>
+        <div className="ps-pt-info-item">
+          <span className="ps-pt-info-name">Bruttopunkte</span>
+          <span className="ps-pt-info-desc">Spielwert × Solofaktor (z. B. ×3 bei Solo). Zeigt, was die Partei insgesamt gewonnen oder verloren hat.</span>
+        </div>
+        <div className="ps-pt-info-item">
+          <span className="ps-pt-info-name">Nettopunkte</span>
+          <span className="ps-pt-info-desc">Bruttopunkte ÷ Teamgröße. Der persönliche Anteil – was tatsächlich auf dem Konto landet.</span>
+        </div>
+      </div>
+    </BottomSheet>
+  );
+}
+
 function PointTypeToggle({
   value,
   onChange,
@@ -34,30 +56,35 @@ function PointTypeToggle({
   onChange: (v: PointType) => void;
   disabledOptions?: PointType[];
 }) {
+  const [showInfo, setShowInfo] = useState(false);
   const opts: { key: PointType; label: string }[] = [
     { key: 'value', label: 'Spielwert' },
-    { key: 'wonlost', label: 'Punkte' },
-    { key: 'earned', label: 'Diff' },
+    { key: 'wonlost', label: 'Brutto' },
+    { key: 'earned', label: 'Netto' },
   ];
   return (
-    <div className="ps-pt-row">
-      <span className="ps-pt-label">Ø zeigt</span>
-      <div className="ps-pt-toggle">
-        {opts.map((o) => {
-          const isDisabled = disabledOptions.includes(o.key);
-          return (
-            <button
-              key={o.key}
-              className={`ps-pt-btn${value === o.key ? ' ps-pt-active' : ''}${isDisabled ? ' ps-pt-locked' : ''}`}
-              disabled={isDisabled}
-              onClick={() => onChange(o.key)}
-            >
-              {o.label}
-            </button>
-          );
-        })}
+    <>
+      <div className="ps-pt-row">
+        <button className="ps-pt-info-btn" onClick={() => setShowInfo(true)} aria-label="Punktetypen erklären">?</button>
+        <span className="ps-pt-label">Ø zeigt</span>
+        <div className="ps-pt-toggle">
+          {opts.map((o) => {
+            const isDisabled = disabledOptions.includes(o.key);
+            return (
+              <button
+                key={o.key}
+                className={`ps-pt-btn${value === o.key ? ' ps-pt-active' : ''}${isDisabled ? ' ps-pt-locked' : ''}`}
+                disabled={isDisabled}
+                onClick={() => onChange(o.key)}
+              >
+                {o.label}
+              </button>
+            );
+          })}
+        </div>
       </div>
-    </div>
+      {showInfo && <PointTypeInfoSheet onClose={() => setShowInfo(false)} />}
+    </>
   );
 }
 
@@ -683,7 +710,7 @@ export function PlayerPage() {
                   {fmtMean(avgVal)}
                 </span>
                 <span className="ps-hero-stat-label">
-                  Ø {effectivePointType === 'earned' ? 'Diff' : effectivePointType === 'wonlost' ? 'Pkt.' : 'Wert'}
+                  Ø {effectivePointType === 'earned' ? 'Netto' : effectivePointType === 'wonlost' ? 'Brutto' : 'Wert'}
                 </span>
               </div>
             </div>
