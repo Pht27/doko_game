@@ -139,10 +139,8 @@ public class AnalogRoundsService(AnalogDbContext db)
         if (gameMode is null)
             return "invalid_game_mode";
 
-        var reCount = input.Teams.Where(t => t.Party == Party.Re).Sum(t => t.PlayerIds.Length);
-        var kontraCount = input
-            .Teams.Where(t => t.Party == Party.Kontra)
-            .Sum(t => t.PlayerIds.Length);
+        var reCount = input.Teams.Count(t => t.Party == Party.Re);
+        var kontraCount = input.Teams.Count(t => t.Party == Party.Kontra);
 
         if (gameMode.IsSolo)
         {
