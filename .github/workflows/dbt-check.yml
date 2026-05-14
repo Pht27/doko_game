@@ -22,7 +22,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install dbt
-        run: pip install dbt-postgres==1.9.*
+        run: pip install "dbt-postgres==1.9.1" "dbt-core==1.9.1"
 
       - name: dbt parse
         working-directory: dbt
