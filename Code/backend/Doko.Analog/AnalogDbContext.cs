@@ -66,6 +66,7 @@ public class AnalogDbContext(DbContextOptions<AnalogDbContext> options) : DbCont
             e.Property(p => p.Name).HasMaxLength(50);
             e.Property(p => p.StartingPoints).HasColumnType("decimal(10,1)");
             e.Property(p => p.CreatedAt).HasDefaultValueSql("now()");
+            e.Property(p => p.HeroCard).HasMaxLength(10).IsRequired(false);
         });
 
         modelBuilder.Entity<AnalogGameMode>(e =>

@@ -3,6 +3,9 @@
 ## [1.4.2] - 2026-05-14
 
 ### Neu
+- Spieler können jetzt ihr **Profil bearbeiten**: Name ändern und eine **Heldenkarte** aus allen 24 Doppelkopf-Karten wählen. Der ✎-Button neben dem Namen öffnet das Bearbeitungsformular. Die Karte wird dauerhaft gespeichert und im Hero-Bereich des Profils angezeigt.
+
+### Verbessert
 - Der **Punkte-Umschalter** im Spielerprofil heißt jetzt „Spielwert / Brutto / Netto" und erklärt per **?-Button** den Unterschied zwischen den drei Punktetypen.
 - Auf der **Spielstatistik-Seite** sind die Ø-Spalten jetzt als „Ø Wert" beschriftet, damit klar erkennbar ist, dass dort der Spielwert (ohne Solo- und Teamfaktor) angezeigt wird.
 

@@ -8,5 +8,6 @@ public record PlayerDetailDto(
     int GamesPlayed,
     int Wins,
     int Losses,
-    IReadOnlyList<PlayerRoundDto> RecentRounds
+    IReadOnlyList<PlayerRoundDto> RecentRounds,
+    string? HeroCard = null
 );

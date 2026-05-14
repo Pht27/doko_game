@@ -41,6 +41,7 @@ export interface PlayerListItem {
   losses: number;
   winRate: number;
   avgPointsPerGame: number;
+  heroCard?: string | null;
 }
 
 export interface PlayerRound {
@@ -60,6 +61,7 @@ export interface PlayerDetail {
   wins: number;
   losses: number;
   recentRounds: PlayerRound[];
+  heroCard?: string | null;
 }
 
 // ── Static data ──────────────────────────────────────────────────────────────

@@ -41,7 +41,8 @@ public class AnalogPlayersService(AnalogDbContext db)
             history.Count,
             history.Count(r => r.Won),
             history.Count(r => !r.Won),
-            recentRounds
+            recentRounds,
+            player.HeroCard
         );
     }
 
@@ -67,6 +68,7 @@ public class AnalogPlayersService(AnalogDbContext db)
         int id,
         bool isActive,
         string? name,
+        string? heroCard = null,
         CancellationToken ct = default
     )
     {
@@ -77,6 +79,8 @@ public class AnalogPlayersService(AnalogDbContext db)
         player.IsActive = isActive;
         if (name is not null)
             player.Name = name;
+        if (heroCard is not null)
+            player.HeroCard = heroCard;
         await db.SaveChangesAsync(ct);
         return player;
     }
@@ -107,5 +111,6 @@ public record PlayerDetail(
     int GamesPlayed,
     int Wins,
     int Losses,
-    IReadOnlyList<PlayerRoundEntry> RecentRounds
+    IReadOnlyList<PlayerRoundEntry> RecentRounds,
+    string? HeroCard = null
 );

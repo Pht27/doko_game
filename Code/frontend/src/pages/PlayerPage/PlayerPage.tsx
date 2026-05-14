@@ -19,6 +19,8 @@ import type {
   PlayerRoundListItem,
 } from '@/types/analog';
 import { colorForRate, colorForMean, colorForTotal, fmtRate, fmtMean, fmtInt } from '@/utils/statsUtils';
+import { patchPlayer } from '@/api/analog';
+import { cardSvgPathById, ALL_CARD_IDS } from '@/api/cards';
 import './PlayerPage.css';
 
 // ── Point type toggle ─────────────────────────────────────────────────────────
@@ -238,9 +240,9 @@ function CollapsibleGameModeTable({
   );
 }
 
-// ── Hero card SVG ─────────────────────────────────────────────────────────────
+// ── Hero card display ─────────────────────────────────────────────────────────
 
-function CardFace() {
+function HeroCardFallback() {
   const w = 64, h = 92, r = 7;
   const suit = '♦';
   const rank = 'A';
@@ -262,6 +264,104 @@ function CardFace() {
         <text x={w * 0.86} y={h * 0.92} fontFamily="sans-serif" fontSize={8} fill={color}>{suit}</text>
       </g>
     </svg>
+  );
+}
+
+function HeroCardDisplay({ heroCard }: { heroCard: string | null }) {
+  const url = heroCard ? cardSvgPathById(heroCard) : null;
+  return url ? (
+    <img src={url} width={64} height={92} style={{ display: 'block', borderRadius: 7 }} alt={heroCard ?? ''} />
+  ) : (
+    <HeroCardFallback />
+  );
+}
+
+function validateName(name: string): string | null {
+  const trimmed = name.trim();
+  if (!trimmed) return 'Name darf nicht leer sein';
+  if (trimmed.length > 50) return 'Name darf maximal 50 Zeichen haben';
+  return null;
+}
+
+function EditProfileModal({
+  initialName,
+  currentHeroCard,
+  onSave,
+  onClose,
+}: {
+  initialName: string;
+  currentHeroCard: string | null;
+  onSave: (name: string, heroCard: string | null) => Promise<void>;
+  onClose: () => void;
+}) {
+  const [name, setName] = useState(initialName);
+  const [heroCard, setHeroCard] = useState<string | null>(currentHeroCard);
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  async function handleSave() {
+    const err = validateName(name);
+    if (err) { setNameError(err); return; }
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await onSave(name.trim(), heroCard);
+      onClose();
+    } catch {
+      setSaveError('Speichern fehlgeschlagen. Bitte erneut versuchen.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <BottomSheet title="Profil bearbeiten" onClose={onClose} maxHeight="92vh">
+      <div className="ps-edit-profile">
+        <div className="ps-edit-field">
+          <label className="ps-edit-label" htmlFor="ps-name-input">Name</label>
+          <input
+            id="ps-name-input"
+            className={`ps-edit-name-input${nameError ? ' ps-edit-name-error' : ''}`}
+            type="text"
+            value={name}
+            maxLength={50}
+            onChange={(e) => { setName(e.target.value); setNameError(null); }}
+            autoComplete="off"
+            spellCheck={false}
+          />
+          {nameError && <span className="ps-edit-name-errmsg">{nameError}</span>}
+        </div>
+
+        <div className="ps-edit-field">
+          <span className="ps-edit-label">Heldenarte</span>
+          <div className="ps-card-picker-grid">
+            {ALL_CARD_IDS.map((id) => {
+              const url = cardSvgPathById(id);
+              const isSelected = id === heroCard;
+              return (
+                <button
+                  key={id}
+                  className={`ps-card-picker-item${isSelected ? ' ps-card-picker-selected' : ''}`}
+                  onClick={() => setHeroCard(id)}
+                >
+                  <img src={url} alt={id} width={52} height={75} style={{ display: 'block', borderRadius: 5 }} />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {saveError && <div className="ps-edit-save-error">{saveError}</div>}
+
+        <div className="ps-edit-actions">
+          <button className="ps-edit-btn-cancel" onClick={onClose} disabled={saving}>Abbrechen</button>
+          <button className="ps-edit-btn-save" onClick={handleSave} disabled={saving}>
+            {saving ? 'Speichert…' : 'Speichern'}
+          </button>
+        </div>
+      </div>
+    </BottomSheet>
   );
 }
 
@@ -556,6 +656,9 @@ export function PlayerPage() {
   const data = usePlayerStats(playerId);
   const [activeTab, setActiveTab] = useState<TabId>('gm');
   const [pointType, setPointType] = useState<PointType>('earned');
+  const [localHeroCard, setLocalHeroCard] = useState<string | null | undefined>(undefined);
+  const [localName, setLocalName] = useState<string | undefined>(undefined);
+  const [showEditProfile, setShowEditProfile] = useState(false);
 
   if (data.loading) {
     return (
@@ -574,6 +677,15 @@ export function PlayerPage() {
   }
 
   const { stats, detail, gameModes, specialCards, extraPoints, partners, bestRound, worstRound, rank } = data;
+
+  const effectiveHeroCard = localHeroCard !== undefined ? localHeroCard : (detail?.heroCard ?? null);
+  const effectiveName = localName !== undefined ? localName : stats.name;
+
+  async function handleProfileSave(newName: string, newHeroCard: string | null) {
+    await patchPlayer(playerId, { isActive: stats.isActive, name: newName, heroCard: newHeroCard ?? undefined });
+    setLocalName(newName);
+    setLocalHeroCard(newHeroCard);
+  }
 
   const scAvg = (r: PlayerSpecialCardStat) =>
     effectivePointType === 'wonlost' || effectivePointType === 'earned' ? r.avgPointsWonLost : r.avgGameValue;
@@ -672,20 +784,34 @@ export function PlayerPage() {
         <BackButton to={-1 as never} />
         <div className="ps-topbar-text">
           <span className="ps-topbar-title">Profil</span>
-          <span className="ps-topbar-sub">{stats.name}</span>
+          <span className="ps-topbar-sub">{effectiveName}</span>
         </div>
         {!stats.isActive && <span className="ps-inactive-badge">{t.analogInactive}</span>}
       </div>
+
+      {showEditProfile && (
+        <EditProfileModal
+          initialName={effectiveName}
+          currentHeroCard={effectiveHeroCard}
+          onSave={handleProfileSave}
+          onClose={() => setShowEditProfile(false)}
+        />
+      )}
 
       <div className="ps-scroll">
         {/* Hero: card + name/points + inline stats */}
         <div className="ps-hero">
           <div className="ps-hero-mount">
-            <CardFace />
+            <HeroCardDisplay heroCard={effectiveHeroCard} />
           </div>
           <div className="ps-hero-right">
             <div className="ps-hero-name-row">
-              <span className="ps-hero-name">{stats.name}</span>
+              <span className="ps-hero-name">{effectiveName}</span>
+              <button
+                className="ps-hero-edit-btn"
+                onClick={() => setShowEditProfile(true)}
+                title="Profil bearbeiten"
+              >✎</button>
               <RankBadge rank={rank} />
             </div>
             <div className="ps-hero-total" style={{ color: colorForTotal(totalPts) }}>

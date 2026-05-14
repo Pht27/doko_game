@@ -7,4 +7,5 @@ public class AnalogPlayer
     public bool IsActive { get; set; } = true;
     public decimal StartingPoints { get; set; } = 0;
     public DateTime CreatedAt { get; set; }
+    public string? HeroCard { get; set; }
 }

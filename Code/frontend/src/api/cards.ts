@@ -45,3 +45,16 @@ export function cardSvgComponent(suit: string, rank: string): React.FC<React.SVG
 }
 
 export const cardBackSvgPath: string = svgUrls['../assets/cards/card_back.svg'] ?? '';
+
+export const ALL_CARD_IDS: string[] = [
+  'krA', 'krK', 'krD', 'krB', 'kr10', 'kr9',
+  'pA', 'pK', 'pD', 'pB', 'p10', 'p9',
+  'hA', 'hK', 'hD', 'hB', 'h10', 'h9',
+  'kA', 'kK', 'kD', 'kB', 'k10', 'k9',
+];
+
+export function cardSvgPathById(id: string): string {
+  const url = svgUrls[`../assets/cards/${id}.svg`];
+  if (!url) console.warn(`Card SVG not found by id: ${id}`);
+  return url ?? '';
+}
