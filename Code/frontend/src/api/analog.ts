@@ -6,6 +6,14 @@ import type {
   RoundDetail,
   RoundRequest,
   StaticData,
+  PlayerStats,
+  PlayerGameModeStat,
+  PlayerSpecialCardStat,
+  PlayerExtraPointStat,
+  PlayerPartnerStat,
+  GameModeStat,
+  SpecialCardStat,
+  ExtraPointStat,
 } from '@/types/analog';
 
 export function getPlayers(): Promise<PlayerListItem[]> {
@@ -61,4 +69,38 @@ export function updateRound(id: number, body: RoundRequest): Promise<{ id: numbe
 
 export function deleteRound(id: number): Promise<void> {
   return apiFetch(`/analog/rounds/${id}`, null, { method: 'DELETE' });
+}
+
+// ── Stats ────────────────────────────────────────────────────────────────────
+
+export function getPlayerStats(id: number): Promise<PlayerStats> {
+  return apiFetch(`/analog/players/${id}/stats`, null);
+}
+
+export function getPlayerGameModeStats(id: number): Promise<PlayerGameModeStat[]> {
+  return apiFetch(`/analog/players/${id}/stats/game-modes`, null);
+}
+
+export function getPlayerSpecialCardStats(id: number): Promise<PlayerSpecialCardStat[]> {
+  return apiFetch(`/analog/players/${id}/stats/special-cards`, null);
+}
+
+export function getPlayerExtraPointStats(id: number): Promise<PlayerExtraPointStat[]> {
+  return apiFetch(`/analog/players/${id}/stats/extra-points`, null);
+}
+
+export function getPlayerPartnerStats(id: number): Promise<PlayerPartnerStat[]> {
+  return apiFetch(`/analog/players/${id}/stats/partners`, null);
+}
+
+export function getGameModeStats(): Promise<GameModeStat[]> {
+  return apiFetch('/analog/stats/game-modes', null);
+}
+
+export function getSpecialCardStats(): Promise<SpecialCardStat[]> {
+  return apiFetch('/analog/stats/special-cards', null);
+}
+
+export function getExtraPointStats(): Promise<ExtraPointStat[]> {
+  return apiFetch('/analog/stats/extra-points', null);
 }

@@ -1,4 +1,5 @@
 using Doko.Analog.Entities;
+using Doko.Analog.Stats;
 using Microsoft.EntityFrameworkCore;
 
 namespace Doko.Analog;
@@ -17,6 +18,16 @@ public class AnalogDbContext(DbContextOptions<AnalogDbContext> options) : DbCont
     public DbSet<AnalogComment> Comments => Set<AnalogComment>();
     public DbSet<PlayerLeaderboardEntry> PlayerLeaderboard => Set<PlayerLeaderboardEntry>();
     public DbSet<PlayerRoundHistoryEntry> PlayerRoundHistory => Set<PlayerRoundHistoryEntry>();
+    public DbSet<PlayerStatsEntry> PlayerStats => Set<PlayerStatsEntry>();
+    public DbSet<PlayerGameModeStatsEntry> PlayerGameModeStats => Set<PlayerGameModeStatsEntry>();
+    public DbSet<PlayerSpecialCardStatsEntry> PlayerSpecialCardStats =>
+        Set<PlayerSpecialCardStatsEntry>();
+    public DbSet<PlayerExtraPointStatsEntry> PlayerExtraPointStats =>
+        Set<PlayerExtraPointStatsEntry>();
+    public DbSet<PlayerPartnerStatsEntry> PlayerPartnerStats => Set<PlayerPartnerStatsEntry>();
+    public DbSet<GameModeStatsEntry> GameModeStats => Set<GameModeStatsEntry>();
+    public DbSet<SpecialCardStatsEntry> SpecialCardStats => Set<SpecialCardStatsEntry>();
+    public DbSet<ExtraPointStatsEntry> ExtraPointStats => Set<ExtraPointStatsEntry>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -224,6 +235,125 @@ public class AnalogDbContext(DbContextOptions<AnalogDbContext> options) : DbCont
         modelBuilder.Entity<AnalogComment>(e =>
         {
             e.ToTable("comment");
+        });
+
+        modelBuilder.Entity<PlayerStatsEntry>(e =>
+        {
+            e.HasNoKey();
+            e.ToView("player_stats", "analytics");
+            e.Property(p => p.PlayerId).HasColumnName("player_id");
+            e.Property(p => p.Name).HasColumnName("name");
+            e.Property(p => p.IsActive).HasColumnName("is_active");
+            e.Property(p => p.TotalGames).HasColumnName("total_games");
+            e.Property(p => p.TotalWins).HasColumnName("total_wins");
+            e.Property(p => p.TotalWinRate).HasColumnName("total_win_rate");
+            e.Property(p => p.TotalAvgGameValue).HasColumnName("total_avg_game_value");
+            e.Property(p => p.TotalAvgPointsWonLost).HasColumnName("total_avg_points_won_lost");
+            e.Property(p => p.TotalAvgPointsEarned).HasColumnName("total_avg_points_earned");
+            e.Property(p => p.SoloGames).HasColumnName("solo_games");
+            e.Property(p => p.SoloWins).HasColumnName("solo_wins");
+            e.Property(p => p.SoloWinRate).HasColumnName("solo_win_rate");
+            e.Property(p => p.SoloAvgGameValue).HasColumnName("solo_avg_game_value");
+            e.Property(p => p.SoloAvgPointsWonLost).HasColumnName("solo_avg_points_won_lost");
+            e.Property(p => p.AloneGames).HasColumnName("alone_games");
+            e.Property(p => p.AloneWins).HasColumnName("alone_wins");
+            e.Property(p => p.AloneWinRate).HasColumnName("alone_win_rate");
+            e.Property(p => p.AloneAvgPointsEarned).HasColumnName("alone_avg_points_earned");
+        });
+
+        modelBuilder.Entity<PlayerGameModeStatsEntry>(e =>
+        {
+            e.HasNoKey();
+            e.ToView("player_game_mode_stats", "analytics");
+            e.Property(p => p.PlayerId).HasColumnName("player_id");
+            e.Property(p => p.GameModeId).HasColumnName("game_mode_id");
+            e.Property(p => p.GameModeName).HasColumnName("game_mode_name");
+            e.Property(p => p.Party).HasColumnName("party");
+            e.Property(p => p.Games).HasColumnName("games");
+            e.Property(p => p.Wins).HasColumnName("wins");
+            e.Property(p => p.WinRate).HasColumnName("win_rate");
+            e.Property(p => p.AvgGameValue).HasColumnName("avg_game_value");
+            e.Property(p => p.AvgPointsWonLost).HasColumnName("avg_points_won_lost");
+            e.Property(p => p.AvgPointsEarned).HasColumnName("avg_points_earned");
+        });
+
+        modelBuilder.Entity<PlayerSpecialCardStatsEntry>(e =>
+        {
+            e.HasNoKey();
+            e.ToView("player_special_card_stats", "analytics");
+            e.Property(p => p.PlayerId).HasColumnName("player_id");
+            e.Property(p => p.SpecialCardId).HasColumnName("special_card_id");
+            e.Property(p => p.SpecialCardName).HasColumnName("special_card_name");
+            e.Property(p => p.Occurrences).HasColumnName("occurrences");
+            e.Property(p => p.Wins).HasColumnName("wins");
+            e.Property(p => p.WinRate).HasColumnName("win_rate");
+            e.Property(p => p.AvgGameValue).HasColumnName("avg_game_value");
+            e.Property(p => p.AvgPointsWonLost).HasColumnName("avg_points_won_lost");
+        });
+
+        modelBuilder.Entity<PlayerExtraPointStatsEntry>(e =>
+        {
+            e.HasNoKey();
+            e.ToView("player_extra_point_stats", "analytics");
+            e.Property(p => p.PlayerId).HasColumnName("player_id");
+            e.Property(p => p.ExtraPointId).HasColumnName("extra_point_id");
+            e.Property(p => p.ExtraPointName).HasColumnName("extra_point_name");
+            e.Property(p => p.Occurrences).HasColumnName("occurrences");
+            e.Property(p => p.TotalCount).HasColumnName("total_count");
+            e.Property(p => p.Wins).HasColumnName("wins");
+            e.Property(p => p.WinRate).HasColumnName("win_rate");
+            e.Property(p => p.AvgGameValue).HasColumnName("avg_game_value");
+        });
+
+        modelBuilder.Entity<PlayerPartnerStatsEntry>(e =>
+        {
+            e.HasNoKey();
+            e.ToView("player_partner_stats", "analytics");
+            e.Property(p => p.PlayerId).HasColumnName("player_id");
+            e.Property(p => p.PartnerId).HasColumnName("partner_id");
+            e.Property(p => p.PartnerName).HasColumnName("partner_name");
+            e.Property(p => p.GamesTogether).HasColumnName("games_together");
+            e.Property(p => p.WinsTogether).HasColumnName("wins_together");
+            e.Property(p => p.WinRateTogether).HasColumnName("win_rate_together");
+        });
+
+        modelBuilder.Entity<GameModeStatsEntry>(e =>
+        {
+            e.HasNoKey();
+            e.ToView("game_mode_stats", "analytics");
+            e.Property(p => p.GameModeId).HasColumnName("game_mode_id");
+            e.Property(p => p.GameModeName).HasColumnName("game_mode_name");
+            e.Property(p => p.TotalRounds).HasColumnName("total_rounds");
+            e.Property(p => p.AvgGameValue).HasColumnName("avg_game_value");
+            e.Property(p => p.ReWinRate).HasColumnName("re_win_rate");
+            e.Property(p => p.ReAvgGameValue).HasColumnName("re_avg_game_value");
+        });
+
+        modelBuilder.Entity<SpecialCardStatsEntry>(e =>
+        {
+            e.HasNoKey();
+            e.ToView("special_card_stats", "analytics");
+            e.Property(p => p.SpecialCardId).HasColumnName("special_card_id");
+            e.Property(p => p.Name).HasColumnName("name");
+            e.Property(p => p.Occurrences).HasColumnName("occurrences");
+            e.Property(p => p.Wins).HasColumnName("wins");
+            e.Property(p => p.WinRate).HasColumnName("win_rate");
+            e.Property(p => p.AvgGameValue).HasColumnName("avg_game_value");
+            e.Property(p => p.AvgPointsWonLost).HasColumnName("avg_points_won_lost");
+        });
+
+        modelBuilder.Entity<ExtraPointStatsEntry>(e =>
+        {
+            e.HasNoKey();
+            e.ToView("extra_point_stats", "analytics");
+            e.Property(p => p.ExtraPointId).HasColumnName("extra_point_id");
+            e.Property(p => p.Name).HasColumnName("name");
+            e.Property(p => p.Occurrences).HasColumnName("occurrences");
+            e.Property(p => p.TotalCount).HasColumnName("total_count");
+            e.Property(p => p.Wins).HasColumnName("wins");
+            e.Property(p => p.WinRate).HasColumnName("win_rate");
+            e.Property(p => p.AvgGameValue).HasColumnName("avg_game_value");
+            e.Property(p => p.AvgPointsWonLost).HasColumnName("avg_points_won_lost");
         });
     }
 }

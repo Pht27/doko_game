@@ -95,8 +95,10 @@ export function LandingPage() {
             <div className="landing-drawer-panel landing-drawer-panel--herz">
               <SubItem label={t.landingRundenubersicht} hint={t.landingHintRundenubersicht} hasDivider
                 onClick={() => navigate('/history')} />
-              <SubItem label={t.landingStats} hint={t.landingHintStats}
+              <SubItem label={t.landingStats} hint={t.landingHintStats} hasDivider
                 onClick={() => navigate('/leaderboard')} />
+              <SubItem label={t.landingSpielstatistiken} hint={t.landingHintSpielstatistiken}
+                onClick={() => navigate('/stats')} />
             </div>
           )}
           {displayKey === 'karo' && (

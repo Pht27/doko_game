@@ -4,11 +4,11 @@ on:
   push:
     branches: [main, develop]
     paths:
-      - 'dbt/**'
+      - 'Code/database/**'
       - '.github/workflows/dbt-check.yml'
   pull_request:
     paths:
-      - 'dbt/**'
+      - 'Code/database/**'
       - '.github/workflows/dbt-check.yml'
 
 jobs:
@@ -25,7 +25,7 @@ jobs:
         run: pip install "dbt-postgres==1.9.1" "dbt-core==1.9.1"
 
       - name: dbt parse
-        working-directory: dbt
+        working-directory: Code/database
         run: |
           cat > profiles.yml << 'EOF'
           doko:

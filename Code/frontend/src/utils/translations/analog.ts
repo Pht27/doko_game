@@ -96,4 +96,7 @@ export const analog = {
   analogLeaderboardGraphModeGames: 'Spiele',
   analogLeaderboardGraphModeDate: 'Datum',
   analogLeaderboardGraphWeeks: 'Wo.',
+
+  // ── Stats page (overall) ───────────────────────────────────────────────────
+  statsTitle: 'Spielstatistiken',
 };

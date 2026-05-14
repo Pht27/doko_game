@@ -84,8 +84,8 @@ services:
   # =========================
   dbt:
     build:
-      context: ../../dbt
-      dockerfile: ../Code/infrastructure/dbt/Dockerfile
+      context: ../database
+      dockerfile: ../infrastructure/dbt/Dockerfile
     environment:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     networks:
