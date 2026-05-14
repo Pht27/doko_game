@@ -3,6 +3,8 @@ import type {
   PlayerListItem,
   PlayerDetail,
   RoundListResponse,
+  PlayerRoundListResponse,
+  PlayerRoundListItem,
   RoundDetail,
   RoundRequest,
   StaticData,
@@ -91,6 +93,19 @@ export function getPlayerExtraPointStats(id: number): Promise<PlayerExtraPointSt
 
 export function getPlayerPartnerStats(id: number): Promise<PlayerPartnerStat[]> {
   return apiFetch(`/analog/players/${id}/stats/partners`, null);
+}
+
+export interface BestWorstRounds {
+  best: PlayerRoundListItem | null;
+  worst: PlayerRoundListItem | null;
+}
+
+export function getPlayerBestWorstRounds(id: number): Promise<BestWorstRounds> {
+  return apiFetch(`/analog/players/${id}/stats/best-worst`, null);
+}
+
+export function getPlayerRounds(id: number, page = 1, pageSize = 20): Promise<PlayerRoundListResponse> {
+  return apiFetch(`/analog/players/${id}/rounds?page=${page}&pageSize=${pageSize}`, null);
 }
 
 export function getGameModeStats(): Promise<GameModeStat[]> {

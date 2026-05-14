@@ -315,6 +315,7 @@ public class AnalogDbContext(DbContextOptions<AnalogDbContext> options) : DbCont
             e.Property(p => p.GamesTogether).HasColumnName("games_together");
             e.Property(p => p.WinsTogether).HasColumnName("wins_together");
             e.Property(p => p.WinRateTogether).HasColumnName("win_rate_together");
+            e.Property(p => p.AvgPointsWonLost).HasColumnName("avg_points_won_lost");
         });
 
         modelBuilder.Entity<GameModeStatsEntry>(e =>

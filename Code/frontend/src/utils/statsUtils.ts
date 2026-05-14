@@ -20,10 +20,12 @@ function statsGradient(pct: number): string {
 
 export function colorForRate(rate: number | null | undefined): string {
   if (rate == null) return 'var(--app-text-muted)';
-  return statsGradient(rate);
+  // 40 % → red, 50 % → yellow, 60 % → green (±10 % around the expected 50 %)
+  const pct = Math.max(0, Math.min(1, (rate - 0.40) / 0.20));
+  return statsGradient(pct);
 }
 
-export function colorForMean(m: number | null | undefined, clamp = 2): string {
+export function colorForMean(m: number | null | undefined, clamp = 0.5): string {
   if (m == null) return 'var(--app-text-muted)';
   return statsGradient((Math.max(-clamp, Math.min(clamp, m)) + clamp) / (clamp * 2));
 }

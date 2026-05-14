@@ -58,7 +58,8 @@ public record PlayerPartnerStatsDto(
     string PartnerName,
     int GamesTogether,
     int WinsTogether,
-    decimal WinRateTogether
+    decimal WinRateTogether,
+    decimal AvgPointsWonLost
 );
 
 public record GameModeStatsDto(

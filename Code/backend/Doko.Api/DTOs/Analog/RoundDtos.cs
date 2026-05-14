@@ -22,6 +22,21 @@ public record ExtraPointRequest(int ExtraPointId, int Count);
 
 public record RoundListResponse(int Total, int Page, RoundListItemDto[] Items);
 
+public record PlayerRoundListResponse(int Total, int Page, PlayerRoundListItemDto[] Items);
+
+public record PlayerRoundListItemDto(
+    int Id,
+    DateTime PlayedAt,
+    Party WinningParty,
+    int Points,
+    string GameMode,
+    PlayerInfoDto[] RePlayers,
+    PlayerInfoDto[] KontraPlayers,
+    string? Comment,
+    PlayerInfoDto[] TeamPartners,
+    decimal PointDelta
+);
+
 public record RoundListItemDto(
     int Id,
     DateTime PlayedAt,

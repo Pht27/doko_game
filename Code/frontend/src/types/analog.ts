@@ -20,6 +20,17 @@ export interface RoundListResponse {
   items: RoundListItem[];
 }
 
+export interface PlayerRoundListItem extends RoundListItem {
+  teamPartners: PlayerRef[];
+  pointDelta: number;
+}
+
+export interface PlayerRoundListResponse {
+  total: number;
+  page: number;
+  items: PlayerRoundListItem[];
+}
+
 export interface PlayerListItem {
   id: number;
   name: string;
@@ -178,6 +189,7 @@ export interface PlayerPartnerStat {
   gamesTogether: number;
   winsTogether: number;
   winRateTogether: number;
+  avgPointsWonLost: number;
 }
 
 export interface GameModeStat {

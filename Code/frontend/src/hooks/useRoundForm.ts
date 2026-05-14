@@ -21,6 +21,7 @@ export interface RoundFormState {
   gameModeId: number | null;
   winningParty: Party | null;
   comment: string;
+  playedAt: string | null;
 }
 
 const emptyBlock = (party: Party): TeamBlockState => ({
@@ -36,6 +37,7 @@ const initialState = (): RoundFormState => ({
   gameModeId: null,
   winningParty: null,
   comment: '',
+  playedAt: null,
 });
 
 export function useRoundForm() {
@@ -190,6 +192,7 @@ export function useRoundForm() {
       gameModeId: detail.gameMode.id,
       winningParty: detail.winningParty,
       comment: detail.comment ?? '',
+      playedAt: detail.playedAt,
     });
     setLastSwitchedBlock(null);
   }, []);
@@ -205,12 +208,13 @@ export function useRoundForm() {
       gameModeId: null,
       winningParty: null,
       comment: '',
+      playedAt: null,
     }));
     setLastSwitchedBlock(null);
   }, []);
 
   const toApiRequest = useCallback((): RoundRequest => {
-    const { blocks, points, gameModeId, winningParty, comment } = form;
+    const { blocks, points, gameModeId, winningParty, comment, playedAt } = form;
     const teams: TeamRequest[] = blocks.map((b) => ({
       party: b.party,
       playerIds: b.playerIds,
@@ -218,7 +222,7 @@ export function useRoundForm() {
       extraPoints: b.extraPoints,
     }));
     return {
-      playedAt: new Date().toISOString(),
+      playedAt: playedAt ?? new Date().toISOString(),
       winningParty: winningParty!,
       points: points as number,
       gameModeId: gameModeId!,

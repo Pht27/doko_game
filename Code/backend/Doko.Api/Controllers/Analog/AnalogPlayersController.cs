@@ -8,7 +8,10 @@ namespace Doko.Api.Controllers.Analog;
 [ApiController]
 [Route("analog/players")]
 [AllowAnonymous]
-public class AnalogPlayersController(AnalogPlayersService playersService) : ControllerBase
+public class AnalogPlayersController(
+    AnalogPlayersService playersService,
+    AnalogRoundsService roundsService
+) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetPlayers(CancellationToken ct)
@@ -55,6 +58,37 @@ public class AnalogPlayersController(AnalogPlayersService playersService) : Cont
                 player.Wins,
                 player.Losses,
                 rounds
+            )
+        );
+    }
+
+    [HttpGet("{id:int}/rounds")]
+    public async Task<IActionResult> GetPlayerRounds(
+        int id,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 20,
+        CancellationToken ct = default
+    )
+    {
+        var result = await roundsService.GetPlayerRoundsAsync(id, page, pageSize, ct);
+        return Ok(
+            new PlayerRoundListResponse(
+                result.Total,
+                result.Page,
+                result
+                    .Items.Select(r => new PlayerRoundListItemDto(
+                        r.Id,
+                        r.PlayedAt,
+                        r.WinningParty,
+                        r.Points,
+                        r.GameMode,
+                        r.RePlayers.Select(p => new PlayerInfoDto(p.Id, p.Name)).ToArray(),
+                        r.KontraPlayers.Select(p => new PlayerInfoDto(p.Id, p.Name)).ToArray(),
+                        r.Comment,
+                        r.TeamPartners.Select(p => new PlayerInfoDto(p.Id, p.Name)).ToArray(),
+                        r.PointDelta
+                    ))
+                    .ToArray()
             )
         );
     }

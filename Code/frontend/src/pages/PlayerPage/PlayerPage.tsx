@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { usePlayerStats } from '@/hooks/usePlayerStats';
+import { usePlayerRounds } from '@/hooks/usePlayerRounds';
 import { t } from '@/utils/translations';
 import { BackButton } from '@/components/BackButton/BackButton';
 import { StatusState } from '@/components/StatusState/StatusState';
 import { SortableTable } from '@/components/SortableTable/SortableTable';
+import { RoundCard } from '@/pages/HistoryPage/RoundCard/RoundCard';
 import type { Column } from '@/components/SortableTable/SortableTable';
 import type {
   PlayerStats,
@@ -13,6 +15,7 @@ import type {
   PlayerExtraPointStat,
   PlayerPartnerStat,
   PlayerRound,
+  PlayerRoundListItem,
 } from '@/types/analog';
 import { colorForRate, colorForMean, colorForTotal, fmtRate, fmtMean, fmtInt } from '@/utils/statsUtils';
 import './PlayerPage.css';
@@ -25,31 +28,40 @@ type TabId = 'gm' | 'sc' | 'ep' | 'pt' | 'al';
 function PointTypeToggle({
   value,
   onChange,
+  disabledOptions = [],
 }: {
   value: PointType;
   onChange: (v: PointType) => void;
+  disabledOptions?: PointType[];
 }) {
   const opts: { key: PointType; label: string }[] = [
-    { key: 'value', label: 'Wert' },
+    { key: 'value', label: 'Spielwert' },
     { key: 'wonlost', label: 'Punkte' },
     { key: 'earned', label: 'Diff' },
   ];
   return (
-    <div className="ps-pt-toggle">
-      {opts.map((o) => (
-        <button
-          key={o.key}
-          className={`ps-pt-btn${value === o.key ? ' ps-pt-active' : ''}`}
-          onClick={() => onChange(o.key)}
-        >
-          {o.label}
-        </button>
-      ))}
+    <div className="ps-pt-row">
+      <span className="ps-pt-label">Ø zeigt</span>
+      <div className="ps-pt-toggle">
+        {opts.map((o) => {
+          const isDisabled = disabledOptions.includes(o.key);
+          return (
+            <button
+              key={o.key}
+              className={`ps-pt-btn${value === o.key ? ' ps-pt-active' : ''}${isDisabled ? ' ps-pt-locked' : ''}`}
+              disabled={isDisabled}
+              onClick={() => onChange(o.key)}
+            >
+              {o.label}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
 
-// ── Game mode grouped table ───────────────────────────────────────────────────
+// ── Game mode collapsible table ───────────────────────────────────────────────
 
 type GameModeGroup = {
   gameModeId: number;
@@ -76,39 +88,23 @@ function groupByGameMode(rows: PlayerGameModeStat[]): GameModeGroup[] {
   return Array.from(map.values());
 }
 
-type GmSortKey = 'name' | 'totalGames' | 'reWR' | 'totalWR';
-
-function GameModeTable({
+function CollapsibleGameModeTable({
   rows,
   pointType,
 }: {
   rows: PlayerGameModeStat[];
   pointType: PointType;
 }) {
-  const [sortKey, setSortKey] = useState<GmSortKey>('totalGames');
-  const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
+  const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
-  const groups = groupByGameMode(rows);
+  const groups = groupByGameMode(rows).sort(
+    (a, b) =>
+      (b.re?.games ?? 0) + (b.kontra?.games ?? 0) - ((a.re?.games ?? 0) + (a.kontra?.games ?? 0)),
+  );
 
   const totalGames = (g: GameModeGroup) => (g.re?.games ?? 0) + (g.kontra?.games ?? 0);
-  const totalWins  = (g: GameModeGroup) => (g.re?.wins  ?? 0) + (g.kontra?.wins  ?? 0);
+  const totalWins  = (g: GameModeGroup) => (g.re?.wins ?? 0) + (g.kontra?.wins ?? 0);
   const totalWR    = (g: GameModeGroup) => { const t = totalGames(g); return t > 0 ? totalWins(g) / t : 0; };
-
-  const sortedGroups = [...groups].sort((a, b) => {
-    let va: number | string;
-    let vb: number | string;
-    if (sortKey === 'name')       { va = a.gameModeName; vb = b.gameModeName; }
-    else if (sortKey === 'reWR')  { va = a.re?.winRate ?? -1; vb = b.re?.winRate ?? -1; }
-    else if (sortKey === 'totalGames') { va = totalGames(a); vb = totalGames(b); }
-    else                          { va = totalWR(a); vb = totalWR(b); }
-    const cmp = va < vb ? -1 : va > vb ? 1 : 0;
-    return sortDir === 'asc' ? cmp : -cmp;
-  });
-
-  const handleSort = (key: GmSortKey) => {
-    if (sortKey === key) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
-    else { setSortKey(key); setSortDir('desc'); }
-  };
 
   const avg = (r: PlayerGameModeStat) =>
     pointType === 'earned' ? r.avgPointsEarned
@@ -124,81 +120,90 @@ function GameModeTable({
     return (reContrib + koContrib) / total;
   };
 
-  const SortBtn = ({ k, label, className }: { k: GmSortKey; label: string; className?: string }) => (
-    <button className={`ps-gm-th${className ? ' ' + className : ''}`} onClick={() => handleSort(k)}>
-      {label}{sortKey === k ? (sortDir === 'asc' ? ' ↑' : ' ↓') : ''}
-    </button>
-  );
-
-  const SubRow = ({
-    label,
-    labelClass,
-    stat,
-    games,
-    wr,
-    avgValue,
-  }: {
-    label: string;
-    labelClass: string;
-    stat?: PlayerGameModeStat | null;
-    games: number;
-    wr: number;
-    avgValue: number | null;
-  }) => {
-    void stat;
-    const isEmpty = games === 0;
-    return (
-      <div className={`ps-gm-sub${isEmpty ? ' ps-gm-sub-empty' : ''}`}>
-        <span className={`ps-gm-sub-label ${labelClass}`}>{label}</span>
-        <span className="ps-gm-sub-val ps-gm-sub-games">
-          {isEmpty ? '—' : fmtInt(games)}
-        </span>
-        <span className="ps-gm-sub-val ps-gm-sub-wr" style={{ color: isEmpty ? undefined : colorForRate(wr) }}>
-          {isEmpty ? '—' : fmtRate(wr)}
-        </span>
-        <span className="ps-gm-sub-val ps-gm-sub-avg" style={{ color: avgValue != null ? colorForMean(avgValue) : undefined }}>
-          {avgValue != null ? fmtMean(avgValue) : '—'}
-        </span>
-      </div>
-    );
+  const toggle = (id: number) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   };
 
   return (
-    <div className="ps-gm-table">
+    <div className="ps-cgm-table">
       {/* Header */}
-      <div className="ps-gm-header">
-        <SortBtn k="name" label="Spielmodus" className="ps-gm-th-name" />
-        <SortBtn k="totalGames" label="Sp." />
-        <SortBtn k="totalWR" label="WR" />
-        <SortBtn k="reWR" label="Ø" />
+      <div className="ps-cgm-header">
+        <span className="ps-cgm-th ps-cgm-th-name">Spielmodus</span>
+        <span className="ps-cgm-th">Sp.</span>
+        <span className="ps-cgm-th">WR</span>
+        <span className="ps-cgm-th">Ø</span>
+        <span className="ps-cgm-th ps-cgm-th-chevron" />
       </div>
 
-      {sortedGroups.map((g) => {
+      {groups.map((g) => {
         const tGames = totalGames(g);
-        const tWR    = totalWR(g);
-        const tAvg   = weightedAvg(g);
+        const tWR = totalWR(g);
+        const tAvg = weightedAvg(g);
+        const isExpanded = expanded.has(g.gameModeId);
+
         return (
-          <div key={g.gameModeId} className="ps-gm-group">
-            <div className="ps-gm-group-name">{g.gameModeName}</div>
-            <div className="ps-gm-subrows">
-              <SubRow
-                label="Re" labelClass="ps-gm-label-re"
-                stat={g.re}
-                games={g.re?.games ?? 0}
-                wr={g.re?.winRate ?? 0} avgValue={g.re ? avg(g.re) : null}
-              />
-              <SubRow
-                label="Ko." labelClass="ps-gm-label-ko"
-                stat={g.kontra}
-                games={g.kontra?.games ?? 0}
-                wr={g.kontra?.winRate ?? 0} avgValue={g.kontra ? avg(g.kontra) : null}
-              />
-              <SubRow
-                label="Ges." labelClass="ps-gm-label-total"
-                games={tGames}
-                wr={tWR} avgValue={tAvg}
-              />
-            </div>
+          <div key={g.gameModeId} className="ps-cgm-group">
+            <button
+              className={`ps-cgm-summary${isExpanded ? ' ps-cgm-summary-open' : ''}`}
+              onClick={() => toggle(g.gameModeId)}
+            >
+              <span className="ps-cgm-mode-name">{g.gameModeName}</span>
+              <span className="ps-cgm-val">{tGames > 0 ? fmtInt(tGames) : '—'}</span>
+              <span
+                className="ps-cgm-val"
+                style={{ color: tGames > 0 ? colorForRate(tWR) : undefined }}
+              >
+                {tGames > 0 ? fmtRate(tWR) : '—'}
+              </span>
+              <span
+                className="ps-cgm-val"
+                style={{ color: tAvg != null ? colorForMean(tAvg) : undefined }}
+              >
+                {tAvg != null ? fmtMean(tAvg) : '—'}
+              </span>
+              <span className="ps-cgm-chevron">{isExpanded ? '▴' : '▾'}</span>
+            </button>
+
+            {isExpanded && (
+              <div className="ps-cgm-sub-rows">
+                {[
+                  { label: 'Re', labelClass: 'ps-cgm-label-re', stat: g.re },
+                  { label: 'Ko', labelClass: 'ps-cgm-label-ko', stat: g.kontra },
+                ].map(({ label, labelClass, stat }) => {
+                  const isEmpty = !stat || stat.games === 0;
+                  const sAvg = stat ? avg(stat) : null;
+                  return (
+                    <div
+                      key={label}
+                      className={`ps-cgm-sub${isEmpty ? ' ps-cgm-sub-empty' : ''}`}
+                    >
+                      <span className={`ps-cgm-sub-label ${labelClass}`}>{label}</span>
+                      <span className="ps-cgm-val ps-cgm-sub-val">
+                        {isEmpty ? '—' : fmtInt(stat!.games)}
+                      </span>
+                      <span
+                        className="ps-cgm-val ps-cgm-sub-val"
+                        style={{ color: !isEmpty ? colorForRate(stat!.winRate) : undefined }}
+                      >
+                        {isEmpty ? '—' : fmtRate(stat!.winRate)}
+                      </span>
+                      <span
+                        className="ps-cgm-val ps-cgm-sub-val"
+                        style={{ color: sAvg != null ? colorForMean(sAvg) : undefined }}
+                      >
+                        {sAvg != null ? fmtMean(sAvg) : '—'}
+                      </span>
+                      <span className="ps-cgm-chevron" />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         );
       })}
@@ -209,7 +214,7 @@ function GameModeTable({
 // ── Hero card SVG ─────────────────────────────────────────────────────────────
 
 function CardFace() {
-  const w = 72, h = 104, r = 8;
+  const w = 64, h = 92, r = 7;
   const suit = '♦';
   const rank = 'A';
   const color = '#c0392b';
@@ -222,21 +227,68 @@ function CardFace() {
     >
       <rect x={0.5} y={0.5} width={w - 1} height={h - 1} rx={r} fill="#fafafa" stroke="rgba(0,0,0,0.18)" />
       <rect x={3} y={3} width={w - 6} height={h - 6} rx={r - 2} fill="none" stroke="rgba(0,0,0,0.05)" />
-      <text x={w * 0.14} y={h * 0.17} fontFamily="Georgia, serif" fontWeight={700} fontSize={13} fill={color}>{rank}</text>
-      <text x={w * 0.14} y={h * 0.27} fontFamily="sans-serif" fontSize={9} fill={color}>{suit}</text>
-      <text x={w / 2} y={h / 2 + 18} textAnchor="middle" fontFamily="sans-serif" fontSize={44} fill={color}>{suit}</text>
+      <text x={w * 0.14} y={h * 0.17} fontFamily="Georgia, serif" fontWeight={700} fontSize={12} fill={color}>{rank}</text>
+      <text x={w * 0.14} y={h * 0.27} fontFamily="sans-serif" fontSize={8} fill={color}>{suit}</text>
+      <text x={w / 2} y={h / 2 + 16} textAnchor="middle" fontFamily="sans-serif" fontSize={38} fill={color}>{suit}</text>
       <g transform={`rotate(180 ${w * 0.86} ${h * 0.835})`}>
-        <text x={w * 0.86} y={h * 0.835} fontFamily="Georgia, serif" fontWeight={700} fontSize={13} fill={color}>{rank}</text>
-        <text x={w * 0.86} y={h * 0.92} fontFamily="sans-serif" fontSize={9} fill={color}>{suit}</text>
+        <text x={w * 0.86} y={h * 0.835} fontFamily="Georgia, serif" fontWeight={700} fontSize={12} fill={color}>{rank}</text>
+        <text x={w * 0.86} y={h * 0.92} fontFamily="sans-serif" fontSize={8} fill={color}>{suit}</text>
       </g>
     </svg>
   );
 }
 
-function HeroCard() {
+function RankBadge({ rank }: { rank: number | null }) {
+  if (!rank) return null;
+  const medals: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
+  const medal = medals[rank];
   return (
-    <div className="ps-hero-mount">
-      <CardFace />
+    <div className="ps-rank-badge">
+      {medal ? <span className="ps-rank-medal">{medal}</span> : null}
+      <span className="ps-rank-text">#{rank}</span>
+    </div>
+  );
+}
+
+// ── Best / worst round cards ──────────────────────────────────────────────────
+
+function BestWorstCards({
+  best,
+  worst,
+}: {
+  best: PlayerRoundListItem | null;
+  worst: PlayerRoundListItem | null;
+}) {
+  if (!best && !worst) return null;
+
+  function MiniCard({
+    round,
+    label,
+    labelClass,
+  }: {
+    round: PlayerRoundListItem | null;
+    label: string;
+    labelClass: string;
+  }) {
+    if (!round) return null;
+    const won = round.pointDelta >= 0;
+    const date = new Date(round.playedAt).toLocaleDateString('de-DE', { day: '2-digit', month: 'short', year: '2-digit' });
+    const delta = round.pointDelta;
+    const pts = (delta >= 0 ? '+' : '') + delta.toFixed(0);
+    return (
+      <div className={`ps-bw-card ${labelClass}`}>
+        <div className="ps-bw-card-label">{label}</div>
+        <div className={`ps-bw-card-pts${won ? ' ps-bw-pts-win' : ' ps-bw-pts-loss'}`}>{pts}</div>
+        <div className="ps-bw-card-mode">{round.gameMode}</div>
+        <div className="ps-bw-card-date">{date}</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="ps-bw-row">
+        <MiniCard round={best} label="Bestes Spiel" labelClass="ps-bw-best" />
+        <MiniCard round={worst} label="Schlechtestes" labelClass="ps-bw-worst" />
     </div>
   );
 }
@@ -246,7 +298,7 @@ function HeroCard() {
 function TimeSeriesChart({ rounds }: { rounds: PlayerRound[] }) {
   if (rounds.length < 2) return null;
   const pts = rounds.map((r) => r.cumulativePoints);
-  const w = 360, h = 120, pad = 4;
+  const w = 360, h = 100, pad = 4;
   const min = Math.min(0, ...pts);
   const max = Math.max(0, ...pts);
   const range = max - min || 1;
@@ -270,45 +322,193 @@ function TimeSeriesChart({ rounds }: { rounds: PlayerRound[] }) {
       <path d={areaPath} fill="url(#ps-area-grad)" />
       <path d={linePath} fill="none" stroke="var(--app-re)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       <circle cx={x(pts.length - 1)} cy={y(last)} r={3.5} fill={lastColor} stroke="var(--app-bg)" strokeWidth={1.5} />
-      <text x={w - pad} y={y(last) - 8} textAnchor="end" fontSize={11} fontFamily="ui-monospace, monospace" fontWeight={700} fill={lastColor}>
-        {(last >= 0 ? '+' : '') + last.toFixed(0)}
-      </text>
+      {(() => {
+        const labelText = (last >= 0 ? '+' : '') + last.toFixed(0);
+        const pillW = labelText.length * 6.6 + 10;
+        const pillH = 15;
+        const pillX = w - pad - pillW;
+        const pillY = y(last) - 8 - pillH + 3;
+        return (
+          <>
+            <rect x={pillX} y={pillY} width={pillW} height={pillH} rx={4} fill="var(--app-bg)" fillOpacity={0.88} />
+            <text x={w - pad} y={y(last) - 8} textAnchor="end" fontSize={11} fontFamily="ui-monospace, monospace" fontWeight={700} fill={lastColor}>
+              {labelText}
+            </text>
+          </>
+        );
+      })()}
     </svg>
   );
 }
 
-// ── Alone / Solo stats key-value list ─────────────────────────────────────────
+// ── Alone stats ───────────────────────────────────────────────────────────────
 
 function AloneStats({ stats }: { stats: PlayerStats }) {
-  const sections = [
-    {
-      label: 'Solo',
-      rows: [
-        { k: 'Gespielt', v: fmtInt(stats.soloGames), c: 'var(--app-text)' },
-        { k: 'Gewonnen', v: fmtInt(stats.soloWins), c: 'var(--app-win)' },
-        { k: 'Winrate', v: fmtRate(stats.soloWinRate), c: colorForRate(stats.soloWinRate) },
-        { k: 'Ø Spielwert', v: fmtMean(stats.soloAvgGameValue), c: colorForMean(stats.soloAvgGameValue) },
-        { k: 'Ø Punkte', v: fmtMean(stats.soloAvgPointsWonLost), c: colorForMean(stats.soloAvgPointsWonLost) },
-        { k: 'Ø Diff', v: fmtMean(stats.aloneAvgPointsEarned), c: colorForMean(stats.aloneAvgPointsEarned) },
-      ],
-    },
+  const rows = [
+    { k: 'Gespielt',  v: fmtInt(stats.aloneGames),           c: 'var(--app-text)' },
+    { k: 'Gewonnen',  v: fmtInt(stats.aloneWins),            c: 'var(--app-win)' },
+    { k: 'Winrate',   v: fmtRate(stats.aloneWinRate),        c: colorForRate(stats.aloneWinRate) },
+    { k: 'Ø Punktediff', v: fmtMean(stats.aloneAvgPointsEarned), c: colorForMean(stats.aloneAvgPointsEarned) },
   ];
 
   return (
     <div className="ps-alone-stats">
-      {sections.map((s) => (
-        <div key={s.label}>
-          <div className="ps-alone-section-label">{s.label}</div>
-          {s.rows.map((r, i) => (
-            <div key={r.k} className={`ps-alone-row${i === s.rows.length - 1 ? ' ps-alone-row-last' : ''}`}>
-              <span className="ps-alone-key">{r.k}</span>
-              <span className="ps-alone-val" style={{ color: r.c }}>
-                {r.v}
-              </span>
-            </div>
-          ))}
+      <div className="ps-alone-section-label">Alleine gespielt</div>
+      {rows.map((r, i) => (
+        <div key={r.k} className={`ps-alone-row${i === rows.length - 1 ? ' ps-alone-row-last' : ''}`}>
+          <span className="ps-alone-key">{r.k}</span>
+          <span className="ps-alone-val" style={{ color: r.c }}>{r.v}</span>
         </div>
       ))}
+    </div>
+  );
+}
+
+function getPageNumbers(current: number, total: number): (number | 'ellipsis')[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const pages: (number | 'ellipsis')[] = [1];
+  if (current > 3) pages.push('ellipsis');
+  for (let p = Math.max(2, current - 1); p <= Math.min(total - 1, current + 1); p++) {
+    pages.push(p);
+  }
+  if (current < total - 2) pages.push('ellipsis');
+  pages.push(total);
+  return pages;
+}
+
+// ── Match history section ─────────────────────────────────────────────────────
+
+function MatchHistoryCompactRow({
+  round,
+  playerId,
+  expanded,
+  onToggle,
+}: {
+  round: PlayerRoundListItem;
+  playerId: number;
+  expanded: boolean;
+  onToggle: () => void;
+}) {
+  const date = new Date(round.playedAt);
+  const isRe = round.rePlayers.some((p) => p.id === playerId);
+  const won = round.pointDelta >= 0;
+  const partners = round.teamPartners;
+
+  const dateStr = date.toLocaleDateString('de-DE', { day: '2-digit', month: 'short' });
+  const delta = round.pointDelta;
+  const pts = (delta >= 0 ? '+' : '') + delta.toFixed(0);
+
+  return (
+    <div className={`ps-mh-row-wrap${expanded ? ' ps-mh-row-wrap-open' : ''}`}>
+      <button className="ps-mh-compact-row" onClick={onToggle}>
+        {/* Left: W/L pill + date */}
+        <div className="ps-mh-left">
+          <span className={`ps-mh-pill${won ? ' ps-mh-pill-win' : ' ps-mh-pill-loss'}`}>
+            {won ? 'W' : 'L'}
+          </span>
+          <span className="ps-mh-date">{dateStr}</span>
+        </div>
+
+        {/* Center: mode on top, team partner below */}
+        <div className="ps-mh-center">
+          <div className="ps-mh-mode-line">
+            <span className="ps-mh-mode">{round.gameMode}</span>
+          </div>
+          {partners.length > 0 && (
+            <div className="ps-mh-partner">mit {partners.map((p) => p.name).join(', ')}</div>
+          )}
+        </div>
+
+        {/* Party column */}
+        <span className={`ps-mh-party-col${isRe ? ' ps-mh-party-re' : ' ps-mh-party-ko'}`}>
+          {isRe ? 'Re' : 'Ko'}
+        </span>
+
+        {/* Right: points + chevron */}
+        <div className="ps-mh-right">
+          <span className={`ps-mh-pts${won ? ' ps-mh-pts-win' : ' ps-mh-pts-loss'}`}>{pts}</span>
+          <span className="ps-mh-chevron">{expanded ? '▴' : '▾'}</span>
+        </div>
+      </button>
+
+      {expanded && (
+        <div className="ps-mh-expanded">
+          <RoundCard round={round} onDelete={() => {}} readOnly />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MatchHistorySection({ playerId }: { playerId: number }) {
+  const { rounds, total, page, totalPages, loading, error, goToPage } = usePlayerRounds(playerId);
+  const [expandedIds, setExpandedIds] = useState<Set<number>>(new Set());
+
+  const toggle = (id: number) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  return (
+    <div className="ps-mh-section">
+      <div className="ps-mh-header">
+        <span className="ps-section-label">Spielverlauf</span>
+        {total > 0 && <span className="ps-mh-count">{total} Spiele</span>}
+      </div>
+
+      {loading && <StatusState type="loading" />}
+      {error && <StatusState type="error" message={error} />}
+      {!loading && !error && rounds.length === 0 && (
+        <div className="ps-mh-empty">Keine Spiele vorhanden.</div>
+      )}
+
+      {!loading && rounds.map((round) => (
+        <MatchHistoryCompactRow
+          key={round.id}
+          round={round}
+          playerId={playerId}
+          expanded={expandedIds.has(round.id)}
+          onToggle={() => toggle(round.id)}
+        />
+      ))}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="ps-mh-pagination">
+          <button
+            className="ps-mh-page-btn ps-mh-page-arrow"
+            disabled={page <= 1 || loading}
+            onClick={() => goToPage(page - 1)}
+          >
+            ‹
+          </button>
+          {getPageNumbers(page, totalPages).map((p, i) =>
+            p === 'ellipsis' ? (
+              <span key={`ellipsis-${i}`} className="ps-mh-page-ellipsis">…</span>
+            ) : (
+              <button
+                key={p}
+                className={`ps-mh-page-btn${p === page ? ' ps-mh-page-active' : ''}`}
+                disabled={p === page || loading}
+                onClick={() => goToPage(p)}
+              >
+                {p}
+              </button>
+            )
+          )}
+          <button
+            className="ps-mh-page-btn ps-mh-page-arrow"
+            disabled={page >= totalPages || loading}
+            onClick={() => goToPage(page + 1)}
+          >
+            ›
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -320,12 +520,13 @@ const TABS: { id: TabId; label: string }[] = [
   { id: 'sc', label: 'Sonderkarten' },
   { id: 'ep', label: 'Extrapunkte' },
   { id: 'pt', label: 'Teamstatistik' },
-  { id: 'al', label: 'Solo' },
+  { id: 'al', label: 'Alleine' },
 ];
 
 export function PlayerPage() {
   const { id } = useParams<{ id: string }>();
-  const data = usePlayerStats(Number(id));
+  const playerId = Number(id);
+  const data = usePlayerStats(playerId);
   const [activeTab, setActiveTab] = useState<TabId>('gm');
   const [pointType, setPointType] = useState<PointType>('earned');
 
@@ -345,12 +546,10 @@ export function PlayerPage() {
     );
   }
 
-  const { stats, detail, gameModes, specialCards, extraPoints, partners } = data;
-
-  // ── Column definitions ─────────────────────────────────────────────────────
+  const { stats, detail, gameModes, specialCards, extraPoints, partners, bestRound, worstRound, rank } = data;
 
   const scAvg = (r: PlayerSpecialCardStat) =>
-    pointType === 'wonlost' || pointType === 'earned' ? r.avgPointsWonLost : r.avgGameValue;
+    effectivePointType === 'wonlost' || effectivePointType === 'earned' ? r.avgPointsWonLost : r.avgGameValue;
 
   const specialCardColumns: Column<PlayerSpecialCardStat>[] = [
     { key: 'specialCardName', label: 'Karte' },
@@ -414,6 +613,14 @@ export function PlayerPage() {
         <span style={{ color: colorForRate(r.winRateTogether) }}>{fmtRate(r.winRateTogether)}</span>
       ),
     },
+    {
+      key: 'avgPointsWonLost',
+      label: 'Ø',
+      sortValue: (r) => r.avgPointsWonLost,
+      render: (r) => (
+        <span style={{ color: colorForMean(r.avgPointsWonLost) }}>{fmtMean(r.avgPointsWonLost)}</span>
+      ),
+    },
   ];
 
   const totalPts = detail?.totalPoints ?? 0;
@@ -424,7 +631,12 @@ export function PlayerPage() {
         ? stats.totalAvgPointsWonLost
         : stats.totalAvgGameValue;
 
-  const showPointToggle = activeTab !== 'pt' && activeTab !== 'al';
+  const showPointToggle = activeTab === 'gm' || activeTab === 'sc' || activeTab === 'ep';
+  const toggleDisabledOptions: PointType[] =
+    activeTab === 'ep' || activeTab === 'sc' ? ['wonlost', 'earned'] : [];
+  // Force effective type when current selection is locked
+  const effectivePointType: PointType =
+    activeTab === 'ep' || activeTab === 'sc' ? 'value' : pointType;
 
   return (
     <div className="ps-page">
@@ -439,38 +651,47 @@ export function PlayerPage() {
       </div>
 
       <div className="ps-scroll">
-        {/* Hero */}
+        {/* Hero: card + name/points + inline stats */}
         <div className="ps-hero">
-          <HeroCard />
+          <div className="ps-hero-mount">
+            <CardFace />
+          </div>
           <div className="ps-hero-right">
-            <span className="ps-hero-name">{stats.name}</span>
+            <div className="ps-hero-name-row">
+              <span className="ps-hero-name">{stats.name}</span>
+              <RankBadge rank={rank} />
+            </div>
             <div className="ps-hero-total" style={{ color: colorForTotal(totalPts) }}>
               {totalPts >= 0 ? '+' : ''}{totalPts}
+            </div>
+            {/* Inline stats below total */}
+            <div className="ps-hero-inline-stats">
+              <div className="ps-hero-stat">
+                <span className="ps-hero-stat-val">{fmtInt(stats.totalGames)}</span>
+                <span className="ps-hero-stat-label">Spiele</span>
+              </div>
+              <div className="ps-hero-stat-sep" />
+              <div className="ps-hero-stat">
+                <span className="ps-hero-stat-val" style={{ color: colorForRate(stats.totalWinRate) }}>
+                  {fmtRate(stats.totalWinRate)}
+                </span>
+                <span className="ps-hero-stat-label">Winrate</span>
+              </div>
+              <div className="ps-hero-stat-sep" />
+              <div className="ps-hero-stat">
+                <span className="ps-hero-stat-val" style={{ color: colorForMean(avgVal) }}>
+                  {fmtMean(avgVal)}
+                </span>
+                <span className="ps-hero-stat-label">
+                  Ø {effectivePointType === 'earned' ? 'Diff' : effectivePointType === 'wonlost' ? 'Pkt.' : 'Wert'}
+                </span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Hero stats mini-grid */}
-        <div className="ps-hero-grid">
-          <div className="ps-hero-cell">
-            <span className="ps-hero-cell-val">{fmtInt(stats.totalGames)}</span>
-            <span className="ps-hero-cell-label">Spiele</span>
-          </div>
-          <div className="ps-hero-cell">
-            <span className="ps-hero-cell-val" style={{ color: colorForRate(stats.totalWinRate) }}>
-              {fmtRate(stats.totalWinRate)}
-            </span>
-            <span className="ps-hero-cell-label">Winrate</span>
-          </div>
-          <div className="ps-hero-cell">
-            <span className="ps-hero-cell-val" style={{ color: colorForMean(avgVal) }}>
-              {fmtMean(avgVal)}
-            </span>
-            <span className="ps-hero-cell-label">
-              Ø {pointType === 'earned' ? 'Diff' : pointType === 'wonlost' ? 'Pkt.' : 'Wert'}
-            </span>
-          </div>
-        </div>
+        {/* Best / worst round */}
+        <BestWorstCards best={bestRound} worst={worstRound} />
 
         {/* Time series */}
         {detail && detail.recentRounds.length >= 2 && (
@@ -483,7 +704,7 @@ export function PlayerPage() {
           </div>
         )}
 
-        {/* Tabs row — full width, scrollable */}
+        {/* Tabs row */}
         <div className="ps-tabs-row">
           <div className="ps-tabs">
             {TABS.map((tab) => (
@@ -496,19 +717,22 @@ export function PlayerPage() {
               </button>
             ))}
           </div>
+          <div className="ps-tabs-fade" aria-hidden />
         </div>
 
-        {/* Point type toggle — own row, right-aligned */}
+        {/* Point type toggle */}
         {showPointToggle && (
-          <div className="ps-pt-row">
-            <PointTypeToggle value={pointType} onChange={setPointType} />
-          </div>
+          <PointTypeToggle
+            value={effectivePointType}
+            onChange={setPointType}
+            disabledOptions={toggleDisabledOptions}
+          />
         )}
 
         {/* Tab content */}
         <div className="ps-tab-body">
           {activeTab === 'gm' && (
-            <GameModeTable rows={gameModes} pointType={pointType} />
+            <CollapsibleGameModeTable rows={gameModes} pointType={effectivePointType} />
           )}
           {activeTab === 'sc' && (
             <SortableTable
@@ -536,6 +760,9 @@ export function PlayerPage() {
           )}
           {activeTab === 'al' && <AloneStats stats={stats} />}
         </div>
+
+        {/* Match history */}
+        <MatchHistorySection playerId={playerId} />
 
         <div style={{ height: 24 }} />
       </div>

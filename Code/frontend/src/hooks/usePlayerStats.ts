@@ -6,6 +6,8 @@ import {
   getPlayerSpecialCardStats,
   getPlayerExtraPointStats,
   getPlayerPartnerStats,
+  getPlayerBestWorstRounds,
+  getPlayers,
 } from '@/api/analog';
 import type {
   PlayerDetail,
@@ -14,6 +16,7 @@ import type {
   PlayerSpecialCardStat,
   PlayerExtraPointStat,
   PlayerPartnerStat,
+  PlayerRoundListItem,
 } from '@/types/analog';
 
 export interface PlayerStatsPageData {
@@ -23,6 +26,9 @@ export interface PlayerStatsPageData {
   specialCards: PlayerSpecialCardStat[];
   extraPoints: PlayerExtraPointStat[];
   partners: PlayerPartnerStat[];
+  bestRound: PlayerRoundListItem | null;
+  worstRound: PlayerRoundListItem | null;
+  rank: number | null;
   loading: boolean;
   error: string | null;
 }
@@ -35,6 +41,9 @@ export function usePlayerStats(id: number): PlayerStatsPageData {
     specialCards: [],
     extraPoints: [],
     partners: [],
+    bestRound: null,
+    worstRound: null,
+    rank: null,
     loading: true,
     error: null,
   });
@@ -49,10 +58,29 @@ export function usePlayerStats(id: number): PlayerStatsPageData {
       getPlayerSpecialCardStats(id),
       getPlayerExtraPointStats(id),
       getPlayerPartnerStats(id),
+      getPlayerBestWorstRounds(id),
+      getPlayers(),
     ])
-      .then(([detail, stats, gameModes, specialCards, extraPoints, partners]) => {
+      .then(([detail, stats, gameModes, specialCards, extraPoints, partners, bestWorst, allPlayers]) => {
         if (cancelled) return;
-        setData({ detail, stats, gameModes, specialCards, extraPoints, partners, loading: false, error: null });
+        const activeSorted = allPlayers
+          .filter((p) => p.isActive)
+          .sort((a, b) => b.totalPoints - a.totalPoints);
+        const rankIdx = activeSorted.findIndex((p) => p.id === id);
+        const rank = rankIdx >= 0 ? rankIdx + 1 : null;
+        setData({
+          detail,
+          stats,
+          gameModes,
+          specialCards,
+          extraPoints,
+          partners,
+          bestRound: bestWorst.best,
+          worstRound: bestWorst.worst,
+          rank,
+          loading: false,
+          error: null,
+        });
       })
       .catch((err: unknown) => {
         if (cancelled) return;

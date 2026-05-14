@@ -28,9 +28,11 @@ function fromDetail(detail: RoundDetail, party: 'Re' | 'Kontra'): NormalizedTeam
 export function RoundCard({
   round,
   onDelete,
+  readOnly = false,
 }: {
   round: RoundListItem;
   onDelete: (id: number) => void;
+  readOnly?: boolean;
 }) {
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
@@ -117,15 +119,19 @@ export function RoundCard({
         )}
 
         <div className="ahr-controls">
-          <button
-            className={`ahr-ctrl-btn ahr-ctrl-left${expanded ? ' ahr-ctrl-show' : ''}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              onDelete(round.id);
-            }}
-          >
-            {t.analogHistoryDelete}
-          </button>
+          {!readOnly ? (
+            <button
+              className={`ahr-ctrl-btn ahr-ctrl-left${expanded ? ' ahr-ctrl-show' : ''}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(round.id);
+              }}
+            >
+              {t.analogHistoryDelete}
+            </button>
+          ) : (
+            <span />
+          )}
 
           <button
             className={`ahr-expand-toggle${expanded ? ' ahr-toggle-open' : ''}`}
@@ -147,15 +153,19 @@ export function RoundCard({
             </svg>
           </button>
 
-          <button
-            className={`ahr-ctrl-btn ahr-ctrl-right${expanded ? ' ahr-ctrl-show' : ''}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(`/analog/edit/${round.id}`);
-            }}
-          >
-            {t.analogHistoryEdit}
-          </button>
+          {!readOnly ? (
+            <button
+              className={`ahr-ctrl-btn ahr-ctrl-right${expanded ? ' ahr-ctrl-show' : ''}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/analog/edit/${round.id}`);
+              }}
+            >
+              {t.analogHistoryEdit}
+            </button>
+          ) : (
+            <span />
+          )}
         </div>
       </div>
     </div>

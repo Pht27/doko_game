@@ -1,5 +1,10 @@
 # Release Notes
 
+## [1.4.1] - 2026-05-14
+
+### Behoben
+- Beim nachträglichen Bearbeiten eines Spiels bleibt der ursprüngliche Zeitstempel jetzt erhalten – er wurde bisher fälschlicherweise auf die aktuelle Uhrzeit gesetzt.
+
 ## [1.4.0] - 2026-05-14
 
 ### Neu
