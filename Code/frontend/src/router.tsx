@@ -12,6 +12,7 @@ import { HistoryPage } from '@/pages/HistoryPage/HistoryPage';
 import { AnalogNewRoundPage } from '@/pages/AnalogNewRoundPage/AnalogNewRoundPage';
 import { AnalogEditRoundPage } from '@/pages/AnalogEditRoundPage/AnalogEditRoundPage';
 import { LeaderboardPage } from '@/pages/LeaderboardPage/LeaderboardPage';
+import { StatsPage } from '@/pages/StatsPage/StatsPage';
 import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage';
 import { Root } from './Root';
 
@@ -31,6 +32,7 @@ export const router = createBrowserRouter([
           { path: 'analog/new', element: <AnalogNewRoundPage /> },
           { path: 'analog/edit/:id', element: <AnalogEditRoundPage /> },
           { path: 'leaderboard', element: <LeaderboardPage /> },
+          { path: 'stats', element: <StatsPage /> },
           { path: '*', element: <NotFoundPage /> },
         ],
       },

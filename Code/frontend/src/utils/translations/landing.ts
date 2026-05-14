@@ -19,6 +19,7 @@ export const landing = {
   landingSpielEintragen: 'Spiel eintragen',
   landingRundenubersicht: 'Rundenübersicht',
   landingStats: 'Bestenliste',
+  landingSpielstatistiken: 'Spielstatistiken',
   landingRegelsets: 'Regelsets',
 
   // ── Drawer item hints ──────────────────────────────────────────────────────
@@ -28,6 +29,7 @@ export const landing = {
   landingHintTestGame: 'Allein ausprobieren',
   landingHintRundenubersicht: 'Schau dir vergangene Runden an',
   landingHintStats: 'Wer sitzt oben?',
+  landingHintSpielstatistiken: 'Spielmodi, Sonderkarten, Extrapunkte',
   landingHintRegeln: 'Doppelkopf nachlesen',
   landingHintRegelsets: 'Noch nicht verfügbar',
 

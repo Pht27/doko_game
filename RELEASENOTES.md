@@ -3,6 +3,12 @@
 ## [1.4.0] - 2026-05-14
 
 ### Neu
+- Unter **Übersicht → Spielstatistiken** gibt es jetzt eine neue Seite mit Gesamtstatistiken: Für jeden Spielmodus werden Rundenanzahl, Re-Siegquote und Re-Durchschnittswert angezeigt. Sonderkarten und Extrapunkte sind mit Anzahl, Siegquote und Ø-Wert aufgelistet.
+- Das **Spielerprofil** zeigt jetzt detaillierte Spielmodus-Statistiken mit Re/Kontra-Aufteilung – je Spielmodus und Partei eine eigene Zeile mit Spiele, Siegquote und Durchschnittswert. Der Punktetyp-Umschalter (Wert / Punkte / Diff) liegt jetzt auf einer eigenen Zeile unter den Tabs, damit er nicht den Tab-Bereich abschneidet. Die Hero-Stats (Spiele, Winrate, Ø) werden jetzt als übersichtliches Drei-Felder-Raster unterhalb des Hero-Bereichs angezeigt.
+- Die Datenbankschicht für Spielerstatistiken und Gesamtstatistiken ist jetzt vorbereitet: Neue dbt-Modelle berechnen Siegquoten, Durchschnittspunkte und Bilanzen – aufgeteilt nach Spielmodus, Sonderkarten und Extrapunkten. Für jeden Spieler gibt es eine Gesamtübersicht sowie detaillierte Auswertungen je Partner, Spielmodus und Karte.
+- Der dbt-Code liegt jetzt einheitlich unter `Code/database/` – zusammen mit Backend und Frontend im `Code/`-Verzeichnis.
+
+
 - Beim Eintragen eines neuen Spiels gibt es jetzt einen Button **„Letzte Teams laden"**: Er füllt die vier Team-Blöcke mit den Spielern aus dem zuletzt gespeicherten Spiel – so müssen Spieler nach einem kurzen Zurück-Gehen nicht neu zugewiesen werden. Falls bereits Spieler eingetragen sind, erscheint vorher ein Bestätigungs-Dialog.
 - Farbthemen können jetzt direkt auf der Startseite gewechselt werden: Das 🎨-Symbol oben rechts öffnet eine Auswahl mit sechs Themes – **Default** (dunkel), **Rosé**, **Aqua**, **Classic**, **Cherry** und **Nautical**. Die fünf neuen Themes sind helle Designs; jedes zeigt die Kartenfarben Re und Kontra in eigenen Tönen. Die Auswahl wird sofort angewendet und gespeichert.
 

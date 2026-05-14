@@ -1,144 +1,387 @@
 @reference "../../styles/index.css";
 
-:root {
-  --apd-surface:    var(--app-surface);
-  --apd-surface2:   var(--app-surface-2);
-  --apd-border:     var(--app-border);
-  --apd-text:       var(--app-text);
-  --apd-text-sub:   var(--app-text-sub);
-  --apd-text-muted: var(--app-text-muted);
-  --apd-win:        var(--app-win);
-  --apd-loss:       var(--app-loss);
-  --apd-radius:     12px;
-  --apd-radius-sm:  8px;
-}
-
-.apd-page {
+.ps-page {
   @apply flex flex-col w-full h-full overflow-hidden;
   background: var(--app-bg);
-  color: var(--apd-text);
+  color: var(--app-text);
 }
 
-/* ── Header ── */
-.apd-header {
+/* ── Top bar ── */
+.ps-topbar {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--apd-surface);
-  border-bottom: 1px solid var(--apd-border);
-  padding: 14px 16px;
+  background: var(--app-header-bg);
+  border-bottom: 1px solid var(--app-border);
+  padding: 10px 14px 10px 8px;
   flex-shrink: 0;
 }
 
-.apd-name {
-  font-size: 1.6rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin: 0;
-  color: var(--apd-text);
+.ps-topbar-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
 }
 
-.apd-inactive {
-  display: inline-block;
-  margin-top: 6px;
-  font-size: 0.72rem;
+.ps-topbar-title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  color: var(--app-header-text);
+}
+
+.ps-topbar-sub {
+  font-size: 11px;
+  color: var(--app-text-muted);
+  margin-top: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ps-inactive-badge {
+  font-size: 10px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--apd-text-muted);
+  color: var(--app-text-muted);
   background: var(--app-surface-hover);
-  border: 1px solid var(--apd-border);
+  border: 1px solid var(--app-border);
   border-radius: 4px;
   padding: 2px 7px;
-}
-
-/* ── Stats grid ── */
-.apd-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: var(--apd-border);
-  border-bottom: 1px solid var(--apd-border);
   flex-shrink: 0;
 }
 
-.apd-stat {
-  background: var(--apd-surface);
-  padding: 14px 12px;
-  text-align: center;
-}
-
-.apd-stat-value {
-  font-size: 1.4rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--apd-text);
-  line-height: 1.1;
-}
-
-.apd-stat-label {
-  font-size: 0.72rem;
-  color: var(--apd-text-muted);
-  margin-top: 3px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-weight: 600;
-}
-
-.apd-wins  { color: var(--apd-win); }
-.apd-losses { color: var(--apd-loss); }
-
-/* ── Rounds section ── */
-.apd-rounds-section {
+/* ── Scroll area ── */
+.ps-scroll {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 16px;
 }
 
-.apd-section-title {
-  font-size: 0.8rem;
+/* ── Hero ── */
+.ps-hero {
+  display: flex;
+  gap: 14px;
+  padding: 14px;
+  background: var(--app-surface);
+  border-bottom: 1px solid var(--app-border);
+}
+
+.ps-hero-mount {
+  background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+  border-radius: 12px;
+  padding: 10px;
+  flex-shrink: 0;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ps-hero-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  justify-content: center;
+}
+
+.ps-hero-name {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ps-hero-total {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  line-height: 1;
+}
+
+/* ── Hero stats mini-grid ── */
+.ps-hero-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--app-border);
+  border-bottom: 1px solid var(--app-border);
+}
+
+.ps-hero-cell {
+  background: var(--app-surface);
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+  text-align: center;
+}
+
+.ps-hero-cell-val {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--app-text);
+}
+
+.ps-hero-cell-label {
+  font-size: 9px;
   font-weight: 600;
-  text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--apd-text-muted);
-  margin: 0 0 12px;
-}
-
-
-
-/* ── Rounds table ── */
-.apd-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
-}
-
-.apd-table th {
-  text-align: left;
-  padding: 6px 12px;
-  font-size: 0.7rem;
-  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--apd-text-muted);
-  background: var(--app-surface-subtle);
-  border-radius: var(--apd-radius-sm) var(--apd-radius-sm) 0 0;
+  color: var(--app-text-muted);
 }
 
-.apd-table th:not(:first-child) { text-align: right; }
-
-.apd-table td {
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--apd-border);
-  color: var(--apd-text-sub);
+/* ── Time series ── */
+.ps-timeseries {
+  padding: 12px 14px 10px;
+  background: var(--app-surface);
+  border-bottom: 1px solid var(--app-border);
 }
 
-.apd-table td:not(:first-child) { text-align: right; }
+.ps-timeseries-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
 
-.apd-table tr:last-child td { border-bottom: none; }
+.ps-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+}
 
-.apd-table tr:hover td { background: var(--app-surface-subtle); }
+.ps-timeseries-count {
+  font-size: 11px;
+  color: var(--app-text-muted);
+  font-family: ui-monospace, monospace;
+}
 
-.apd-td-won  { color: var(--apd-win);  font-weight: 600; }
-.apd-td-lost { color: var(--apd-loss); font-weight: 600; }
+/* ── Tabs row ── */
+.ps-tabs-row {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px 6px;
+  background: var(--app-surface-2);
+  border-bottom: 1px solid var(--app-border);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.ps-tabs {
+  display: flex;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.ps-tab {
+  padding: 5px 11px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--app-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ps-tab-active {
+  background: var(--app-primary);
+  color: var(--app-primary-text);
+}
+
+/* ── Point type toggle row (below tabs) ── */
+.ps-pt-row {
+  display: flex;
+  justify-content: flex-end;
+  padding: 6px 10px;
+  background: var(--app-surface-2);
+  border-bottom: 1px solid var(--app-border);
+}
+
+.ps-pt-toggle {
+  display: flex;
+  gap: 1px;
+  background: var(--app-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.ps-pt-btn {
+  padding: 4px 9px;
+  border: none;
+  background: var(--app-surface-2);
+  color: var(--app-text-muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ps-pt-active {
+  background: var(--app-surface-raised);
+  color: var(--app-text);
+}
+
+/* ── Tab content ── */
+.ps-tab-body {
+  background: var(--app-surface);
+}
+
+/* ── Game mode table (Re / Ko. / Ges. sub-rows) ── */
+.ps-gm-table {
+  background: var(--app-surface);
+}
+
+.ps-gm-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  background: var(--app-surface-2);
+  border-bottom: 1px solid var(--app-border);
+}
+
+.ps-gm-th {
+  padding: 7px 8px;
+  border: none;
+  background: transparent;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+  cursor: pointer;
+  text-align: left;
+}
+
+.ps-gm-th-name {
+  /* wider name column */
+}
+
+/* ── Group row ── */
+.ps-gm-group {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.ps-gm-group:last-child {
+  border-bottom: none;
+}
+
+.ps-gm-group-name {
+  width: 33%;
+  flex-shrink: 0;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--app-text-sub);
+  display: flex;
+  align-items: center;
+  border-right: 1px solid var(--app-border);
+}
+
+.ps-gm-subrows {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Sub-row (Re / Ko. / Ges.) ── */
+.ps-gm-sub {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  align-items: baseline;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.ps-gm-sub:last-child {
+  border-bottom: none;
+  background: var(--app-surface-hover);
+}
+
+.ps-gm-sub-empty .ps-gm-sub-val {
+  color: var(--app-text-muted);
+}
+
+.ps-gm-sub-label {
+  padding: 0 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.ps-gm-label-re    { color: var(--app-re); }
+.ps-gm-label-ko    { color: var(--app-kontra); }
+.ps-gm-label-total { color: var(--app-text-muted); }
+
+.ps-gm-sub-val {
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 700;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  text-align: right;
+}
+
+.ps-gm-sub-games {
+  color: var(--app-text-muted);
+  font-weight: 500;
+}
+
+/* ── Alone / Solo stats ── */
+.ps-alone-stats {
+  background: var(--app-surface);
+}
+
+.ps-alone-section-label {
+  padding: 10px 14px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+}
+
+.ps-alone-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.ps-alone-row-last {
+  border-bottom: none;
+}
+
+.ps-alone-key {
+  font-size: 12px;
+  color: var(--app-text-sub);
+}
+
+.ps-alone-val {
+  font-size: 13px;
+  font-weight: 700;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}

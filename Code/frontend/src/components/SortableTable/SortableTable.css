@@ -1,0 +1,66 @@
+@reference "../../styles/index.css";
+
+.st-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.st-th {
+  padding: 8px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+  background: var(--app-surface-subtle);
+  border-bottom: 1px solid var(--app-border);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.st-th-active {
+  color: var(--app-text-sub);
+}
+
+.st-th-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.st-sort-icon {
+  font-size: 8px;
+  line-height: 1;
+  opacity: 0.4;
+}
+
+.st-th-active .st-sort-icon {
+  opacity: 1;
+}
+
+.st-td {
+  padding: 11px 10px;
+  border-bottom: 1px solid var(--app-border);
+  color: var(--app-text-sub);
+}
+
+.st-td-label {
+  color: var(--app-text);
+  font-weight: 500;
+}
+
+.st-td-num {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.st-td-last {
+  border-bottom: none;
+}
+
+.st-tr:hover .st-td {
+  background: var(--app-surface-subtle);
+}

@@ -116,3 +116,96 @@ export interface RoundRequest {
   teams: TeamRequest[];
   comment: string | null;
 }
+
+// ── Stats ────────────────────────────────────────────────────────────────────
+
+export interface PlayerStats {
+  playerId: number;
+  name: string;
+  isActive: boolean;
+  totalGames: number;
+  totalWins: number;
+  totalWinRate: number;
+  totalAvgGameValue: number;
+  totalAvgPointsWonLost: number;
+  totalAvgPointsEarned: number;
+  soloGames: number;
+  soloWins: number;
+  soloWinRate: number;
+  soloAvgGameValue: number;
+  soloAvgPointsWonLost: number;
+  aloneGames: number;
+  aloneWins: number;
+  aloneWinRate: number;
+  aloneAvgPointsEarned: number;
+}
+
+export interface PlayerGameModeStat {
+  gameModeId: number;
+  gameModeName: string;
+  party: number;
+  games: number;
+  wins: number;
+  winRate: number;
+  avgGameValue: number;
+  avgPointsWonLost: number;
+  avgPointsEarned: number;
+}
+
+export interface PlayerSpecialCardStat {
+  specialCardId: number;
+  specialCardName: string;
+  occurrences: number;
+  wins: number;
+  winRate: number;
+  avgGameValue: number;
+  avgPointsWonLost: number;
+}
+
+export interface PlayerExtraPointStat {
+  extraPointId: number;
+  extraPointName: string;
+  occurrences: number;
+  totalCount: number;
+  wins: number;
+  winRate: number;
+  avgGameValue: number;
+}
+
+export interface PlayerPartnerStat {
+  partnerId: number;
+  partnerName: string;
+  gamesTogether: number;
+  winsTogether: number;
+  winRateTogether: number;
+}
+
+export interface GameModeStat {
+  gameModeId: number;
+  gameModeName: string;
+  totalRounds: number;
+  avgGameValue: number;
+  reWinRate: number | null;
+  reAvgGameValue: number | null;
+}
+
+export interface SpecialCardStat {
+  specialCardId: number;
+  name: string;
+  occurrences: number;
+  wins: number;
+  winRate: number;
+  avgGameValue: number;
+  avgPointsWonLost: number;
+}
+
+export interface ExtraPointStat {
+  extraPointId: number;
+  name: string;
+  occurrences: number;
+  totalCount: number;
+  wins: number;
+  winRate: number;
+  avgGameValue: number;
+  avgPointsWonLost: number;
+}
