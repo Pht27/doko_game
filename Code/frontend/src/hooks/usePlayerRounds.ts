@@ -15,7 +15,7 @@ export interface PlayerRoundsData {
 }
 
 export function usePlayerRounds(playerId: number): PlayerRoundsData {
-  const [rounds, setRounds] = useState<RoundListItem[]>([]);
+  const [rounds, setRounds] = useState<PlayerRoundListItem[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
