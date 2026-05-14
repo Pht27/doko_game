@@ -141,6 +141,27 @@ export function useRoundForm() {
     [updateBlock],
   );
 
+  const importTeams = useCallback((detail: RoundDetail) => {
+    const sorted = [
+      ...detail.teams.filter((t) => t.party === 'Re'),
+      ...detail.teams.filter((t) => t.party === 'Kontra'),
+    ];
+    const defaultParties: Party[] = ['Re', 'Re', 'Kontra', 'Kontra'];
+    setForm((prev) => ({
+      ...prev,
+      blocks: [0, 1, 2, 3].map((i) => {
+        const team = sorted[i];
+        return {
+          party: defaultParties[i],
+          playerIds: team ? team.players.map((p) => p.id) : [],
+          specialCardIds: [],
+          extraPoints: [],
+        };
+      }) as RoundFormState['blocks'],
+    }));
+    setLastSwitchedBlock(null);
+  }, []);
+
   const loadFromDetail = useCallback((detail: RoundDetail) => {
     // Sort teams: Re first, then Kontra, preserving order within each party
     const sorted = [
@@ -220,6 +241,7 @@ export function useRoundForm() {
     addExtraPoint,
     updateExtraPointCount,
     removeExtraPoint,
+    importTeams,
     loadFromDetail,
     resetForNew,
     toApiRequest,

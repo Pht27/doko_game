@@ -22,7 +22,7 @@ export const SPECIAL_CARD_ICONS: Record<string, string> = {
   Gegengenscherdamen:         '♦♦',
   Heidmann:                   '⚔',
   Heidfrau:                   '🛡',
-  Kemmerich:                  '♦B',
+  Kemmerich:                  '♥B',
 };
 
 export const EXTRA_POINT_ICONS: Record<string, string> = {

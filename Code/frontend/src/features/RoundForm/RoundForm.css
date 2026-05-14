@@ -267,6 +267,41 @@
 
 .arf-points-input:focus { border-bottom-color: var(--arf-primary-h); }
 
+/* ── Import last teams button (in save bar, secondary variant override) ── */
+.arf-import-btn {
+  width: 100%;
+  font-size: 0.85rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--arf-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* ── Import confirm sheet content ── */
+.arf-import-confirm {
+  padding: 16px 20px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.arf-import-confirm-text {
+  font-size: 0.95rem;
+  color: var(--arf-text-sub);
+  margin: 0;
+}
+
+.arf-import-confirm-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+
 /* ── Comment ── */
 .arf-comment-input {
   width: 100%;

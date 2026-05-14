@@ -121,6 +121,107 @@ public class AnalogRoundsService(AnalogDbContext db)
         );
     }
 
+    public async Task<bool> AnyPlayerInactiveAsync(int[] playerIds, CancellationToken ct = default)
+    {
+        var ids = playerIds.ToList();
+        return await db.Players.Where(p => ids.Contains(p.Id) && p.IsActive).CountAsync(ct)
+            != playerIds.Length;
+    }
+
+    public async Task<string?> PlausibilityErrorAsync(
+        RoundInput input,
+        CancellationToken ct = default
+    )
+    {
+        var gameMode = await db
+            .GameModes.AsNoTracking()
+            .FirstOrDefaultAsync(gm => gm.Id == input.GameModeId, ct);
+        if (gameMode is null)
+            return "invalid_game_mode";
+
+        var reCount = input.Teams.Where(t => t.Party == Party.Re).Sum(t => t.PlayerIds.Length);
+        var kontraCount = input
+            .Teams.Where(t => t.Party == Party.Kontra)
+            .Sum(t => t.PlayerIds.Length);
+
+        if (gameMode.IsSolo)
+        {
+            var soloCount = gameMode.SoloParty == Party.Re ? reCount : kontraCount;
+            var otherCount = gameMode.SoloParty == Party.Re ? kontraCount : reCount;
+            if (soloCount != 1 || otherCount != 3)
+                return "solo_party_distribution_invalid";
+        }
+        else
+        {
+            if (reCount != 2 || kontraCount != 2)
+                return "normal_party_distribution_invalid";
+        }
+
+        var allSpecialCardIds = input.Teams.SelectMany(t => t.SpecialCardIds).ToHashSet();
+
+        if (
+            allSpecialCardIds.Contains(SpecialCardIds.Hyperschweinchen)
+            && !allSpecialCardIds.Contains(SpecialCardIds.Superschweinchen)
+        )
+            return "hyperschweinchen_requires_superschweinchen";
+        if (
+            allSpecialCardIds.Contains(SpecialCardIds.Superschweinchen)
+            && !allSpecialCardIds.Contains(SpecialCardIds.Schweinchen)
+        )
+            return "superschweinchen_requires_schweinchen";
+        if (
+            allSpecialCardIds.Contains(SpecialCardIds.Gegengenscherdamen)
+            && !allSpecialCardIds.Contains(SpecialCardIds.Genscherdamen)
+        )
+            return "gegengenscherdamen_requires_genscherdamen";
+        if (
+            allSpecialCardIds.Contains(SpecialCardIds.Heidfrau)
+            && !allSpecialCardIds.Contains(SpecialCardIds.Heidmann)
+        )
+            return "heidfrau_requires_heidmann";
+
+        int ExtraCount(int id) =>
+            input
+                .Teams.SelectMany(t => t.ExtraPoints)
+                .Where(ep => ep.ExtraPointId == id)
+                .Sum(ep => ep.Count);
+
+        if (ExtraCount(ExtraPointIds.Karlchen) + ExtraCount(ExtraPointIds.Agathe) > 1)
+            return "karlchen_agathe_limit_exceeded";
+        if (ExtraCount(ExtraPointIds.Kaffeekranzchen) > 2)
+            return "kaffeekranzchen_limit_exceeded";
+        if (ExtraCount(ExtraPointIds.KlabautermannGefangen) > 2)
+            return "klabautermann_limit_exceeded";
+        if (ExtraCount(ExtraPointIds.GansGefangen) + ExtraCount(ExtraPointIds.Fischauge) > 2)
+            return "gans_fischauge_limit_exceeded";
+        if (ExtraCount(ExtraPointIds.FuchsGefangen) > 2)
+            return "fuchs_gefangen_limit_exceeded";
+
+        return null;
+    }
+
+    private static class SpecialCardIds
+    {
+        public const int Gegengenscherdamen = 1;
+        public const int Genscherdamen = 2;
+        public const int Heidfrau = 3;
+        public const int Heidmann = 4;
+        public const int Hyperschweinchen = 5;
+        public const int Schweinchen = 8;
+        public const int Superschweinchen = 9;
+    }
+
+    private static class ExtraPointIds
+    {
+        public const int Agathe = 1;
+        public const int Fischauge = 3;
+        public const int FuchsGefangen = 4;
+        public const int GansGefangen = 5;
+        public const int Kaffeekranzchen = 6;
+        public const int Karlchen = 7;
+        public const int KlabautermannGefangen = 8;
+    }
+
     public async Task<AnalogRound> CreateRoundAsync(
         RoundInput input,
         CancellationToken ct = default

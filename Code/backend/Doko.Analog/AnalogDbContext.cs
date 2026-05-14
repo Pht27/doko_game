@@ -16,6 +16,7 @@ public class AnalogDbContext(DbContextOptions<AnalogDbContext> options) : DbCont
     public DbSet<AnalogRoundExtraPoint> RoundExtraPoints => Set<AnalogRoundExtraPoint>();
     public DbSet<AnalogComment> Comments => Set<AnalogComment>();
     public DbSet<PlayerLeaderboardEntry> PlayerLeaderboard => Set<PlayerLeaderboardEntry>();
+    public DbSet<PlayerRoundHistoryEntry> PlayerRoundHistory => Set<PlayerRoundHistoryEntry>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -34,6 +35,18 @@ public class AnalogDbContext(DbContextOptions<AnalogDbContext> options) : DbCont
             e.Property(p => p.Losses).HasColumnName("losses");
             e.Property(p => p.WinRate).HasColumnName("win_rate");
             e.Property(p => p.AvgPointsPerGame).HasColumnName("avg_points_per_game");
+        });
+
+        modelBuilder.Entity<PlayerRoundHistoryEntry>(e =>
+        {
+            e.HasNoKey();
+            e.ToView("player_round_history", "analytics");
+            e.Property(p => p.PlayerId).HasColumnName("player_id");
+            e.Property(p => p.RoundId).HasColumnName("round_id");
+            e.Property(p => p.PlayedAt).HasColumnName("played_at");
+            e.Property(p => p.PointDelta).HasColumnName("point_delta");
+            e.Property(p => p.Won).HasColumnName("won");
+            e.Property(p => p.CumulativePoints).HasColumnName("cumulative_points");
         });
 
         modelBuilder.Entity<AnalogPlayer>(e =>

@@ -73,7 +73,15 @@ public class AnalogRoundsController(AnalogRoundsService roundsService) : Control
         if (ValidationError(body) is { } err)
             return BadRequest(new { error = err });
 
+        var allPlayerIds = body.Teams.SelectMany(t => t.PlayerIds).ToArray();
+        if (await roundsService.AnyPlayerInactiveAsync(allPlayerIds, ct))
+            return BadRequest(new { error = "inactive_player" });
+
         var input = ToInput(body);
+
+        if (await roundsService.PlausibilityErrorAsync(input, ct) is { } plausErr)
+            return BadRequest(new { error = plausErr });
+
         var round = await roundsService.CreateRoundAsync(input, ct);
 
         return CreatedAtAction(nameof(GetRound), new { id = round.Id }, new { round.Id });
@@ -89,7 +97,15 @@ public class AnalogRoundsController(AnalogRoundsService roundsService) : Control
         if (ValidationError(body) is { } err)
             return BadRequest(new { error = err });
 
+        var allPlayerIds = body.Teams.SelectMany(t => t.PlayerIds).ToArray();
+        if (await roundsService.AnyPlayerInactiveAsync(allPlayerIds, ct))
+            return BadRequest(new { error = "inactive_player" });
+
         var input = ToInput(body);
+
+        if (await roundsService.PlausibilityErrorAsync(input, ct) is { } plausErr)
+            return BadRequest(new { error = plausErr });
+
         var round = await roundsService.UpdateRoundAsync(id, input, ct);
         if (round is null)
             return NotFound();

@@ -89,3 +89,7 @@ No hardcoded German strings in component files.
 - `src/utils/env.ts` exports feature flags and config read from `import.meta.env`
 - `.env.local` / `.env.production` / `.env.staging` hold environment-specific values
 - Never access `import.meta.env` directly in components — go through `env.ts`
+
+## Themes
+
+Always use the global style colors for as many components as possible - they get changed by the themes applied by the user.
