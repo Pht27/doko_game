@@ -157,7 +157,7 @@ export function useRoundForm() {
           specialCardIds: [],
           extraPoints: [],
         };
-      }) as RoundFormState['blocks'],
+      }) as unknown as RoundFormState['blocks'],
     }));
     setLastSwitchedBlock(null);
   }, []);
