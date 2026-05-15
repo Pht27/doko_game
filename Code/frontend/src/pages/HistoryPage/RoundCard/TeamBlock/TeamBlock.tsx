@@ -1,15 +1,14 @@
+import { PlayerLink } from '@/components/PlayerLink/PlayerLink';
 import type { NormalizedTeam } from '../RoundCard';
 
 export function TeamBlock({
   team,
   won,
   expanded,
-  onPlayerClick,
 }: {
   team: NormalizedTeam;
   won: boolean;
   expanded: boolean;
-  onPlayerClick: (id: number) => void;
 }) {
   const hasSpecials = team.specialCards.length > 0;
   const hasExtras = team.extraPoints.length > 0;
@@ -17,16 +16,7 @@ export function TeamBlock({
   return (
     <div className={`ahr-team-block ${won ? 'ahr-party-win' : 'ahr-party-lose'}${expanded ? ' ahr-block-expanded' : ''}`}>
       {team.players.map((p) => (
-        <button
-          key={p.id}
-          className="ahr-player-name"
-          onClick={(e) => {
-            e.stopPropagation();
-            onPlayerClick(p.id);
-          }}
-        >
-          {p.name}
-        </button>
+        <PlayerLink key={p.id} player={p} className="ahr-player-name" />
       ))}
       {hasSpecials && (
         <div className={`ahr-team-section${expanded ? ' ahr-section-show' : ''}`}>

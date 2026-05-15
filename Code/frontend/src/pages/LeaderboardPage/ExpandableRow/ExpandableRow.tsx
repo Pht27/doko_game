@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { PlayerLink } from '@/components/PlayerLink/PlayerLink';
 import { t } from '@/utils/translations';
 import type { PlayerListItem, PlayerDetail } from '@/types/analog';
 import { StatusState } from '@/components/StatusState/StatusState';
@@ -55,12 +55,10 @@ export function ExpandableRow({
         </div>
 
         <div className="alb-row-info">
-          <Link
-            to={`/players/${player.id}`}
+          <PlayerLink
+            player={player}
             className={`alb-row-name${!player.isActive ? ' alb-row-name--inactive' : ''}`}
-          >
-            {player.name}
-          </Link>
+          />
           <div className="alb-row-stats">
             {winPct.toFixed(1)}% WR · {player.gamesPlayed} Spiele
           </div>
