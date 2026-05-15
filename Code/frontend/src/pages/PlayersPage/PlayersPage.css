@@ -149,7 +149,7 @@
   min-width: 0;
   background: var(--ap-surface2);
   border: 1px solid var(--ap-primary-h);
-  box-shadow: 0 0 0 3px rgba(var(--app-primary-raw),0.2);
+  box-shadow: 0 0 0 3px rgb(from var(--app-primary) r g b / 0.2);
   border-radius: 6px;
   padding: 7px 10px;
   color: var(--ap-text);
@@ -161,7 +161,7 @@
 
 .ap-edit-input--error {
   border-color: var(--app-loss);
-  box-shadow: 0 0 0 3px rgba(var(--app-loss-raw),0.2);
+  box-shadow: 0 0 0 3px rgb(from var(--app-loss) r g b / 0.2);
 }
 
 /* ── Icon buttons ── */
@@ -252,7 +252,7 @@
 
 .ap-input:focus {
   border-color: var(--ap-primary-h);
-  box-shadow: 0 0 0 3px rgba(var(--app-primary-raw),0.2);
+  box-shadow: 0 0 0 3px rgb(from var(--app-primary) r g b / 0.2);
 }
 
 .ap-dialog-actions {

@@ -173,7 +173,7 @@
 
 .rp-search-input:focus {
   border-color: var(--rp-re);
-  box-shadow: 0 0 0 3px rgba(var(--app-re-raw), 0.2);
+  box-shadow: 0 0 0 3px rgb(from var(--app-re) r g b / 0.2);
 }
 
 .rp-search-input::placeholder {
@@ -203,7 +203,7 @@
 
 .rp-section-open {
   border-color: var(--app-border-md);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 1px rgba(var(--app-re-raw), 0.15);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3), 0 0 0 1px rgb(from var(--app-re) r g b / 0.15);
   background: var(--app-surface);
 }
 
@@ -464,8 +464,8 @@
   font-weight: 600;
 }
 
-.rp-party-re     { background: var(--rp-re-soft); color: var(--rp-re-label); border: 1px solid rgba(var(--app-re-raw), 0.3); }
-.rp-party-kontra { background: var(--rp-kontra-soft); color: var(--rp-kontra-label); border: 1px solid rgba(var(--app-kontra-raw), 0.3); }
+.rp-party-re     { background: var(--rp-re-soft); color: var(--rp-re-label); border: 1px solid rgb(from var(--app-re) r g b / 0.3); }
+.rp-party-kontra { background: var(--rp-kontra-soft); color: var(--rp-kontra-label); border: 1px solid rgb(from var(--app-kontra) r g b / 0.3); }
 
 .rp-pill-label { font-size: 1rem; margin-bottom: 2px; }
 .rp-pill-sub   { font-size: 0.78rem; opacity: 0.75; font-weight: 400; }

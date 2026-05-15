@@ -170,7 +170,7 @@
 .alb-row-rank {
   font-size: 0.95rem;
   font-weight: 700;
-  color: rgba(var(--app-re-raw),0.5);
+  color: rgb(from var(--app-re) r g b / 0.5);
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 .alb-row-rank--top { color: var(--app-re); }

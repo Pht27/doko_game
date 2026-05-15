@@ -2,6 +2,10 @@
 
 ## [1.4.2] - 2026-05-14
 
+### Verbessert
+- Die **Farbverläufe für Siegquoten und Ø-Werte** (rot → gelb → grün) passen sich jetzt ans gewählte Theme an – auf hellen Themes wirken die Farben deutlich harmonischer.
+- Der **Karten-Rahmen** im Spielerprofil und die **Fehlerfarben** im Namens-Editor nutzen jetzt die Theme-Farben statt fester Werte.
+
 ### Neu
 - **Sonderkarten und Extrapunkte** zeigen jetzt im Spielerprofil eine aufklappbare **Re/Kontra-Aufschlüsselung**: Wie oft hat man eine Karte/einen Extrapunkt als Re oder Kontra gehabt? Wie war die Siegquote und der Ø-Spielwert je Partei?
 - In der **globalen Spielstatistik** (Übersicht → Spielstatistiken) haben Sonderkarten und Extrapunkte jetzt eine zusätzliche Spalte **Re WR**, die zeigt, wie oft Re-Teams mit dieser Karte/diesem Extrapunkt gewonnen haben.

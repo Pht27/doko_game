@@ -696,8 +696,8 @@ function TimeSeriesChart({ rounds }: { rounds: PlayerRound[] }) {
     <svg viewBox={`0 0 ${w} ${h}`} width="100%" height={h} style={{ display: 'block', overflow: 'visible' }}>
       <defs>
         <linearGradient id="ps-area-grad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={`rgba(var(--app-re-raw), 0.30)`} />
-          <stop offset="100%" stopColor={`rgba(var(--app-re-raw), 0)`} />
+          <stop offset="0%" stopColor={`rgb(from var(--app-re) r g b / 0.30)`} />
+          <stop offset="100%" stopColor={`rgb(from var(--app-re) r g b / 0)`} />
         </linearGradient>
       </defs>
       <line x1={pad} x2={w - pad} y1={zeroY} y2={zeroY} stroke="var(--app-border-md)" strokeWidth="1" strokeDasharray="3 3" />

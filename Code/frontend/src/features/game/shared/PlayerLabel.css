@@ -86,13 +86,13 @@
 .player-health-gesund {
   background: color-mix(in srgb, var(--app-win) 20%, transparent);
   color: var(--app-win);
-  border-color: rgba(var(--app-win-raw), 0.35);
+  border-color: rgb(from var(--app-win) r g b / 0.35);
 }
 
 .player-health-vorbehalt {
   background: color-mix(in srgb, var(--app-solo) 20%, transparent);
   color: var(--app-solo);
-  border-color: rgba(var(--app-solo-raw), 0.4);
+  border-color: rgb(from var(--app-solo) r g b / 0.4);
 }
 
 /* Announce flash — a pseudo-element that expands and fades, leaving the label untouched */
@@ -111,8 +111,8 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  border: 1.5px solid rgba(var(--app-re-raw), 0.65);
-  background: rgba(var(--app-re-raw), 0.18);
+  border: 1.5px solid rgb(from var(--app-re) r g b / 0.65);
+  background: rgb(from var(--app-re) r g b / 0.18);
   pointer-events: none;
   animation: announce-ping 1.3s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
 }

@@ -99,31 +99,31 @@
 .rd-cat-btn-active.rd-cat-solo {
   background: color-mix(in srgb, var(--app-solo) 20%, transparent);
   color: var(--app-solo);
-  border-color: rgba(var(--app-solo-raw), 0.45);
+  border-color: rgb(from var(--app-solo) r g b / 0.45);
 }
 
 .rd-cat-btn-active.rd-cat-armut {
   background: var(--app-re-soft);
   color: var(--app-re-label);
-  border-color: rgba(var(--app-re-raw), 0.45);
+  border-color: rgb(from var(--app-re) r g b / 0.45);
 }
 
 .rd-cat-btn-active.rd-cat-schmeissen {
   background: color-mix(in srgb, var(--app-loss) 20%, transparent);
   color: var(--app-loss);
-  border-color: rgba(var(--app-loss-raw), 0.4);
+  border-color: rgb(from var(--app-loss) r g b / 0.4);
 }
 
 .rd-cat-btn-active.rd-cat-hochzeit {
   background: color-mix(in srgb, var(--app-primary) 20%, transparent);
   color: var(--app-primary);
-  border-color: rgba(var(--app-primary-raw), 0.45);
+  border-color: rgb(from var(--app-primary) r g b / 0.45);
 }
 
 .rd-cat-btn-active.rd-cat-martin {
   background: var(--app-kontra-soft);
   color: var(--app-kontra-label);
-  border-color: rgba(var(--app-kontra-raw), 0.4);
+  border-color: rgb(from var(--app-kontra) r g b / 0.4);
 }
 
 /* Right column: detail options */

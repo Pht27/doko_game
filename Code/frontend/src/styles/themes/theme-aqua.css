@@ -27,21 +27,21 @@ html.accent-aqua {
   --app-primary:        #CC1010;
   --app-primary-h:      #E02020;
   --app-primary-text:   #fff;
-  --app-primary-raw:    204,16,16;
+
   --app-re:             #0E8898;
   --app-re-soft:        rgba(14,136,152,0.18);
   --app-re-label:       #30A8B8;
-  --app-re-raw:         14,136,152;
+
   --app-kontra:         #CC1010;
   --app-kontra-soft:    rgba(204,16,16,0.15);
   --app-kontra-label:   #E03030;
-  --app-kontra-raw:     204,16,16;
+
   --app-solo:           #b86800;
-  --app-solo-raw:       184,104,0;
+
   --app-win:            #1e8c50;
-  --app-win-raw:        30,140,80;
+
   --app-loss:           #C01010;
-  --app-loss-raw:       192,16,16;
+
   --app-warning:        #b87800;
   --app-orange:         #d06820;
 }

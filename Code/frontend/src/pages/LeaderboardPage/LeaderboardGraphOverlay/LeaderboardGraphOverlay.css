@@ -37,14 +37,14 @@
   font-weight: 600;
   color: var(--app-re);
   background: var(--app-re-soft);
-  border: 1px solid rgba(var(--app-re-raw), 0.3);
+  border: 1px solid rgb(from var(--app-re) r g b / 0.3);
   border-radius: 8px;
   padding: 4px 10px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition: background 0.12s;
 }
-.lgo-players-btn:active { background: rgba(var(--app-re-raw), 0.22); }
+.lgo-players-btn:active { background: rgb(from var(--app-re) r g b / 0.22); }
 
 .lgo-close-btn {
   font-size: 1rem;
@@ -122,7 +122,7 @@
   border-radius: 50%;
   background: var(--app-re);
   cursor: pointer;
-  box-shadow: 0 0 0 3px rgba(var(--app-re-raw), 0.25);
+  box-shadow: 0 0 0 3px rgb(from var(--app-re) r g b / 0.25);
 }
 .lgo-slider::-moz-range-thumb {
   width: 18px;

@@ -44,7 +44,7 @@
   background: var(--app-re-soft);
   padding: 1px 7px;
   border-radius: 999px;
-  border: 1px solid rgba(var(--app-re-raw), 0.3);
+  border: 1px solid rgb(from var(--app-re) r g b / 0.3);
   letter-spacing: 0;
   text-transform: none;
 }
@@ -85,7 +85,7 @@
 .health-check-btn-gesund {
   background: color-mix(in srgb, var(--app-win) 20%, transparent);
   color: var(--app-win);
-  border-color: rgba(var(--app-win-raw), 0.35);
+  border-color: rgb(from var(--app-win) r g b / 0.35);
 }
 
 .health-check-btn-gesund:hover {
@@ -95,7 +95,7 @@
 .health-check-btn-vorbehalt {
   background: color-mix(in srgb, var(--app-solo) 20%, transparent);
   color: var(--app-solo);
-  border-color: rgba(var(--app-solo-raw), 0.4);
+  border-color: rgb(from var(--app-solo) r g b / 0.4);
 }
 
 .health-check-btn-vorbehalt:hover {

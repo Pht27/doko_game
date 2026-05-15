@@ -108,7 +108,7 @@
   background: var(--app-kontra-soft);
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(var(--app-kontra-raw), 0.25);
+  border: 1px solid rgb(from var(--app-kontra) r g b / 0.25);
 }
 
 .sts-hero-wr-bar-fill {
@@ -117,7 +117,7 @@
   left: 0;
   bottom: 0;
   background: var(--app-re);
-  border-right: 2px solid rgba(255, 255, 255, 0.3);
+  border-right: 2px solid var(--app-bg);
 }
 
 .sts-hero-mini-row {

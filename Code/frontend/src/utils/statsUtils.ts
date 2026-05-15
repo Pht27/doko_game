@@ -2,11 +2,13 @@ function lerp(a: number, b: number, t: number) {
   return Math.round(a + t * (b - a));
 }
 
+import { cssColor } from './themeUtils';
+
 function statsGradient(pct: number): string {
   const p = Math.max(0, Math.min(1, pct));
-  const lo = { r: 248, g: 113, b: 113 };
-  const mid = { r: 250, g: 204, b: 21 };
-  const hi = { r: 74, g: 222, b: 128 };
+  const lo = cssColor('--app-loss');
+  const mid = cssColor('--app-warning');
+  const hi = cssColor('--app-win');
   let c;
   if (p < 0.5) {
     const t = p * 2;

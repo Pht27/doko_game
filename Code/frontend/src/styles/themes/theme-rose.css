@@ -27,21 +27,21 @@ html.accent-rose {
   --app-primary:        #C02858;
   --app-primary-h:      #D83870;
   --app-primary-text:   #fff;
-  --app-primary-raw:    192,40,88;
+
   --app-re:             #6f9de7;
   --app-re-soft:        rgba(58,112,200,0.18);
   --app-re-label:       #5A8EE0;
-  --app-re-raw:         58,112,200;
+
   --app-kontra:         #D43060;
   --app-kontra-soft:    rgba(212,48,96,0.15);
   --app-kontra-label:   #E85080;
-  --app-kontra-raw:     212,48,96;
+
   --app-solo:           #b86800;
-  --app-solo-raw:       184,104,0;
+
   --app-win:            #1e8c50;
-  --app-win-raw:        30,140,80;
+
   --app-loss:           #9020d0;
-  --app-loss-raw:       200,48,64;
+
   --app-warning:        #b87800;
   --app-orange:         #e451bf;
 }

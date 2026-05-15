@@ -30,66 +30,66 @@
 
 .gmb-solo {
   background: color-mix(in srgb, var(--app-solo) 45%, transparent);
-  border-color: rgba(var(--app-solo-raw), 0.45);
+  border-color: rgb(from var(--app-solo) r g b / 0.45);
   color: var(--app-solo);
-  box-shadow: 0 2px 14px rgba(var(--app-solo-raw), 0.28);
+  box-shadow: 0 2px 14px rgb(from var(--app-solo) r g b / 0.28);
 }
 
 .gmb-armut {
   background: var(--app-re-soft);
-  border-color: rgba(var(--app-re-raw), 0.45);
+  border-color: rgb(from var(--app-re) r g b / 0.45);
   color: var(--app-re-label);
-  box-shadow: 0 2px 14px rgba(var(--app-re-raw), 0.28);
+  box-shadow: 0 2px 14px rgb(from var(--app-re) r g b / 0.28);
 }
 
 .gmb-hochzeit {
   background: color-mix(in srgb, var(--app-primary) 30%, transparent);
-  border-color: rgba(var(--app-primary-raw), 0.45);
+  border-color: rgb(from var(--app-primary) r g b / 0.45);
   color: var(--app-primary);
-  box-shadow: 0 2px 14px rgba(var(--app-primary-raw), 0.28);
+  box-shadow: 0 2px 14px rgb(from var(--app-primary) r g b / 0.28);
 }
 
 .gmb-schwarze-sau {
   background: color-mix(in srgb, var(--app-loss) 25%, transparent);
-  border-color: rgba(var(--app-loss-raw), 0.45);
+  border-color: rgb(from var(--app-loss) r g b / 0.45);
   color: var(--app-loss);
-  box-shadow: 0 2px 14px rgba(var(--app-loss-raw), 0.28);
+  box-shadow: 0 2px 14px rgb(from var(--app-loss) r g b / 0.28);
 }
 
 /* Phase-specific badge styles (reservation phases) */
 .gmb-ph-health {
   background: color-mix(in srgb, var(--app-re) 15%, transparent);
-  border-color: rgba(var(--app-re-raw), 0.35);
+  border-color: rgb(from var(--app-re) r g b / 0.35);
   color: var(--app-re-label);
-  box-shadow: 0 2px 12px rgba(var(--app-re-raw), 0.2);
+  box-shadow: 0 2px 12px rgb(from var(--app-re) r g b / 0.2);
 }
 
 .gmb-ph-solo {
   background: color-mix(in srgb, var(--app-solo) 45%, transparent);
-  border-color: rgba(var(--app-solo-raw), 0.45);
+  border-color: rgb(from var(--app-solo) r g b / 0.45);
   color: var(--app-solo);
-  box-shadow: 0 2px 14px rgba(var(--app-solo-raw), 0.28);
+  box-shadow: 0 2px 14px rgb(from var(--app-solo) r g b / 0.28);
 }
 
 .gmb-ph-armut {
   background: var(--app-re-soft);
-  border-color: rgba(var(--app-re-raw), 0.45);
+  border-color: rgb(from var(--app-re) r g b / 0.45);
   color: var(--app-re-label);
-  box-shadow: 0 2px 14px rgba(var(--app-re-raw), 0.28);
+  box-shadow: 0 2px 14px rgb(from var(--app-re) r g b / 0.28);
 }
 
 .gmb-ph-schmeissen {
   background: color-mix(in srgb, var(--app-loss) 25%, transparent);
-  border-color: rgba(var(--app-loss-raw), 0.4);
+  border-color: rgb(from var(--app-loss) r g b / 0.4);
   color: var(--app-loss);
-  box-shadow: 0 2px 12px rgba(var(--app-loss-raw), 0.25);
+  box-shadow: 0 2px 12px rgb(from var(--app-loss) r g b / 0.25);
 }
 
 .gmb-ph-hochzeit {
   background: color-mix(in srgb, var(--app-primary) 30%, transparent);
-  border-color: rgba(var(--app-primary-raw), 0.45);
+  border-color: rgb(from var(--app-primary) r g b / 0.45);
   color: var(--app-primary);
-  box-shadow: 0 2px 14px rgba(var(--app-primary-raw), 0.28);
+  box-shadow: 0 2px 14px rgb(from var(--app-primary) r g b / 0.28);
 }
 
 /* Pill row */
@@ -140,13 +140,13 @@
 .gmb-chip-re {
   background: var(--app-re-soft);
   color: var(--app-re-label);
-  border: 1px solid rgba(var(--app-re-raw), 0.45);
+  border: 1px solid rgb(from var(--app-re) r g b / 0.45);
 }
 
 .gmb-chip-solo {
   background: color-mix(in srgb, var(--app-solo) 30%, transparent);
   color: var(--app-solo);
-  border: 1px solid rgba(var(--app-solo-raw), 0.45);
+  border: 1px solid rgb(from var(--app-solo) r g b / 0.45);
 }
 
 .gmb-chip-unk {
