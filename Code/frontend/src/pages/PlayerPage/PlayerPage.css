@@ -421,22 +421,52 @@
   min-width: 0;
   overflow-x: auto;
   scrollbar-width: none;
-  padding-right: 20px;
 }
 
 .ps-tabs::-webkit-scrollbar {
   display: none;
 }
 
-/* Fade hint for horizontal scroll */
+/* Fade hints for horizontal scroll */
 .ps-tabs-fade {
   position: absolute;
-  right: 10px;
   top: 0;
   bottom: 0;
-  width: 28px;
-  background: linear-gradient(to right, transparent, var(--app-surface-2));
+  width: 44px;
   pointer-events: none;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+}
+
+.ps-tabs-fade-right {
+  right: 0;
+  background: linear-gradient(to right, transparent, var(--app-surface-2) 70%);
+  justify-content: flex-end;
+  padding-right: 6px;
+}
+
+.ps-tabs-fade-right::after {
+  content: '›';
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--app-text-muted);
+  line-height: 1;
+}
+
+.ps-tabs-fade-left {
+  left: 0;
+  background: linear-gradient(to left, transparent, var(--app-surface-2) 70%);
+  justify-content: flex-start;
+  padding-left: 6px;
+}
+
+.ps-tabs-fade-left::after {
+  content: '‹';
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--app-text-muted);
+  line-height: 1;
 }
 
 .ps-tab {

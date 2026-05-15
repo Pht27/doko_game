@@ -101,6 +101,194 @@ function StatsHero({ gameModes }: { gameModes: GameModeStat[] }) {
   );
 }
 
+// ── Special card collapsible table ────────────────────────────────────────────
+
+type ScGroup = { specialCardId: number; name: string; re: SpecialCardStat | null; kontra: SpecialCardStat | null };
+
+function groupSpecialCards(rows: SpecialCardStat[]): ScGroup[] {
+  const map = new Map<number, ScGroup>();
+  for (const row of rows) {
+    if (!map.has(row.specialCardId))
+      map.set(row.specialCardId, { specialCardId: row.specialCardId, name: row.name, re: null, kontra: null });
+    const g = map.get(row.specialCardId)!;
+    if (row.party === 0) g.re = row;
+    else g.kontra = row;
+  }
+  return Array.from(map.values());
+}
+
+function CollapsibleSpecialCardTable({ rows }: { rows: SpecialCardStat[] }) {
+  const [expanded, setExpanded] = useState<Set<number>>(new Set());
+
+  const groups = groupSpecialCards(rows).sort(
+    (a, b) => (b.re?.occurrences ?? 0) + (b.kontra?.occurrences ?? 0) - ((a.re?.occurrences ?? 0) + (a.kontra?.occurrences ?? 0)),
+  );
+
+  const totalOcc = (g: ScGroup) => (g.re?.occurrences ?? 0) + (g.kontra?.occurrences ?? 0);
+  const totalWins = (g: ScGroup) => (g.re?.wins ?? 0) + (g.kontra?.wins ?? 0);
+  const totalWR = (g: ScGroup) => { const t = totalOcc(g); return t > 0 ? totalWins(g) / t : 0; };
+  const weightedAvg = (g: ScGroup) => {
+    const total = totalOcc(g);
+    if (total === 0) return null;
+    return ((g.re ? g.re.avgGameValue * g.re.occurrences : 0) + (g.kontra ? g.kontra.avgGameValue * g.kontra.occurrences : 0)) / total;
+  };
+
+  const toggle = (id: number) =>
+    setExpanded((prev) => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+
+  return (
+    <div className="ps-cgm-table">
+      <div className="ps-cgm-header">
+        <span className="ps-cgm-th ps-cgm-th-name">Karte</span>
+        <span className="ps-cgm-th">Anz.</span>
+        <span className="ps-cgm-th">WR</span>
+        <span className="ps-cgm-th">Ø</span>
+        <span className="ps-cgm-th ps-cgm-th-chevron" />
+      </div>
+
+      {groups.map((g) => {
+        const tOcc = totalOcc(g);
+        const tWR = totalWR(g);
+        const tAvg = weightedAvg(g);
+        const isExpanded = expanded.has(g.specialCardId);
+        return (
+          <div key={g.specialCardId} className="ps-cgm-group">
+            <button
+              className={`ps-cgm-summary${isExpanded ? ' ps-cgm-summary-open' : ''}`}
+              onClick={() => toggle(g.specialCardId)}
+            >
+              <span className="ps-cgm-mode-name">{g.name}</span>
+              <span className="ps-cgm-val">{tOcc > 0 ? fmtInt(tOcc) : '—'}</span>
+              <span className="ps-cgm-val" style={{ color: tOcc > 0 ? colorForRate(tWR) : undefined }}>
+                {tOcc > 0 ? fmtRate(tWR) : '—'}
+              </span>
+              <span className="ps-cgm-val" style={{ color: tAvg != null ? colorForMean(tAvg) : undefined }}>
+                {tAvg != null ? fmtMean(tAvg) : '—'}
+              </span>
+              <span className="ps-cgm-chevron">{isExpanded ? '▴' : '▾'}</span>
+            </button>
+
+            {isExpanded && (
+              <div className="ps-cgm-sub-rows">
+                {([{ label: 'Re', labelClass: 'ps-cgm-label-re', stat: g.re }, { label: 'Ko', labelClass: 'ps-cgm-label-ko', stat: g.kontra }] as const).map(({ label, labelClass, stat }) => {
+                  const isEmpty = !stat || stat.occurrences === 0;
+                  return (
+                    <div key={label} className={`ps-cgm-sub${isEmpty ? ' ps-cgm-sub-empty' : ''}`}>
+                      <span className={`ps-cgm-sub-label ${labelClass}`}>{label}</span>
+                      <span className="ps-cgm-val ps-cgm-sub-val">{isEmpty ? '—' : fmtInt(stat!.occurrences)}</span>
+                      <span className="ps-cgm-val ps-cgm-sub-val" style={{ color: !isEmpty ? colorForRate(stat!.winRate) : undefined }}>
+                        {isEmpty ? '—' : fmtRate(stat!.winRate)}
+                      </span>
+                      <span className="ps-cgm-val ps-cgm-sub-val" style={{ color: !isEmpty ? colorForMean(stat!.avgGameValue) : undefined }}>
+                        {isEmpty ? '—' : fmtMean(stat!.avgGameValue)}
+                      </span>
+                      <span className="ps-cgm-chevron" />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Extra point collapsible table ─────────────────────────────────────────────
+
+type EpGroup = { extraPointId: number; name: string; re: ExtraPointStat | null; kontra: ExtraPointStat | null };
+
+function groupExtraPoints(rows: ExtraPointStat[]): EpGroup[] {
+  const map = new Map<number, EpGroup>();
+  for (const row of rows) {
+    if (!map.has(row.extraPointId))
+      map.set(row.extraPointId, { extraPointId: row.extraPointId, name: row.name, re: null, kontra: null });
+    const g = map.get(row.extraPointId)!;
+    if (row.party === 0) g.re = row;
+    else g.kontra = row;
+  }
+  return Array.from(map.values());
+}
+
+function CollapsibleExtraPointTable({ rows }: { rows: ExtraPointStat[] }) {
+  const [expanded, setExpanded] = useState<Set<number>>(new Set());
+
+  const groups = groupExtraPoints(rows).sort(
+    (a, b) => (b.re?.occurrences ?? 0) + (b.kontra?.occurrences ?? 0) - ((a.re?.occurrences ?? 0) + (a.kontra?.occurrences ?? 0)),
+  );
+
+  const totalOcc = (g: EpGroup) => (g.re?.occurrences ?? 0) + (g.kontra?.occurrences ?? 0);
+  const totalWins = (g: EpGroup) => (g.re?.wins ?? 0) + (g.kontra?.wins ?? 0);
+  const totalWR = (g: EpGroup) => { const t = totalOcc(g); return t > 0 ? totalWins(g) / t : 0; };
+  const weightedAvg = (g: EpGroup) => {
+    const total = totalOcc(g);
+    if (total === 0) return null;
+    return ((g.re ? g.re.avgGameValue * g.re.occurrences : 0) + (g.kontra ? g.kontra.avgGameValue * g.kontra.occurrences : 0)) / total;
+  };
+
+  const toggle = (id: number) =>
+    setExpanded((prev) => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
+
+  return (
+    <div className="ps-cgm-table">
+      <div className="ps-cgm-header">
+        <span className="ps-cgm-th ps-cgm-th-name">Extrapunkt</span>
+        <span className="ps-cgm-th">Anz.</span>
+        <span className="ps-cgm-th">WR</span>
+        <span className="ps-cgm-th">Ø</span>
+        <span className="ps-cgm-th ps-cgm-th-chevron" />
+      </div>
+
+      {groups.map((g) => {
+        const tOcc = totalOcc(g);
+        const tWR = totalWR(g);
+        const tAvg = weightedAvg(g);
+        const isExpanded = expanded.has(g.extraPointId);
+        return (
+          <div key={g.extraPointId} className="ps-cgm-group">
+            <button
+              className={`ps-cgm-summary${isExpanded ? ' ps-cgm-summary-open' : ''}`}
+              onClick={() => toggle(g.extraPointId)}
+            >
+              <span className="ps-cgm-mode-name">{g.name}</span>
+              <span className="ps-cgm-val">{tOcc > 0 ? fmtInt(tOcc) : '—'}</span>
+              <span className="ps-cgm-val" style={{ color: tOcc > 0 ? colorForRate(tWR) : undefined }}>
+                {tOcc > 0 ? fmtRate(tWR) : '—'}
+              </span>
+              <span className="ps-cgm-val" style={{ color: tAvg != null ? colorForMean(tAvg) : undefined }}>
+                {tAvg != null ? fmtMean(tAvg) : '—'}
+              </span>
+              <span className="ps-cgm-chevron">{isExpanded ? '▴' : '▾'}</span>
+            </button>
+
+            {isExpanded && (
+              <div className="ps-cgm-sub-rows">
+                {([{ label: 'Re', labelClass: 'ps-cgm-label-re', stat: g.re }, { label: 'Ko', labelClass: 'ps-cgm-label-ko', stat: g.kontra }] as const).map(({ label, labelClass, stat }) => {
+                  const isEmpty = !stat || stat.occurrences === 0;
+                  return (
+                    <div key={label} className={`ps-cgm-sub${isEmpty ? ' ps-cgm-sub-empty' : ''}`}>
+                      <span className={`ps-cgm-sub-label ${labelClass}`}>{label}</span>
+                      <span className="ps-cgm-val ps-cgm-sub-val">{isEmpty ? '—' : fmtInt(stat!.occurrences)}</span>
+                      <span className="ps-cgm-val ps-cgm-sub-val" style={{ color: !isEmpty ? colorForRate(stat!.winRate) : undefined }}>
+                        {isEmpty ? '—' : fmtRate(stat!.winRate)}
+                      </span>
+                      <span className="ps-cgm-val ps-cgm-sub-val" style={{ color: !isEmpty ? colorForMean(stat!.avgGameValue) : undefined }}>
+                        {isEmpty ? '—' : fmtMean(stat!.avgGameValue)}
+                      </span>
+                      <span className="ps-cgm-chevron" />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export function StatsPage() {
@@ -157,54 +345,6 @@ export function StatsPage() {
     },
   ];
 
-  const specialCardColumns: Column<SpecialCardStat>[] = [
-    { key: 'name', label: 'Karte' },
-    {
-      key: 'occurrences',
-      label: 'Anzahl',
-      sortValue: (r) => r.occurrences,
-      render: (r) => fmtInt(r.occurrences),
-    },
-    {
-      key: 'winRate',
-      label: 'WR',
-      sortValue: (r) => r.winRate,
-      render: (r) => <span style={{ color: colorForRate(r.winRate) }}>{fmtRate(r.winRate)}</span>,
-    },
-    {
-      key: 'avg',
-      label: 'Ø Wert',
-      sortValue: (r) => r.avgGameValue,
-      render: (r) => (
-        <span style={{ color: colorForMean(r.avgGameValue) }}>{fmtMean(r.avgGameValue)}</span>
-      ),
-    },
-  ];
-
-  const extraPointColumns: Column<ExtraPointStat>[] = [
-    { key: 'name', label: 'Extrapunkt' },
-    {
-      key: 'occurrences',
-      label: 'Anz.',
-      sortValue: (r) => r.occurrences,
-      render: (r) => fmtInt(r.occurrences),
-    },
-    {
-      key: 'winRate',
-      label: 'WR',
-      sortValue: (r) => r.winRate,
-      render: (r) => <span style={{ color: colorForRate(r.winRate) }}>{fmtRate(r.winRate)}</span>,
-    },
-    {
-      key: 'avg',
-      label: 'Ø Wert',
-      sortValue: (r) => r.avgGameValue,
-      render: (r) => (
-        <span style={{ color: colorForMean(r.avgGameValue) }}>{fmtMean(r.avgGameValue)}</span>
-      ),
-    },
-  ];
-
   return (
     <div className="sts-page">
       <PageHeader title={t.statsTitle} backTo={-1 as never} />
@@ -237,22 +377,8 @@ export function StatsPage() {
               rowKey={(r) => r.gameModeId}
             />
           )}
-          {activeTab === 'sc' && (
-            <SortableTable
-              columns={specialCardColumns}
-              rows={specialCards}
-              initialSort="occurrences"
-              rowKey={(r) => r.specialCardId}
-            />
-          )}
-          {activeTab === 'ep' && (
-            <SortableTable
-              columns={extraPointColumns}
-              rows={extraPoints}
-              initialSort="occurrences"
-              rowKey={(r) => r.extraPointId}
-            />
-          )}
+          {activeTab === 'sc' && <CollapsibleSpecialCardTable rows={specialCards} />}
+          {activeTab === 'ep' && <CollapsibleExtraPointTable rows={extraPoints} />}
         </div>
 
         <div style={{ height: 24 }} />

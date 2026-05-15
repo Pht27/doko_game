@@ -168,6 +168,7 @@ export interface PlayerGameModeStat {
 export interface PlayerSpecialCardStat {
   specialCardId: number;
   specialCardName: string;
+  party: number;
   occurrences: number;
   wins: number;
   winRate: number;
@@ -178,6 +179,7 @@ export interface PlayerSpecialCardStat {
 export interface PlayerExtraPointStat {
   extraPointId: number;
   extraPointName: string;
+  party: number;
   occurrences: number;
   totalCount: number;
   wins: number;
@@ -206,6 +208,7 @@ export interface GameModeStat {
 export interface SpecialCardStat {
   specialCardId: number;
   name: string;
+  party: number;
   occurrences: number;
   wins: number;
   winRate: number;
@@ -216,6 +219,7 @@ export interface SpecialCardStat {
 export interface ExtraPointStat {
   extraPointId: number;
   name: string;
+  party: number;
   occurrences: number;
   totalCount: number;
   wins: number;

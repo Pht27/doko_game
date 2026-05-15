@@ -3,6 +3,10 @@
 ## [1.4.2] - 2026-05-14
 
 ### Neu
+- **Sonderkarten und Extrapunkte** zeigen jetzt im Spielerprofil eine aufklappbare **Re/Kontra-Aufschlüsselung**: Wie oft hat man eine Karte/einen Extrapunkt als Re oder Kontra gehabt? Wie war die Siegquote und der Ø-Spielwert je Partei?
+- In der **globalen Spielstatistik** (Übersicht → Spielstatistiken) haben Sonderkarten und Extrapunkte jetzt eine zusätzliche Spalte **Re WR**, die zeigt, wie oft Re-Teams mit dieser Karte/diesem Extrapunkt gewonnen haben.
+
+### Neu
 - Spieler können jetzt ihr **Profil bearbeiten**: Name ändern und eine **Heldenkarte** aus allen 24 Doppelkopf-Karten wählen. Der ✎-Button neben dem Namen öffnet das Bearbeitungsformular. Die Karte wird dauerhaft gespeichert und im Hero-Bereich des Profils angezeigt.
 
 ### Verbessert

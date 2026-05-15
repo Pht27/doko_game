@@ -2,6 +2,7 @@ select
     tm.player_id,
     ep.extra_point_id,
     ep.name                                                                  as extra_point_name,
+    tr.party,
     count(*)                                                                 as occurrences,
     sum(rep.count)                                                           as total_count,
     count(*) filter (where tr.won)                                           as wins,
@@ -11,4 +12,4 @@ from {{ ref('stg_analog__round_extra_points') }} rep
 join {{ ref('stg_analog__extra_points') }}       ep on ep.extra_point_id = rep.extra_point_id
 join {{ ref('stg_analog__team_members') }}       tm on tm.team_id        = rep.team_id
 join {{ ref('int_team_round_results') }}         tr on tr.team_id        = rep.team_id
-group by tm.player_id, ep.extra_point_id, ep.name
+group by tm.player_id, ep.extra_point_id, ep.name, tr.party
