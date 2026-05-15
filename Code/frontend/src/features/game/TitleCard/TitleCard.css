@@ -90,13 +90,13 @@
 .tc-chip-re {
   background: var(--app-re-soft);
   color: var(--app-re-label);
-  border: 1px solid rgba(var(--app-re-raw), 0.5);
+  border: 1px solid rgb(from var(--app-re) r g b / 0.5);
 }
 
 .tc-chip-solo {
   background: color-mix(in srgb, var(--app-solo) 30%, transparent);
   color: var(--app-solo);
-  border: 1px solid rgba(var(--app-solo-raw), 0.5);
+  border: 1px solid rgb(from var(--app-solo) r g b / 0.5);
 }
 
 .tc-chip-unk {

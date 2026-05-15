@@ -1,8 +1,8 @@
 @reference "../../styles/index.css";
 
 @keyframes update-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(var(--app-re-raw),0.5), 0 0 10px rgba(var(--app-re-raw),0.25); border-color: rgba(var(--app-re-raw),0.45); }
-  50% { box-shadow: 0 0 0 5px rgba(var(--app-re-raw),0), 0 0 22px rgba(var(--app-re-raw),0.55); border-color: rgba(var(--app-re-raw),0.75); }
+  0%, 100% { box-shadow: 0 0 0 0 rgb(from var(--app-re) r g b / 0.5), 0 0 10px rgb(from var(--app-re) r g b / 0.25); border-color: rgb(from var(--app-re) r g b / 0.45); }
+  50% { box-shadow: 0 0 0 5px rgb(from var(--app-re) r g b / 0), 0 0 22px rgb(from var(--app-re) r g b / 0.55); border-color: rgb(from var(--app-re) r g b / 0.75); }
 }
 
 @keyframes dot-pulse {
@@ -11,8 +11,8 @@
 }
 
 .update-pill {
-  background: rgba(var(--app-re-raw),0.15) !important;
-  border-color: rgba(var(--app-re-raw),0.45) !important;
+  background: rgb(from var(--app-re) r g b / 0.15) !important;
+  border-color: rgb(from var(--app-re) r g b / 0.45) !important;
   transition: none !important;
   animation: update-glow 2s ease-in-out infinite;
 }
@@ -124,20 +124,20 @@
    --tile-glyph-color stays fixed: red for ♥♦, text-adaptive for ♣♠. */
 .tile--kreuz {
   --tile-color:       var(--app-re);
-  --tile-glow:        rgba(var(--app-re-raw),0.5);
-  --tile-open-bg:     rgba(var(--app-re-raw),0.1);
+  --tile-glow:        rgb(from var(--app-re) r g b / 0.5);
+  --tile-open-bg:     rgb(from var(--app-re) r g b / 0.1);
   --tile-glyph-color: var(--app-text);
 }
 .tile--pik {
   --tile-color:       var(--app-kontra);
-  --tile-glow:        rgba(var(--app-kontra-raw),0.5);
-  --tile-open-bg:     rgba(var(--app-kontra-raw),0.1);
+  --tile-glow:        rgb(from var(--app-kontra) r g b / 0.5);
+  --tile-open-bg:     rgb(from var(--app-kontra) r g b / 0.1);
   --tile-glyph-color: var(--app-text);
 }
 .tile--herz {
   --tile-color:       var(--app-loss);
-  --tile-glow:        rgba(var(--app-loss-raw),0.5);
-  --tile-open-bg:     rgba(var(--app-loss-raw),0.1);
+  --tile-glow:        rgb(from var(--app-loss) r g b / 0.5);
+  --tile-open-bg:     rgb(from var(--app-loss) r g b / 0.1);
   --tile-glyph-color: #dc2626;
 }
 .tile--karo {
@@ -271,7 +271,7 @@
   height: 7px;
   border-radius: 50%;
   background: var(--app-re);
-  box-shadow: 0 0 8px var(--app-re), 0 0 16px rgba(var(--app-re-raw),0.5);
+  box-shadow: 0 0 8px var(--app-re), 0 0 16px rgb(from var(--app-re) r g b / 0.5);
   flex-shrink: 0;
 }
 

@@ -25,7 +25,7 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--app-solo);
-  text-shadow: 0 0 10px rgba(var(--app-solo-raw), 0.6);
+  text-shadow: 0 0 10px rgb(from var(--app-solo) r g b / 0.6);
 }
 
 .sk-flash-name {
@@ -34,8 +34,8 @@
   color: var(--app-text);
   white-space: nowrap;
   text-shadow:
-    0 0 20px rgba(var(--app-solo-raw), 0.85),
-    0 0 45px rgba(var(--app-solo-raw), 0.5),
+    0 0 20px rgb(from var(--app-solo) r g b / 0.85),
+    0 0 45px rgb(from var(--app-solo) r g b / 0.5),
     0 2px 8px rgba(0, 0, 0, 0.85);
   letter-spacing: 0.03em;
 }

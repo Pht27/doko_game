@@ -27,21 +27,21 @@ html.accent-nautical {
   --app-primary:        #002C54;
   --app-primary-h:      #003a70;
   --app-primary-text:   #fff;
-  --app-primary-raw:    0,44,84;
+
   --app-re:             #002C54;
   --app-re-soft:        rgba(0,44,84,0.15);
   --app-re-label:       #1A4878;
-  --app-re-raw:         0,44,84;
+
   --app-kontra:         #C5001A;
   --app-kontra-soft:    rgba(197,0,26,0.15);
   --app-kontra-label:   #E01830;
-  --app-kontra-raw:     197,0,26;
+
   --app-solo:           #b86800;
-  --app-solo-raw:       184,104,0;
+
   --app-win:            #1e8c50;
-  --app-win-raw:        30,140,80;
+
   --app-loss:           #C5001A;
-  --app-loss-raw:       197,0,26;
+
   --app-warning:        #b87800;
   --app-orange:         #d06820;
 }

@@ -60,8 +60,8 @@
 }
 
 .arf-gamemode-btn.arf-solo {
-  background: rgba(var(--app-solo-raw),0.14);
-  border-color: rgba(var(--app-solo-raw),0.45);
+  background: rgb(from var(--app-solo) r g b / 0.14);
+  border-color: rgb(from var(--app-solo) r g b / 0.45);
 }
 
 .arf-gamemode-label {
@@ -141,17 +141,17 @@
 
 
 .arf-party-btn.arf-re-selected {
-  background: rgba(var(--app-re-raw),0.14);
-  border-color: rgba(var(--app-re-raw),0.45);
+  background: rgb(from var(--app-re) r g b / 0.14);
+  border-color: rgb(from var(--app-re) r g b / 0.45);
   color: var(--arf-re);
-  box-shadow: 0 0 0 1px rgba(var(--app-re-raw),0.45), 0 6px 18px rgba(var(--app-re-raw),0.14);
+  box-shadow: 0 0 0 1px rgb(from var(--app-re) r g b / 0.45), 0 6px 18px rgb(from var(--app-re) r g b / 0.14);
 }
 
 .arf-party-btn.arf-kontra-selected {
-  background: rgba(var(--app-kontra-raw),0.14);
-  border-color: rgba(var(--app-kontra-raw),0.45);
+  background: rgb(from var(--app-kontra) r g b / 0.14);
+  border-color: rgb(from var(--app-kontra) r g b / 0.45);
   color: var(--arf-kontra);
-  box-shadow: 0 0 0 1px rgba(var(--app-kontra-raw),0.45), 0 6px 18px rgba(var(--app-kontra-raw),0.14);
+  box-shadow: 0 0 0 1px rgb(from var(--app-kontra) r g b / 0.45), 0 6px 18px rgb(from var(--app-kontra) r g b / 0.14);
 }
 
 .arf-points-label {
@@ -195,11 +195,11 @@
 
 .arf-team-block:active { opacity: 0.85; }
 
-.arf-re-col .arf-team-block     { border-color: rgba(var(--app-re-raw),0.25); }
-.arf-kontra-col .arf-team-block { border-color: rgba(var(--app-kontra-raw),0.25); }
+.arf-re-col .arf-team-block     { border-color: rgb(from var(--app-re) r g b / 0.25); }
+.arf-kontra-col .arf-team-block { border-color: rgb(from var(--app-kontra) r g b / 0.25); }
 
-.arf-team-block.arf-winning { background: rgba(var(--app-win-raw),0.10); }
-.arf-team-block.arf-losing  { background: rgba(var(--app-loss-raw),0.10); }
+.arf-team-block.arf-winning { background: rgb(from var(--app-win) r g b / 0.10); }
+.arf-team-block.arf-losing  { background: rgb(from var(--app-loss) r g b / 0.10); }
 
 .arf-team-empty {
   font-size: 0.85rem;

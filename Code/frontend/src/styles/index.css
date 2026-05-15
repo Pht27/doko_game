@@ -38,21 +38,21 @@
   --app-primary:        #4f46e5;
   --app-primary-h:      #6366f1;
   --app-primary-text:   #fff;
-  --app-primary-raw:    79,70,229;
+
   --app-re:             #818cf8;
   --app-re-soft:        rgba(99,102,241,0.15);
   --app-re-label:       rgba(165,180,252,1);
-  --app-re-raw:         129,140,248;
+
   --app-kontra:         oklch(65% 0.23 303);
   --app-kontra-soft:    oklch(65% 0.23 303 / 0.15);
   --app-kontra-label:   oklch(78% 0.18 303);
-  --app-kontra-raw:     192,132,252;
+
   --app-solo:           #d97706;
-  --app-solo-raw:       217,119,6;
+
   --app-win:            #4ade80;
-  --app-win-raw:        74,222,128;
+
   --app-loss:           #f87171;
-  --app-loss-raw:       248,113,113;
+
   --app-warning:        #facc15;
   --app-orange:         #fb923c;
 }

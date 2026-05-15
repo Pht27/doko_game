@@ -72,7 +72,7 @@
 }
 
 .ps-hero-mount {
-  background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+  background: var(--app-deep);
   border-radius: 10px;
   padding: 8px;
   flex-shrink: 0;
@@ -140,17 +140,17 @@
 }
 
 .ps-edit-name-input.ps-edit-name-error {
-  border-color: #ef4444;
+  border-color: var(--app-loss);
 }
 
 .ps-edit-name-errmsg {
   font-size: 12px;
-  color: #ef4444;
+  color: var(--app-loss);
 }
 
 .ps-edit-save-error {
   font-size: 13px;
-  color: #ef4444;
+  color: var(--app-loss);
   padding: 6px 0;
 }
 
@@ -216,7 +216,7 @@
 
 .ps-card-picker-selected {
   border-color: var(--app-accent, #3b82f6);
-  background: rgba(59, 130, 246, 0.12);
+  background: rgb(from var(--app-primary) r g b / 0.12);
 }
 
 .ps-hero-right {
@@ -831,12 +831,12 @@
 }
 
 .ps-mh-pill-win {
-  background: rgba(var(--app-win-raw), 0.18);
+  background: rgb(from var(--app-win) r g b / 0.18);
   color: var(--app-win);
 }
 
 .ps-mh-pill-loss {
-  background: rgba(var(--app-loss-raw), 0.18);
+  background: rgb(from var(--app-loss) r g b / 0.18);
   color: var(--app-loss);
 }
 

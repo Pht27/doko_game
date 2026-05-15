@@ -12,7 +12,7 @@
 
 .announcement-btn-re {
   background: var(--app-re-soft);
-  border: 1px solid rgba(var(--app-re-raw), 0.4);
+  border: 1px solid rgb(from var(--app-re) r g b / 0.4);
   color: var(--app-re-label);
 }
 
@@ -22,7 +22,7 @@
 
 .announcement-btn-kontra {
   background: var(--app-kontra-soft);
-  border: 1px solid rgba(var(--app-kontra-raw), 0.4);
+  border: 1px solid rgb(from var(--app-kontra) r g b / 0.4);
   color: var(--app-kontra-label);
 }
 

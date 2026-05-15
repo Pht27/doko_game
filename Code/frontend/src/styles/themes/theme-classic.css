@@ -27,21 +27,21 @@ html.accent-classic {
   --app-primary:        #2860B0;
   --app-primary-h:      #3870C8;
   --app-primary-text:   #fff;
-  --app-primary-raw:    40,96,176;
+
   --app-re:             #2860B0;
   --app-re-soft:        rgba(40,96,176,0.15);
   --app-re-label:       #4880D0;
-  --app-re-raw:         40,96,176;
+
   --app-kontra:         #2D7D42;
   --app-kontra-soft:    rgba(45,125,66,0.15);
   --app-kontra-label:   #4A9E60;
-  --app-kontra-raw:     45,125,66;
+
   --app-solo:           #b86800;
-  --app-solo-raw:       184,104,0;
+
   --app-win:            #1e8c50;
-  --app-win-raw:        30,140,80;
+
   --app-loss:           #c02020;
-  --app-loss-raw:       192,32,32;
+
   --app-warning:        #b87800;
   --app-orange:         #ecbb31;
 }

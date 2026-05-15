@@ -54,16 +54,16 @@
 .gmp-card:active { opacity: 0.82; }
 
 .gmp-card-solo {
-  border-color: rgba(var(--app-solo-raw),0.2);
+  border-color: rgb(from var(--app-solo) r g b / 0.2);
 }
 
 .gmp-card-selected {
-  background: rgba(var(--app-primary-raw),0.22);
+  background: rgb(from var(--app-primary) r g b / 0.22);
   border-color: var(--gmp-primary);
 }
 
 .gmp-card-solo.gmp-card-selected {
-  background: rgba(var(--app-solo-raw),0.18);
+  background: rgb(from var(--app-solo) r g b / 0.18);
   border-color: var(--gmp-solo);
 }
 
