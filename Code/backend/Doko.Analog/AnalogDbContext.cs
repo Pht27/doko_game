@@ -285,6 +285,7 @@ public class AnalogDbContext(DbContextOptions<AnalogDbContext> options) : DbCont
             e.Property(p => p.PlayerId).HasColumnName("player_id");
             e.Property(p => p.SpecialCardId).HasColumnName("special_card_id");
             e.Property(p => p.SpecialCardName).HasColumnName("special_card_name");
+            e.Property(p => p.Party).HasColumnName("party");
             e.Property(p => p.Occurrences).HasColumnName("occurrences");
             e.Property(p => p.Wins).HasColumnName("wins");
             e.Property(p => p.WinRate).HasColumnName("win_rate");
@@ -299,6 +300,7 @@ public class AnalogDbContext(DbContextOptions<AnalogDbContext> options) : DbCont
             e.Property(p => p.PlayerId).HasColumnName("player_id");
             e.Property(p => p.ExtraPointId).HasColumnName("extra_point_id");
             e.Property(p => p.ExtraPointName).HasColumnName("extra_point_name");
+            e.Property(p => p.Party).HasColumnName("party");
             e.Property(p => p.Occurrences).HasColumnName("occurrences");
             e.Property(p => p.TotalCount).HasColumnName("total_count");
             e.Property(p => p.Wins).HasColumnName("wins");
@@ -337,6 +339,7 @@ public class AnalogDbContext(DbContextOptions<AnalogDbContext> options) : DbCont
             e.ToView("special_card_stats", "analytics");
             e.Property(p => p.SpecialCardId).HasColumnName("special_card_id");
             e.Property(p => p.Name).HasColumnName("name");
+            e.Property(p => p.Party).HasColumnName("party");
             e.Property(p => p.Occurrences).HasColumnName("occurrences");
             e.Property(p => p.Wins).HasColumnName("wins");
             e.Property(p => p.WinRate).HasColumnName("win_rate");
@@ -350,6 +353,7 @@ public class AnalogDbContext(DbContextOptions<AnalogDbContext> options) : DbCont
             e.ToView("extra_point_stats", "analytics");
             e.Property(p => p.ExtraPointId).HasColumnName("extra_point_id");
             e.Property(p => p.Name).HasColumnName("name");
+            e.Property(p => p.Party).HasColumnName("party");
             e.Property(p => p.Occurrences).HasColumnName("occurrences");
             e.Property(p => p.TotalCount).HasColumnName("total_count");
             e.Property(p => p.Wins).HasColumnName("wins");

@@ -5,6 +5,7 @@ public class PlayerExtraPointStatsEntry
     public int PlayerId { get; set; }
     public int ExtraPointId { get; set; }
     public string ExtraPointName { get; set; } = "";
+    public int Party { get; set; }
     public int Occurrences { get; set; }
     public int TotalCount { get; set; }
     public int Wins { get; set; }

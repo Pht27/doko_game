@@ -94,6 +94,7 @@ public class AnalogStatsController(
             entries.Select(e => new PlayerSpecialCardStatsDto(
                 e.SpecialCardId,
                 e.SpecialCardName,
+                e.Party,
                 e.Occurrences,
                 e.Wins,
                 e.WinRate,
@@ -111,6 +112,7 @@ public class AnalogStatsController(
             entries.Select(e => new PlayerExtraPointStatsDto(
                 e.ExtraPointId,
                 e.ExtraPointName,
+                e.Party,
                 e.Occurrences,
                 e.TotalCount,
                 e.Wins,
@@ -160,6 +162,7 @@ public class AnalogStatsController(
             entries.Select(e => new SpecialCardStatsDto(
                 e.SpecialCardId,
                 e.Name,
+                e.Party,
                 e.Occurrences,
                 e.Wins,
                 e.WinRate,
@@ -177,6 +180,7 @@ public class AnalogStatsController(
             entries.Select(e => new ExtraPointStatsDto(
                 e.ExtraPointId,
                 e.Name,
+                e.Party,
                 e.Occurrences,
                 e.TotalCount,
                 e.Wins,

@@ -36,6 +36,7 @@ public record PlayerGameModeStatsDto(
 public record PlayerSpecialCardStatsDto(
     int SpecialCardId,
     string SpecialCardName,
+    int Party,
     int Occurrences,
     int Wins,
     decimal WinRate,
@@ -46,6 +47,7 @@ public record PlayerSpecialCardStatsDto(
 public record PlayerExtraPointStatsDto(
     int ExtraPointId,
     string ExtraPointName,
+    int Party,
     int Occurrences,
     int TotalCount,
     int Wins,
@@ -74,6 +76,7 @@ public record GameModeStatsDto(
 public record SpecialCardStatsDto(
     int SpecialCardId,
     string Name,
+    int Party,
     int Occurrences,
     int Wins,
     decimal WinRate,
@@ -84,6 +87,7 @@ public record SpecialCardStatsDto(
 public record ExtraPointStatsDto(
     int ExtraPointId,
     string Name,
+    int Party,
     int Occurrences,
     int TotalCount,
     int Wins,
