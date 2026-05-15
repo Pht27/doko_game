@@ -90,7 +90,6 @@ export function RoundCard({
                 team={team}
                 won={reWon}
                 expanded={expanded}
-                onPlayerClick={(id) => navigate(`/players/${id}`)}
               />
             ))}
           </div>
@@ -106,7 +105,6 @@ export function RoundCard({
                 team={team}
                 won={!reWon}
                 expanded={expanded}
-                onPlayerClick={(id) => navigate(`/players/${id}`)}
               />
             ))}
           </div>

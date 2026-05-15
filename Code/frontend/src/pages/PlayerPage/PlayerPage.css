@@ -800,12 +800,10 @@
   align-items: center;
   width: 100%;
   padding: 8px 12px;
-  border: none;
-  background: transparent;
   cursor: pointer;
-  text-align: left;
   color: var(--app-text);
   min-width: 0;
+  user-select: none;
 }
 
 .ps-mh-row-wrap-open .ps-mh-compact-row {
@@ -903,6 +901,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
+}
+
+.ps-mh-partner-link {
+  font-size: 10px;
+  color: var(--app-text-muted);
 }
 
 /* Right column */

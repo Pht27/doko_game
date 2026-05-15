@@ -8,6 +8,7 @@ import { StatusState } from '@/components/StatusState/StatusState';
 import { SortableTable } from '@/components/SortableTable/SortableTable';
 import { BottomSheet } from '@/components/BottomSheet/BottomSheet';
 import { RoundCard } from '@/pages/HistoryPage/RoundCard/RoundCard';
+import { PlayerLink } from '@/components/PlayerLink/PlayerLink';
 import type { Column } from '@/components/SortableTable/SortableTable';
 import type {
   PlayerStats,
@@ -781,7 +782,13 @@ function MatchHistoryCompactRow({
 
   return (
     <div className={`ps-mh-row-wrap${expanded ? ' ps-mh-row-wrap-open' : ''}`}>
-      <button className="ps-mh-compact-row" onClick={onToggle}>
+      <div
+        className="ps-mh-compact-row"
+        role="button"
+        tabIndex={0}
+        onClick={onToggle}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(); } }}
+      >
         {/* Left: W/L pill + date */}
         <div className="ps-mh-left">
           <span className={`ps-mh-pill${won ? ' ps-mh-pill-win' : ' ps-mh-pill-loss'}`}>
@@ -796,7 +803,15 @@ function MatchHistoryCompactRow({
             <span className="ps-mh-mode">{round.gameMode}</span>
           </div>
           {partners.length > 0 && (
-            <div className="ps-mh-partner">mit {partners.map((p) => p.name).join(', ')}</div>
+            <div className="ps-mh-partner">
+              {'mit '}
+              {partners.map((p, i) => (
+                <span key={p.id}>
+                  {i > 0 && ', '}
+                  <PlayerLink player={p} className="ps-mh-partner-link" />
+                </span>
+              ))}
+            </div>
           )}
         </div>
 
@@ -810,7 +825,7 @@ function MatchHistoryCompactRow({
           <span className={`ps-mh-pts${won ? ' ps-mh-pts-win' : ' ps-mh-pts-loss'}`}>{pts}</span>
           <span className="ps-mh-chevron">{expanded ? '▴' : '▾'}</span>
         </div>
-      </button>
+      </div>
 
       {expanded && (
         <div className="ps-mh-expanded">
