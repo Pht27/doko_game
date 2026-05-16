@@ -1,47 +1,70 @@
-/* Rosé — pale pink bg, surfaces get darker as elevation increases */
+/* Rosé — pale pink bg, refined surface ramp + rose-tinted chrome.
+   ============================================================
+   - surface-2 is much closer to surface (no harsh pink-to-pink jump on
+     tab strips / sub-headers). --app-surface-3 takes over the "deepest
+     in-card chrome" role.
+   - --app-deep moved from #A03060 → #8E2554 (a touch more refined).
+   - Borders are rose-tinted (rgba(142,37,84,…)) so dividers belong to
+     the palette instead of reading as gray on pink.
+   - New tokens:
+       --app-surface-3      deepest in-card chrome (was surface-2)
+       --app-divider        gentle in-card divider (between rows)
+       --app-border-strong  section-level divider
+   - --app-re / --app-kontra labels darkened for contrast on light pink.
+   - --app-orange remapped to a warm magenta (#C8478F) so the Karo tile
+     reads as part of the rose family.
+*/
 
 html.neutral-rose {
   --app-bg:             #FAE4EE;
-  --app-surface:        #F0C0D6;
-  --app-surface-2:      #E098B8;
-  --app-deep:           #A03060;
-  --app-text:           #111111;
-  --app-header-text:    #FAE4EE;
-  --app-header-bg:      #A03060;
-  --app-header-back:      #FAE4EE;
-  --app-match-header-bg:   #ca6593;
-  --app-match-header-text: #FAE4EE;
-  --app-switch-on:      #C02858;
-  --app-switch-off:     rgba(0,0,0,0.18);
+  --app-surface:        #F3CCDD;
+  --app-surface-2:      #ECBBD0;
+  --app-surface-3:      #E2A8C2;
+  --app-deep:           #8E2554;
+
+  --app-text:           #2A0913;
+  --app-header-text:    #FCE9F1;
+  --app-header-bg:      #8E2554;
+  --app-header-back:    #FCE9F1;
+  --app-match-header-bg:   #C25586;
+  --app-match-header-text: #FCE9F1;
+
+  --app-switch-on:      #B83264;
+  --app-switch-off:     rgba(80,20,50,0.20);
+
   --app-text-sub:       #5A1A38;
-  --app-text-muted:     #8A5070;
-  --app-border:         rgba(0,0,0,0.10);
-  --app-border-md:      rgba(0,0,0,0.18);
-  --app-border-lg:      rgba(0,0,0,0.26);
-  --app-surface-hover:  rgba(0,0,0,0.05);
-  --app-surface-subtle: rgba(0,0,0,0.025);
-  --app-surface-raised: rgba(0,0,0,0.08);
+  --app-text-muted:     #94627C;
+
+  /* Rose-tinted borders — they blend with the warm palette */
+  --app-border:         rgba(142,37,84,0.14);
+  --app-border-md:      rgba(142,37,84,0.22);
+  --app-border-lg:      rgba(142,37,84,0.34);
+  --app-border-strong:  rgba(142,37,84,0.42);
+  --app-divider:        rgba(142,37,84,0.10);
+
+  --app-surface-hover:  rgba(142,37,84,0.06);
+  --app-surface-subtle: rgba(142,37,84,0.03);
+  --app-surface-raised: rgba(142,37,84,0.10);
 }
 
 html.accent-rose {
-  --app-primary:        #C02858;
-  --app-primary-h:      #D83870;
-  --app-primary-text:   #fff;
+  --app-primary:        #B83264;
+  --app-primary-h:      #CC3F75;
+  --app-primary-text:   #FFFFFF;
 
-  --app-re:             #6f9de7;
-  --app-re-soft:        rgba(58,112,200,0.18);
-  --app-re-label:       #5A8EE0;
+  --app-re:             #3F7AD0;
+  --app-re-soft:        rgba(63,122,208,0.16);
+  --app-re-label:       #2E5FA8;
 
-  --app-kontra:         #D43060;
-  --app-kontra-soft:    rgba(212,48,96,0.15);
-  --app-kontra-label:   #E85080;
+  --app-kontra:         #B82658;
+  --app-kontra-soft:    rgba(184,38,88,0.14);
+  --app-kontra-label:   #8E1F46;
 
-  --app-solo:           #b86800;
+  --app-solo:           #A85800;
 
-  --app-win:            #1e8c50;
+  --app-win:            #1E7A45;
+  --app-loss:           #8B1FB8;
 
-  --app-loss:           #9020d0;
-
-  --app-warning:        #b87800;
-  --app-orange:         #e451bf;
+  --app-warning:        #A66B00;
+  --app-orange:         #C8478F;
 }

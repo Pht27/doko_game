@@ -12,9 +12,10 @@ export function MultiLineChart({ series }: { series: ChartSeries[] }) {
 
   let minY = Math.min(...allPoints);
   let maxY = Math.max(...allPoints);
-  if (minY > 0) minY = 0;
-  if (maxY < 0) maxY = 0;
-  const rangeY = maxY - minY || 1;
+  const pad = (maxY - minY) * 0.08 || 5;
+  minY -= pad;
+  maxY += pad;
+  const rangeY = maxY - minY;
 
   const W = 372;
   const ticks = 4;
