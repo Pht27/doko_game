@@ -1,6 +1,7 @@
 import type { ExtraPointStat } from '@/types/analog';
 import { CollapsibleOccurrenceTable } from '@/components/CollapsibleOccurrenceTable/CollapsibleOccurrenceTable';
 import type { OccurrenceGroup } from '@/components/CollapsibleOccurrenceTable/CollapsibleOccurrenceTable';
+import { t } from '@/utils/translations';
 
 function toGroups(rows: ExtraPointStat[]): OccurrenceGroup[] {
   const map = new Map<number, OccurrenceGroup>();
