@@ -1,0 +1,37 @@
+@reference "../../../styles/index.css";
+
+.ps-alone-stats {
+  background: var(--app-surface);
+}
+
+.ps-alone-section-label {
+  padding: 10px 14px 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+}
+
+.ps-alone-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.ps-alone-row-last {
+  border-bottom: none;
+}
+
+.ps-alone-key {
+  font-size: 12px;
+  color: var(--app-text-sub);
+}
+
+.ps-alone-val {
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}

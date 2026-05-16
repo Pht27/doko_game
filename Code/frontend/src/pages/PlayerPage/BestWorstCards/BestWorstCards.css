@@ -1,0 +1,51 @@
+@reference "../../../styles/index.css";
+
+.ps-bw-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--app-border);
+  border-bottom: 1px solid var(--app-border);
+}
+
+.ps-bw-card {
+  background: var(--app-surface);
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ps-bw-card-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+}
+
+.ps-bw-card-pts {
+  font-size: 20px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.ps-bw-pts-win  { color: var(--app-win); }
+.ps-bw-pts-loss { color: var(--app-loss); }
+
+.ps-bw-card-mode {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--app-text-sub);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ps-bw-card-date {
+  font-size: 10px;
+  color: var(--app-text-muted);
+  font-variant-numeric: tabular-nums;
+}

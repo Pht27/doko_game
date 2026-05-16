@@ -3,6 +3,9 @@
 ## [1.4.2] - 2026-05-14
 
 ### Verbessert
+- **RoundForm- und GameBoard-Komponenten** wurden intern in Unterordner aufgeteilt – keine sichtbaren Änderungen für Nutzer, klarere Codestruktur.
+
+### Verbessert
 - Die **Farbverläufe für Siegquoten und Ø-Werte** (rot → gelb → grün) passen sich jetzt ans gewählte Theme an – auf hellen Themes wirken die Farben deutlich harmonischer.
 - Der **Karten-Rahmen** im Spielerprofil und die **Fehlerfarben** im Namens-Editor nutzen jetzt die Theme-Farben statt fester Werte.
 

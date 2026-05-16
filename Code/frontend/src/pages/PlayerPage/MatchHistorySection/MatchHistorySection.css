@@ -1,0 +1,84 @@
+@reference "../../../styles/index.css";
+
+.ps-mh-section {
+  background: var(--app-surface);
+  border-top: 3px solid var(--app-border-md, var(--app-border));
+  margin-top: 12px;
+}
+
+.ps-mh-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px 8px;
+  background: var(--app-surface-2);
+  border-bottom: 1px solid var(--app-border);
+}
+
+.ps-mh-count {
+  font-size: 11px;
+  color: var(--app-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.ps-mh-empty {
+  padding: 16px 14px;
+  font-size: 13px;
+  color: var(--app-text-muted);
+  text-align: center;
+}
+
+.ps-mh-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--app-border);
+  flex-wrap: wrap;
+}
+
+.ps-mh-page-btn {
+  min-width: 32px;
+  height: 30px;
+  padding: 0 6px;
+  border-radius: 6px;
+  border: 1px solid var(--app-border);
+  background: var(--app-surface-2);
+  color: var(--app-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.ps-mh-page-btn:hover:not(:disabled) {
+  background: var(--app-surface-hover);
+  color: var(--app-text);
+}
+
+.ps-mh-page-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.ps-mh-page-active {
+  background: var(--app-primary) !important;
+  color: var(--app-primary-text) !important;
+  border-color: transparent;
+  cursor: default;
+}
+
+.ps-mh-page-arrow {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.ps-mh-page-ellipsis {
+  font-size: 12px;
+  color: var(--app-text-muted);
+  padding: 0 2px;
+  line-height: 30px;
+  user-select: none;
+}

@@ -1,0 +1,146 @@
+@reference "../../../styles/index.css";
+
+.sts-hero {
+  padding: 16px 14px 14px;
+  background: linear-gradient(180deg, var(--app-surface) 0%, var(--app-surface-2) 100%);
+  border-bottom: 1px solid var(--app-border);
+}
+
+.sts-hero-headline {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.sts-hero-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+}
+
+.sts-hero-total {
+  font-size: 38px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--app-text);
+  margin-bottom: 14px;
+}
+
+.sts-hero-wr-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.sts-hero-wr-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sts-hero-wr-side {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sts-hero-wr-side-right {
+  flex-direction: row-reverse;
+}
+
+.sts-hero-wr-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.sts-hero-wr-dot-re {
+  background: var(--app-re);
+}
+
+.sts-hero-wr-dot-ko {
+  background: var(--app-kontra);
+}
+
+.sts-hero-wr-party {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.sts-hero-wr-party-re {
+  color: var(--app-re-label);
+}
+
+.sts-hero-wr-party-ko {
+  color: var(--app-kontra-label);
+}
+
+.sts-hero-wr-val {
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.sts-hero-wr-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--app-kontra-soft);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgb(from var(--app-kontra) r g b / 0.25);
+}
+
+.sts-hero-wr-bar-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: var(--app-re);
+  border-right: 2px solid var(--app-bg);
+}
+
+.sts-hero-mini-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  background: var(--app-surface-hover);
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--app-border);
+}
+
+.sts-hero-mini-cell {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 10px;
+  gap: 2px;
+}
+
+.sts-hero-mini-divider {
+  width: 1px;
+  background: var(--app-border);
+  flex-shrink: 0;
+}
+
+.sts-hero-mini-val {
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--app-text);
+}
+
+.sts-hero-mini-label {
+  font-size: 10px;
+  color: var(--app-text-muted);
+  letter-spacing: 0.03em;
+}

@@ -13,6 +13,8 @@ export const shared = {
   // ── Re / Kontra labels (used in game and analog) ───────────────────────────
   reLabel: 'Re',
   kontraLabel: 'Kontra',
+  reLabelShort: 'RE',
+  kontraLabelShort: 'KO',
 
   // ── BackButton ─────────────────────────────────────────────────────────────
   backAriaLabel: 'Zurück',
