@@ -4,6 +4,7 @@ html.neutral-classic {
   --app-bg:             #ecf2fd;
   --app-surface:        #d5e3fd;
   --app-surface-2:      #7d9fd1;
+  --app-surface-3:      #5A80B0;
   --app-deep:           #244379;
   --app-text:           #111111;
   --app-header-text:    #fff;
@@ -18,6 +19,8 @@ html.neutral-classic {
   --app-border:         rgba(0,0,0,0.10);
   --app-border-md:      rgba(0,0,0,0.18);
   --app-border-lg:      rgba(0,0,0,0.26);
+  --app-border-strong:  rgba(0,0,0,0.34);
+  --app-divider:        rgba(0,0,0,0.06);
   --app-surface-hover:  rgba(0,0,0,0.05);
   --app-surface-subtle: rgba(0,0,0,0.025);
   --app-surface-raised: rgba(0,0,0,0.08);

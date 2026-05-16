@@ -36,8 +36,8 @@
 /* ── Hero panel ── */
 .alb-hero {
   background: var(--alb-surface);
-  border-bottom: 1px solid var(--alb-border);
-  padding: 12px 14px 10px;
+  border-bottom: none;
+  padding: 12px 14px 4px;
 }
 
 
@@ -45,9 +45,10 @@
 .alb-hero-chart-btn {
   display: block;
   width: 100%;
-  background: none;
-  border: none;
-  padding: 0;
+  background: var(--alb-bg);
+  border: 1px solid var(--alb-border);
+  border-radius: 12px;
+  padding: 8px 6px 4px;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   position: relative;
@@ -150,6 +151,7 @@
   -webkit-tap-highlight-color: transparent;
   user-select: none;
   transition: background 0.12s;
+  border-bottom: 1px solid var(--alb-border);
 }
 .alb-row-head:active,
 .alb-row-head--open { background: var(--alb-surface); }
@@ -248,11 +250,12 @@
 .alb-row-body-inner { overflow: hidden; }
 
 .alb-row-detail {
-  padding: 4px 14px 14px;
+  padding: 10px 14px 14px;
   background: var(--alb-surface);
+  border-top: 1px solid var(--alb-border);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .alb-row-detail-label {
@@ -270,7 +273,7 @@
   padding: 8px 0 2px;
 }
 
-/* ── Mini-stat grid (3 cells with 1px gap = border effect) ── */
+/* ── Mini-stat grid ── */
 .alb-mini-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -281,7 +284,7 @@
 }
 
 .alb-mini-cell {
-  background: var(--alb-surface2);
+  background: var(--alb-bg);
   padding: 8px 10px;
   text-align: center;
   display: flex;

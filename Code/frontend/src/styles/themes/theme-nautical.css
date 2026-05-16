@@ -4,6 +4,7 @@ html.neutral-nautical {
   --app-bg:             #D0E4F0;
   --app-surface:        #A8CCDE;
   --app-surface-2:      #7AACCA;
+  --app-surface-3:      #5A90B0;
   --app-deep:           #003A6A;
   --app-text:           #111111;
   --app-header-text:    #D0E4F0;
@@ -18,6 +19,8 @@ html.neutral-nautical {
   --app-border:         rgba(0,0,0,0.10);
   --app-border-md:      rgba(0,0,0,0.18);
   --app-border-lg:      rgba(0,0,0,0.26);
+  --app-border-strong:  rgba(0,0,0,0.34);
+  --app-divider:        rgba(0,0,0,0.06);
   --app-surface-hover:  rgba(0,0,0,0.05);
   --app-surface-subtle: rgba(0,0,0,0.025);
   --app-surface-raised: rgba(0,0,0,0.08);
