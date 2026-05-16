@@ -160,7 +160,7 @@ export const analog = {
   // ── PlayerPage – EditProfileModal ─────────────────────────────────────────────
   playerEditProfileTitle: 'Profil bearbeiten',
   playerEditNameLabel: 'Name',
-  playerEditHeroCardLabel: 'Heldenkarte',
+  playerEditHeroCardLabel: 'Profilkarte',
   playerEditNameEmpty: 'Name darf nicht leer sein',
   playerEditNameTooLong: 'Name darf maximal 50 Zeichen haben',
   playerEditSaveError: 'Speichern fehlgeschlagen. Bitte erneut versuchen.',
