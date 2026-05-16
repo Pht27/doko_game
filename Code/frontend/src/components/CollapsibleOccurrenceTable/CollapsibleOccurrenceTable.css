@@ -1,0 +1,112 @@
+@reference "../../styles/index.css";
+
+.ps-cgm-table {
+  background: var(--app-surface);
+}
+
+.ps-cgm-header {
+  display: grid;
+  grid-template-columns: 1fr 44px 56px 56px 20px;
+  padding: 7px 10px 7px 14px;
+  background: var(--app-surface-2);
+  border-bottom: 1px solid var(--app-border);
+  gap: 4px;
+}
+
+.ps-cgm-th {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--app-text-muted);
+  text-align: right;
+}
+
+.ps-cgm-th-name {
+  text-align: left;
+}
+
+.ps-cgm-summary {
+  display: grid;
+  grid-template-columns: 1fr 44px 56px 56px 20px;
+  gap: 4px;
+  align-items: center;
+  width: 100%;
+  padding: 11px 10px 11px 14px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  color: var(--app-text);
+}
+
+.ps-cgm-summary-open {
+  background: var(--app-surface-hover);
+}
+
+.ps-cgm-group {
+  border-bottom: 1px solid var(--app-border);
+}
+
+.ps-cgm-group:last-child {
+  border-bottom: none;
+}
+
+.ps-cgm-mode-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ps-cgm-val {
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--app-text-sub);
+}
+
+.ps-cgm-chevron {
+  font-size: 9px;
+  color: var(--app-text-muted);
+  text-align: center;
+}
+
+.ps-cgm-sub-rows {
+  background: var(--app-surface-2);
+  border-top: 1px solid var(--app-border);
+}
+
+.ps-cgm-sub {
+  display: grid;
+  grid-template-columns: 1fr 44px 56px 56px 20px;
+  gap: 4px;
+  align-items: baseline;
+  padding: 6px 10px 6px 14px;
+  border-bottom: 1px solid var(--app-border);
+}
+
+.ps-cgm-sub:last-child {
+  border-bottom: none;
+}
+
+.ps-cgm-sub-empty .ps-cgm-sub-val {
+  color: var(--app-text-muted) !important;
+}
+
+.ps-cgm-sub-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding-left: 8px;
+}
+
+.ps-cgm-sub-val {
+  font-size: 11px !important;
+}
+
+.ps-cgm-label-re  { color: var(--app-re-label); }
+.ps-cgm-label-ko  { color: var(--app-kontra-label); }

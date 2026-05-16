@@ -99,4 +99,75 @@ export const analog = {
 
   // ── Stats page (overall) ───────────────────────────────────────────────────
   statsTitle: 'Spielstatistiken',
+  statsTabGameModes: 'Spielmodi',
+  statsTabSpecialCards: 'Sonderkarten',
+  statsTabExtraPoints: 'Extrapunkte',
+  statsColGameModeName: 'Spielmodus',
+  statsColRounds: 'Runden',
+  statsColReWinRate: 'Re WR',
+  statsColReAvgValue: 'Re Ø Wert',
+
+  // ── StatsHero ────────────────────────────────────────────────────────────────
+  statsHeroRoundsLabel: 'Gespielte Runden',
+  statsHeroAvgValue: 'Ø Spielwert',
+  statsHeroSolosPlayed: 'Solos gespielt',
+
+  // ── Shared stats table columns ────────────────────────────────────────────────
+  statsColGamesShort: 'Sp.',
+  statsColWinRate: 'WR',
+  statsColAvgShort: 'Ø',
+  statsColOccurrences: 'Anz.',
+  statsColCardName: 'Karte',
+  statsColExtraPointName: 'Extrapunkt',
+
+  // ── PlayerPage ────────────────────────────────────────────────────────────────
+  playerPageTitle: 'Profil',
+  playerTabGameModes: 'Spielmodi',
+  playerTabSpecialCards: 'Sonderkarten',
+  playerTabExtraPoints: 'Extrapunkte',
+  playerTabTeamStats: 'Teamstatistik',
+  playerTabAlone: 'Alleine',
+  playerColPartner: 'Partner',
+  playerHeroStatGames: 'Spiele',
+  playerHeroStatWinRate: 'Winrate',
+  playerHeroAvgValueLabel: 'Ø Wert',
+  playerHeroAvgGrossLabel: 'Ø Brutto',
+  playerHeroAvgNetLabel: 'Ø Netto',
+  playerTimeSeriesLabel: 'Punkte über die Zeit',
+  playerTimeSeriesRounds: 'Runden',
+
+  // ── PlayerPage – PointTypeToggle ──────────────────────────────────────────────
+  playerPointTypeLabel: 'Ø zeigt',
+  playerPointTypeSheetTitle: 'Punktetypen',
+  playerPointTypeValue: 'Spielwert',
+  playerPointTypeGross: 'Brutto',
+  playerPointTypeNet: 'Netto',
+  playerPointTypeValueDesc: 'Der reine Spielwert ohne Solofaktor und Teamfaktor. Vergleichbar unabhängig von Spielkonstellation.',
+  playerPointTypeGrossDesc: 'Spielwert × Solofaktor (z. B. ×3 bei Solo). Zeigt, was die Partei insgesamt gewonnen oder verloren hat.',
+  playerPointTypeNetDesc: 'Bruttopunkte ÷ Teamgröße. Der persönliche Anteil – was tatsächlich auf dem Konto landet.',
+
+  // ── PlayerPage – AloneStats ───────────────────────────────────────────────────
+  playerAloneSectionLabel: 'Alleine gespielt',
+  playerAlonePlayed: 'Gespielt',
+  playerAloneWon: 'Gewonnen',
+  playerAloneWinRate: 'Winrate',
+  playerAloneAvgNet: 'Ø Netto',
+
+  // ── PlayerPage – BestWorstCards ───────────────────────────────────────────────
+  playerBestGame: 'Bestes Spiel',
+  playerWorstGame: 'Schlechtestes',
+
+  // ── PlayerPage – EditProfileModal ─────────────────────────────────────────────
+  playerEditProfileTitle: 'Profil bearbeiten',
+  playerEditNameLabel: 'Name',
+  playerEditHeroCardLabel: 'Heldenkarte',
+  playerEditNameEmpty: 'Name darf nicht leer sein',
+  playerEditNameTooLong: 'Name darf maximal 50 Zeichen haben',
+  playerEditSaveError: 'Speichern fehlgeschlagen. Bitte erneut versuchen.',
+
+  // ── PlayerPage – MatchHistorySection ─────────────────────────────────────────
+  playerMatchHistoryLabel: 'Spielverlauf',
+  playerMatchHistoryGames: 'Spiele',
+  playerMatchHistoryEmpty: 'Keine Spiele vorhanden.',
+  playerMatchHistoryWith: 'mit ',
 };

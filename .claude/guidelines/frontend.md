@@ -45,7 +45,7 @@ Use relative imports only within the same feature/folder.
 - One component per file, filename matches export name (`PascalCase`)
 - Co-locate CSS with the component file it belongs to (e.g. `TrickArea/TrickArea.css`)
 - CSS files reference global Tailwind via `@reference "../../../styles/index.css"` (adjust depth)
-- Complex components get a `subcomponents/` subfolder; flat siblings for same-level extractions
+- Sub-components used only inside component B live in a named subfolder: `B/A/A.tsx` (applied recursively)
 - No default exports — always named exports
 
 ## Styling
