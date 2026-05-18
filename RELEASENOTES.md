@@ -1,6 +1,16 @@
 # Release Notes
 
+## [1.5.0] - 2026-05-18
+
+### Neu
+- **Einstellungen**: Über das ⚙️-Symbol unten rechts auf der Startseite öffnet sich ein neues Einstellungsmenü. Dort lässt sich das Theme wählen (bisher eigener Palette-Button) und ein persönlicher Spieler auswählen.
+- **Mein Spieler**: Wer seinen Spieler in den Einstellungen auswählt, profitiert von mehreren Komforts: In der Spielerliste und der Bestenliste wird der eigene Eintrag subtil hervorgehoben; im Spielverlauf erscheint der eigene Name farbig. Beim Eintragen eines neuen Spiels wird das Re-Team automatisch mit dem eigenen Spieler vorausgefüllt. Beim Beitreten einer Lobby wird der Name automatisch gesetzt.
+
 ## [1.4.2] - 2026-05-14
+
+### Verbessert
+- Die **Theme-Auswahl** zeigt jetzt nur noch vier Themes: Classic, Rosé, Cherry und Nacht. Classic ist das neue Standard-Theme. Das frühere „Default"-Theme heißt jetzt „Nacht".
+
 
 ### Verbessert
 - **RoundForm- und GameBoard-Komponenten** wurden intern in Unterordner aufgeteilt – keine sichtbaren Änderungen für Nutzer, klarere Codestruktur.

@@ -1,0 +1,51 @@
+@reference "../../styles/index.css";
+
+.ss-rows {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0 16px;
+}
+
+.ss-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  width: 100%;
+  text-align: left;
+  border-bottom: 1px solid var(--app-border);
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.12s;
+}
+
+.ss-row:last-child {
+  border-bottom: none;
+}
+
+.ss-row:active {
+  background: var(--app-surface-hover);
+}
+
+.ss-row-label {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--app-text);
+}
+
+.ss-row-value {
+  font-size: 15px;
+  color: var(--app-text-muted);
+  flex-shrink: 0;
+}
+
+/* ThemePicker uses flex:1 designed for a standalone sheet — reset it here */
+.bottom-sheet-panel .tp-body {
+  flex: none;
+  overflow-y: visible;
+  padding-bottom: 16px;
+}

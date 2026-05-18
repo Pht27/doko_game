@@ -195,6 +195,11 @@
 
 .ahr-player-name:hover { opacity: 0.7; text-decoration: underline; }
 
+.ahr-player-name--selected {
+  color: var(--app-primary);
+  font-weight: 700;
+}
+
 /* ── Points column ── */
 .ahr-points-col {
   display: flex;

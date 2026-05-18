@@ -112,6 +112,15 @@
   pointer-events: none;
 }
 
+.ap-row--selected {
+  border-left: 3px solid var(--app-primary);
+  background: rgb(from var(--app-primary) r g b / 0.07);
+}
+
+.ap-row--selected:hover {
+  background: rgb(from var(--app-primary) r g b / 0.12);
+}
+
 /* ── Name button (navigate to stats) ── */
 .ap-name-btn {
   flex: 1;

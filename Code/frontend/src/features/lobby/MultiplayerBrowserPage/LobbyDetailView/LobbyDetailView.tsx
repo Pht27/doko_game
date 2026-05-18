@@ -9,6 +9,7 @@ import {
   clearLobbySession,
 } from '@/hooks/useLobby';
 import { useSetPlayerNames } from '@/context/PlayerNamesContext';
+import { usePlayerPreference } from '@/context/PlayerPreferenceContext';
 import { ResultScreen } from '@/features/game/ResultScreen/ResultScreen';
 import { ReadyVoteButton } from '@/features/game/shared/ReadyVoteButton';
 import type { LobbySession } from '@/hooks/useLobby';
@@ -27,6 +28,7 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
 
   const { seats, opaSeats, playerNames, gameId, isStarted, lobbyClosed, startVoteCount, readySeats, selectedScenario, error } = useLobby(session, lobbyId);
   const setPlayerNamesCtx = useSetPlayerNames();
+  const { selectedPlayer } = usePlayerPreference();
 
   const [copied, setCopied] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
@@ -106,6 +108,14 @@ export function LobbyDetailView({ lobbyId, onGameStarted, onLobbyClosed, lastFin
       };
       saveLobbySession(newSession);
       setSession(newSession);
+
+      if (selectedPlayer) {
+        try {
+          await setLobbyPlayerName(newSession.token, lobbyId, selectedPlayer.name);
+        } catch {
+          // best-effort
+        }
+      }
 
       const lobby = await getLobby(lobbyId);
       if (lobby.isStarted && lobby.activeGameId) {

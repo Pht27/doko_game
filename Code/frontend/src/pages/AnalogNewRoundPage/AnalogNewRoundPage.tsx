@@ -5,6 +5,7 @@ import { useAnalogPlayers } from '@/hooks/useAnalogPlayers';
 import { useRoundForm } from '@/hooks/useRoundForm';
 import { createRound, getRounds, getRound } from '@/api/analog';
 import { RoundForm } from '@/features/RoundForm/RoundForm';
+import { usePlayerPreference } from '@/context/PlayerPreferenceContext';
 import { t } from '@/utils/translations';
 
 export function AnalogNewRoundPage() {
@@ -29,6 +30,7 @@ export function AnalogNewRoundPage() {
     resetForNew,
     importTeams,
   } = useRoundForm();
+  const { selectedPlayer } = usePlayerPreference();
   const [saving, setSaving] = useState(false);
 
   // Default game mode: Normal
@@ -38,6 +40,18 @@ export function AnalogNewRoundPage() {
       if (normal) setGameMode(normal.id);
     }
   }, [staticData, form.gameModeId, setGameMode]);
+
+  // Pre-fill Re block with selected player if the block is still empty
+  useEffect(() => {
+    if (!selectedPlayer || players.length === 0) return;
+    const isActive = players.some((p) => p.isActive && p.id === selectedPlayer.id);
+    if (!isActive) return;
+    if (form.blocks[0].playerIds.length === 0) {
+      setBlockPlayers(0, [selectedPlayer.id]);
+    }
+  // Only run once after players load
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [players]);
 
   if (staticLoading || playersLoading) {
     return (

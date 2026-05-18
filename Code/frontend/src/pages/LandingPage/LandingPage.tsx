@@ -4,11 +4,9 @@ import { useRegisterSW } from 'virtual:pwa-register/react';
 import { t } from '@/utils/translations';
 import { appVersion } from '@/utils/releaseNotes';
 import { ReleaseNotesModal } from '@/components/ReleaseNotesModal/ReleaseNotesModal';
-import { BottomSheet } from '@/components/BottomSheet/BottomSheet';
-import { useTheme } from '@/hooks/useTheme';
+import { SettingsSheet } from '@/components/SettingsSheet/SettingsSheet';
 import { Tile } from './Tile/Tile';
 import { SubItem } from './SubItem/SubItem';
-import { ThemePicker } from './ThemePicker/ThemePicker';
 import './LandingPage.css';
 
 type DrawerKey = 'kreuz' | 'pik' | 'herz' | 'karo' | null;
@@ -17,10 +15,9 @@ export function LandingPage() {
   const navigate = useNavigate();
   const [open, setOpen] = useState<DrawerKey>(null);
   const [showReleaseNotes, setShowReleaseNotes] = useState(false);
-  const [showThemePicker, setShowThemePicker] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const { needRefresh: [needRefresh], updateServiceWorker } = useRegisterSW();
   const lastOpenRef = useRef<NonNullable<DrawerKey>>('kreuz');
-  const { setPreset, activePreset } = useTheme();
 
   const toggle = (key: DrawerKey) => setOpen(prev => prev === key ? null : key);
   if (open !== null) lastOpenRef.current = open;
@@ -36,13 +33,13 @@ export function LandingPage() {
         <span className="landing-watermark landing-watermark--br">♠</span>
       </div>
 
-      <div className="landing-bottom-left">
+      <div className="landing-bottom-right">
         <button
-          className="landing-palette-btn"
-          onClick={() => setShowThemePicker(true)}
-          aria-label="Theme wählen"
+          className="landing-settings-btn"
+          onClick={() => setShowSettings(true)}
+          aria-label="Einstellungen"
         >
-          🎨
+          ⚙️
         </button>
       </div>
 
@@ -130,13 +127,8 @@ export function LandingPage() {
         />
       )}
 
-      {showThemePicker && (
-        <BottomSheet title="Theme" onClose={() => setShowThemePicker(false)}>
-          <ThemePicker
-            activePreset={activePreset}
-            onSelect={(preset) => { setPreset(preset); setShowThemePicker(false); }}
-          />
-        </BottomSheet>
+      {showSettings && (
+        <SettingsSheet onClose={() => setShowSettings(false)} />
       )}
     </div>
   );

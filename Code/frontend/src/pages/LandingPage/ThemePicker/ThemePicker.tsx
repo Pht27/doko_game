@@ -3,12 +3,10 @@ import type { Preset } from '@/hooks/useTheme';
 import './ThemePicker.css';
 
 const PRESET_DESCS: Record<string, string> = {
-  default:  'Dunkles Navy-Blau',
-  rose:     'Helles Rosa',
-  aqua:     'Helles Türkis',
   classic:  'Klassisches Weiß',
+  rose:     'Helles Rosa',
   cherry:   'Helles Kirschrot',
-  nautical: 'Helles Marine-Rot',
+  default:  'Dunkles Navy-Blau',
 };
 
 interface ThemePickerProps {
