@@ -21,6 +21,7 @@ export const shared = {
   settingsThemeSection: 'Theme',
   settingsPlayerSection: 'Mein Spieler',
   settingsNoPlayer: 'Kein Spieler (Standard)',
+  settingsGreeting: (name: string) => `Willkommen,\n${name}!`,
 
   // ── BackButton ─────────────────────────────────────────────────────────────
   backAriaLabel: 'Zurück',

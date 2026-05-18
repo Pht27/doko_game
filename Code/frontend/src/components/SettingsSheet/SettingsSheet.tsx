@@ -25,15 +25,19 @@ export function SettingsSheet({ onClose }: SettingsSheetProps) {
           <PlayerPreferencePicker />
         </div>
 
-        <div className="ss-divider" />
+        {selectedPlayer && (
+          <>
+            <div className="ss-divider" />
 
-        <div className="ss-section">
-          <div className="ss-section-head">
-            <span className="ss-section-title">{t.settingsThemeSection}</span>
-            <span className="ss-section-active">{activePreset.name}</span>
-          </div>
-          <ThemePicker activePreset={activePreset} onSelect={setPreset} />
-        </div>
+            <div className="ss-section">
+              <div className="ss-section-head">
+                <span className="ss-section-title">{t.settingsThemeSection}</span>
+                <span className="ss-section-active">{activePreset.name}</span>
+              </div>
+              <ThemePicker activePreset={activePreset} onSelect={setPreset} />
+            </div>
+          </>
+        )}
       </div>
     </BottomSheet>
   );
