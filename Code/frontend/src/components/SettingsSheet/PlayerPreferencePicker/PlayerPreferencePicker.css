@@ -1,73 +1,31 @@
 @reference "../../../styles/index.css";
 
-.ppp-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px 16px 24px;
+.ppp-wrap {
+  padding: 0 16px;
 }
 
-.ppp-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 12px;
+.ppp-select {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 10px;
   border: 2px solid var(--app-border);
   background: var(--app-surface);
-  cursor: pointer;
+  color: var(--app-text);
   font: inherit;
-  text-align: left;
-  width: 100%;
-  transition: border-color 0.15s, background 0.15s;
-  -webkit-tap-highlight-color: transparent;
-  min-height: 56px;
-}
-
-.ppp-card:active { opacity: 0.85; }
-
-.ppp-card--active {
-  border-color: var(--app-primary);
-  background: var(--app-surface-2);
-}
-
-.ppp-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgb(from var(--app-primary) r g b / 0.15);
-  color: var(--app-primary);
-  font-size: 0.9rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.ppp-avatar--none {
-  background: var(--app-surface-raised);
-  color: var(--app-text-muted);
-}
-
-.ppp-name {
-  flex: 1;
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--app-text);
+  cursor: pointer;
+  appearance: auto;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.15s;
 }
 
-.ppp-check {
-  font-size: 1.1rem;
-  color: var(--app-primary);
-  flex-shrink: 0;
-  width: 20px;
-  text-align: center;
+.ppp-select:focus {
+  outline: none;
+  border-color: var(--app-primary);
 }
 
-.ppp-loading {
-  padding: 16px;
-  text-align: center;
-  color: var(--app-text-muted);
-  font-size: 14px;
+.ppp-select:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
