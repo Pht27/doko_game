@@ -4,6 +4,7 @@ import type { PlayerListItem, PlayerDetail } from '@/types/analog';
 import { StatusState } from '@/components/StatusState/StatusState';
 import { MultiLineChart, MAX_ROUNDS } from '../MultiLineChart/MultiLineChart';
 import type { ChartSeries } from '../MultiLineChart/MultiLineChart';
+import { usePlayerPreference } from '@/context/PlayerPreferenceContext';
 
 export type DetailState = PlayerDetail | 'loading' | 'error';
 
@@ -18,6 +19,8 @@ export function ExpandableRow({
   onToggle: () => void;
   onExpand: () => void;
 }) {
+  const { selectedPlayer } = usePlayerPreference();
+  const isSelected = selectedPlayer?.id === player.id;
   const positive = player.totalPoints >= 0;
   const winPct = Math.round((player.winRate ?? 0) * 100);
   const avgSign = player.avgPointsPerGame >= 0 ? '+' : '';
@@ -42,7 +45,7 @@ export function ExpandableRow({
   return (
     <div style={{ borderBottom: '1px solid var(--app-border)' }}>
       <div
-        className={`alb-row-head${expanded ? ' alb-row-head--open' : ''}`}
+        className={`alb-row-head${expanded ? ' alb-row-head--open' : ''}${isSelected ? ' alb-row-head--selected' : ''}`}
         onClick={handleHeadClick}
         role="button"
         aria-expanded={expanded}

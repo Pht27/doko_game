@@ -156,6 +156,16 @@
 .alb-row-head:active,
 .alb-row-head--open { background: var(--alb-surface); }
 
+.alb-row-head--selected {
+  border-left: 3px solid var(--app-primary);
+  background: rgb(from var(--app-primary) r g b / 0.07);
+}
+
+.alb-row-head--selected:active,
+.alb-row-head--selected.alb-row-head--open {
+  background: rgb(from var(--app-primary) r g b / 0.12);
+}
+
 .alb-row-rank-wrap {
   display: flex;
   align-items: center;

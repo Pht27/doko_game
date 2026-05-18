@@ -15,8 +15,12 @@
   <body>
     <script>
       (function () {
-        var n = localStorage.getItem('doko-theme-neutral') || 'navy';
-        var a = localStorage.getItem('doko-theme-accent') || 'indigo';
+        var validN = ['navy', 'rose', 'classic', 'cherry'];
+        var validA = ['indigo', 'rose', 'classic', 'cherry'];
+        var n = localStorage.getItem('doko-theme-neutral');
+        var a = localStorage.getItem('doko-theme-accent');
+        n = validN.includes(n) ? n : 'classic';
+        a = validA.includes(a) ? a : 'classic';
         document.documentElement.classList.add('neutral-' + n, 'accent-' + a);
       })();
     </script>

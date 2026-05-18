@@ -3,6 +3,7 @@ import type { PlayerListItem } from '@/types/analog';
 import { t } from '@/utils/translations';
 import { ToggleSwitch } from '@/components/ToggleSwitch/ToggleSwitch';
 import { FormError } from '@/components/FormError/FormError';
+import { usePlayerPreference } from '@/context/PlayerPreferenceContext';
 
 interface PlayerRowProps {
   player: PlayerListItem;
@@ -12,6 +13,8 @@ interface PlayerRowProps {
 }
 
 export function PlayerRow({ player, onNavigate, onToggle, onRename }: PlayerRowProps) {
+  const { selectedPlayer } = usePlayerPreference();
+  const isSelected = selectedPlayer?.id === player.id;
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState('');
   const [renameError, setRenameError] = useState<string | null>(null);
@@ -52,7 +55,7 @@ export function PlayerRow({ player, onNavigate, onToggle, onRename }: PlayerRowP
   };
 
   return (
-    <div className={`ap-row${player.isActive ? '' : ' ap-row--inactive'}${leaving ? ' ap-row--leaving' : ''}`}>
+    <div className={`ap-row${player.isActive ? '' : ' ap-row--inactive'}${leaving ? ' ap-row--leaving' : ''}${isSelected ? ' ap-row--selected' : ''}`}>
       {editing ? (
         <div className="ap-edit-area" onClick={(e) => e.stopPropagation()}>
           <input

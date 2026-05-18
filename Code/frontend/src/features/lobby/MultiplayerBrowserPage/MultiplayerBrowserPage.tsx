@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { t } from '@/utils/translations';
 import { BackButton } from '@/components/BackButton/BackButton';
-import { listLobbies, createLobby, leaveLobby } from '@/api/lobby';
+import { listLobbies, createLobby, leaveLobby, setLobbyPlayerName } from '@/api/lobby';
 import { saveLobbySession, clearLobbySession, loadAnySession } from '@/hooks/useLobby';
+import { usePlayerPreference } from '@/context/PlayerPreferenceContext';
 import { LobbyDetailView } from './LobbyDetailView/LobbyDetailView';
 import type { LobbyListItemResponse } from '@/api/lobby';
 import type { LobbySession } from '@/hooks/useLobby';
@@ -23,6 +24,7 @@ export function MultiplayerBrowserPage({
   onGameStarted,
   lastFinishedResult,
 }: MultiplayerBrowserPageProps) {
+  const { selectedPlayer } = usePlayerPreference();
   const [lobbies, setLobbies] = useState<LobbyListItemResponse[]>([]);
   const [creating, setCreating] = useState(false);
   const [hasFetchedLobbies, setHasFetchedLobbies] = useState(false);
@@ -71,10 +73,18 @@ export function MultiplayerBrowserPage({
       const session: LobbySession = {
         lobbyId: res.lobbyId,
         token: res.token,
-
         seatIndex: res.seatIndex,
       };
       saveLobbySession(session);
+
+      if (selectedPlayer) {
+        try {
+          await setLobbyPlayerName(session.token, res.lobbyId, selectedPlayer.name);
+        } catch {
+          // best-effort
+        }
+      }
+
       // Refresh list before selecting so the lobby is already in lobbies
       // when the "disappeared from list" effect runs.
       await fetchLobbies();

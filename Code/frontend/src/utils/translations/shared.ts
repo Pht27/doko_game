@@ -16,6 +16,12 @@ export const shared = {
   reLabelShort: 'RE',
   kontraLabelShort: 'KO',
 
+  // ── Settings ───────────────────────────────────────────────────────────────
+  settingsTitle: 'Einstellungen',
+  settingsThemeSection: 'Theme',
+  settingsPlayerSection: 'Mein Spieler',
+  settingsNoPlayer: 'Kein Spieler (Standard)',
+
   // ── BackButton ─────────────────────────────────────────────────────────────
   backAriaLabel: 'Zurück',
 

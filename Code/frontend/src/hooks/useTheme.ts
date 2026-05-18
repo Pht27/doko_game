@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-export const NEUTRALS = ['navy', 'rose', 'aqua', 'classic', 'cherry', 'nautical'] as const;
-export const ACCENTS  = ['indigo', 'rose', 'aqua', 'classic', 'cherry', 'nautical'] as const;
+export const NEUTRALS = ['navy', 'rose', 'classic', 'cherry'] as const;
+export const ACCENTS  = ['indigo', 'rose', 'classic', 'cherry'] as const;
 
 export type Neutral = (typeof NEUTRALS)[number];
 export type Accent  = (typeof ACCENTS)[number];
@@ -15,12 +15,10 @@ export interface Preset {
 }
 
 export const PRESETS: Preset[] = [
-  { id: 'default',  name: 'Default',  neutral: 'navy',     accent: 'indigo',   swatches: ['#1a1a2e', '#22223a', '#818cf8', '#c084fc'] },
-  { id: 'rose',     name: 'Rosé',     neutral: 'rose',     accent: 'rose',     swatches: ['#FAE4EE', '#F0C0D6', '#3A70C8', '#D43060'] },
-  { id: 'aqua',     name: 'Aqua',     neutral: 'aqua',     accent: 'aqua',     swatches: ['#D8F0F2', '#B0D8DC', '#0E8898', '#CC1010'] },
   { id: 'classic',  name: 'Classic',  neutral: 'classic',  accent: 'classic',  swatches: ['#E8ECF2', '#D0D8E8', '#2860B0', '#2D7D42'] },
+  { id: 'rose',     name: 'Rosé',     neutral: 'rose',     accent: 'rose',     swatches: ['#FAE4EE', '#F0C0D6', '#3A70C8', '#D43060'] },
   { id: 'cherry',   name: 'Cherry',   neutral: 'cherry',   accent: 'cherry',   swatches: ['#F8E0DC', '#F0B8B0', '#880008', '#B81818'] },
-  { id: 'nautical', name: 'Nautical', neutral: 'nautical', accent: 'nautical', swatches: ['#D0E4F0', '#A8CCDE', '#002C54', '#C5001A'] },
+  { id: 'default',  name: 'Nacht',    neutral: 'navy',     accent: 'indigo',   swatches: ['#1a1a2e', '#22223a', '#818cf8', '#c084fc'] },
 ];
 
 const STORAGE_NEUTRAL = 'doko-theme-neutral';
@@ -28,12 +26,12 @@ const STORAGE_ACCENT  = 'doko-theme-accent';
 
 function readNeutral(): Neutral {
   const stored = localStorage.getItem(STORAGE_NEUTRAL);
-  return (NEUTRALS as readonly string[]).includes(stored ?? '') ? (stored as Neutral) : 'navy';
+  return (NEUTRALS as readonly string[]).includes(stored ?? '') ? (stored as Neutral) : 'classic';
 }
 
 function readAccent(): Accent {
   const stored = localStorage.getItem(STORAGE_ACCENT);
-  return (ACCENTS as readonly string[]).includes(stored ?? '') ? (stored as Accent) : 'indigo';
+  return (ACCENTS as readonly string[]).includes(stored ?? '') ? (stored as Accent) : 'classic';
 }
 
 function applyClasses(neutral: Neutral, accent: Accent) {
