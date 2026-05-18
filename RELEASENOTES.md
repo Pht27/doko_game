@@ -3,6 +3,7 @@
 ## [1.5.0] - 2026-05-18
 
 ### Neu
+- **Datenbankimport**: Ein ETL-Skript (`docs/migration/etl_mysql_to_postgres.py`) wandelt ein MySQL-Backup-Dump in das lokale Postgres-Schema um und importiert es. Anschließend kann der Datenbankstand mit `push_to_server.sh` auf Prod oder Staging übertragen werden. Der vollständige Workflow ist in `docs/migration/README.md` dokumentiert.
 - **Einstellungen**: Über das ⚙️-Symbol unten rechts auf der Startseite öffnet sich ein neues Einstellungsmenü. Dort lässt sich das Theme wählen (bisher eigener Palette-Button) und ein persönlicher Spieler auswählen.
 - **Mein Spieler**: Wer seinen Spieler in den Einstellungen auswählt, profitiert von mehreren Komforts: In der Spielerliste und der Bestenliste wird der eigene Eintrag subtil hervorgehoben; im Spielverlauf erscheint der eigene Name farbig. Beim Eintragen eines neuen Spiels wird das Re-Team automatisch mit dem eigenen Spieler vorausgefüllt. Beim Beitreten einer Lobby wird der Name automatisch gesetzt.
 
