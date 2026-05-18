@@ -1,13 +1,7 @@
+import type React from 'react';
 import { PRESETS } from '@/hooks/useTheme';
 import type { Preset } from '@/hooks/useTheme';
 import './ThemePicker.css';
-
-const PRESET_DESCS: Record<string, string> = {
-  classic:  'Klassisches Weiß',
-  rose:     'Helles Rosa',
-  cherry:   'Helles Kirschrot',
-  default:  'Dunkles Navy-Blau',
-};
 
 interface ThemePickerProps {
   activePreset: Preset;
@@ -16,23 +10,28 @@ interface ThemePickerProps {
 
 export function ThemePicker({ activePreset, onSelect }: ThemePickerProps) {
   return (
-    <div className="tp-body">
+    <div className="tp-strip">
       {PRESETS.map(preset => (
         <button
           key={preset.id}
           className={`tp-card${preset.id === activePreset.id ? ' tp-card--active' : ''}`}
           onClick={() => onSelect(preset)}
+          style={{ '--tp-accent': preset.swatches[2] } as React.CSSProperties}
         >
-          <div className="tp-swatches">
-            {preset.swatches.map((color, i) => (
-              <div key={i} className="tp-swatch" style={{ background: color }} />
-            ))}
+          <div className="tp-preview" style={{ background: preset.swatches[0] }}>
+            <div className="tp-preview-top" style={{ background: preset.swatches[2] }}>
+              <div className="tp-preview-dot" />
+            </div>
+            <div className="tp-preview-body" style={{ background: preset.swatches[1] }}>
+              <div className="tp-preview-row" />
+              <div className="tp-preview-row" />
+              <div className="tp-preview-row tp-preview-row--accent" />
+            </div>
           </div>
-          <div className="tp-card-info">
-            <span className="tp-card-name">{preset.name}</span>
-            <span className="tp-card-desc">{PRESET_DESCS[preset.id]}</span>
+          <div className="tp-name">
+            <span>{preset.name}</span>
+            {preset.id === activePreset.id && <div className="tp-check">✓</div>}
           </div>
-          <div className="tp-check">{preset.id === activePreset.id ? '✓' : ''}</div>
         </button>
       ))}
     </div>

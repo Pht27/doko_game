@@ -1,51 +1,36 @@
 @reference "../../styles/index.css";
 
-.ss-rows {
-  display: flex;
-  flex-direction: column;
-  padding: 8px 0 16px;
+.ss-body {
+  padding: 4px 0 16px;
 }
 
-.ss-row {
+.ss-section {
+  padding: 6px 0 16px;
+}
+
+.ss-section-head {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
-  gap: 12px;
-  padding: 16px;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font: inherit;
-  width: 100%;
-  text-align: left;
-  border-bottom: 1px solid var(--app-border);
-  -webkit-tap-highlight-color: transparent;
-  transition: background 0.12s;
+  padding: 8px 16px 10px;
 }
 
-.ss-row:last-child {
-  border-bottom: none;
-}
-
-.ss-row:active {
-  background: var(--app-surface-hover);
-}
-
-.ss-row-label {
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--app-text);
-}
-
-.ss-row-value {
-  font-size: 15px;
+.ss-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
   color: var(--app-text-muted);
-  flex-shrink: 0;
 }
 
-/* ThemePicker uses flex:1 designed for a standalone sheet — reset it here */
-.bottom-sheet-panel .tp-body {
-  flex: none;
-  overflow-y: visible;
-  padding-bottom: 16px;
+.ss-section-active {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--app-text-sub);
+}
+
+.ss-divider {
+  height: 1px;
+  background: var(--app-divider);
+  margin: 0 16px;
 }

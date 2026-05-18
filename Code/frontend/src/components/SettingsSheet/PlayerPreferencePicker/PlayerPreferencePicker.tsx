@@ -5,11 +5,7 @@ import { t } from '@/utils/translations';
 import type { PlayerListItem } from '@/types/analog';
 import './PlayerPreferencePicker.css';
 
-interface PlayerPreferencePickerProps {
-  onSelect?: () => void;
-}
-
-export function PlayerPreferencePicker({ onSelect }: PlayerPreferencePickerProps) {
+export function PlayerPreferencePicker() {
   const { selectedPlayer, setSelectedPlayer, clearSelectedPlayer } = usePlayerPreference();
   const [players, setPlayers] = useState<PlayerListItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,30 +20,30 @@ export function PlayerPreferencePicker({ onSelect }: PlayerPreferencePickerProps
       .catch(() => setLoading(false));
   }, []);
 
+  function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const val = e.target.value;
+    if (val === '') {
+      clearSelectedPlayer();
+    } else {
+      const id = Number(val);
+      const player = players.find(p => p.id === id);
+      if (player) setSelectedPlayer(player.id, player.name);
+    }
+  }
+
   return (
-    <div className="ppp-list">
-      <button
-        className={`ppp-card${selectedPlayer === null ? ' ppp-card--active' : ''}`}
-        onClick={() => { clearSelectedPlayer(); onSelect?.(); }}
+    <div className="ppp-wrap">
+      <select
+        className="ppp-select"
+        value={selectedPlayer?.id ?? ''}
+        onChange={handleChange}
+        disabled={loading}
       >
-        <div className="ppp-avatar ppp-avatar--none">–</div>
-        <span className="ppp-name">{t.settingsNoPlayer}</span>
-        {selectedPlayer === null && <span className="ppp-check">✓</span>}
-      </button>
-
-      {loading && <div className="ppp-loading">{t.loading}</div>}
-
-      {!loading && players.map((p) => (
-        <button
-          key={p.id}
-          className={`ppp-card${selectedPlayer?.id === p.id ? ' ppp-card--active' : ''}`}
-          onClick={() => { setSelectedPlayer(p.id, p.name); onSelect?.(); }}
-        >
-          <div className="ppp-avatar">{p.name[0].toUpperCase()}</div>
-          <span className="ppp-name">{p.name}</span>
-          {selectedPlayer?.id === p.id && <span className="ppp-check">✓</span>}
-        </button>
-      ))}
+        <option value="">{t.settingsNoPlayer}</option>
+        {players.map((p) => (
+          <option key={p.id} value={p.id}>{p.name}</option>
+        ))}
+      </select>
     </div>
   );
 }
